@@ -405,16 +405,12 @@
     flex-direction: column;
     gap: 10px;
     align-items: stretch;
+    overflow-x: hidden; /* clip 200%-width strip before 50% scale */
   }
   .sheet.has-lib-preview .tab-wrap {
     order: 0;
-    gap: 0;
-    row-gap: 0;
+    gap: 8px;
     align-items: flex-start;
-  }
-  /* Library strip at true 50% — JS sets negative margins from each card's box */
-  .sheet.has-lib-preview .tab-wrap .phrase {
-    transform: scale(0.5);
     transform-origin: top left;
   }
   .sheet.has-lib-preview .tab-wrap .phrase.playing {
@@ -2175,20 +2171,31 @@ function syncAllPlaySelections() {
 }
 var libPreviewQueue = []; // [{name, src}] — multiple native-size previews on the same screen
 function compactLibraryStrip(on) {
-  document.querySelectorAll("#tabWrap .phrase").forEach(function(el){
+  var wrap = document.getElementById("tabWrap");
+  if (!wrap) return;
+  // Clear any old per-card hacks
+  wrap.querySelectorAll(".phrase").forEach(function(el){
     el.style.transform = "";
     el.style.transformOrigin = "";
     el.style.marginRight = "";
     el.style.marginBottom = "";
-    if (!on) return;
-    // Measure full size, then scale visually to 50% and reclaim layout space
-    var w = el.offsetWidth;
-    var h = el.offsetHeight;
-    el.style.transform = "scale(0.5)";
-    el.style.transformOrigin = "top left";
-    el.style.marginRight = (-Math.round(w / 2)) + "px";
-    el.style.marginBottom = (-Math.round(h / 2)) + "px";
   });
+  if (!on) {
+    wrap.style.transform = "";
+    wrap.style.transformOrigin = "";
+    wrap.style.width = "";
+    wrap.style.marginBottom = "";
+    return;
+  }
+  // Scale the whole strip as one unit so spacing stays even
+  wrap.style.transform = "";
+  wrap.style.marginBottom = "";
+  wrap.style.width = "200%"; // wrap as if double-width, then scale to 50% => normal width
+  wrap.style.transformOrigin = "top left";
+  // force layout at 200% width
+  var h = wrap.scrollHeight;
+  wrap.style.transform = "scale(0.5)";
+  wrap.style.marginBottom = (-Math.round(h / 2)) + "px";
 }
 function renderLibraryPreviewBoard() {
   var sheet = document.getElementById("licks");
@@ -2577,6 +2584,32 @@ function toggleEls(els) {
   relayout();
 }
 function revealKind(kind) {
+  // SBS / Paranoid: A/B/C/D filters the strip to that kind at normal card scale (no cover-flip / no scatter)
+  if (COVER[currentLetter]) {
+    var phrases = [].slice.call(document.querySelectorAll(".phrase"));
+    var showingOnly = phrases.length && phrases.every(function(el){
+      var match = lickKind(el.getAttribute("data-name")) === kind;
+      return match ? !el.classList.contains("filtered-out") : el.classList.contains("filtered-out");
+    });
+    var tabWrap = document.getElementById("tabWrap");
+    var board = document.getElementById("coverBoard");
+    phrases.forEach(function(el){
+      el.classList.remove("flipped");
+      if (showingOnly) el.classList.remove("filtered-out");
+      else el.classList.toggle("filtered-out", lickKind(el.getAttribute("data-name")) !== kind);
+      if (tabWrap) tabWrap.appendChild(el);
+    });
+    if (board) {
+      board.innerHTML = "";
+      board.className = "cover-board hidden";
+    }
+    if (document.getElementById("licks") &&
+        document.getElementById("licks").classList.contains("has-lib-preview")) {
+      compactLibraryStrip(true);
+      requestAnimationFrame(function(){ compactLibraryStrip(true); });
+    }
+    return;
+  }
   toggleEls([].filter.call(document.querySelectorAll(".phrase"), function(el){
     return lickKind(el.getAttribute("data-name")) === kind;
   }));
@@ -2586,6 +2619,22 @@ function showKind(kind) {
     return lickKind(el.getAttribute("data-name")) === kind;
   });
   if (!els.length) return;
+  if (COVER[currentLetter]) {
+    var tabWrap = document.getElementById("tabWrap");
+    var board = document.getElementById("coverBoard");
+    document.querySelectorAll(".phrase").forEach(function(el){
+      el.classList.remove("flipped");
+      el.classList.toggle("filtered-out", lickKind(el.getAttribute("data-name")) !== kind);
+      if (tabWrap) tabWrap.appendChild(el);
+    });
+    if (board) { board.innerHTML = ""; board.className = "cover-board hidden"; }
+    if (document.getElementById("licks") &&
+        document.getElementById("licks").classList.contains("has-lib-preview")) {
+      compactLibraryStrip(true);
+      requestAnimationFrame(function(){ compactLibraryStrip(true); });
+    }
+    return;
+  }
   els.forEach(function(el){ el.classList.remove("flipped"); });
   relayout();
 }
