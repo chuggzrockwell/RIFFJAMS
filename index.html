@@ -1,0 +1,2812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIFFJAMS</title>
+<style>
+  @font-face {
+    font-family: "SBS Title";
+    src: url("fonts/MetalMania-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "Paranoid Title";
+    src: url("fonts/BlackOpsOne-Regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+  }
+  html, body { margin: 0; height: 100%; font-family: "Segoe UI", system-ui, sans-serif; }
+  body.home-mode { background: #0e0f12; color: #f3f3f1; }
+  body.sheet-mode {
+    background: #0b0d11;
+    background-image:
+      radial-gradient(ellipse 90% 60% at 50% 0%, #1a2030 0%, transparent 55%),
+      radial-gradient(circle at 20% 80%, rgba(80,40,120,.12), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(120,20,30,.1), transparent 42%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.015) 0 1px, transparent 1px 48px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 48px);
+    color: #e8e6e1;
+  }
+  .wrap { width: 100%; padding: 10px 8px 28px; box-sizing: border-box; }
+  h1 { margin: 0 0 10px 6px; font-size: 0.95rem; letter-spacing: .08em; text-transform: uppercase; color: #c2c2be; font-weight: 600; }
+  .grid {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px; width: 100%; max-width: 920px;
+  }
+  .tile {
+    display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end;
+    width: 100%; aspect-ratio: 1 / 1; height: auto; padding: 24px 28px; border: 0; border-radius: 14px;
+    box-sizing: border-box; overflow: hidden;
+    cursor: pointer; color: #fff; font-size: clamp(2rem, 8vw, 4.5rem); font-weight: 800;
+    text-align: left; box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  }
+  .tile small { font-size: 1rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 6px; }
+  .tile.a {
+    background: #000 url("covers/sbs.png") center / cover no-repeat;
+    color: transparent;
+  }
+  .tile.a small { color: transparent; }
+  .tile.b {
+    background: #000 url("covers/paranoid.png") center / cover no-repeat;
+    color: transparent;
+  }
+  .tile.b small { color: transparent; }
+  .tile.hp {
+    background: #000 url("covers/sabbath-hp-tile.png") center / cover no-repeat;
+    color: transparent;
+  }
+  .tile.hp small { color: transparent; }
+  .tile.c { background: #ffe44a; color: #111; }
+  .tile.d { background: #ff3d4e; }
+  .tile:hover { filter: brightness(1.12); }
+  .hidden { display: none !important; }
+  .bar { display: flex; align-items: center; gap: 12px; margin: 0 0 12px 4px; }
+  .back {
+    background: transparent; color: inherit; border: 1px solid #bbb;
+    border-radius: 999px; padding: 6px 14px; cursor: pointer;
+  }
+  body.sheet-mode .back { border-color: #4a4e5a; color: #e8e6e1; }
+  body.sheet-mode .count, body.sheet-mode .keys { opacity: .55; color: #c8c6c0; }
+  body.sections-mode {
+    background: #fff;
+    background-image: none;
+    color: #111;
+  }
+  body.sections-mode .back { border-color: #333; color: #111; }
+  body.sections-mode .count, body.sections-mode .keys { opacity: .55; color: #444; }
+  .badge { font-size: 1.15rem; font-weight: 800; padding: 4px 12px; border-radius: 8px; color: #111; }
+  .badge.a { background: #3ec8ff; } .badge.b { background: #3ee45e; }
+  .badge.c { background: #ffe44a; } .badge.d { background: #ff3d4e; }
+  .count { opacity: .65; font-size: 0.9rem; }
+  .keys { margin-left: auto; opacity: .5; font-size: 0.78rem; letter-spacing: .04em; }
+  .phrase.filtered-out { display: none !important; }
+
+  .sec-filters {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+    margin: 0 0 12px; padding: 8px 10px;
+    background: rgba(0,0,0,.03);
+    border-radius: 10px;
+    user-select: none;
+  }
+  .sec-filter-group {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  }
+  .sec-filter-label {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; color: rgba(0,0,0,.38);
+    margin-right: 2px;
+  }
+  .sec-filter-btn {
+    border: 1px solid rgba(0,0,0,.12);
+    background: #fff;
+    color: #333;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 0.72rem; font-weight: 700;
+    cursor: pointer;
+    line-height: 1.3;
+  }
+  .sec-filter-btn:hover { border-color: rgba(112,48,160,.45); }
+  .sec-filter-btn.on {
+    background: #7030a0; color: #fff; border-color: #7030a0;
+  }
+  .sec-filter-btn.tier.on.t1 { background: #7030a0; border-color: #7030a0; }
+  .sec-filter-btn.tier.on.t2 { background: #a365d1; border-color: #a365d1; }
+  .sec-filter-btn.tier.on.t3 { background: #bc90da; border-color: #bc90da; color: #1a1020; }
+  .sec-filter-btn.tier.on.t4 { background: #d4bbe3; border-color: #d4bbe3; color: #1a1020; }
+  .sec-filter-btn.tier.on.t5 { background: #f3edf7; border-color: #c9b3d9; color: #1a1020; }
+  .sec-filter-clear {
+    margin-left: auto;
+    border: 0; background: transparent;
+    color: rgba(0,0,0,.45); font-size: 0.72rem; font-weight: 600;
+    cursor: pointer; text-decoration: underline;
+  }
+  .sec-filter-clear:hover { color: #7030a0; }
+
+  .sec-modes {
+    display: flex; gap: 6px; align-items: center;
+    margin: 0 0 10px;
+  }
+  .sec-mode-btn {
+    border: 1px solid rgba(0,0,0,.14);
+    background: #fff;
+    color: rgba(0,0,0,.55);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 0.78rem; font-weight: 700;
+    cursor: pointer;
+  }
+  .sec-mode-btn.on {
+    background: #111; color: #fff; border-color: #111;
+  }
+  .sec-edit-tools {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+  }
+  body.sections-edit .sec-edit-tools {
+    display: inline-flex;
+  }
+  .sec-edit-tools[hidden] { display: none !important; }
+  body.sections-edit .sec-edit-tools:not([hidden]) {
+    display: inline-flex;
+  }
+  .sec-tool-btn {
+    border: 1px solid rgba(0,0,0,.14);
+    background: #fff;
+    color: rgba(0,0,0,.7);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 0.78rem; font-weight: 700;
+    cursor: pointer;
+  }
+  .sec-tool-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .sec-tool-btn.primary {
+    background: #7030a0;
+    border-color: #7030a0;
+    color: #fff;
+  }
+  .sec-tool-btn.primary.saved {
+    background: #2e8b57;
+    border-color: #2e8b57;
+  }
+  .sec-save-status {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(0,0,0,.45);
+    min-width: 4em;
+  }
+  body.sections-edit .sec-filters { opacity: .55; pointer-events: none; }
+
+  body.sections-play .sec-filters { opacity: 1; }
+  body.sections-edit .sec-play-pane,
+  body.sections-mode:not(.sections-play) .sec-play-pane { display: none; }
+  /* Map tab: play pane off — Play lives in a second window */
+  body.sections-play .sec-play-pane { display: none !important; }
+  body.playboard-mode {
+    background: #0a0a0c;
+    margin: 0;
+    min-height: 100vh;
+  }
+  body.playboard-mode .wrap {
+    padding: 12px;
+    max-width: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  body.playboard-mode #playboardRoot {
+    width: 100%;
+    height: calc(100vh - 24px);
+  }
+  body.playboard-mode .sec-play-pane {
+    display: flex !important;
+    position: relative;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    flex: 1 1 auto;
+    border-radius: 12px;
+  }
+  .album-art-cell { display: none !important; }
+  .sec-head-label.album { display: none !important; }
+  body.sections-play #sectionsSheet {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    align-items: stretch !important;
+  }
+  body.sections-play .sections-wrap {
+    --grid-left: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w));
+    width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w));
+    max-width: none;
+    flex: 0 0 auto;
+  }
+  .sections-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+  }
+  .sections-layout .sections-wrap {
+    flex: 0 0 auto;
+  }
+  body.sections-play .sections-layout {
+    gap: 8px;
+    width: 100%;
+  }
+  body.sections-play .sections-layout .sections-wrap {
+    flex: 0 0 auto;
+    width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w));
+  }
+  .sec-play-pane {
+    display: none;
+    position: sticky;
+    top: 8px;
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    height: calc(100vh - 110px);
+    max-height: calc(100vh - 110px);
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    background: #0e0e10;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,.14);
+    box-shadow: 0 8px 28px rgba(0,0,0,.18);
+    overflow: hidden;
+  }
+  .sec-play-meta {
+    flex: 0 0 auto;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255,255,255,.65);
+    letter-spacing: .02em;
+  }
+  .sec-play-meta strong { color: #fff; font-weight: 800; }
+  .sec-play-board {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    align-items: flex-start;
+    gap: 8px;
+    overflow: hidden;
+  }
+  .sec-play-card {
+    position: relative;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    background: transparent;
+    border: 0;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 8px 14px;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+  .sec-play-card:hover .face { filter: brightness(1.03); }
+  .sec-play-card:active .face { transform: scale(0.99); }
+  .sec-play-card .face {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow:
+      0 0 6px 1px rgba(163,73,164,.95),
+      0 0 18px 4px rgba(163,73,164,.7),
+      0 0 40px 10px rgba(163,73,164,.4);
+  }
+  .sec-play-card.tier-1 .face {
+    box-shadow:
+      0 0 6px 1px rgba(112,48,160,.95),
+      0 0 18px 4px rgba(112,48,160,.7),
+      0 0 40px 10px rgba(112,48,160,.4);
+  }
+  .sec-play-card.tier-2 .face {
+    box-shadow:
+      0 0 6px 1px rgba(163,101,209,.95),
+      0 0 18px 4px rgba(163,101,209,.7),
+      0 0 40px 10px rgba(163,101,209,.4);
+  }
+  .sec-play-card.tier-3 .face {
+    box-shadow:
+      0 0 6px 1px rgba(188,144,218,.9),
+      0 0 18px 4px rgba(188,144,218,.6),
+      0 0 40px 10px rgba(188,144,218,.35);
+  }
+  .sec-play-card.tier-4 .face {
+    box-shadow:
+      0 0 6px 1px rgba(212,187,227,.85),
+      0 0 18px 4px rgba(212,187,227,.55),
+      0 0 40px 10px rgba(212,187,227,.3);
+  }
+  .sec-play-card.tier-5 .face {
+    box-shadow:
+      0 0 6px 1px rgba(243,237,247,.9),
+      0 0 18px 4px rgba(200,180,220,.5),
+      0 0 40px 10px rgba(160,140,190,.25);
+  }
+  .sec-play-card img {
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    object-fit: contain;
+    background: #fff;
+    display: block;
+    border-radius: 10px;
+    image-rendering: crisp-edges;
+  }
+  .sec-play-card .ref {
+    position: absolute;
+    top: 8px; left: 10px;
+    z-index: 2;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(0,0,0,.72);
+    color: #fff;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+    pointer-events: none;
+  }
+  .sec-play-card .cap {
+    margin-top: 6px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: rgba(255,255,255,.7);
+    text-align: center;
+  }
+  .sec-play-empty {
+    color: rgba(255,255,255,.45);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    padding: 24px 8px;
+    text-align: center;
+    width: 100%;
+  }
+  .sec-chip.playing {
+    outline: 2px solid #111;
+    outline-offset: -2px;
+    box-shadow: inset 0 0 0 2px #ffe44a !important;
+  }
+  .sec-chip.playing-offscreen {
+    outline: 2px dashed rgba(0,0,0,.35);
+    outline-offset: -2px;
+    box-shadow: inset 0 0 0 2px rgba(255,228,74,.45) !important;
+  }
+  .phrase.playing {
+    outline: 2px solid #ffe44a;
+    outline-offset: 2px;
+  }
+  .phrase.playing-offscreen {
+    outline: 2px dashed rgba(255,228,74,.45);
+    outline-offset: 2px;
+  }
+  .exclude-dd {
+    position: relative;
+    display: inline-block;
+  }
+  .exclude-dd-toggle {
+    border: 1px solid rgba(0,0,0,.14);
+    background: #fff;
+    color: #333;
+    border-radius: 999px;
+    padding: 3px 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    min-width: 72px;
+    text-align: left;
+  }
+  .exclude-dd-toggle.has-excludes {
+    background: #333;
+    color: #fff;
+    border-color: #333;
+  }
+  .exclude-dd-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 40;
+    min-width: 140px;
+    max-height: 240px;
+    overflow: auto;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.14);
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(0,0,0,.16);
+    padding: 6px;
+  }
+  .exclude-dd.open .exclude-dd-menu { display: block; }
+  .exclude-dd-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #222;
+    cursor: pointer;
+  }
+  .exclude-dd-item:hover { background: rgba(0,0,0,.05); }
+  .exclude-dd-item input { margin: 0; }
+    .song-thumb {
+    flex: 0 0 calc(var(--chip-h) - 6px);
+    width: calc(var(--chip-h) - 6px);
+    height: calc(var(--chip-h) - 6px);
+    max-width: calc(var(--chip-h) - 6px);
+    max-height: calc(var(--chip-h) - 6px);
+    object-fit: cover;
+    border-radius: 0;
+    display: block;
+    background: #111;
+    margin: 3px 4px 3px 3px;
+    box-sizing: border-box;
+  }
+  .song-name-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 0 0 var(--name-w);
+    width: var(--name-w);
+    min-width: var(--name-w);
+    max-width: var(--name-w);
+    height: var(--chip-h);
+    overflow: hidden;
+    border-radius: 8px 0 0 8px;
+    background: #fff;
+  }
+  .song-name-wrap.np-paranoid-wrap { background: #fff; }
+  .song-name-wrap.np-sbs-wrap { background: #f3edf7; }
+  .song-name-wrap.np-mor-wrap { background: #fff; }
+  .song-name-wrap .song-name {
+    flex: 1 1 auto;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    border-radius: 0;
+    height: 100%;
+  }
+  @media (max-width: 900px) {
+    .sections-layout { flex-direction: column; }
+    .sec-play-pane {
+      position: relative;
+      top: 0;
+      width: 100%;
+      height: 50vh;
+      max-height: 50vh;
+    }
+  }
+  body.sections-edit .sec-chip { cursor: pointer; }
+  body.sections-edit .sec-chip:not(.empty) {
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  body.sections-edit .sec-chip:not(.empty):active {
+    cursor: grabbing;
+  }
+  .sec-chip.dragging {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .sec-chip.drag-over {
+    outline: 2px solid #7030a0 !important;
+    outline-offset: -2px;
+    box-shadow: inset 0 0 0 2px rgba(112,48,160,.25) !important;
+  }
+  .sec-chip.drag-over-empty {
+    background: rgba(112,48,160,.12) !important;
+  }
+  body.sections-edit .sec-chip.empty {
+    color: rgba(0,0,0,.2) !important;
+    cursor: cell;
+  }
+  body.sections-edit .sec-chip.empty:hover {
+    background: rgba(112,48,160,.08) !important;
+  }
+  body.sections-edit .sec-chip:not(.empty):hover {
+    outline: 2px solid #7030a0; outline-offset: -2px;
+  }
+  .chip-editor {
+    position: fixed; z-index: 80;
+    min-width: 220px;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.12);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.2);
+    padding: 12px;
+    display: none;
+  }
+  .chip-editor.open { display: block; }
+  .chip-editor label {
+    display: block; font-size: 0.68rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    color: rgba(0,0,0,.4); margin: 0 0 4px;
+  }
+  .chip-editor input[type="text"] {
+    width: 100%; box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,.18);
+    border-radius: 8px; padding: 8px 10px;
+    font-size: 1rem; font-weight: 700; margin-bottom: 10px;
+  }
+  .chip-editor .tier-row { display: flex; gap: 6px; margin-bottom: 12px; }
+  .chip-editor .tier-pick {
+    width: 32px; height: 28px; border: 0; border-radius: 6px;
+    cursor: pointer; font-size: 0.7rem; font-weight: 800;
+  }
+  .chip-editor .tier-pick.t1 { background: #7030a0; color: #fff; }
+  .chip-editor .tier-pick.t2 { background: #a365d1; color: #fff; }
+  .chip-editor .tier-pick.t3 { background: #bc90da; color: #1a1020; }
+  .chip-editor .tier-pick.t4 { background: #d4bbe3; color: #1a1020; }
+  .chip-editor .tier-pick.t5 { background: #f3edf7; color: #1a1020; }
+  .chip-editor .tier-pick.on { outline: 2px solid #111; outline-offset: 1px; }
+  .chip-editor .editor-actions { display: flex; gap: 8px; align-items: center; }
+  .chip-editor .editor-actions button {
+    border: 0; border-radius: 8px; padding: 7px 12px;
+    font-size: 0.78rem; font-weight: 700; cursor: pointer;
+  }
+  .chip-editor .btn-save { background: #7030a0; color: #fff; }
+  .chip-editor .btn-cancel { background: #eee; color: #333; }
+  .chip-editor .btn-del { background: transparent; color: #c0392b; margin-left: auto; }
+  /* Filtered chips stay as empty cells so grid lines remain */
+  .sec-chip.filtered-out {
+    color: transparent !important;
+    background: rgba(0,0,0,.02) !important;
+    box-shadow: inset -1px 0 0 rgba(0,0,0,.1), inset 0 -1px 0 rgba(0,0,0,.1) !important;
+    pointer-events: none;
+    cursor: default;
+    filter: none !important;
+  }
+  .sheet {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 16px;
+    width: 100%;
+    background: linear-gradient(160deg, #1a1d26 0%, #12141a 40%, #0e1016 100%);
+    border: 1px solid #2c3040;
+    border-radius: 14px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.06),
+      inset 0 -40px 80px rgba(0,0,0,.35),
+      0 16px 48px rgba(0,0,0,.55);
+    padding: 12px;
+    box-sizing: border-box;
+  }
+  .tab-wrap { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; width: 100%; }
+  .cover-board {
+    display: flex; flex-direction: column; gap: 12px;
+    align-items: stretch; width: 100%; order: -1;
+  }
+  .group {
+    display: flex; flex-direction: row; flex-wrap: wrap;
+    gap: 6px; align-items: flex-start; width: 100%;
+  }
+  .group.tall-head {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 150px);
+    grid-auto-rows: 150px;
+    gap: 6px;
+    align-items: stretch;
+  }
+  .col-head {
+    width: 150px; height: 150px; box-sizing: border-box;
+    background: #050607; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 3rem; letter-spacing: .12em;
+    border-radius: 8px; flex: 0 0 150px;
+    box-shadow: 0 0 0 1px #22262f, 0 8px 20px rgba(0,0,0,.45);
+    cursor: pointer; user-select: none;
+  }
+  .col-head:hover { filter: brightness(1.15); }
+  .col-head.tall {
+    grid-row: span 2;
+    height: auto;
+    width: 150px;
+  }
+  .col-body {
+    display: contents;
+  }
+  .phrase {
+    box-sizing: border-box; padding: 0; cursor: grab;
+    border: 0; background: transparent; position: relative;
+    perspective: 900px;
+  }
+  .phrase:active { cursor: grabbing; }
+  .phrase.dragging { opacity: .4; }
+  .phrase.dragging .card-inner { }
+  .phrase img { pointer-events: none; display: block; }
+  .card-inner {
+    position: relative;
+  }
+  .phrase:not(.flipped) .card-inner {
+    /* ref anchors to card */
+  }
+  .face {
+    border-radius: 8px;
+  }
+  .face-tab { position: relative; }
+  .face-cover {
+    display: none;
+    position: absolute; inset: 0;
+    background: transparent;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .phrase img.tab {
+    width: auto; height: auto; max-width: none;
+    background: #fff; image-rendering: crisp-edges;
+    border-radius: 10px;
+  }
+  .phrase img.cover {
+    width: 100%; height: 100%; object-fit: cover;
+    border-radius: 8px; image-rendering: auto;
+  }
+  .phrase .ref {
+    display: none;
+    pointer-events: none;
+    z-index: 2;
+  }
+  /* face-up (tab showing): ID top-left */
+  .phrase:not(.flipped) .ref {
+    display: block;
+    position: absolute;
+    top: 8px; left: 10px;
+    margin: 0;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(0,0,0,.72);
+    color: #fff;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+  .phrase.song-im:not(.flipped) .ref { background: rgba(220,100,20,.92); }
+  .phrase.song-p:not(.flipped) .ref { background: rgba(200,30,40,.92); }
+  .phrase.song-wp:not(.flipped) .ref { background: rgba(30,140,70,.92); }
+  .phrase.song-lft:not(.flipped) .ref { background: rgba(40,140,210,.92); }
+  .phrase.song-kytl:not(.flipped) .ref { background: rgba(140,60,190,.92); }
+  .phrase.song-kytl2:not(.flipped) .ref { background: rgba(100,70,210,.92); }
+  .phrase.song-other:not(.flipped) .ref { background: rgba(0,0,0,.72); }
+
+  /* pedalboard glow on open tabs */
+  .phrase:not(.flipped) .face-tab {
+    border-radius: 10px;
+    overflow: visible;
+    background: transparent;
+  }
+  .phrase.a:not(.flipped) .face-tab {
+    box-shadow:
+      0 0 6px 1px rgba(163,73,164,.95),
+      0 0 18px 4px rgba(163,73,164,.7),
+      0 0 40px 10px rgba(163,73,164,.4);
+  }
+  .phrase.b:not(.flipped) .face-tab {
+    box-shadow:
+      0 0 6px 1px rgba(237,28,36,.95),
+      0 0 18px 4px rgba(237,28,36,.7),
+      0 0 40px 10px rgba(237,28,36,.4);
+  }
+  .phrase.c:not(.flipped) .face-tab {
+    box-shadow:
+      0 0 6px 1px rgba(255,210,40,.9),
+      0 0 18px 4px rgba(255,210,40,.55),
+      0 0 40px 10px rgba(255,210,40,.3);
+  }
+  .phrase.d:not(.flipped) .face-tab {
+    box-shadow:
+      0 0 6px 1px rgba(46,180,90,.95),
+      0 0 18px 4px rgba(46,180,90,.7),
+      0 0 40px 10px rgba(46,180,90,.4);
+  }
+  /* cover-up resting state: real album art, not the tab backface */
+  .phrase.flipped {
+    width: 150px; height: 150px;
+    border-radius: 8px;
+    background: transparent;
+    overflow: hidden;
+    box-shadow:
+      0 0 10px 2px rgba(255,255,255,.08),
+      0 8px 22px rgba(0,0,0,.65);
+  }
+  .phrase.a.flipped {
+    box-shadow:
+      0 0 8px 2px rgba(163,73,164,.55),
+      0 0 22px 6px rgba(163,73,164,.28),
+      0 8px 22px rgba(0,0,0,.65);
+  }
+  .phrase.b.flipped {
+    box-shadow:
+      0 0 8px 2px rgba(237,28,36,.55),
+      0 0 22px 6px rgba(237,28,36,.28),
+      0 8px 22px rgba(0,0,0,.65);
+  }
+  .phrase.d.flipped {
+    box-shadow:
+      0 0 8px 2px rgba(46,180,90,.55),
+      0 0 22px 6px rgba(46,180,90,.28),
+      0 8px 22px rgba(0,0,0,.65);
+  }
+  .phrase.flipped .card-inner {
+    width: 100%; height: 100%;
+    transform: none;
+  }
+  .phrase.flipped .face-tab { display: none; }
+  .phrase.flipped .face-cover {
+    display: block;
+    position: absolute; inset: 0;
+    transform: none;
+    background: transparent;
+  }
+  .phrase.flipped img.cover {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  .phrase.flipped .ref {
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; left: 0; right: 0; top: auto; bottom: 0;
+    height: 48px; padding: 0 4px;
+    background: rgba(0,0,0,.42); color: #fff;
+    border-radius: 0 0 8px 8px;
+    font-size: 22px; line-height: 1; letter-spacing: .04em;
+    font-weight: 400;
+    white-space: nowrap; overflow: hidden;
+    pointer-events: none;
+    max-width: none;
+  }
+  .phrase.a.flipped .ref {
+    font-family: "SBS Title", "Metal Mania", cursive;
+    font-size: 22px;
+    color: #fff;
+    background: rgba(0,0,0,.42);
+  }
+  .phrase.b.flipped .ref {
+    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-size: 20px;
+    color: #fff;
+    background: rgba(0,0,0,.42);
+  }
+  .phrase.d.flipped .ref {
+    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-size: 20px;
+    color: #fff;
+    background: rgba(0,0,0,.42);
+  }
+  .cover-board.shrunk .phrase.flipped {
+    width: 75px; height: 75px;
+  }
+  .cover-board.shrunk .phrase.flipped img.cover {
+    border-radius: 4px;
+  }
+  .cover-board.shrunk .phrase.flipped .face { border-radius: 4px; }
+  .cover-board.shrunk .phrase.flipped .ref {
+    height: 22px; padding: 0 2px; font-size: 10px;
+    border-radius: 0 0 4px 4px;
+    top: auto; left: 0; right: 0; bottom: 0;
+  }
+  .cover-board.shrunk .phrase.a.flipped .ref { font-size: 11px; }
+  .cover-board.shrunk .phrase.b.flipped .ref { font-size: 9px; }
+  .cover-board.shrunk .phrase.d.flipped .ref { font-size: 9px; }
+  .cover-board.shrunk .col-head {
+    width: 75px; height: 75px; flex-basis: 75px;
+    font-size: 1.6rem; border-radius: 4px;
+  }
+  .cover-board.shrunk .group.tall-head {
+    grid-template-columns: repeat(auto-fill, 75px);
+    grid-auto-rows: 75px;
+  }
+  .cover-board.shrunk .col-head.tall {
+    height: auto;
+    width: 75px;
+  }
+  .lightbox {
+    position: fixed; inset: 0; background: rgba(20,18,14,.82);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px; z-index: 20; cursor: zoom-out;
+  }
+  .lightbox img { max-width: 98vw; max-height: 94vh; background: #fff; border-radius: 4px; image-rendering: crisp-edges; }
+
+  #sectionsSheet {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 4px 8px !important;
+  }
+  /* Song lists + Excel-style grid; covers hug max chip column (Acrobat = 10) */
+  .sections-wrap {
+    --row-g: 28px;
+    --name-w: 200px;
+    --chip-w: 48px;
+    --chip-h: 28px;
+    --cols: 10;
+    --cover-rows: 6;
+    --cover: calc(var(--chip-h) * var(--cover-rows));
+    --grid-left: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w));
+    width: 100%;
+    max-width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w));
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .sec-head {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    height: 28px;
+    min-height: 28px;
+    margin: 0 0 2px;
+    user-select: none;
+    background: transparent;
+  }
+  .sec-head-label {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,.38);
+    background: transparent;
+    border: 0;
+    padding: 0 10px;
+  }
+  .sec-head-label.song {
+    flex: 0 0 calc(var(--row-g) + var(--name-w));
+    width: calc(var(--row-g) + var(--name-w));
+    min-width: calc(var(--row-g) + var(--name-w));
+    max-width: calc(var(--row-g) + var(--name-w));
+    justify-content: center;
+  }
+  .sec-head-label.section {
+    flex: 0 0 calc(var(--cols) * var(--chip-w));
+    width: calc(var(--cols) * var(--chip-w));
+    min-width: calc(var(--cols) * var(--chip-w));
+    max-width: calc(var(--cols) * var(--chip-w));
+    justify-content: center;
+  }
+  .sec-head-label.album {
+    flex: 0 0 calc(var(--cover) + 20px);
+    width: calc(var(--cover) + 20px);
+    min-width: calc(var(--cover) + 20px);
+    max-width: calc(var(--cover) + 20px);
+    justify-content: center;
+  }
+  .sec-ruler {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    height: 20px;
+    min-height: 20px;
+    margin: 0 0 6px;
+    user-select: none;
+    background: transparent;
+  }
+  .row-num {
+    flex: 0 0 var(--row-g);
+    width: var(--row-g); min-width: var(--row-g); max-width: var(--row-g);
+    height: var(--chip-h);
+    box-sizing: border-box;
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 0.62rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: rgba(0,0,0,.28);
+    background: transparent;
+    border: 0;
+  }
+  .sec-ruler .row-num {
+    height: 20px;
+    background: transparent;
+    color: transparent;
+  }
+  .sec-ruler .song-name {
+    height: 20px; max-height: 20px; line-height: 20px;
+    background: transparent !important;
+    color: transparent;
+    box-shadow: none !important;
+    padding: 0 10px;
+  }
+  .sec-ruler .song-name::before,
+  .sec-ruler .song-name::after { display: none !important; }
+  .col-num {
+    box-sizing: border-box;
+    width: var(--chip-w); min-width: var(--chip-w); max-width: var(--chip-w);
+    height: 20px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 0.6rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: rgba(0,0,0,.3);
+    background: transparent;
+    box-shadow: none;
+  }
+  .album-block {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    overflow: visible;
+    background: transparent;
+    box-shadow: none;
+    display: block;
+  }
+  .album-songs {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+  }
+  /* Album art vertically centered in that album's song stack */
+  .album-art-cell {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--grid-left);
+    width: calc(var(--cover) + 20px);
+    height: auto;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    z-index: 2;
+    background: transparent;
+    border: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .album-art-cell .album-cover-end { pointer-events: auto; }
+  .album-cover-end {
+    position: static;
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: calc(100% - 4px);
+    max-height: calc(100% - 16px);
+    aspect-ratio: 1 / 1;
+    flex: 0 0 auto;
+    object-fit: cover;
+    object-position: center;
+    background: #0a0a0a;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow:
+      0 1px 2px rgba(0,0,0,.35),
+      0 8px 24px rgba(0,0,0,.45),
+      0 18px 40px rgba(0,0,0,.25);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .album-art-cell:hover .album-cover-end {
+    transform: scale(1.03);
+    box-shadow:
+      0 2px 4px rgba(0,0,0,.4),
+      0 12px 32px rgba(0,0,0,.5),
+      0 24px 48px rgba(0,0,0,.3);
+  }
+
+  .song-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    height: var(--chip-h);
+    min-height: var(--chip-h);
+    max-height: var(--chip-h);
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+  .song-row:hover { background: rgba(112,48,160,.04); }
+  .song-secs {
+    display: flex; flex-wrap: nowrap; gap: 0; align-items: stretch;
+    flex: 0 0 auto;
+    min-width: 0;
+    margin-left: 0;
+  }
+  .sec-chip {
+    border: 0; cursor: pointer;
+    box-sizing: border-box;
+    width: var(--chip-w); min-width: var(--chip-w); max-width: var(--chip-w);
+    height: var(--chip-h); min-height: var(--chip-h); max-height: var(--chip-h);
+    padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 0;
+    font-weight: 800; font-size: 0.8rem;
+    letter-spacing: 0;
+    color: #fff;
+    background: #a064d0;
+    box-shadow: inset -1px 0 0 rgba(0,0,0,.14), inset 0 -1px 0 rgba(0,0,0,.14);
+  }
+  .sec-chip:hover { filter: brightness(1.12); }
+  .sec-chip:active { filter: brightness(.95); }
+  /* legacy shade aliases → Excel tiers */
+  .sec-chip.shade-0 { background: #7030a0; color: #fff; }
+  .sec-chip.shade-1 { background: #a365d1; color: #fff; }
+  .sec-chip.shade-2 { background: #bc90da; color: #1a1020; }
+  .sec-chip.shade-3 { background: #d4bbe3; color: #1a1020; }
+  .sec-chip.shade-4 { background: #f3edf7; color: #1a1020; }
+  .sec-chip.S { color: #ffe44a !important; }
+  .sec-chip.L { color: #7ec8ff !important; }
+  /* Must follow .S/.L so filtered chips actually clear */
+  .sec-chip.filtered-out,
+  .sec-chip.filtered-out.S,
+  .sec-chip.filtered-out.L,
+  .sec-chip.S.filtered-out,
+  .sec-chip.L.filtered-out {
+    color: transparent !important;
+    background: rgba(0,0,0,.02) !important;
+    box-shadow: inset -1px 0 0 rgba(0,0,0,.1), inset 0 -1px 0 rgba(0,0,0,.1) !important;
+    text-shadow: none !important;
+    pointer-events: none;
+    cursor: default;
+    filter: none !important;
+  }
+  .sec-chip.empty {
+    opacity: 1; cursor: default;
+    background: rgba(0,0,0,.02) !important;
+    color: transparent !important;
+    box-shadow: inset -1px 0 0 rgba(0,0,0,.1), inset 0 -1px 0 rgba(0,0,0,.1) !important;
+  }
+  .sec-chip.empty:hover { filter: none; }
+  .song-name {
+    flex: 0 0 var(--name-w); width: var(--name-w); min-width: var(--name-w); max-width: var(--name-w);
+    height: var(--chip-h); max-height: var(--chip-h);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-weight: 600; font-size: 0.88rem;
+    letter-spacing: -0.015em;
+    color: #16141a; margin: 0; line-height: var(--chip-h);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: linear-gradient(90deg, #f7f5f9 0%, #ffffff 70%);
+    border-radius: 8px 0 0 8px;
+    padding: 0 12px 0 10px;
+    box-sizing: border-box;
+    display: block;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.04);
+  }
+  .song-name::before { display: none !important; content: none !important; }
+  .song-name::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 8px;
+    bottom: 3px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(163,101,209,.35), rgba(163,101,209,0));
+    pointer-events: none;
+  }
+
+  /* Album-tinted nameplates */
+  .song-name.np-paranoid {
+    background: linear-gradient(90deg, #f4f6f8 0%, #ffffff 75%);
+    color: #14161a;
+  }
+  .song-name.np-paranoid::after {
+    background: linear-gradient(90deg, rgba(90,106,120,.35), rgba(90,106,120,0));
+  }
+  .song-name.np-sbs {
+    background: linear-gradient(90deg, #f3edf7 0%, #faf7fc 55%, #ffffff 100%);
+    color: #1a1020;
+  }
+  .song-name.np-sbs::after {
+    background: linear-gradient(90deg, rgba(112,48,160,.4), rgba(112,48,160,0));
+  }
+  .song-name.np-mor {
+    background: linear-gradient(90deg, #f6f3ef 0%, #ffffff 75%);
+    color: #1a1612;
+  }
+  .song-name.np-mor::after {
+    background: linear-gradient(90deg, rgba(138,106,58,.35), rgba(138,106,58,0));
+  }
+  /* Excel fills ranked by darkness: T1 darkest → T5 near-white */
+  .sec-chip.tier-1 { background: #7030a0; color: #fff; }
+  .sec-chip.tier-2 { background: #a365d1; color: #fff; }
+  .sec-chip.tier-3 { background: #bc90da; color: #1a1020; }
+  .sec-chip.tier-4 { background: #d4bbe3; color: #1a1020; }
+  .sec-chip.tier-5 { background: #f3edf7; color: #1a1020; }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 100%; }
+    .tile { padding: 16px 18px; border-radius: 12px; }
+    .tile small { font-size: 0.75rem; }
+    .keys { display: none; }
+    .bar { flex-wrap: wrap; gap: 8px; }
+    .sections-wrap {
+      --row-g: 22px; --name-w: 140px; --chip-w: 30px; --chip-h: 20px; --cover-rows: 6; --cover: calc(var(--chip-h) * var(--cover-rows));
+      max-width: 100%; gap: 0;
+    }
+    .song-name { flex: 0 0 var(--name-w); width: var(--name-w); min-width: var(--name-w); max-width: var(--name-w); font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; }
+    .sec-chip { width: var(--chip-w); min-width: var(--chip-w); max-width: var(--chip-w); height: var(--chip-h); min-height: var(--chip-h); font-size: 0.62rem; }
+    .row-num { font-size: 0.58rem; }
+    .col-num { font-size: 0.55rem; height: 18px; }
+    .phrase { max-width: 100%; }
+    .cover-board { gap: 8px; }
+  }
+  @media (max-width: 560px) {
+    .wrap { padding: 8px 6px 20px; }
+    .grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .tile { padding: 12px 14px; font-size: clamp(1.6rem, 12vw, 2.8rem); }
+    .sections-wrap {
+      --row-g: 20px; --name-w: 110px; --chip-w: 28px; --chip-h: 22px; --cover-rows: 4; --cover: calc(var(--chip-h) * var(--cover-rows));
+    }
+    .song-row {
+      flex-wrap: nowrap;
+      height: var(--chip-h);
+      min-height: var(--chip-h);
+      max-height: var(--chip-h);
+      gap: 0;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      line-height: var(--chip-h);
+    }
+    .song-name {
+      flex: 0 0 var(--name-w);
+      width: var(--name-w); min-width: var(--name-w); max-width: var(--name-w);
+      height: var(--chip-h); max-height: var(--chip-h);
+      font-size: 0.75rem;
+      line-height: var(--chip-h);
+      padding: 0 6px;
+      flex-shrink: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      background: #fff;
+      z-index: 2;
+      text-shadow: none;
+    }
+    .song-name { font-size: 0.78rem; font-weight: 600; }
+    .song-secs {
+      flex-wrap: nowrap;
+      flex: 0 0 auto;
+      overflow: visible;
+    }
+    .sec-chip {
+      width: var(--chip-w); min-width: var(--chip-w); max-width: var(--chip-w);
+      height: var(--chip-h); min-height: var(--chip-h);
+      font-size: 0.58rem;
+      flex-shrink: 0;
+    }
+    .album-block { padding: 0; border-radius: 0; overflow: visible; margin: 0; }
+    .album-cover-end {
+      max-width: none;
+      min-width: 0;
+    }
+
+    .album-songs { overflow: hidden; gap: 0; }
+    .sections-wrap { overflow-x: auto; overflow-y: visible; gap: 0; }
+    #sectionsSheet { overflow: visible !important; padding: 0 !important; }
+    .wrap { overflow-x: auto; padding-bottom: 20px; }
+    .badge { font-size: 0.95rem; padding: 3px 8px; }
+    /* lick cover cards: shrink to fit */
+    /* Face-down covers: tiny so a full series fits on one phone screen */
+    .cover-board { gap: 4px; }
+    .group { gap: 4px; }
+    .phrase.flipped { width: 48px; height: 48px; }
+    .phrase.flipped .ref { font-size: 7px !important; height: 14px; padding: 0 1px; }
+    .phrase.a.flipped .ref { font-size: 8px !important; }
+    .phrase.b.flipped .ref, .phrase.d.flipped .ref { font-size: 6px !important; }
+    .cover-board.shrunk .phrase.flipped { width: 40px; height: 40px; }
+    .cover-board.shrunk .phrase.flipped .ref { font-size: 6px !important; height: 12px; }
+    .col-head { width: 48px; height: 48px; flex-basis: 48px; font-size: 1rem; border-radius: 4px; }
+    .cover-board.shrunk .col-head { width: 40px; height: 40px; flex-basis: 40px; font-size: 0.85rem; }
+    .group.tall-head { grid-template-columns: repeat(auto-fill, 48px); grid-auto-rows: 48px; }
+    .cover-board.shrunk .group.tall-head { grid-template-columns: repeat(auto-fill, 40px); grid-auto-rows: 40px; }
+    .cover-board.shrunk .col-head.tall { width: 40px; }
+  }
+
+  /* Phone landscape: all home modules fit on one screen */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .wrap { padding: 6px 8px 10px; }
+    h1 { margin: 0 0 6px 4px; font-size: 0.75rem; }
+    .grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      max-width: 100%;
+      width: 100%;
+    }
+    .tile {
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: clamp(1.4rem, 6vh, 2.4rem);
+      aspect-ratio: auto;
+      height: min(42vw, calc(100vh - 52px));
+      max-height: calc(100vh - 52px);
+    }
+    .tile small { font-size: 0.65rem; margin-bottom: 2px; }
+  }
+  @media (max-height: 430px) and (orientation: landscape) {
+    .tile {
+      height: calc(100vh - 44px);
+      max-height: calc(100vh - 44px);
+    }
+  }
+</style>
+</head>
+<body class="home-mode">
+<div class="wrap">
+  <section id="home">
+    <h1>RIFFJAMS</h1>
+    <p class="keys" style="margin:0 0 10px 4px">Numpad 1 Song Map · 2 SBS · 3 Paranoid · 0 home</p>
+    <div class="grid">
+      <button type="button" class="tile hp" id="btnHP"><small>Song Map</small>Sabbath</button>
+      <button type="button" class="tile a" id="btnA"><small>Licks</small>A</button>
+      <button type="button" class="tile b" id="btnB"><small>Paranoid</small>B</button>
+      <button type="button" class="tile c" id="btnC"><small>Licks</small>C</button>
+      <button type="button" class="tile d" id="btnD"><small>Licks</small>D</button>
+    </div>
+  </section>
+  <section id="sections" class="hidden">
+    <div class="bar">
+      <button type="button" class="back" id="backSections">Back</button>
+      <span class="badge" style="background:#fff;color:#111">Song Map</span>
+      <span class="count" id="sectionsCount"></span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · i/v/… types · 1–5 tiers · Esc/0 home</span>
+    </div>
+    <div class="sec-modes" id="secModes">
+      <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
+      <button type="button" class="sec-mode-btn" data-sec-mode="edit">Edit</button>
+      <button type="button" class="sec-mode-btn" data-sec-mode="play">Play</button>
+      <span class="sec-edit-tools" id="secEditTools" hidden>
+        <button type="button" class="sec-tool-btn" id="secUndoBtn" title="Undo (Ctrl+Z)">Undo</button>
+        <button type="button" class="sec-tool-btn primary" id="secSaveBtn" title="Save (Ctrl+S)">Save</button>
+        <span class="sec-save-status" id="secSaveStatus" aria-live="polite"></span>
+      </span>
+    </div>
+    <div class="sec-filters" id="secFilters" aria-label="Filter song map">
+      <div class="sec-filter-group" id="secTypeFilters">
+        <span class="sec-filter-label">Type</span>
+      </div>
+      <div class="sec-filter-group" id="secExcludeFilters">
+        <span class="sec-filter-label">Exclude</span>
+      </div>
+      <div class="sec-filter-group" id="secTierFilters">
+        <span class="sec-filter-label">Tier</span>
+      </div>
+      <button type="button" class="sec-filter-clear" id="secFilterClear">Clear</button>
+    </div>
+    <div class="sheet stage" id="sectionsSheet"></div>
+  </section>
+  <div id="chipEditor" class="chip-editor" aria-hidden="true">
+    <label for="chipEditId">Chip ID</label>
+    <input type="text" id="chipEditId" maxlength="8" placeholder="e.g. V1" autocomplete="off">
+    <label for="chipEditLick">Lick (for Play)</label>
+    <input type="text" id="chipEditLick" maxlength="20" placeholder="e.g. P-1A" autocomplete="off">
+    <label>Tier</label>
+    <div class="tier-row" id="chipEditTiers">
+      <button type="button" class="tier-pick t1" data-tier="1">1</button>
+      <button type="button" class="tier-pick t2" data-tier="2">2</button>
+      <button type="button" class="tier-pick t3" data-tier="3">3</button>
+      <button type="button" class="tier-pick t4" data-tier="4">4</button>
+      <button type="button" class="tier-pick t5" data-tier="5">5</button>
+    </div>
+    <div class="editor-actions">
+      <button type="button" class="btn-save" id="chipEditSave">Save</button>
+      <button type="button" class="btn-cancel" id="chipEditCancel">Cancel</button>
+      <button type="button" class="btn-del" id="chipEditDelete">Delete</button>
+    </div>
+  </div>
+  <section id="series" class="hidden">
+    <div class="bar">
+      <button type="button" class="back" id="back">Back</button>
+      <span class="badge" id="badge">A</span>
+      <span class="count" id="count"></span>
+      <span class="keys">Click licks → Playboard · 1–9 = *-N · Esc/0 home</span>
+    </div>
+    <div class="sheet" id="licks">
+      <div class="cover-board hidden" id="coverBoard"></div>
+      <div class="tab-wrap" id="tabWrap"></div>
+    </div>
+  </section>
+</div>
+<div id="lb" class="lightbox hidden"></div>
+<script>
+
+var ALBUMS_DEFAULT = [
+  { name: "Paranoid", cover: "covers/paranoid.png", font: "font-paranoid", songs: [
+    { song: "War Pigs", sections: [["I1",2,"WP-I1"],["V1",5,"WP-V1"],["V2",2,"WP-V2"],["V3",2,"WP-V3"],["V4",2,"WP-V4"],["S1",1,"WP-S1"],["O1",2,"WP-O1"],["O2",1,"WP-O2"],["S2",1,"WP-S2"]] },
+    { song: "Paranoid", sections: [["I",2],["V1",4],["S1",1]] },
+    { song: "Planet Caravan", sections: [["V",5],["S1",1]] },
+    { song: "Iron Man", sections: [["V1",1],["V2",2],["V3",2],["V4",2],["S1",1],["S2",1],["O1",1]] },
+    { song: "Electric Funeral", sections: [["I1",4],["V1",4],["B1",5],["B2",5],["B3",5],["B4",5]] },
+    { song: "Hand of Doom", sections: [["V1",5],["V2",5],["B1",2],["B2",2],["S1",1]] },
+    { song: "Rat Salad", sections: [["V1",4],["V2",4],["S1",1]] },
+    { song: "Jack the Stripper", sections: [["I1",2],["I2",2],["S1",1],["V1",4],["B1",4],["S2",1],["F1",5]] },
+  ]},
+  { name: "Sabbath Bloody Sabbath", cover: "covers/sbs.png", font: "font-sbs", songs: [
+    { song: "Sabbath Bloody Sabbath", sections: [["V1",1],["PC1",2],["PC2",2],["S1",1],["B1",4],["B2",2],["B3",2],["B4",2],["S2",2]] },
+    { song: "A National Acrobat", sections: [["I1",1],["V1",5],["B1",1],["S1",1],["B2",4],["B3",5],["B4",4],["B5",4],["B6",5],["S3",5]] },
+    { song: "Fluff", sections: [] },
+    { song: "Sabbra Cadabra", sections: [["I1",1],["L1",1],["L2",1],["V1",2],["B1",4],["B2",4],["B3",4]] },
+    { song: "Killing Yourself to Live", sections: [["I1",2],["V1",2],["C1",2],["S1",1],["B1",2],["B2",2],["S2",1],["B3",2],["B4",2]] },
+    { song: "Who Are You?", sections: [] },
+    { song: "Looking for Today", sections: [["V1",2],["PC1",2],["C1",1],["S1",1]] },
+    { song: "Spiral Architect", sections: [["I1",1],["L1",2],["I2",5],["V1",5],["C1",5]] },
+  ]},
+  { name: "Master of Reality", cover: "covers/mor.png", font: "font-mor", songs: [
+    { song: "Sweet Leaf", sections: [] },
+    { song: "After Forever", sections: [["I1",1],["V1",4],["B1",4],["B2",2],["S1",1]] },
+    { song: "Embryo", sections: [["V1",2]] },
+    { song: "Children of the Grave", sections: [["I1",4],["I2",5],["V1",4],["V2",5],["B1",2],["S1",1],["L1",5]] },
+    { song: "Orchid", sections: [] },
+    { song: "Lord of This World", sections: [] },
+    { song: "Solitude", sections: [] },
+    { song: "Into the Void", sections: [["I1",2,"ITV-I1"]] },
+  ]},
+];
+var ALBUMS_KEY = "lick-sections-albums-v3";
+var ALBUMS = null; // filled after slot helpers exist (SONG_SLOTS must be defined first)
+var sectionsMode = "view";
+var chipEditState = null;
+function cloneAlbums(src) {
+  return JSON.parse(JSON.stringify(src));
+}
+function loadAlbums() {
+  try {
+    var raw = localStorage.getItem(ALBUMS_KEY);
+    var albums = (!raw) ? cloneAlbums(ALBUMS_DEFAULT) : JSON.parse(raw);
+    if (!albums || !albums.length) albums = cloneAlbums(ALBUMS_DEFAULT);
+    albums.forEach(function(a){
+      (a.songs||[]).forEach(function(s){
+        if (s.song === "Into the Void") {
+          var has = (s.sections||[]).some(function(p){ return p && p[0]==="I1" && p[2]==="ITV-I1"; });
+          if (!has) {
+            if (!s.sections) s.sections = [];
+            if (!s.sections.length) s.sections.push(["I1",2,"ITV-I1"]);
+            else {
+              var found=false;
+              s.sections.forEach(function(p){ if(p && p[0]==="I1"){ p[1]=2; p[2]="ITV-I1"; found=true; }});
+              if(!found) s.sections.unshift(["I1",2,"ITV-I1"]);
+            }
+          }
+        }
+        if (s.song === "War Pigs") {
+          var links = { "I1": ["I1",2,"WP-I1"], "V1": ["V1",5,"WP-V1"], "V2": ["V2",2,"WP-V2"], "V3": ["V3",2,"WP-V3"], "V4": ["V4",2,"WP-V4"], "S1": ["S1",1,"WP-S1"] , "O1": ["O1",2,"WP-O1"] , "O2": ["O2",1,"WP-O2"] , "S2": ["S2",1,"WP-S2"] };
+          if (!s.sections) s.sections = [];
+          Object.keys(links).forEach(function(code){
+            var want = links[code];
+            var hit = null;
+            s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === code) hit = p; });
+            if (hit) {
+              if (hit[2] !== want[2]) { hit[1] = want[1]; hit[2] = want[2]; }
+            } else if (!s.sections.length) {
+              s.sections.push(want.slice());
+            }
+          });
+        }
+      });
+    });
+    try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(albums)); } catch (err) {}
+    return albums;
+  } catch (e) {
+    return cloneAlbums(ALBUMS_DEFAULT);
+  }
+}
+function saveAlbums() {
+  try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (e) {}
+}
+var albumHistory = [];
+var albumsDirty = false;
+var saveStatusTimer = null;
+function pushAlbumHistory() {
+  try {
+    albumHistory.push(cloneAlbums(ALBUMS));
+    if (albumHistory.length > 40) albumHistory.shift();
+  } catch (e) {}
+  albumsDirty = true;
+  updateEditSaveUi();
+}
+function undoAlbums() {
+  if (!albumHistory.length) return;
+  ALBUMS = albumHistory.pop();
+  albumsDirty = true;
+  closeChipEditor();
+  saveAlbums();
+  updateEditSaveUi();
+  showSections(true);
+  setSaveStatus("Undid");
+}
+function saveAlbumsNow() {
+  saveAlbums();
+  albumsDirty = false;
+  updateEditSaveUi();
+  setSaveStatus("Saved");
+  var btn = document.getElementById("secSaveBtn");
+  if (btn) {
+    btn.classList.add("saved");
+    btn.textContent = "Saved";
+    setTimeout(function(){
+      btn.classList.remove("saved");
+      btn.textContent = "Save";
+    }, 1200);
+  }
+}
+function setSaveStatus(msg) {
+  var el = document.getElementById("secSaveStatus");
+  if (!el) return;
+  el.textContent = msg || "";
+  if (saveStatusTimer) clearTimeout(saveStatusTimer);
+  if (msg) {
+    saveStatusTimer = setTimeout(function(){ el.textContent = ""; }, 1600);
+  }
+}
+function updateEditSaveUi() {
+  var tools = document.getElementById("secEditTools");
+  var undoBtn = document.getElementById("secUndoBtn");
+  var saveBtn = document.getElementById("secSaveBtn");
+  if (tools) {
+    if (sectionsMode === "edit") tools.removeAttribute("hidden");
+    else tools.setAttribute("hidden", "");
+  }
+  if (undoBtn) undoBtn.disabled = !albumHistory.length;
+  if (saveBtn) saveBtn.disabled = false;
+}
+function resetAlbumsToDefault() {
+  ALBUMS = cloneAlbums(ALBUMS_DEFAULT);
+  saveAlbums();
+}
+function secType(code) {
+  if (!code) return "";
+  var m = String(code).match(/^[A-Z]+/);
+  return m ? m[0] : "";
+}
+var SONG_SLOTS = 10;
+function isChipPair(pair) {
+  return !!(pair && pair[0]);
+}
+function countSongChips(song) {
+  var n = 0;
+  (song.sections || []).forEach(function(pair){ if (isChipPair(pair)) n++; });
+  return n;
+}
+/** Pack existing chips into a fixed 10-column slot grid (null = empty square). */
+function ensureSongSlots(song) {
+  if (!song) return;
+  var slots = (typeof SONG_SLOTS === "number" && SONG_SLOTS > 0) ? SONG_SLOTS : 10;
+  var src = song.sections || [];
+  var out = [];
+  var i;
+  for (i = 0; i < slots; i++) out[i] = isChipPair(src[i]) ? src[i] : null;
+  song.sections = out;
+}
+function ensureAllSongSlots(albums) {
+  (albums || []).forEach(function(a){
+    (a.songs || []).forEach(ensureSongSlots);
+  });
+}
+
+function totalAlbumChips(albums) {
+  var n = 0;
+  (albums || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){ n += countSongChips(s); });
+  });
+  return n;
+}
+function repairAlbumsFromDefaults(albums) {
+  var defaults = cloneAlbums(ALBUMS_DEFAULT);
+  // Total wipe: restore everything from built-in defaults
+  if (totalAlbumChips(albums) === 0) {
+    albums.length = 0;
+    defaults.forEach(function(a){ albums.push(a); });
+    ensureAllSongSlots(albums);
+    return defaults.reduce(function(n, a){ return n + (a.songs || []).length; }, 0) || 1;
+  }
+  var repaired = 0;
+  (albums || []).forEach(function(a, ai){
+    var da = null;
+    for (var di = 0; di < defaults.length; di++) {
+      if (defaults[di].name === a.name) { da = defaults[di]; break; }
+    }
+    if (!da) da = defaults[ai];
+    if (!da) return;
+    (a.songs || []).forEach(function(s, si){
+      var ds = null;
+      (da.songs || []).forEach(function(x){ if (x.song === s.song) ds = x; });
+      if (!ds) ds = da.songs && da.songs[si];
+      if (!ds) return;
+      ensureSongSlots(s);
+      var chips = countSongChips(s);
+      var defN = 0;
+      (ds.sections || []).forEach(function(pair){
+        if (isChipPair(pair)) defN++;
+      });
+      if (chips === 0 && defN > 0) {
+        s.sections = JSON.parse(JSON.stringify(ds.sections));
+        ensureSongSlots(s);
+        repaired++;
+      }
+    });
+  });
+  return repaired;
+}
+var ALBUMS = loadAlbums();
+ensureAllSongSlots(ALBUMS);
+if (repairAlbumsFromDefaults(ALBUMS) > 0 || totalAlbumChips(ALBUMS) === 0) {
+  if (totalAlbumChips(ALBUMS) === 0) {
+    ALBUMS = cloneAlbums(ALBUMS_DEFAULT);
+  }
+  ensureAllSongSlots(ALBUMS);
+  try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (e) {}
+}
+
+function showSections(keepScroll) {
+  var sx = window.scrollX || window.pageXOffset || 0;
+  var sy = window.scrollY || window.pageYOffset || 0;
+  currentLetter = "";
+  closeChipEditor();
+  ensureAllSongSlots(ALBUMS);
+  document.body.className = "sections-mode" + (sectionsMode === "edit" ? " sections-edit" : "") + (sectionsMode === "play" ? " sections-play" : "");
+  document.getElementById("home").className = "hidden";
+  document.getElementById("series").className = "hidden";
+  document.getElementById("sections").className = "";
+  var n = 0;
+  var rowN = 0;
+  var maxCols = 10;
+  var colNums = "";
+  for (var c = 1; c <= maxCols; c++) colNums += '<span class="col-num">'+c+'</span>';
+  var head = '<div class="sec-head"><div class="sec-head-label song">Song</div><div class="sec-head-label section">Section</div><div class="sec-head-label album">Album</div></div>';
+  var ruler = '<div class="sec-ruler"><div class="row-num"></div><div class="song-name"></div><div class="song-secs">'+colNums+'</div></div>';
+  var html = ALBUMS.map(function(album, ai){
+    var rows = album.songs.map(function(s, si){
+      rowN += 1;
+      ensureSongSlots(s);
+      n += countSongChips(s);
+      var chipArr = [];
+      for (var ci = 0; ci < maxCols; ci++) {
+        var pair = s.sections[ci];
+        if (!isChipPair(pair)) {
+          chipArr.push('<button type="button" class="sec-chip empty" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Add chip"></button>');
+        } else {
+          var code = pair[0], tier = pair[1], lick = pair[2] || "";
+          var typ = secType(code);
+          chipArr.push('<button type="button" class="sec-chip '+typ+' tier-'+tier+'" data-song="'+s.song+'" data-sec="'+code+'" data-type="'+typ+'" data-tier="'+tier+'" data-lick="'+lick+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+code+'</button>');
+        }
+      }
+      var chips = chipArr.join("");
+      var np = (album.font === 'font-sbs') ? 'np-sbs' : (album.font === 'font-mor') ? 'np-mor' : 'np-paranoid';
+      var thumb = album.cover ? '<img class="song-thumb" src="'+album.cover+'" alt="">' : '';
+      return '<div class="song-row" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num">'+rowN+'</div><div class="song-name-wrap '+np+'-wrap">'+thumb+'<div class="song-name '+np+'">'+s.song+'</div></div><div class="song-secs">'+chips+'</div></div>';
+    }).join("");
+    return '<div class="album-block" data-ai="'+ai+'"><div class="album-songs">'+rows+'</div></div>';
+  }).join("");
+  var playPane = '<aside class="sec-play-pane" id="secPlayPane">'
+    + '<div class="sec-play-meta" id="secPlayMeta">Play — click chips to add · click again to remove</div>'
+    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty" id="secPlayEmpty">Click linked chips to fill this panel.</div></div>'
+    + '</aside>';
+  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+ruler+html+'</div>'+playPane+'</div>';
+  document.getElementById("sectionsCount").textContent = n + " sections";
+  buildSecFilters();
+  applySecFilters();
+  if (sectionsMode === "play") {
+    pullPlayQueue();
+    syncPlayChipClasses();
+  }
+  if (keepScroll) window.scrollTo(sx, sy);
+  else window.scrollTo(0, 0);
+  updateEditSaveUi();
+}
+
+var secTypeFilter = {};
+var secTierFilter = {};
+var secExcludeTypes = {};
+var playQueue = [];
+var PLAY_QUEUE_KEY = "lick-play-queue";
+var playChannel = null;
+try { playChannel = new BroadcastChannel("lick-play"); } catch (e) { playChannel = null; }
+function isPlayboardPage() {
+  return /(?:\?|&)playboard=1(?:&|$)/.test(location.search) || location.hash === "#playboard";
+}
+function publishPlayQueue() {
+  try { localStorage.setItem(PLAY_QUEUE_KEY, JSON.stringify(playQueue)); } catch (e) {}
+  if (playChannel) {
+    try { playChannel.postMessage({ type: "queue", queue: playQueue }); } catch (e) {}
+  }
+}
+function pullPlayQueue() {
+  try {
+    var raw = localStorage.getItem(PLAY_QUEUE_KEY);
+    playQueue = raw ? (JSON.parse(raw) || []) : [];
+  } catch (e) { playQueue = []; }
+}
+function openPlayWindow() {
+  var base = location.href.split("?")[0].split("#")[0];
+  var w = window.open(base + "?playboard=1", "lickPlayBoard");
+  if (!w) {
+    alert("Pop-up blocked — allow pop-ups so Playboard can open in another window.");
+    return null;
+  }
+  try { w.focus(); } catch (e) {}
+  return w;
+}
+function bindPlaySync() {
+  if (playChannel) {
+    playChannel.onmessage = function(ev){
+      if (!ev || !ev.data || ev.data.type !== "queue") return;
+      playQueue = ev.data.queue || [];
+      if (isPlayboardPage()) {
+        if (trimPlayQueueToFit()) publishPlayQueue();
+        renderPlayBoard();
+      } else syncAllPlaySelections();
+    };
+  }
+  window.addEventListener("storage", function(ev){
+    if (ev.key !== PLAY_QUEUE_KEY) return;
+    pullPlayQueue();
+    if (isPlayboardPage()) {
+      if (trimPlayQueueToFit()) publishPlayQueue();
+      renderPlayBoard();
+    } else syncAllPlaySelections();
+  });
+}
+function initPlayboardPage() {
+  document.body.className = "playboard-mode";
+  document.body.innerHTML = '<div class="wrap"><div id="playboardRoot">'
+    + '<aside class="sec-play-pane" id="secPlayPane">'
+    + '<div class="sec-play-meta" id="secPlayMeta">Playboard — click a card to remove</div>'
+    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click Song Map chips or Lick Library cards to add riffs here.</div></div>'
+    + '</aside></div></div>';
+  pullPlayQueue();
+  trimPlayQueueToFit();
+  bindPlaySync();
+  renderPlayBoard();
+  document.getElementById("secPlayBoard").onclick = function(e){
+    var playCard = e.target.closest(".sec-play-card");
+    if (!playCard) return;
+    var key = playCard.getAttribute("data-key");
+    var idx = findPlayIndex(key);
+    if (idx >= 0) {
+      playQueue.splice(idx, 1);
+      publishPlayQueue();
+      renderPlayBoard();
+    }
+  };
+  window.addEventListener("resize", function(){
+    if (trimPlayQueueToFit()) publishPlayQueue();
+    renderPlayBoard();
+  });
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" || isNumpadKey(e, "0")) window.close();
+  });
+}
+var SEC_TYPE_ORDER = ["I","V","B","S","L","O","C","PC","F"];
+function collectSecTypes() {
+  var seen = {};
+  ALBUMS.forEach(function(a){
+    a.songs.forEach(function(s){
+      s.sections.forEach(function(pair){ if (isChipPair(pair)) seen[secType(pair[0])] = true; });
+    });
+  });
+  return SEC_TYPE_ORDER.filter(function(t){ return seen[t]; });
+}
+function buildSecFilters() {
+  var typeHost = document.getElementById("secTypeFilters");
+  var exclHost = document.getElementById("secExcludeFilters");
+  var tierHost = document.getElementById("secTierFilters");
+  if (!typeHost || !tierHost) return;
+  var types = collectSecTypes();
+  typeHost.innerHTML = '<span class="sec-filter-label">Type</span>' + types.map(function(t){
+    var on = secTypeFilter[t] ? ' on' : '';
+    return '<button type="button" class="sec-filter-btn type'+on+'" data-filter-type="'+t+'">'+t+'</button>';
+  }).join("");
+  if (exclHost) {
+    var exclKeys = Object.keys(secExcludeTypes).filter(function(k){ return secExcludeTypes[k]; });
+    var label = exclKeys.length ? ("−" + exclKeys.join(",")) : "None";
+    var items = types.map(function(tp){
+      var checked = secExcludeTypes[tp] ? " checked" : "";
+      return '<label class="exclude-dd-item"><input type="checkbox" data-exclude-type="'+tp+'"'+checked+'>'+tp+'</label>';
+    }).join("");
+    exclHost.innerHTML = '<span class="sec-filter-label">Exclude</span>'
+      + '<div class="exclude-dd'+(exclKeys.length ? " has" : "")+'" id="excludeDd">'
+      + '<button type="button" class="exclude-dd-toggle'+(exclKeys.length ? " has-excludes" : "")+'" id="excludeDdToggle">'+label+' ▾</button>'
+      + '<div class="exclude-dd-menu" id="excludeDdMenu">'+items+'</div>'
+      + '</div>';
+  }
+  tierHost.innerHTML = '<span class="sec-filter-label">Tier</span>' + [1,2,3,4,5].map(function(t){
+    var on = secTierFilter[t] ? ' on' : '';
+    return '<button type="button" class="sec-filter-btn tier t'+t+on+'" data-filter-tier="'+t+'">T'+t+'</button>';
+  }).join("");
+}
+function secFiltersActive() {
+  var t = Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; });
+  var r = Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; });
+  var x = Object.keys(secExcludeTypes).some(function(k){ return secExcludeTypes[k]; });
+  return t || r || x;
+}
+function chipMatchesFilter(chip) {
+  var typ = chip.getAttribute("data-type") || "";
+  var tier = parseInt(chip.getAttribute("data-tier") || "0", 10);
+  if (secExcludeTypes[typ]) return false;
+  var typeOn = Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; });
+  var tierOn = Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; });
+  if (typeOn && !secTypeFilter[typ]) return false;
+  if (tierOn && !secTierFilter[tier]) return false;
+  return true;
+}
+function applySecFilters() {
+  var sheet = document.getElementById("sectionsSheet");
+  if (!sheet) return;
+  // Edit mode always shows every chip so creates/edits are visible
+  var active = sectionsMode !== "edit" && secFiltersActive();
+  var shown = 0;
+  sheet.querySelectorAll(".album-block").forEach(function(block){
+    block.classList.remove("filtered-out");
+    block.querySelectorAll(".song-row").forEach(function(row){
+      row.classList.remove("filtered-out");
+      row.querySelectorAll(".sec-chip").forEach(function(chip){
+        if (chip.classList.contains("empty")) {
+          chip.classList.remove("filtered-out");
+          return;
+        }
+        var ok = !active || chipMatchesFilter(chip);
+        chip.classList.toggle("filtered-out", !ok);
+        if (ok) shown += 1;
+      });
+    });
+  });
+  var total = 0;
+  ALBUMS.forEach(function(a){ a.songs.forEach(function(s){ total += countSongChips(s); }); });
+  var el = document.getElementById("sectionsCount");
+  if (el) el.textContent = active ? (shown + " / " + total + " sections") : (total + " sections");
+  sizeAlbumCovers();
+  if (typeof playQueue !== "undefined" && playQueue.length) {
+    playQueue = playQueue.filter(function(item){
+      var chip = document.querySelector(".sec-chip[data-ai=\""+item.ai+"\"][data-si=\""+item.si+"\"][data-ci=\""+item.ci+"\"]");
+      return chip && !chip.classList.contains("filtered-out") && !chip.classList.contains("empty");
+    });
+    if (sectionsMode === "play") renderPlayBoard();
+  }
+}
+window.addEventListener("resize", function(){ if (document.body.className.indexOf("sections-mode")>=0) { sizeAlbumCovers(); if (sectionsMode==="play") renderPlayBoard(); } });
+function sizeAlbumCovers() {
+  document.querySelectorAll(".album-block").forEach(function(block){
+    var songs = block.querySelector(".album-songs");
+    var img = block.querySelector(".album-cover-end");
+    var cell = block.querySelector(".album-art-cell");
+    if (!songs || !img) return;
+    var h = songs.offsetHeight || 0;
+    var gap = 16;
+    var size = Math.max(40, h - gap);
+    img.style.width = size + "px";
+    img.style.height = size + "px";
+    img.style.maxWidth = size + "px";
+    img.style.maxHeight = size + "px";
+    if (cell) {
+      var colW = size + 20;
+      cell.style.width = colW + "px";
+    }
+  });
+}
+
+function toggleSecTierKey(n) {
+  if (secTierFilter[n]) delete secTierFilter[n];
+  else secTierFilter[n] = true;
+  var btn = document.querySelector('.sec-filter-btn.tier[data-filter-tier="'+n+'"]');
+  if (btn) btn.classList.toggle("on", !!secTierFilter[n]);
+  else buildSecFilters();
+  applySecFilters();
+  if (sectionsMode === "play") renderPlayBoard();
+}
+function toggleSecTypeKey(typ) {
+  typ = (typ || "").toUpperCase();
+  if (!typ) return;
+  if (secTypeFilter[typ]) delete secTypeFilter[typ];
+  else secTypeFilter[typ] = true;
+  var btn = document.querySelector('.sec-filter-btn.type[data-filter-type="'+typ+'"]');
+  if (btn) btn.classList.toggle("on", !!secTypeFilter[typ]);
+  else buildSecFilters();
+  applySecFilters();
+  if (sectionsMode === "play") renderPlayBoard();
+}
+function normalizeChipCodes(albums) {
+  (albums || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      (s.sections || []).forEach(function(pair){
+        if (!pair || !pair[0]) return;
+        var code = String(pair[0]);
+        if (code.indexOf("IR") === 0) pair[0] = "I" + code.slice(2);
+        else if (code.indexOf("VR") === 0) pair[0] = "V" + code.slice(2);
+      });
+    });
+  });
+  return albums;
+}
+function clearSecFilters() {
+  secTypeFilter = {};
+  secTierFilter = {};
+  secExcludeTypes = {};
+  buildSecFilters();
+  applySecFilters();
+}
+
+
+function setSectionsMode(mode) {
+  if (mode === "edit") sectionsMode = "edit";
+  else if (mode === "play") sectionsMode = "play";
+  else sectionsMode = "view";
+  closeChipEditor();
+  document.querySelectorAll(".sec-mode-btn").forEach(function(btn){
+    btn.classList.toggle("on", btn.getAttribute("data-sec-mode") === sectionsMode);
+  });
+  var keys = document.getElementById("sectionsKeys");
+  if (keys) {
+    if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · drag · Undo/Save · click chip to edit · Esc closes";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · map clicks queue · Playboard window · Esc/0 home";
+    else keys.textContent = "Numpad 1/2/3 modes · i/v/… types · 1–5 tiers · Esc/0 home";
+  }
+  if (sectionsMode === "play") {
+    pullPlayQueue();
+    openPlayWindow();
+    publishPlayQueue();
+  }
+  updateEditSaveUi();
+  if (document.getElementById("sections") && !document.getElementById("sections").classList.contains("hidden")) {
+    showSections();
+  }
+}
+function lickLetter(id) {
+  for (var i = 0; i < CATALOG.length; i++) {
+    if (CATALOG[i][0] === id) return CATALOG[i][1];
+  }
+  if (/D$/.test(id)) return "D";
+  if (/C$/.test(id)) return "C";
+  if (/B$/.test(id)) return "B";
+  if (/A$/.test(id)) {
+    if (/^(IM|P-|WP-)/.test(id)) return "B";
+    return "A";
+  }
+  return "B";
+}
+function lickSrc(id) {
+  if (!id) return "";
+  for (var i = 0; i < CATALOG.length; i++) {
+    if (CATALOG[i][0] === id) {
+      var letter = CATALOG[i][1];
+      return (FOLDER[letter] || "b-crops/") + id + ".png";
+    }
+  }
+  return "section-crops/" + id + ".png";
+}
+function playChipKey(chip) {
+  return chip.getAttribute("data-ai")+"|"+chip.getAttribute("data-si")+"|"+chip.getAttribute("data-ci");
+}
+function findPlayIndex(key) {
+  for (var i = 0; i < playQueue.length; i++) if (playQueue[i].key === key) return i;
+  return -1;
+}
+function playBoardReady() {
+  var board = document.getElementById("secPlayBoard");
+  return !!(board && board.clientWidth >= 40 && board.clientHeight >= 40);
+}
+/** Count estimate unused for culling — kept for any callers. */
+function playCapacity() {
+  if (!playBoardReady()) return 99;
+  return 99;
+}
+/** Map window never culls. Playboard culls after paint at native card sizes. */
+function trimPlayQueueToFit() {
+  return 0;
+}
+/** Cycle out oldest riffs until the newest set fits at native sizes. */
+function trimPlayQueueAfterPaint() {
+  if (typeof isPlayboardPage === "function" && !isPlayboardPage()) return 0;
+  var board = document.getElementById("secPlayBoard");
+  if (!board || !playBoardReady()) return 0;
+  var removed = 0;
+  function overflows() {
+    return board.scrollHeight > board.clientHeight + 4
+      || board.scrollWidth > board.clientWidth + 4;
+  }
+  while (playQueue.length > 1 && overflows()) {
+    playQueue.shift();
+    removed++;
+    var first = board.querySelector(".sec-play-card");
+    if (first) first.remove();
+    else break;
+  }
+  return removed;
+}
+function syncPlayChipClasses() {
+  var visible = visiblePlayKeys();
+  document.querySelectorAll(".sec-chip").forEach(function(chip){
+    if (chip.classList.contains("empty")) return;
+    var key = playChipKey(chip);
+    var inQ = findPlayIndex(key) >= 0;
+    chip.classList.toggle("playing", inQ && visible[key]);
+    chip.classList.toggle("playing-offscreen", inQ && !visible[key]);
+  });
+}
+function visiblePlayKeys() {
+  var map = {};
+  playQueue.forEach(function(item){ map[item.key] = true; });
+  return map;
+}
+function renderPlayBoard() {
+  var board = document.getElementById("secPlayBoard");
+  var meta = document.getElementById("secPlayMeta");
+  if (!board) return;
+  var visible = playQueue.slice();
+  if (meta) {
+    meta.innerHTML = playQueue.length
+      ? ("<strong>"+playQueue.length+"</strong> on Playboard")
+      : "Playboard — click chips on the map to add · click a card to remove";
+  }
+  if (!visible.length) {
+    board.innerHTML = '<div class="sec-play-empty" id="secPlayEmpty">Click linked chips on the map to fill the Playboard.</div>';
+    syncPlayChipClasses();
+    return;
+  }
+  board.innerHTML = visible.map(function(item){
+    var tier = item.tier || 2;
+    return '<div class="sec-play-card tier-'+tier+'" data-key="'+item.key+'">'
+      + '<div class="face">'
+      + '<div class="ref">'+item.code+'</div>'
+      + '<img src="'+item.src+'" alt="'+item.lick+'">'
+      + '</div>'
+      + '<div class="cap">'+item.song+' · '+item.lick+'</div>'
+      + '</div>';
+  }).join("");
+  syncPlayChipClasses();
+  function afterNativeSizes() {
+    if (trimPlayQueueAfterPaint()) {
+      publishPlayQueue();
+      renderPlayBoard();
+      return;
+    }
+    syncAllPlaySelections();
+  }
+  var imgs = board.querySelectorAll("img");
+  var pending = imgs.length;
+  if (!pending) { afterNativeSizes(); return; }
+  [].forEach.call(imgs, function(img){
+    if (img.complete) {
+      pending--;
+      if (!pending) afterNativeSizes();
+    } else {
+      img.onload = img.onerror = function(){
+        pending--;
+        if (!pending) afterNativeSizes();
+      };
+    }
+  });
+}
+function togglePlayChip(chip) {
+  if (!chip || chip.classList.contains("empty") || chip.classList.contains("filtered-out")) return;
+  var code = chip.getAttribute("data-sec") || "";
+  var song = chip.getAttribute("data-song") || "";
+  var lick = (chip.getAttribute("data-lick") || "").trim();
+  var key = playChipKey(chip);
+  var idx = findPlayIndex(key);
+  if (idx >= 0) {
+    playQueue.splice(idx, 1);
+    publishPlayQueue();
+    syncAllPlaySelections();
+    return;
+  }
+  if (!lick) {
+    var meta = document.getElementById("secPlayMeta");
+    if (meta) meta.innerHTML = "<strong>"+code+"</strong> has no lick link — set it in Edit";
+    return;
+  }
+  playQueue.push({
+    key: key,
+    ai: chip.getAttribute("data-ai"),
+    si: chip.getAttribute("data-si"),
+    ci: chip.getAttribute("data-ci"),
+    code: code,
+    song: song,
+    lick: lick,
+    tier: parseInt(chip.getAttribute("data-tier") || "2", 10) || 2,
+    src: lickSrc(lick)
+  });
+  trimPlayQueueToFit();
+  publishPlayQueue();
+  syncAllPlaySelections();
+}
+
+function libraryPlayKey(el) {
+  var name = (el && el.getAttribute("data-name")) || "";
+  return "lib|" + (currentLetter || "") + "|" + name;
+}
+function librarySongLabel() {
+  if (currentLetter === "A") return "SBS";
+  if (currentLetter === "B") return "Paranoid";
+  return currentLetter || "";
+}
+function syncPlayLibraryClasses() {
+  var visible = visiblePlayKeys();
+  document.querySelectorAll(".phrase").forEach(function(el){
+    var key = libraryPlayKey(el);
+    var inQ = findPlayIndex(key) >= 0;
+    el.classList.toggle("playing", inQ && visible[key]);
+    el.classList.toggle("playing-offscreen", inQ && !visible[key]);
+  });
+}
+function syncAllPlaySelections() {
+  syncPlayChipClasses();
+  syncPlayLibraryClasses();
+}
+function togglePlayPhrase(el) {
+  if (!el) return;
+  var name = (el.getAttribute("data-name") || "").trim();
+  if (!name) return;
+  var key = libraryPlayKey(el);
+  var idx = findPlayIndex(key);
+  if (idx >= 0) {
+    playQueue.splice(idx, 1);
+    publishPlayQueue();
+    syncPlayLibraryClasses();
+    return;
+  }
+  var src = el.getAttribute("data-file") || lickSrc(name);
+  playQueue.push({
+    key: key,
+    code: name,
+    song: librarySongLabel(),
+    lick: name,
+    tier: 2,
+    src: src
+  });
+  trimPlayQueueToFit();
+  publishPlayQueue();
+  openPlayWindow();
+  syncPlayLibraryClasses();
+}
+function playSectionChip(chip) { togglePlayChip(chip); }
+function closeChipEditor() {
+  chipEditState = null;
+  var ed = document.getElementById("chipEditor");
+  if (!ed) return;
+  ed.classList.remove("open");
+  ed.setAttribute("aria-hidden", "true");
+}
+function openChipEditor(anchor, state) {
+  chipEditState = state;
+  var ed = document.getElementById("chipEditor");
+  var idInput = document.getElementById("chipEditId");
+  idInput.value = state.code || "";
+  var lickInput = document.getElementById("chipEditLick");
+  if (lickInput) lickInput.value = state.lick || "";
+  document.querySelectorAll("#chipEditTiers .tier-pick").forEach(function(b){
+    b.classList.toggle("on", parseInt(b.getAttribute("data-tier"),10) === state.tier);
+  });
+  document.getElementById("chipEditDelete").style.display = state.isNew ? "none" : "";
+  ed.classList.add("open");
+  ed.setAttribute("aria-hidden", "false");
+  var r = anchor.getBoundingClientRect();
+  var left = Math.min(window.innerWidth - 240, Math.max(8, r.left));
+  var top = r.bottom + 8;
+  if (top + 200 > window.innerHeight) top = Math.max(8, r.top - 200);
+  ed.style.left = left + "px";
+  ed.style.top = top + "px";
+  idInput.focus();
+  idInput.select();
+}
+function saveChipEditor() {
+  if (!chipEditState) return;
+  var code = (document.getElementById("chipEditId").value || "").trim().toUpperCase();
+  if (!code) { document.getElementById("chipEditId").focus(); return; }
+  var tierBtn = document.querySelector("#chipEditTiers .tier-pick.on");
+  var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : (chipEditState.tier || 3);
+  if (tier < 1 || tier > 5) tier = 3;
+  var ai = chipEditState.ai, si = chipEditState.si, ci = chipEditState.ci;
+  var song = ALBUMS[ai] && ALBUMS[ai].songs[si];
+  if (!song) return;
+  var lick = (document.getElementById("chipEditLick").value || "").trim();
+  var entry = lick ? [code, tier, lick] : [code, tier];
+  pushAlbumHistory();
+  ensureSongSlots(song);
+  if (chipEditState.isNew) {
+    if (countSongChips(song) >= SONG_SLOTS) {
+      alert("This song already has 10 chips.");
+      return;
+    }
+    song.sections[ci] = entry;
+  } else {
+    song.sections[ci] = entry;
+  }
+  // Keep filters from hiding the chip you just saved
+  var typ = secType(code);
+  if (Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; })) {
+    secTypeFilter[typ] = true;
+  }
+  if (Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; })) {
+    secTierFilter[tier] = true;
+  }
+  saveAlbums();
+  closeChipEditor();
+  showSections();
+}
+function deleteChipEditor() {
+  if (!chipEditState || chipEditState.isNew) return;
+  pushAlbumHistory();
+  var song = ALBUMS[chipEditState.ai].songs[chipEditState.si];
+  ensureSongSlots(song);
+  song.sections[chipEditState.ci] = null;
+  saveAlbums();
+  closeChipEditor();
+  showSections();
+}
+
+var CATALOG = [
+  ["LFT-1A","A"],["LFT-2A","A"],["LFT-3A","A"],["LFT-4A","A"],["LFT-5A","A"],
+  ["KYTL-1A","A"],["KYTL-2A","A"],
+  ["KYTL2-3A","A"],["KYTL2-4A","A"],["KYTL2-5A","A"],["KYTL2-6A","A"],["KYTL2-7A","A"],
+  ["IM-1-1A","B"],["IM-1-2A","B"],["IM-1-3A","B"],["IM-1-4A","B"],
+  ["IM-1-1B","B"],["IM-1-2B","B"],
+  ["IM-2-1B","B"],["IM-2-2B","B"],["IM-2-3B","B"],["IM-2-4B","B"],["IM-2-5B","B"],
+  ["P-1A","B"],["P-1B","B"],["P-2B","B"],["P-3B","B"],["P-4B","B"],
+  ["WP-1-1A","B"],["WP-1-2A","B"],["WP-1-3A","B"],["WP-1-4A","B"],["WP-1-1B","B"],["WP-1-1D","B"],
+  ["LFT-1C","C"],["LFT-1D","D"]
+];
+var FOLDER = { A: "a-crops/", B: "b-crops/", C: "svg/", D: "svg/" };
+var COVER = { A: "covers/sbs.png", B: "covers/paranoid.png" };
+var currentLetter = "";
+var dragged = null;
+var didDrag = false;
+function orderKey(letter) { return "lick-order-" + letter; }
+function applySavedOrder(items, letter) {
+  var saved;
+  try { saved = JSON.parse(localStorage.getItem(orderKey(letter)) || "null"); } catch (e) { saved = null; }
+  if (!saved || !saved.length) return items;
+  var map = {};
+  items.forEach(function(x){ map[x[0]] = x; });
+  var out = [];
+  saved.forEach(function(name){
+    if (map[name]) { out.push(map[name]); delete map[name]; }
+  });
+  items.forEach(function(x){ if (map[x[0]]) out.push(x); });
+  return out;
+}
+function saveOrder() {
+  if (!currentLetter) return;
+  var names = [].map.call(document.querySelectorAll(".phrase"), function(el){
+    return el.getAttribute("data-name");
+  });
+  localStorage.setItem(orderKey(currentLetter), JSON.stringify(names));
+}
+function flipKey(letter) { return "lick-flipped-" + letter; }
+function saveFlipped() {
+  if (!currentLetter) return;
+  var names = [].map.call(document.querySelectorAll(".phrase.flipped"), function(el){
+    return el.getAttribute("data-name");
+  });
+  localStorage.setItem(flipKey(currentLetter), JSON.stringify(names));
+}
+function flippedSet(letter) {
+  try { return JSON.parse(localStorage.getItem(flipKey(letter)) || "[]"); } catch (e) { return []; }
+}
+function lickKind(name) {
+  if (/D$/.test(name)) return "D";
+  if (/B$/.test(name)) return "B";
+  if (/C$/.test(name)) return "C";
+  return "A";
+}
+function songClass(name) {
+  if (/^IM-/.test(name)) return "song-im";
+  if (/^P-/.test(name)) return "song-p";
+  if (/^WP-/.test(name)) return "song-wp";
+  if (/^LFT-/.test(name)) return "song-lft";
+  if (/^KYTL2-/.test(name)) return "song-kytl2";
+  if (/^KYTL-/.test(name)) return "song-kytl";
+  return "song-other";
+}
+var COL_MAX = 5;
+function collectFlipped(kind) {
+  var out = [];
+  [].forEach.call(document.querySelectorAll(".phrase.flipped"), function(el){
+    if (el.classList.contains("filtered-out")) return;
+    if (lickKind(el.getAttribute("data-name")) === kind) out.push(el);
+  });
+  out.sort(function(a, b){
+    var an = a.getAttribute("data-name");
+    var bn = b.getAttribute("data-name");
+    if (kind === "B") {
+      if (an === "WP-1-1B") return -1;
+      if (bn === "WP-1-1B") return 1;
+    }
+    return an.localeCompare(bn, undefined, {numeric: true, sensitivity: "base"});
+  });
+  return out;
+}
+function rebuildColumns() {
+  var board = document.getElementById("coverBoard");
+  var tabWrap = document.getElementById("tabWrap");
+  var a = collectFlipped("A");
+  var b = collectFlipped("B");
+  var c = collectFlipped("C");
+  var d = collectFlipped("D");
+  var hold = document.createDocumentFragment();
+  a.concat(b, c, d).forEach(function(el){ hold.appendChild(el); });
+  board.innerHTML = "";
+  if (!a.length && !b.length && !c.length && !d.length) {
+    board.className = "cover-board hidden";
+    return;
+  }
+  var anyTab = document.querySelector(".phrase:not(.flipped)");
+  board.className = anyTab ? "cover-board shrunk" : "cover-board";
+  function cardsPerRow(cardSize) {
+    var w = board.clientWidth || board.parentElement.clientWidth || window.innerWidth;
+    var gap = 6;
+    var cols = Math.max(1, Math.floor((w + gap) / (cardSize + gap)));
+    return Math.max(1, cols - 1);
+  }
+  function addCols(items, label) {
+    if (!items.length) return;
+    var cardSize = board.classList.contains("shrunk") ? 75 : 150;
+    var tall = items.length > cardsPerRow(cardSize);
+    var group = document.createElement("div");
+    group.className = tall ? "group tall-head" : "group";
+    var headClass = tall ? "col-head tall" : "col-head";
+    group.innerHTML = '<div class="'+headClass+'">'+label+'</div><div class="col-body"></div>';
+    var body = group.querySelector(".col-body");
+    items.forEach(function(el){ body.appendChild(el); });
+    board.appendChild(group);
+  }
+  addCols(a, "A");
+  addCols(b, "B");
+  addCols(c, "C");
+  addCols(d, "D");
+}
+function placePhrase(el) {
+  var tabWrap = document.getElementById("tabWrap");
+  if (!el.classList.contains("flipped")) tabWrap.appendChild(el);
+  rebuildColumns();
+}
+function lickGroup(name) {
+  var m = name.match(/-(\d+)[A-Za-z]$/);
+  return m ? m[1] : null;
+}
+function relayout() {
+  var tabWrap = document.getElementById("tabWrap");
+  [].forEach.call(document.querySelectorAll(".phrase"), function(el){
+    if (!el.classList.contains("flipped")) tabWrap.appendChild(el);
+  });
+  rebuildColumns();
+  saveFlipped();
+}
+function toggleEls(els) {
+  if (!els.length) return;
+  var allUp = els.every(function(el){ return !el.classList.contains("flipped"); });
+  els.forEach(function(el){
+    if (allUp) el.classList.add("flipped");
+    else el.classList.remove("flipped");
+  });
+  relayout();
+}
+function revealKind(kind) {
+  toggleEls([].filter.call(document.querySelectorAll(".phrase"), function(el){
+    return lickKind(el.getAttribute("data-name")) === kind;
+  }));
+}
+function showKind(kind) {
+  var els = [].filter.call(document.querySelectorAll(".phrase"), function(el){
+    return lickKind(el.getAttribute("data-name")) === kind;
+  });
+  if (!els.length) return;
+  els.forEach(function(el){ el.classList.remove("flipped"); });
+  relayout();
+}
+function revealGroup(group) {
+  toggleEls([].filter.call(document.querySelectorAll(".phrase"), function(el){
+    return lickGroup(el.getAttribute("data-name")) === group;
+  }));
+}
+function showSeries(letter) {
+  currentLetter = letter;
+  document.body.className = "sheet-mode stage";
+  document.getElementById("badge").textContent = (letter === "B") ? "Paranoid" : letter;
+  document.getElementById("badge").className = "badge " + letter.toLowerCase();
+  document.getElementById("home").className = "hidden";
+  document.getElementById("sections").className = "hidden";
+  document.getElementById("series").className = "";
+  var items = applySavedOrder(CATALOG.filter(function(x){ return x[1] === letter; }), letter);
+  var folder = FOLDER[letter] || "svg/";
+  document.getElementById("count").textContent = items.length + " licks";
+  var cover = COVER[letter] || "";
+  var flipped = flippedSet(letter);
+  var tabWrap = document.getElementById("tabWrap");
+  document.getElementById("coverBoard").innerHTML = "";
+  tabWrap.innerHTML = items.map(function(x){
+    var src = folder + x[0] + ".png";
+    var on = flipped.indexOf(x[0]) >= 0 ? " flipped" : "";
+    var kind = lickKind(x[0]).toLowerCase();
+    var song = songClass(x[0]);
+    if (cover) {
+      return '<div class="phrase '+kind+' '+song+on+' no-anim" draggable="true" data-name="'+x[0]+'" data-file="'+src+'">'
+        + '<div class="card-inner">'
+        + '<div class="face face-tab"><img class="tab" src="'+src+'" alt="'+x[0]+'"></div>'
+        + '<div class="face face-cover"><img class="cover" src="'+cover+'" alt=""></div>'
+        + '<span class="ref">'+x[0]+'</span>'
+        + '</div></div>';
+    }
+    return '<div class="phrase '+kind+' '+song+'" draggable="true" data-name="'+x[0]+'" data-file="'+src+'"><img class="tab" src="'+src+'" alt="'+x[0]+'"></div>';
+  }).join("");
+  [].forEach.call(document.querySelectorAll(".phrase"), placePhrase);
+  requestAnimationFrame(function(){
+    [].forEach.call(document.querySelectorAll(".phrase.no-anim"), function(el){ el.classList.remove("no-anim"); });
+  });
+  window.scrollTo(0,0);
+  pullPlayQueue();
+  syncPlayLibraryClasses();
+}
+
+function showHome() {
+  closeChipEditor();
+  document.body.className = "home-mode";
+  document.getElementById("home").className = "";
+  document.getElementById("series").className = "hidden";
+  document.getElementById("sections").className = "hidden";
+}
+document.getElementById("btnA").onclick = function(){ showSeries("A"); };
+document.getElementById("btnB").onclick = function(){ showSeries("B"); };
+document.getElementById("btnC").onclick = function(){ showSeries("C"); };
+document.getElementById("btnD").onclick = function(){ showSeries("D"); };
+document.getElementById("btnHP").onclick = showSections;
+document.getElementById("back").onclick = showHome;
+document.getElementById("backSections").onclick = showHome;
+document.getElementById("secFilters").onclick = function(e){
+  var toggle = e.target.closest("#excludeDdToggle");
+  if (toggle) {
+    var dd = document.getElementById("excludeDd");
+    if (dd) dd.classList.toggle("open");
+    e.stopPropagation();
+    return;
+  }
+  var exclBox = e.target.closest("input[data-exclude-type]");
+  if (exclBox) {
+    var xt = exclBox.getAttribute("data-exclude-type");
+    if (exclBox.checked) secExcludeTypes[xt] = true;
+    else delete secExcludeTypes[xt];
+    var exclKeys = Object.keys(secExcludeTypes).filter(function(k){ return secExcludeTypes[k]; });
+    var tg = document.getElementById("excludeDdToggle");
+    if (tg) {
+      tg.textContent = (exclKeys.length ? ("−" + exclKeys.join(",")) : "None") + " ▾";
+      tg.classList.toggle("has-excludes", !!exclKeys.length);
+    }
+    applySecFilters();
+    if (sectionsMode === "play") renderPlayBoard();
+    e.stopPropagation();
+    return;
+  }
+  var btn = e.target.closest(".sec-filter-btn");
+  if (btn) {
+    var t = btn.getAttribute("data-filter-type");
+    var r = btn.getAttribute("data-filter-tier");
+    if (t) {
+      secTypeFilter[t] = !secTypeFilter[t];
+      if (!secTypeFilter[t]) delete secTypeFilter[t];
+    }
+    if (r) {
+      var n = parseInt(r, 10);
+      secTierFilter[n] = !secTierFilter[n];
+      if (!secTierFilter[n]) delete secTierFilter[n];
+    }
+    btn.classList.toggle("on");
+    applySecFilters();
+    if (sectionsMode === "play") renderPlayBoard();
+    return;
+  }
+  if (e.target.id === "secFilterClear" || e.target.closest("#secFilterClear")) clearSecFilters();
+};
+document.addEventListener("click", function(e){
+  var dd = document.getElementById("excludeDd");
+  if (!dd || !dd.classList.contains("open")) return;
+  if (e.target.closest("#excludeDd")) return;
+  dd.classList.remove("open");
+});
+
+document.getElementById("secModes").onclick = function(e){
+  if (e.target.closest("#secUndoBtn")) { undoAlbums(); return; }
+  if (e.target.closest("#secSaveBtn")) { saveAlbumsNow(); return; }
+  var btn = e.target.closest(".sec-mode-btn");
+  if (!btn) return;
+  setSectionsMode(btn.getAttribute("data-sec-mode"));
+};
+document.getElementById("chipEditSave").onclick = saveChipEditor;
+document.getElementById("chipEditCancel").onclick = closeChipEditor;
+document.getElementById("chipEditDelete").onclick = deleteChipEditor;
+document.getElementById("chipEditTiers").onclick = function(e){
+  var b = e.target.closest(".tier-pick");
+  if (!b) return;
+  document.querySelectorAll("#chipEditTiers .tier-pick").forEach(function(x){ x.classList.remove("on"); });
+  b.classList.add("on");
+};
+document.getElementById("chipEditId").addEventListener("keydown", function(e){
+  if (e.key === "Enter") { e.preventDefault(); saveChipEditor(); }
+  if (e.key === "Escape") { e.preventDefault(); closeChipEditor(); }
+});
+document.getElementById("chipEditLick").addEventListener("keydown", function(e){
+  if (e.key === "Enter") { e.preventDefault(); saveChipEditor(); }
+  if (e.key === "Escape") { e.preventDefault(); closeChipEditor(); }
+});
+
+var chipDrag = null;
+var didChipDrag = false;
+var pointerDragActive = false;
+function clearChipDragOver() {
+  document.querySelectorAll(".sec-chip.drag-over, .sec-chip.drag-over-empty").forEach(function(el){
+    el.classList.remove("drag-over");
+    el.classList.remove("drag-over-empty");
+  });
+}
+function moveSongMapChip(fromAi, fromSi, fromCi, toAi, toSi, toCi) {
+  var fromSong = ALBUMS[fromAi] && ALBUMS[fromAi].songs[fromSi];
+  var toSong = ALBUMS[toAi] && ALBUMS[toAi].songs[toSi];
+  if (!fromSong || !toSong) return false;
+  ensureSongSlots(fromSong);
+  ensureSongSlots(toSong);
+  if (fromCi < 0 || fromCi >= SONG_SLOTS || toCi < 0 || toCi >= SONG_SLOTS) return false;
+  if (fromAi === toAi && fromSi === toSi && fromCi === toCi) return false;
+  var item = fromSong.sections[fromCi];
+  if (!isChipPair(item)) return false;
+  var dest = toSong.sections[toCi];
+  // Cross-song into empty: need a free slot count
+  if (!(fromAi === toAi && fromSi === toSi) && !isChipPair(dest) && countSongChips(toSong) >= SONG_SLOTS) return false;
+  pushAlbumHistory();
+  if (fromAi === toAi && fromSi === toSi) {
+    if (isChipPair(dest)) {
+      // Swap within the row (fixes adjacent / across-row moves)
+      fromSong.sections[fromCi] = dest;
+      fromSong.sections[toCi] = item;
+    } else {
+      // Move into an empty square (can leave a gap)
+      fromSong.sections[fromCi] = null;
+      fromSong.sections[toCi] = item;
+    }
+  } else if (isChipPair(dest)) {
+    // Swap across songs
+    fromSong.sections[fromCi] = dest;
+    toSong.sections[toCi] = item;
+  } else {
+    fromSong.sections[fromCi] = null;
+    toSong.sections[toCi] = item;
+  }
+  saveAlbums();
+  return true;
+}
+function chipFromPoint(x, y) {
+  var el = document.elementFromPoint(x, y);
+  return el ? el.closest(".sec-chip") : null;
+}
+function endChipPointerDrag(cancelled) {
+  document.removeEventListener("pointermove", onChipPointerMove);
+  document.removeEventListener("pointerup", onChipPointerUp);
+  document.removeEventListener("pointercancel", onChipPointerUp);
+  if (!chipDrag) {
+    pointerDragActive = false;
+    return;
+  }
+  var over = chipDrag.over;
+  var el = chipDrag.el;
+  if (el) {
+    el.classList.remove("dragging");
+    el.style.visibility = "";
+    try { if (chipDrag.pointerId != null) el.releasePointerCapture(chipDrag.pointerId); } catch (err) {}
+  }
+  clearChipDragOver();
+  var moved = false;
+  if (!cancelled && pointerDragActive && over && over !== el) {
+    moved = finishChipMove(over);
+  }
+  if (!moved) {
+    chipDrag = null;
+    pointerDragActive = false;
+  }
+}
+function finishChipMove(toChip) {
+  if (!chipDrag || !toChip) return false;
+  var toAi = parseInt(toChip.getAttribute("data-ai"), 10);
+  var toSi = parseInt(toChip.getAttribute("data-si"), 10);
+  var toCi = parseInt(toChip.getAttribute("data-ci"), 10);
+  var ok = moveSongMapChip(chipDrag.ai, chipDrag.si, chipDrag.ci, toAi, toSi, toCi);
+  clearChipDragOver();
+  if (chipDrag.el) {
+    chipDrag.el.classList.remove("dragging");
+    chipDrag.el.style.visibility = "";
+  }
+  chipDrag = null;
+  pointerDragActive = false;
+  didChipDrag = true;
+  if (ok) showSections(true);
+  return ok;
+}
+function onChipPointerMove(e) {
+  if (!chipDrag || e.pointerId !== chipDrag.pointerId) return;
+  if (sectionsMode !== "edit") { endChipPointerDrag(true); return; }
+  var dx = e.clientX - chipDrag.startX;
+  var dy = e.clientY - chipDrag.startY;
+  if (!pointerDragActive) {
+    if (Math.abs(dx) + Math.abs(dy) < 8) return;
+    pointerDragActive = true;
+    didChipDrag = true;
+    if (chipDrag.el) {
+      chipDrag.el.classList.add("dragging");
+      try { chipDrag.el.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+  }
+  e.preventDefault();
+  clearChipDragOver();
+  if (chipDrag.el) chipDrag.el.style.visibility = "hidden";
+  var over = chipFromPoint(e.clientX, e.clientY);
+  if (chipDrag.el) chipDrag.el.style.visibility = "";
+  if (over && over !== chipDrag.el) {
+    over.classList.add(over.classList.contains("empty") ? "drag-over-empty" : "drag-over");
+    chipDrag.over = over;
+  } else {
+    chipDrag.over = null;
+  }
+}
+function onChipPointerUp(e) {
+  if (!chipDrag || e.pointerId !== chipDrag.pointerId) return;
+  endChipPointerDrag(false);
+}
+var sectionsSheetEl = document.getElementById("sectionsSheet");
+sectionsSheetEl.addEventListener("pointerdown", function(e){
+  if (sectionsMode !== "edit") return;
+  if (e.pointerType === "mouse" && e.button !== 0) return;
+  var chip = e.target.closest(".sec-chip");
+  if (!chip || chip.classList.contains("empty")) return;
+  // Don't start a new drag while editing text in the chip editor
+  if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) return;
+  chipDrag = {
+    ai: parseInt(chip.getAttribute("data-ai"), 10),
+    si: parseInt(chip.getAttribute("data-si"), 10),
+    ci: parseInt(chip.getAttribute("data-ci"), 10),
+    el: chip,
+    startX: e.clientX,
+    startY: e.clientY,
+    pointerId: e.pointerId,
+    over: null
+  };
+  pointerDragActive = false;
+  didChipDrag = false;
+  document.addEventListener("pointermove", onChipPointerMove, { passive: false });
+  document.addEventListener("pointerup", onChipPointerUp);
+  document.addEventListener("pointercancel", onChipPointerUp);
+});
+// Prevent native HTML5 drag on chips (unreliable on <button>)
+sectionsSheetEl.addEventListener("dragstart", function(e){
+  if (e.target.closest(".sec-chip")) e.preventDefault();
+});
+
+document.getElementById("sectionsSheet").onclick = function(e){
+  var playCard = e.target.closest(".sec-play-card");
+  if (playCard && sectionsMode === "play") {
+    var key = playCard.getAttribute("data-key");
+    var idx = findPlayIndex(key);
+    if (idx >= 0) {
+      playQueue.splice(idx, 1);
+      publishPlayQueue();
+      syncPlayChipClasses();
+    }
+    return;
+  }
+  var chip = e.target.closest(".sec-chip");
+  if (!chip) return;
+  if (didChipDrag) { didChipDrag = false; return; }
+  if (chip.classList.contains("filtered-out") && sectionsMode !== "edit") return;
+  if (sectionsMode === "edit") {
+    var ai = parseInt(chip.getAttribute("data-ai"),10);
+    var si = parseInt(chip.getAttribute("data-si"),10);
+    var ci = parseInt(chip.getAttribute("data-ci"),10);
+    if (chip.classList.contains("empty")) {
+      ensureSongSlots(ALBUMS[ai].songs[si]);
+      if (countSongChips(ALBUMS[ai].songs[si]) >= SONG_SLOTS) return;
+      openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "" });
+      return;
+    }
+    openChipEditor(chip, {
+      ai: ai, si: si, ci: ci, isNew: false,
+      code: chip.getAttribute("data-sec") || "",
+      tier: parseInt(chip.getAttribute("data-tier"),10) || 3,
+      lick: chip.getAttribute("data-lick") || ""
+    });
+    return;
+  }
+  if (sectionsMode === "play") {
+    if (chip.classList.contains("empty") || chip.classList.contains("filtered-out")) return;
+    playSectionChip(chip);
+    return;
+  }
+  if (chip.classList.contains("empty")) return;
+  chip.animate([{transform:"scale(1)"},{transform:"scale(1.06)"},{transform:"scale(1)"}],{duration:180});
+};
+
+window.addEventListener("resize", function(){
+  if (currentLetter && COVER[currentLetter]) rebuildColumns();
+});
+document.getElementById("coverBoard").onclick = function(e){
+  var head = e.target.closest(".col-head");
+  if (!head) return;
+  e.stopPropagation();
+  showKind(head.textContent.trim());
+};
+var sheet = document.getElementById("licks");
+sheet.ondragstart = function(e){
+  var el = e.target.closest(".phrase");
+  if (!el) return;
+  dragged = el;
+  didDrag = false;
+  el.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", el.getAttribute("data-name"));
+};
+sheet.ondragover = function(e){
+  e.preventDefault();
+  var el = e.target.closest(".phrase");
+  if (!dragged || !el || el === dragged) return;
+  var dragFlip = dragged.classList.contains("flipped");
+  if (dragFlip !== el.classList.contains("flipped")) return;
+  if (dragFlip && lickKind(dragged.getAttribute("data-name")) !== lickKind(el.getAttribute("data-name"))) return;
+  didDrag = true;
+  var rect = el.getBoundingClientRect();
+  var before = dragFlip ? ((e.clientY - rect.top) < rect.height / 2) : ((e.clientX - rect.left) < rect.width / 2);
+  el.parentNode.insertBefore(dragged, before ? el : el.nextSibling);
+};
+sheet.ondrop = function(e){
+  e.preventDefault();
+  if (dragged && dragged.classList.contains("flipped")) rebuildColumns();
+  saveOrder();
+};
+sheet.ondragend = function(){
+  if (dragged && dragged.classList.contains("flipped")) rebuildColumns();
+  if (dragged) dragged.classList.remove("dragging");
+  dragged = null;
+  saveOrder();
+};
+sheet.onclick = function(e){
+  if (didDrag) { didDrag = false; return; }
+  var el = e.target.closest(".phrase");
+  if (!el) return;
+  if (COVER[currentLetter]) {
+    togglePlayPhrase(el);
+    return;
+  }
+  document.getElementById("lb").innerHTML = '<img src="'+el.getAttribute("data-file")+'" alt="">';
+  document.getElementById("lb").className = "lightbox";
+};
+document.getElementById("lb").onclick = function(){ this.className = "lightbox hidden"; };
+
+function isNumpadKey(e, digit) {
+  // digit: "0"-"9". Handles NumLock on/off and location=NUMPAD.
+  var codeMap = {
+    "0": ["Numpad0"],
+    "1": ["Numpad1"],
+    "2": ["Numpad2"],
+    "3": ["Numpad3"],
+    "4": ["Numpad4"],
+    "5": ["Numpad5"],
+    "6": ["Numpad6"],
+    "7": ["Numpad7"],
+    "8": ["Numpad8"],
+    "9": ["Numpad9"]
+  };
+  var codes = codeMap[digit] || [];
+  if (codes.indexOf(e.code) >= 0) return true;
+  if (e.location === 3 && String(e.key) === digit) return true;
+  // NumLock off: Numpad0 often reports as Insert
+  if (digit === "0" && e.location === 3 && (e.key === "Insert" || e.code === "Insert")) return true;
+  if (digit === "0" && e.code === "Numpad0") return true;
+  return false;
+}
+function goHomeKey(e) {
+  return isNumpadKey(e, "0") || e.key === "Escape" || e.key === "Backspace" || e.key === "escape" || e.key === "backspace";
+}
+document.addEventListener("keydown", function(e){
+  if ((e.metaKey || e.ctrlKey) && !e.altKey && document.body.classList.contains("sections-mode") && sectionsMode === "edit") {
+    var tag0 = (e.target && e.target.tagName) || "";
+    if (tag0 !== "INPUT" && tag0 !== "TEXTAREA") {
+      var key = (e.key || "").toLowerCase();
+      if (key === "z" && !e.shiftKey) { e.preventDefault(); undoAlbums(); return; }
+      if (key === "s") { e.preventDefault(); saveAlbumsNow(); return; }
+    }
+  }
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  var lb = document.getElementById("lb");
+  if (lb && !lb.classList.contains("hidden")) {
+    if (e.key === "Escape" || isNumpadKey(e, "0")) lb.className = "lightbox hidden";
+    return;
+  }
+  var k = e.key.toLowerCase();
+  if (document.body.classList.contains("home-mode")) {
+    if (isNumpadKey(e, "1")) { showSections(); return; }
+    if (isNumpadKey(e, "2")) { showSeries("A"); return; }
+    if (isNumpadKey(e, "3")) { showSeries("B"); return; }
+    if (k === "a") showSeries("A");
+    else if (k === "b") showSeries("B");
+    else if (k === "c") showSeries("C");
+    else if (k === "d") showSeries("D");
+    return;
+  }
+  if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) {
+    if (k === "escape") { e.preventDefault(); closeChipEditor(); return; }
+    return;
+  }
+  if (document.body.classList.contains("sections-mode")) {
+    var tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    if (isNumpadKey(e, "1")) { setSectionsMode("view"); return; }
+    if (isNumpadKey(e, "2")) { setSectionsMode("edit"); return; }
+    if (isNumpadKey(e, "3")) { setSectionsMode("play"); return; }
+    if (e.shiftKey && k === "v") { setSectionsMode("view"); return; }
+    if (e.shiftKey && k === "e") { setSectionsMode("edit"); return; }
+    if (e.shiftKey && k === "p") { setSectionsMode("play"); return; }
+    if (!e.shiftKey && (k === "i" || k === "v" || k === "c" || k === "b" || k === "s" || k === "l" || k === "o" || k === "f")) {
+      toggleSecTypeKey(k);
+      return;
+    }
+    if (!e.shiftKey && k === "p") {
+      toggleSecTypeKey("PC");
+      return;
+    }
+    if (e.code.indexOf("Digit") === 0 && k >= "1" && k <= "5") {
+      toggleSecTierKey(parseInt(k, 10));
+      return;
+    }
+    if (goHomeKey(e)) {
+      if (k === "backspace") e.preventDefault();
+      showHome();
+    }
+    return;
+  }
+  if (goHomeKey(e)) {
+    if (k === "backspace") e.preventDefault();
+    showHome();
+    return;
+  }
+  if (k === "a" || k === "b" || k === "c" || k === "d") {
+    revealKind(k.toUpperCase());
+    return;
+  }
+  if (k >= "1" && k <= "9") {
+    revealGroup(k);
+  }
+});
+
+if (isPlayboardPage()) {
+  initPlayboardPage();
+} else {
+  pullPlayQueue();
+  bindPlaySync();
+}
+</script>
+</body>
+</html>
