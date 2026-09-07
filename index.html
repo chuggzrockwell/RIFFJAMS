@@ -1369,7 +1369,7 @@ var ALBUMS_DEFAULT = [
     { song: "Orchid", sections: [] },
     { song: "Lord of This World", sections: [] },
     { song: "Solitude", sections: [] },
-    { song: "Into the Void", sections: [["I1",2,"ITV-I1"]] },
+    { song: "Into the Void", sections: [["I1",2,"ITV-I1"],["I2",3],["V1",1],["B1",3],["S1",1],["B2",1],["B3",1],["S2",1]] },
   ]},
 ];
 var ALBUMS_KEY = "lick-sections-albums-v3";
@@ -1387,11 +1387,15 @@ function loadAlbums() {
     albums.forEach(function(a){
       (a.songs||[]).forEach(function(s){
         if (s.song === "Into the Void") {
-          var has = (s.sections||[]).some(function(p){ return p && p[0]==="I1" && p[2]==="ITV-I1"; });
-          if (!has) {
-            if (!s.sections) s.sections = [];
-            if (!s.sections.length) s.sections.push(["I1",2,"ITV-I1"]);
-            else {
+          var itvWant = [["I1",2,"ITV-I1"],["I2",3],["V1",1],["B1",3],["S1",1],["B2",1],["B3",1],["S2",1]];
+          if (!s.sections) s.sections = [];
+          var itvChips = 0;
+          s.sections.forEach(function(p){ if (p && p[0]) itvChips++; });
+          if (itvChips <= 1) {
+            s.sections = itvWant.map(function(x){ return x.slice(); });
+          } else {
+            var has = s.sections.some(function(p){ return p && p[0]==="I1" && p[2]==="ITV-I1"; });
+            if (!has) {
               var found=false;
               s.sections.forEach(function(p){ if(p && p[0]==="I1"){ p[1]=2; p[2]="ITV-I1"; found=true; }});
               if(!found) s.sections.unshift(["I1",2,"ITV-I1"]);
