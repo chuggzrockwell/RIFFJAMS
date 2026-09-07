@@ -403,29 +403,19 @@
   .sheet.has-lib-preview {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     align-items: stretch;
   }
   .sheet.has-lib-preview .tab-wrap {
     order: 0;
-    gap: 6px;
+    gap: 0;
+    row-gap: 0;
     align-items: flex-start;
   }
-  /* Keep the full collection on-screen at half size while previewing */
-  .sheet.has-lib-preview .tab-wrap .phrase .face-tab img.tab,
-  .sheet.has-lib-preview .tab-wrap .phrase img.tab {
-    max-height: 84px;
-    width: auto;
-    height: auto;
-  }
-  .sheet.has-lib-preview .tab-wrap .phrase .face-cover img.cover {
-    width: 84px;
-    height: 84px;
-    object-fit: cover;
-  }
-  .sheet.has-lib-preview .tab-wrap .phrase .card-inner,
-  .sheet.has-lib-preview .tab-wrap .phrase .face {
-    max-height: 84px;
+  /* Library strip at true 50% — JS sets negative margins from each card's box */
+  .sheet.has-lib-preview .tab-wrap .phrase {
+    transform: scale(0.5);
+    transform-origin: top left;
   }
   .sheet.has-lib-preview .tab-wrap .phrase.playing {
     outline: 2px solid #ed1c24;
@@ -433,7 +423,8 @@
   }
   .lib-preview {
     order: 1;
-    flex: 0 0 auto;
+    flex: 1 1 auto;
+    min-height: 0;
     background: #0e0e10;
     border-radius: 12px;
     border: 1px solid rgba(255,255,255,.08);
@@ -444,24 +435,46 @@
   }
   .lib-preview.hidden { display: none !important; }
   .lib-preview-meta {
+    flex: 0 0 auto;
     color: rgba(255,255,255,.8);
     font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: .04em;
   }
-  .lib-preview-face {
+  .lib-preview-board {
+    flex: 1 1 auto;
+    min-height: 120px;
+    max-height: calc(100vh - 200px);
+    overflow: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .lib-preview-card {
+    flex: 0 0 auto;
     background: #fff;
     border-radius: 10px;
-    overflow: auto;
-    max-height: calc(100vh - 220px);
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 0 6px 1px rgba(237,28,36,.85), 0 0 18px 4px rgba(237,28,36,.45);
   }
-  .lib-preview-face img {
+  .lib-preview-card img {
     display: block;
     width: auto;
-    max-width: 100%;
     height: auto;
-    margin: 0 auto;
+    max-width: none;
+    max-height: none;
   }
+  .lib-preview-card .cap {
+    background: rgba(0,0,0,.72);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 8px;
+  }
+
 
   .exclude-dd {
     position: relative;
@@ -1418,8 +1431,8 @@
       <div class="cover-board hidden" id="coverBoard"></div>
       <div class="tab-wrap" id="tabWrap"></div>
       <div class="lib-preview hidden" id="libPreview">
-        <div class="lib-preview-meta" id="libPreviewMeta"></div>
-        <div class="lib-preview-face"><img id="libPreviewImg" alt=""></div>
+        <div class="lib-preview-meta" id="libPreviewMeta">Click licks to add · click again to remove</div>
+        <div class="lib-preview-board" id="libPreviewBoard"></div>
       </div>
     </div>
   </section>
@@ -2160,41 +2173,80 @@ function syncAllPlaySelections() {
   syncPlayChipClasses();
   syncPlayLibraryClasses();
 }
-function clearLibraryPreview() {
+var libPreviewQueue = []; // [{name, src}] — multiple native-size previews on the same screen
+function compactLibraryStrip(on) {
+  document.querySelectorAll("#tabWrap .phrase").forEach(function(el){
+    el.style.transform = "";
+    el.style.transformOrigin = "";
+    el.style.marginRight = "";
+    el.style.marginBottom = "";
+    if (!on) return;
+    // Measure full size, then scale visually to 50% and reclaim layout space
+    var w = el.offsetWidth;
+    var h = el.offsetHeight;
+    el.style.transform = "scale(0.5)";
+    el.style.transformOrigin = "top left";
+    el.style.marginRight = (-Math.round(w / 2)) + "px";
+    el.style.marginBottom = (-Math.round(h / 2)) + "px";
+  });
+}
+function renderLibraryPreviewBoard() {
   var sheet = document.getElementById("licks");
   var prev = document.getElementById("libPreview");
-  var img = document.getElementById("libPreviewImg");
+  var board = document.getElementById("libPreviewBoard");
   var meta = document.getElementById("libPreviewMeta");
-  if (sheet) sheet.classList.remove("has-lib-preview");
-  if (prev) prev.classList.add("hidden");
-  if (img) { img.removeAttribute("src"); img.alt = ""; }
-  if (meta) meta.textContent = "";
+  if (!sheet || !prev || !board) return;
   document.querySelectorAll(".phrase.playing, .phrase.playing-offscreen").forEach(function(el){
     el.classList.remove("playing");
     el.classList.remove("playing-offscreen");
   });
+  if (!libPreviewQueue.length) {
+    sheet.classList.remove("has-lib-preview");
+    prev.classList.add("hidden");
+    board.innerHTML = "";
+    if (meta) meta.textContent = "Click licks to add · click again to remove";
+    compactLibraryStrip(false);
+    return;
+  }
+  sheet.classList.add("has-lib-preview");
+  prev.classList.remove("hidden");
+  if (meta) {
+    meta.textContent = librarySongLabel() + " · " + libPreviewQueue.length +
+      " selected · library at 50% · previews at native size";
+  }
+  var selected = {};
+  libPreviewQueue.forEach(function(item){ selected[item.name] = true; });
+  document.querySelectorAll(".phrase").forEach(function(el){
+    var n = el.getAttribute("data-name") || "";
+    if (selected[n]) el.classList.add("playing");
+  });
+  board.innerHTML = libPreviewQueue.map(function(item){
+    return '<button type="button" class="lib-preview-card" data-name="'+item.name+'">'
+      + '<img src="'+item.src+'" alt="'+item.name+'">'
+      + '<div class="cap">'+item.name+'</div>'
+      + '</button>';
+  }).join("");
+  // Apply 50% strip after layout; again after images settle
+  compactLibraryStrip(true);
+  requestAnimationFrame(function(){ compactLibraryStrip(true); });
+  setTimeout(function(){ compactLibraryStrip(true); }, 50);
 }
-function showLibraryPreview(el) {
+function clearLibraryPreview() {
+  libPreviewQueue = [];
+  renderLibraryPreviewBoard();
+}
+function toggleLibraryPreview(el) {
   if (!el) return;
   var name = (el.getAttribute("data-name") || "").trim();
   if (!name) return;
   var src = el.getAttribute("data-file") || lickSrc(name);
-  var sheet = document.getElementById("licks");
-  var prev = document.getElementById("libPreview");
-  var img = document.getElementById("libPreviewImg");
-  var meta = document.getElementById("libPreviewMeta");
-  if (!sheet || !prev || !img) return;
-  document.querySelectorAll(".phrase.playing, .phrase.playing-offscreen").forEach(function(node){
-    node.classList.remove("playing");
-    node.classList.remove("playing-offscreen");
-  });
-  el.classList.add("playing");
-  sheet.classList.add("has-lib-preview");
-  prev.classList.remove("hidden");
-  meta.textContent = librarySongLabel() + " · " + name;
-  img.alt = name;
-  img.src = src;
-  try { el.scrollIntoView({ block: "nearest", inline: "nearest" }); } catch (err) {}
+  var idx = -1;
+  for (var i = 0; i < libPreviewQueue.length; i++) {
+    if (libPreviewQueue[i].name === name) { idx = i; break; }
+  }
+  if (idx >= 0) libPreviewQueue.splice(idx, 1);
+  else libPreviewQueue.push({ name: name, src: src });
+  renderLibraryPreviewBoard();
 }
 function togglePlayPhrase(el) {
   if (!el) return;
@@ -2202,12 +2254,7 @@ function togglePlayPhrase(el) {
   if (!name) return;
   // COVER libraries (SBS / Paranoid): preview on the same screen — keep all cards visible (half size)
   if (COVER[currentLetter]) {
-    if (el.classList.contains("playing") && document.getElementById("licks") &&
-        document.getElementById("licks").classList.contains("has-lib-preview")) {
-      clearLibraryPreview();
-      return;
-    }
-    showLibraryPreview(el);
+    toggleLibraryPreview(el);
     return;
   }
   var key = libraryPlayKey(el);
@@ -2479,7 +2526,7 @@ function rebuildColumns() {
     return;
   }
   var anyTab = document.querySelector(".phrase:not(.flipped)");
-  board.className = anyTab ? "cover-board shrunk" : "cover-board";
+  board.className = "cover-board"; // keep flipped covers native/full size (no 50% shrunk mode)
   function cardsPerRow(cardSize) {
     var w = board.clientWidth || board.parentElement.clientWidth || window.innerWidth;
     var gap = 6;
@@ -2941,6 +2988,17 @@ sheet.onclick = function(e){
   }
   document.getElementById("lb").innerHTML = '<img src="'+el.getAttribute("data-file")+'" alt="">';
   document.getElementById("lb").className = "lightbox";
+};
+document.getElementById("libPreviewBoard").onclick = function(e){
+  var card = e.target.closest(".lib-preview-card");
+  if (!card) return;
+  var name = card.getAttribute("data-name") || "";
+  var phrase = document.querySelector('.phrase[data-name="'+name+'"]');
+  if (phrase) toggleLibraryPreview(phrase);
+  else {
+    libPreviewQueue = libPreviewQueue.filter(function(item){ return item.name !== name; });
+    renderLibraryPreviewBoard();
+  }
 };
 document.getElementById("lb").onclick = function(){ this.className = "lightbox hidden"; };
 
