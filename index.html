@@ -185,10 +185,10 @@
   body.sections-edit .sec-filters { opacity: .55; pointer-events: none; }
 
   body.sections-play .sec-filters { opacity: 1; }
+  /* Edit/Play: no in-map preview pane. View: show one lick on the right. Play uses Playboard window. */
   body.sections-edit .sec-play-pane,
-  body.sections-mode:not(.sections-play) .sec-play-pane { display: none; }
-  /* Map tab: play pane off — Play lives in a second window */
   body.sections-play .sec-play-pane { display: none !important; }
+  body.sections-mode:not(.sections-edit):not(.sections-play) .sec-play-pane { display: flex; }
   body.playboard-mode {
     background: #0a0a0c;
     margin: 0;
@@ -496,6 +496,24 @@
       height: 50vh;
       max-height: 50vh;
     }
+  }
+  body.sections-mode:not(.sections-edit):not(.sections-play) .sec-chip:not(.empty) { cursor: pointer; }
+  body.sections-mode:not(.sections-edit):not(.sections-play) .sec-chip.viewing {
+    outline: 2px solid #7030a0; outline-offset: -2px;
+  }
+  .sec-view-card {
+    display: flex; flex-direction: column; gap: 8px;
+    align-items: stretch; min-height: 0; overflow: auto;
+    flex: 1 1 auto;
+  }
+  .sec-view-card img {
+    width: 100%; height: auto; max-height: calc(100vh - 180px);
+    object-fit: contain; background: #fff; border-radius: 8px;
+    display: block;
+  }
+  .sec-view-card .cap {
+    color: rgba(255,255,255,.75); font-size: 0.78rem; font-weight: 700;
+    letter-spacing: .04em;
   }
   body.sections-edit .sec-chip { cursor: pointer; }
   body.sections-edit .sec-chip:not(.empty) {
@@ -1626,6 +1644,8 @@ function showSections(keepScroll) {
   if (sectionsMode === "play") {
     pullPlayQueue();
     syncPlayChipClasses();
+  } else if (sectionsMode === "view") {
+    resetViewPane();
   }
   if (keepScroll) window.scrollTo(sx, sy);
   else window.scrollTo(0, 0);
@@ -1877,12 +1897,14 @@ function setSectionsMode(mode) {
   if (keys) {
     if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · Esc closes";
     else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · section clicks queue · Playboard window · Esc/0 home";
-    else keys.textContent = "Numpad 1/2/3 modes · i/v/… types · 1–5 tiers · Esc/0 home";
+    else keys.textContent = "Numpad 1/2/3 · click section to preview on the right · Esc/0 home";
   }
   if (sectionsMode === "play") {
     pullPlayQueue();
     openPlayWindow();
     publishPlayQueue();
+  } else if (sectionsMode === "view") {
+    resetViewPane();
   }
   updateEditSaveUi();
   if (document.getElementById("sections") && !document.getElementById("sections").classList.contains("hidden")) {
@@ -2098,6 +2120,35 @@ function togglePlayPhrase(el) {
   syncPlayLibraryClasses();
 }
 function playSectionChip(chip) { togglePlayChip(chip); }
+function clearViewHighlight() {
+  document.querySelectorAll(".sec-chip.viewing").forEach(function(c){ c.classList.remove("viewing"); });
+}
+function viewSectionLick(chip) {
+  if (!chip || chip.classList.contains("empty") || chip.classList.contains("filtered-out")) return;
+  var code = chip.getAttribute("data-sec") || "";
+  var song = chip.getAttribute("data-song") || "";
+  var lick = (chip.getAttribute("data-lick") || "").trim();
+  var meta = document.getElementById("secPlayMeta");
+  var board = document.getElementById("secPlayBoard");
+  if (!board) return;
+  clearViewHighlight();
+  chip.classList.add("viewing");
+  if (!lick) {
+    if (meta) meta.innerHTML = "<strong>"+code+"</strong> has no link — set it in Edit";
+    board.innerHTML = '<div class="sec-play-empty" id="secPlayEmpty">No linked tab for this section.</div>';
+    return;
+  }
+  var src = lickSrc(lick);
+  if (meta) meta.innerHTML = "<strong>"+song+"</strong> · "+code+" · "+lick;
+  board.innerHTML = '<div class="sec-view-card"><img src="'+src+'" alt="'+lick+'"><div class="cap">'+lick+'</div></div>';
+}
+function resetViewPane() {
+  clearViewHighlight();
+  var meta = document.getElementById("secPlayMeta");
+  var board = document.getElementById("secPlayBoard");
+  if (meta) meta.textContent = "View — click a linked section to preview here";
+  if (board) board.innerHTML = '<div class="sec-play-empty" id="secPlayEmpty">Click a linked section to preview its tab.</div>';
+}
 function closeChipEditor() {
   chipEditState = null;
   var ed = document.getElementById("chipEditor");
@@ -2227,6 +2278,7 @@ var CATALOG = [
   ["IM-2-1B","B"],["IM-2-2B","B"],["IM-2-3B","B"],["IM-2-4B","B"],["IM-2-5B","B"],
   ["P-1A","B"],["P-1B","B"],["P-2B","B"],["P-3B","B"],["P-4B","B"],
   ["WP-1-1A","B"],["WP-1-2A","B"],["WP-1-3A","B"],["WP-1-4A","B"],["WP-1-1B","B"],["WP-1-1D","B"],
+  ["WP-2-1B","B"],["WP-2-2B","B"],["WP-2-3B","B"],["WP-2-4B","B"],
   ["LFT-1C","C"],["LFT-1D","D"]
 ];
 var FOLDER = { A: "a-crops/", B: "b-crops/", C: "svg/", D: "svg/" };
@@ -2717,8 +2769,9 @@ document.getElementById("sectionsSheet").onclick = function(e){
     playSectionChip(chip);
     return;
   }
-  if (chip.classList.contains("empty")) return;
-  chip.animate([{transform:"scale(1)"},{transform:"scale(1.06)"},{transform:"scale(1)"}],{duration:180});
+  // View mode: one lick at a time in the right pane (same window)
+  if (chip.classList.contains("empty") || chip.classList.contains("filtered-out")) return;
+  viewSectionLick(chip);
 };
 
 window.addEventListener("resize", function(){
