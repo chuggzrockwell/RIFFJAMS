@@ -385,21 +385,84 @@
   .sec-chip.playing {
     outline: 2px solid #111;
     outline-offset: -2px;
-    box-shadow: inset 0 0 0 2px #ffe44a !important;
+    box-shadow: inset 0 0 0 2px #ed1c24 !important;
   }
   .sec-chip.playing-offscreen {
     outline: 2px dashed rgba(0,0,0,.35);
     outline-offset: -2px;
-    box-shadow: inset 0 0 0 2px rgba(255,228,74,.45) !important;
+    box-shadow: inset 0 0 0 2px rgba(237,28,36,.45) !important;
   }
   .phrase.playing {
-    outline: 2px solid #ffe44a;
+    outline: 2px solid #ed1c24;
     outline-offset: 2px;
   }
   .phrase.playing-offscreen {
-    outline: 2px dashed rgba(255,228,74,.45);
+    outline: 2px dashed rgba(237,28,36,.45);
     outline-offset: 2px;
   }
+  .sheet.has-lib-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  .sheet.has-lib-preview .tab-wrap {
+    order: 0;
+    gap: 6px;
+    align-items: flex-start;
+  }
+  /* Keep the full collection on-screen at half size while previewing */
+  .sheet.has-lib-preview .tab-wrap .phrase .face-tab img.tab,
+  .sheet.has-lib-preview .tab-wrap .phrase img.tab {
+    max-height: 84px;
+    width: auto;
+    height: auto;
+  }
+  .sheet.has-lib-preview .tab-wrap .phrase .face-cover img.cover {
+    width: 84px;
+    height: 84px;
+    object-fit: cover;
+  }
+  .sheet.has-lib-preview .tab-wrap .phrase .card-inner,
+  .sheet.has-lib-preview .tab-wrap .phrase .face {
+    max-height: 84px;
+  }
+  .sheet.has-lib-preview .tab-wrap .phrase.playing {
+    outline: 2px solid #ed1c24;
+    outline-offset: 2px;
+  }
+  .lib-preview {
+    order: 1;
+    flex: 0 0 auto;
+    background: #0e0e10;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.08);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lib-preview.hidden { display: none !important; }
+  .lib-preview-meta {
+    color: rgba(255,255,255,.8);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+  }
+  .lib-preview-face {
+    background: #fff;
+    border-radius: 10px;
+    overflow: auto;
+    max-height: calc(100vh - 220px);
+  }
+  .lib-preview-face img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+  }
+
   .exclude-dd {
     position: relative;
     display: inline-block;
@@ -1349,11 +1412,15 @@
       <button type="button" class="back" id="back">Back</button>
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
-      <span class="keys">Click licks → Playboard · 1–9 = *-N · Esc/0 home</span>
+      <span class="keys">Click a lick to preview here · 1–9 = *-N · Esc/0 home</span>
     </div>
     <div class="sheet" id="licks">
       <div class="cover-board hidden" id="coverBoard"></div>
       <div class="tab-wrap" id="tabWrap"></div>
+      <div class="lib-preview hidden" id="libPreview">
+        <div class="lib-preview-meta" id="libPreviewMeta"></div>
+        <div class="lib-preview-face"><img id="libPreviewImg" alt=""></div>
+      </div>
     </div>
   </section>
 </div>
@@ -2093,10 +2160,56 @@ function syncAllPlaySelections() {
   syncPlayChipClasses();
   syncPlayLibraryClasses();
 }
+function clearLibraryPreview() {
+  var sheet = document.getElementById("licks");
+  var prev = document.getElementById("libPreview");
+  var img = document.getElementById("libPreviewImg");
+  var meta = document.getElementById("libPreviewMeta");
+  if (sheet) sheet.classList.remove("has-lib-preview");
+  if (prev) prev.classList.add("hidden");
+  if (img) { img.removeAttribute("src"); img.alt = ""; }
+  if (meta) meta.textContent = "";
+  document.querySelectorAll(".phrase.playing, .phrase.playing-offscreen").forEach(function(el){
+    el.classList.remove("playing");
+    el.classList.remove("playing-offscreen");
+  });
+}
+function showLibraryPreview(el) {
+  if (!el) return;
+  var name = (el.getAttribute("data-name") || "").trim();
+  if (!name) return;
+  var src = el.getAttribute("data-file") || lickSrc(name);
+  var sheet = document.getElementById("licks");
+  var prev = document.getElementById("libPreview");
+  var img = document.getElementById("libPreviewImg");
+  var meta = document.getElementById("libPreviewMeta");
+  if (!sheet || !prev || !img) return;
+  document.querySelectorAll(".phrase.playing, .phrase.playing-offscreen").forEach(function(node){
+    node.classList.remove("playing");
+    node.classList.remove("playing-offscreen");
+  });
+  el.classList.add("playing");
+  sheet.classList.add("has-lib-preview");
+  prev.classList.remove("hidden");
+  meta.textContent = librarySongLabel() + " · " + name;
+  img.alt = name;
+  img.src = src;
+  try { el.scrollIntoView({ block: "nearest", inline: "nearest" }); } catch (err) {}
+}
 function togglePlayPhrase(el) {
   if (!el) return;
   var name = (el.getAttribute("data-name") || "").trim();
   if (!name) return;
+  // COVER libraries (SBS / Paranoid): preview on the same screen — keep all cards visible (half size)
+  if (COVER[currentLetter]) {
+    if (el.classList.contains("playing") && document.getElementById("licks") &&
+        document.getElementById("licks").classList.contains("has-lib-preview")) {
+      clearLibraryPreview();
+      return;
+    }
+    showLibraryPreview(el);
+    return;
+  }
   var key = libraryPlayKey(el);
   var idx = findPlayIndex(key);
   if (idx >= 0) {
@@ -2469,17 +2582,14 @@ function showSeries(letter) {
     [].forEach.call(document.querySelectorAll(".phrase.no-anim"), function(el){ el.classList.remove("no-anim"); });
   });
   window.scrollTo(0,0);
+  clearLibraryPreview();
   pullPlayQueue();
-  syncPlayLibraryClasses();
+  // Don't re-apply yellow/red queue outlines in the library strip — preview uses .playing instead
 }
 
 function showHome() {
   closeChipEditor();
-  // Drop library play highlights so cards look normal when you come back
-  document.querySelectorAll(".phrase.playing, .phrase.playing-offscreen").forEach(function(el){
-    el.classList.remove("playing");
-    el.classList.remove("playing-offscreen");
-  });
+  clearLibraryPreview();
   document.body.className = "home-mode";
   document.getElementById("home").className = "";
   document.getElementById("series").className = "hidden";
