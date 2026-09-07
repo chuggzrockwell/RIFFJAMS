@@ -2475,6 +2475,11 @@ function showSeries(letter) {
 
 function showHome() {
   closeChipEditor();
+  // Drop library play highlights so cards look normal when you come back
+  document.querySelectorAll(".phrase.playing, .phrase.playing-offscreen").forEach(function(el){
+    el.classList.remove("playing");
+    el.classList.remove("playing-offscreen");
+  });
   document.body.className = "home-mode";
   document.getElementById("home").className = "";
   document.getElementById("series").className = "hidden";
