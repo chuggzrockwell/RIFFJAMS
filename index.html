@@ -32,8 +32,8 @@
   .wrap { width: 100%; padding: 10px 8px 28px; box-sizing: border-box; }
   h1 { margin: 0 0 10px 6px; font-size: 0.95rem; letter-spacing: .08em; text-transform: uppercase; color: #c2c2be; font-weight: 600; }
   .grid {
-    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px; width: 100%; max-width: 920px;
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px; width: 100%; max-width: 1100px;
   }
   .tile {
     display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end;
@@ -53,6 +53,24 @@
     color: transparent;
   }
   .tile.b small { color: transparent; }
+  /* Inverted Paranoid tile (B2) — invert only the art layer so hover brightness stays normal */
+  .tile.b2 {
+    position: relative;
+    background: #000;
+    color: transparent;
+    isolation: isolate;
+  }
+  .tile.b2::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #000 url("covers/paranoid.png") center / cover no-repeat;
+    filter: invert(1);
+    z-index: 0;
+    border-radius: inherit;
+  }
+  .tile.b2 > * { position: relative; z-index: 1; }
+  .tile.b2 small { color: transparent; }
   .tile.hp {
     background: #000 url("covers/sabbath-hp-tile.png") center / cover no-repeat;
     color: transparent;
@@ -78,7 +96,7 @@
   body.sections-mode .count, body.sections-mode .keys { opacity: .55; color: #444; }
   .badge { font-size: 1.15rem; font-weight: 800; padding: 4px 12px; border-radius: 8px; color: #111; }
   .badge.a { background: #3ec8ff; } .badge.b { background: #3ee45e; }
-  .badge.c { background: #ffe44a; } .badge.d { background: #ff3d4e; }
+  .badge.b2 { background: #9bffb0; } .badge.c { background: #ffe44a; } .badge.d { background: #ff3d4e; }
   .count { opacity: .65; font-size: 0.9rem; }
   .keys { margin-left: auto; opacity: .5; font-size: 0.78rem; letter-spacing: .04em; }
   .phrase.filtered-out { display: none !important; }
@@ -731,6 +749,50 @@
   .col-body {
     display: contents;
   }
+  /* B2: song columns (Iron Man | Paranoid | War Pigs), 2 lick cols each */
+  .cover-board.song-cols {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: flex-start;
+  }
+  .song-col {
+    --card: 150px;
+    --gap: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    flex: 0 0 auto;
+    width: calc(var(--card) * 2 + var(--gap));
+  }
+  .song-col-head {
+    box-sizing: border-box;
+    width: 100%;
+    background: #050607;
+    color: #fff;
+    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-weight: 400;
+    font-size: 1.05rem;
+    letter-spacing: .04em;
+    text-align: center;
+    padding: 10px 8px;
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px #22262f, 0 8px 20px rgba(0,0,0,.45);
+    user-select: none;
+  }
+  .song-col-body {
+    display: grid;
+    grid-template-columns: var(--card) var(--card);
+    gap: var(--gap);
+    width: 100%;
+    justify-content: start;
+  }
+  .cover-board.shrunk .song-col { --card: 75px; }
+  .cover-board.shrunk .song-col-head {
+    font-size: 0.78rem;
+    padding: 6px 4px;
+    border-radius: 4px;
+  }
   .phrase {
     box-sizing: border-box; padding: 0; cursor: grab;
     border: 0; background: transparent; position: relative;
@@ -1336,6 +1398,9 @@
     .group.tall-head { grid-template-columns: repeat(auto-fill, 48px); grid-auto-rows: 48px; }
     .cover-board.shrunk .group.tall-head { grid-template-columns: repeat(auto-fill, 40px); grid-auto-rows: 40px; }
     .cover-board.shrunk .col-head.tall { width: 40px; }
+    .song-col { --card: 48px; }
+    .cover-board.shrunk .song-col { --card: 40px; }
+    .song-col-head { font-size: 0.65rem; padding: 4px 2px; }
   }
 
   /* Phone landscape: home modules stay square (not full-height stretch) */
@@ -1343,9 +1408,9 @@
     .wrap { padding: 6px 8px 10px; }
     h1 { margin: 0 0 6px 4px; font-size: 0.75rem; }
     .grid {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 8px;
-      max-width: min(100%, calc(5 * (100vh - 64px) + 4 * 8px));
+      max-width: min(100%, calc(6 * (100vh - 64px) + 5 * 8px));
       width: 100%;
       justify-items: stretch;
     }
@@ -1371,6 +1436,7 @@
       <button type="button" class="tile hp" id="btnHP"><small>Song Map</small>Sabbath</button>
       <button type="button" class="tile a" id="btnA"><small>Licks</small>A</button>
       <button type="button" class="tile b" id="btnB"><small>Paranoid</small>B</button>
+      <button type="button" class="tile b2" id="btnB2"><small>Paranoid</small>B2</button>
       <button type="button" class="tile c" id="btnC"><small>Licks</small>C</button>
       <button type="button" class="tile d" id="btnD"><small>Licks</small>D</button>
     </div>
@@ -2335,6 +2401,7 @@ function libraryPlayKey(el) {
 function librarySongLabel() {
   if (currentLetter === "A") return "SBS";
   if (currentLetter === "B") return "Paranoid";
+  if (currentLetter === "B2") return "Paranoid 2";
   return currentLetter || "";
 }
 function syncPlayLibraryClasses() {
@@ -2631,8 +2698,8 @@ var CATALOG = [
   ["WP-2-1B","B"],["WP-2-2B","B"],["WP-2-3B","B"],["WP-2-4B","B"],
   ["LFT-1C","C"],["LFT-1D","D"]
 ];
-var FOLDER = { A: "a-crops/", B: "b-crops/", C: "svg/", D: "svg/" };
-var COVER = { A: "covers/sbs.png", B: "covers/paranoid.png" };
+var FOLDER = { A: "a-crops/", B: "b-crops/", B2: "b-crops/", C: "svg/", D: "svg/" };
+var COVER = { A: "covers/sbs.png", B: "covers/paranoid.png", B2: "covers/paranoid.png" };
 var currentLetter = "";
 var dragged = null;
 var didDrag = false;
@@ -2702,7 +2769,50 @@ function collectFlipped(kind) {
   });
   return out;
 }
+function rebuildColumnsB2() {
+  var board = document.getElementById("coverBoard");
+  var songs = [
+    { re: /^IM-/, label: "Iron Man" },
+    { re: /^P-/, label: "Paranoid" },
+    { re: /^WP-/, label: "War Pigs" }
+  ];
+  // Preserve document / saved order among flipped (album-art) cards
+  var allFlipped = [];
+  [].forEach.call(document.querySelectorAll(".phrase"), function(el){
+    if (el.classList.contains("flipped") && !el.classList.contains("filtered-out")) allFlipped.push(el);
+  });
+  var hold = document.createDocumentFragment();
+  allFlipped.forEach(function(el){ hold.appendChild(el); });
+  board.innerHTML = "";
+  if (!allFlipped.length) {
+    board.className = "cover-board hidden";
+    return;
+  }
+  var anyTab = !!document.querySelector("#tabWrap .phrase");
+  board.className = anyTab ? "cover-board shrunk song-cols" : "cover-board song-cols";
+  songs.forEach(function(song){
+    var items = allFlipped.filter(function(el){
+      return song.re.test(el.getAttribute("data-name") || "");
+    });
+    if (!items.length) return;
+    var col = document.createElement("div");
+    col.className = "song-col";
+    var head = document.createElement("div");
+    head.className = "song-col-head";
+    head.textContent = song.label;
+    var body = document.createElement("div");
+    body.className = "song-col-body";
+    items.forEach(function(el){ body.appendChild(el); });
+    col.appendChild(head);
+    col.appendChild(body);
+    board.appendChild(col);
+  });
+}
 function rebuildColumns() {
+  if (currentLetter === "B2") {
+    rebuildColumnsB2();
+    return;
+  }
   var board = document.getElementById("coverBoard");
   var tabWrap = document.getElementById("tabWrap");
   var a = collectFlipped("A");
@@ -2805,15 +2915,17 @@ function revealGroup(group) {
 function showSeries(letter) {
   currentLetter = letter;
   document.body.className = "sheet-mode stage";
-  document.getElementById("badge").textContent = (letter === "B") ? "Paranoid" : letter;
+  var badgeLabel = (letter === "B") ? "Paranoid" : (letter === "B2") ? "Paranoid 2" : letter;
+  document.getElementById("badge").textContent = badgeLabel;
   document.getElementById("badge").className = "badge " + letter.toLowerCase();
   document.getElementById("home").className = "hidden";
   document.getElementById("sections").className = "hidden";
   document.getElementById("series").className = "";
-  var items = applySavedOrder(CATALOG.filter(function(x){ return x[1] === letter; }), letter);
-  var folder = FOLDER[letter] || "svg/";
+  var catalogLetter = (letter === "B2") ? "B" : letter;
+  var items = applySavedOrder(CATALOG.filter(function(x){ return x[1] === catalogLetter; }), letter);
+  var folder = FOLDER[letter] || FOLDER[catalogLetter] || "svg/";
   document.getElementById("count").textContent = items.length + " licks";
-  var cover = COVER[letter] || "";
+  var cover = COVER[letter] || COVER[catalogLetter] || "";
   var flipped = flippedSet(letter);
   var tabWrap = document.getElementById("tabWrap");
   document.getElementById("coverBoard").innerHTML = "";
@@ -2852,6 +2964,7 @@ function showHome() {
 }
 document.getElementById("btnA").onclick = function(){ showSeries("A"); };
 document.getElementById("btnB").onclick = function(){ showSeries("B"); };
+document.getElementById("btnB2").onclick = function(){ showSeries("B2"); };
 document.getElementById("btnC").onclick = function(){ showSeries("C"); };
 document.getElementById("btnD").onclick = function(){ showSeries("D"); };
 document.getElementById("btnHP").onclick = showSections;
