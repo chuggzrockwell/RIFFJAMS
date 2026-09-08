@@ -694,17 +694,25 @@
     box-sizing: border-box;
   }
   .tab-wrap { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; width: 100%; }
+  /* Song columns: heads in one row at top, licks stacked under each head */
   .cover-board {
-    display: flex; flex-direction: row; flex-wrap: nowrap;
-    align-items: flex-start; gap: 14px;
-    width: 100%; order: -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    column-gap: 14px;
+    row-gap: 8px;
+    width: 100%;
+    order: -1;
   }
+  .cover-board.cols-1 { grid-template-columns: minmax(0, 1fr); }
+  .cover-board.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cover-board.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cover-board.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .group {
-    display: flex; flex-direction: column;
-    gap: 8px; align-items: stretch;
-    flex: 1 1 0; min-width: 0;
+    display: contents; /* head + body become direct grid children of cover-board */
   }
   .col-head {
+    grid-row: 1;
     width: 100%; height: auto; min-height: 44px;
     box-sizing: border-box;
     background: #050607; color: #fff;
@@ -712,7 +720,7 @@
     text-align: center;
     font-weight: 800; font-size: 0.95rem; letter-spacing: .06em;
     text-transform: uppercase;
-    border-radius: 8px; flex: 0 0 auto;
+    border-radius: 8px;
     padding: 10px 8px;
     box-shadow: 0 0 0 1px #22262f, 0 8px 20px rgba(0,0,0,.45);
     cursor: pointer; user-select: none;
@@ -721,12 +729,17 @@
   .col-body {
     display: flex; flex-direction: row; flex-wrap: wrap;
     gap: 6px; align-items: flex-start;
+    align-content: flex-start;
+    width: 100%;
+    min-height: 0;
   }
   .cover-board.shrunk .col-head {
     min-height: 36px;
     font-size: 0.72rem;
     padding: 6px 4px;
   }
+  /* When using song columns, flat tab-wrap is unused */
+  .sheet.song-cols #tabWrap:empty { display: none; }
   .phrase {
     box-sizing: border-box; padding: 0; cursor: grab;
     border: 0; background: transparent; position: relative;
@@ -2551,9 +2564,9 @@ function songColumnsForLibrary() {
     { key: "other", label: "Other" }
   ];
 }
-function collectFlippedBySong(songKey) {
+function collectSongPhrases(songKey) {
   var out = [];
-  [].forEach.call(document.querySelectorAll(".phrase.flipped"), function(el){
+  [].forEach.call(document.querySelectorAll(".phrase"), function(el){
     if (el.classList.contains("filtered-out")) return;
     var n = el.getAttribute("data-name") || "";
     if (lickSongKey(n) === songKey) out.push(el);
@@ -2567,21 +2580,28 @@ function collectFlippedBySong(songKey) {
 }
 function rebuildColumns() {
   var board = document.getElementById("coverBoard");
-  var cols = songColumnsForLibrary();
-  var groups = cols.map(function(c){
-    return { key: c.key, label: c.label, items: collectFlippedBySong(c.key) };
-  }).filter(function(g){ return g.items.length; });
-  var hold = document.createDocumentFragment();
-  groups.forEach(function(g){ g.items.forEach(function(el){ hold.appendChild(el); }); });
-  board.innerHTML = "";
-  if (!groups.length) {
+  var sheet = document.getElementById("licks");
+  var tabWrap = document.getElementById("tabWrap");
+  if (!COVER[currentLetter]) {
+    // Non-cover libraries keep old flat behavior
     board.className = "cover-board hidden";
     return;
   }
-  // Jacob: flipped = tab (full size); unflipped = album art.
-  // CSS .flipped = album art. When any tabs show, album-art tiles go to half (75px).
-  var anyTab = !!document.querySelector("#tabWrap .phrase");
-  board.className = anyTab ? "cover-board shrunk" : "cover-board";
+  var cols = songColumnsForLibrary();
+  var groups = cols.map(function(c){
+    return { key: c.key, label: c.label, items: collectSongPhrases(c.key) };
+  });
+  // Always keep song heads even if a column is empty
+  var hold = document.createDocumentFragment();
+  groups.forEach(function(g){ g.items.forEach(function(el){ hold.appendChild(el); }); });
+  board.innerHTML = "";
+  if (tabWrap) tabWrap.innerHTML = "";
+  var anyTab = groups.some(function(g){
+    return g.items.some(function(el){ return !el.classList.contains("flipped"); });
+  });
+  var nCols = Math.max(1, Math.min(4, cols.length));
+  board.className = "cover-board cols-" + nCols + (anyTab ? " shrunk" : "");
+  if (sheet) sheet.classList.add("song-cols");
   groups.forEach(function(g){
     var group = document.createElement("div");
     group.className = "group";
@@ -2597,6 +2617,10 @@ function revealSong(songKey) {
   }));
 }
 function placePhrase(el) {
+  if (COVER[currentLetter]) {
+    rebuildColumns();
+    return;
+  }
   var tabWrap = document.getElementById("tabWrap");
   if (!el.classList.contains("flipped")) tabWrap.appendChild(el);
   rebuildColumns();
@@ -2606,6 +2630,11 @@ function lickGroup(name) {
   return m ? m[1] : null;
 }
 function relayout() {
+  if (COVER[currentLetter]) {
+    rebuildColumns(); // all licks live in song columns
+    saveFlipped();
+    return;
+  }
   var tabWrap = document.getElementById("tabWrap");
   [].forEach.call(document.querySelectorAll(".phrase"), function(el){
     if (!el.classList.contains("flipped")) tabWrap.appendChild(el);
