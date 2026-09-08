@@ -1440,12 +1440,12 @@
 <div class="wrap">
   <section id="home">
     <h1>RIFFJAMS</h1>
-    <p class="keys" style="margin:0 0 10px 4px">Numpad 1 Song Map · 2 SBS · 3 Paranoid · 0 home</p>
+    <p class="keys" style="margin:0 0 10px 4px">Numpad 1 Song Map · 2 SBS · 3 LL-p · 0 home</p>
     <div class="grid">
       <button type="button" class="tile hp" id="btnHP"><small>Song Map</small>Sabbath</button>
       <button type="button" class="tile a" id="btnA"><small>Licks</small>A</button>
-      <button type="button" class="tile b" id="btnB"><small>Paranoid</small>B</button>
-      <button type="button" class="tile b2" id="btnB2"><small>Paranoid</small>B2</button>
+      <button type="button" class="tile b" id="btnB"><small>LL-p</small>B</button>
+      <button type="button" class="tile b2" id="btnB2"><small>LL-p</small>B2</button>
       <button type="button" class="tile c" id="btnC"><small>Licks</small>C</button>
       <button type="button" class="tile d" id="btnD"><small>Licks</small>D</button>
     </div>
@@ -1508,7 +1508,7 @@
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
       <button type="button" class="btn-randomize" id="btnRandomize" title="Shuffle cover cards on the board">Randomize</button>
-      <span class="keys">Click a lick to flip · A/B/C/D/E class · I/P/W songs · 1–9 = *-N · Esc/0 home</span>
+      <span class="keys">Click a lick to flip · A/B/C/D/E class · I/P/W/H/R songs · 1–9 = *-N · Esc/0 home</span>
     </div>
     <div class="sheet" id="licks">
       <div class="cover-board hidden" id="coverBoard"></div>
@@ -2503,8 +2503,8 @@ function libraryPlayKey(el) {
 }
 function librarySongLabel() {
   if (currentLetter === "A") return "SBS";
-  if (currentLetter === "B") return "Paranoid";
-  if (currentLetter === "B2") return "Paranoid 2";
+  if (currentLetter === "B") return "LL-p";
+  if (currentLetter === "B2") return "LL-p 2";
   return currentLetter || "";
 }
 function syncPlayLibraryClasses() {
@@ -3112,7 +3112,7 @@ function revealKind(kind) {
   }));
 }
 function revealSong(prefix) {
-  // I/P/W: toggle all licks for a song (IM- / P- / WP-). Same flip rule as A/B/C/D.
+  // I/P/W/H/R: toggle song licks (IM-/P-/WP-/HOD-/RS-). Same flip rule as A/B/C/D.
   document.querySelectorAll(".phrase.filtered-out").forEach(function(el){
     el.classList.remove("filtered-out");
   });
@@ -3141,7 +3141,7 @@ function revealGroup(group) {
 function showSeries(letter) {
   currentLetter = letter;
   document.body.className = "sheet-mode stage";
-  var badgeLabel = (letter === "B") ? "Paranoid" : (letter === "B2") ? "Paranoid 2" : letter;
+  var badgeLabel = (letter === "B") ? "LL-p" : (letter === "B2") ? "LL-p 2" : letter;
   document.getElementById("badge").textContent = badgeLabel;
   document.getElementById("badge").className = "badge " + letter.toLowerCase();
   document.getElementById("home").className = "hidden";
@@ -3687,6 +3687,8 @@ document.addEventListener("keydown", function(e){
   if (k === "i") { revealSong("IM-"); return; }
   if (k === "p") { revealSong("P-"); return; }
   if (k === "w") { revealSong("WP-"); return; }
+  if (k === "h") { revealSong("HOD-"); return; }
+  if (k === "r") { revealSong("RS-"); return; }
   if (k >= "1" && k <= "9") {
     revealGroup(k);
   }
