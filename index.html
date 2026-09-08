@@ -1642,7 +1642,7 @@ function loadSoloMap() {
     if (raw) {
       var parsed = JSON.parse(raw);
       if (parsed && (parsed.albums || Array.isArray(parsed))) {
-        return normalizeSoloMap(parsed, ALBUMS_DEFAULT);
+        return mergeEmptySoloFromCatalog(normalizeSoloMap(parsed, ALBUMS_DEFAULT));
       }
     }
   } catch (e) {}
@@ -2329,10 +2329,11 @@ function lickLetter(id) {
   if (/C$/.test(id)) return "C";
   if (/B$/.test(id)) return "B";
   if (/A$/.test(id)) {
-    if (/^(IM|P-|WP-|HOD-)/.test(id)) return "B";
+    if (/^(IM|P-|WP-|HOD-|RS-)/.test(id)) return "B";
     return "A";
   }
   if (/^HOD-/.test(id)) return "B";
+  if (/^RS-/.test(id)) return "B";
   return "B";
 }
 function lickSrc(id) {
@@ -2807,6 +2808,7 @@ var CATALOG = [
   ["WP-1-1A","B"],["WP-1-2A","B"],["WP-1-3A","B"],["WP-1-4A","B"],["WP-1-1B","B"],["WP-1-1D","B"],
   ["WP-2-1B","B"],["WP-2-2B","B"],["WP-2-3B","B"],["WP-2-4B","B"],
   ["HOD-1","B"],["HOD-2E","B"],["HOD-3E","B"],["HOD-4E","B"],["HOD-5E","B"],["HOD-6E","B"],
+  ["RS-1","B"],["RS-2E","B"],["RS-3E","B"],["RS-4E","B"],["RS-5E","B"],
   ["LFT-1C","C"],["LFT-1D","D"]
 ];
 var FOLDER = { A: "a-crops/", B: "b-crops/", B2: "b-crops/", C: "svg/", D: "svg/" };
@@ -2849,14 +2851,14 @@ function flippedSet(letter) {
   try { return JSON.parse(localStorage.getItem(flipKey(letter)) || "[]"); } catch (e) { return []; }
 }
 function lickKind(name) {
-  if (/E$/i.test(name) || name === "HOD-1") return "E";
+  if (/E$/i.test(name) || name === "HOD-1" || name === "RS-1") return "E";
   if (/D$/.test(name)) return "D";
   if (/B$/.test(name)) return "B";
   if (/C$/.test(name)) return "C";
   return "A";
 }
 function buildDefaultSoloMapFromParanoid() {
-  var buckets = { "Iron Man": [], "Paranoid": [], "War Pigs": [], "Hand of Doom": [] };
+  var buckets = { "Iron Man": [], "Paranoid": [], "War Pigs": [], "Hand of Doom": [], "Rat Salad": [] };
   (CATALOG || []).forEach(function(x){
     if (!x || x[1] !== "B") return;
     var id = x[0];
@@ -2864,12 +2866,13 @@ function buildDefaultSoloMapFromParanoid() {
     if (id.indexOf("IM-") === 0) song = "Iron Man";
     else if (id.indexOf("WP-") === 0) song = "War Pigs";
     else if (id.indexOf("HOD-") === 0) song = "Hand of Doom";
+    else if (id.indexOf("RS-") === 0) song = "Rat Salad";
     else if (id.indexOf("P-") === 0) song = "Paranoid";
     if (!song || !buckets[song]) return;
     var k = lickKind(id);
     var tier = (k === "A") ? 1 : (k === "B") ? 2 : (k === "E") ? 1 : 1;
     // Chip text: drop song prefix; keep full id for Play
-    var label = id.replace(/^(IM|WP|P|HOD)-/, "");
+    var label = id.replace(/^(IM|WP|P|HOD|RS)-/, "");
     buckets[song].push([label, tier, id]);
   });
   var albums = blankSoloMapFromAlbums(ALBUMS_DEFAULT);
@@ -2880,11 +2883,33 @@ function buildDefaultSoloMapFromParanoid() {
   });
   return { albums: albums };
 }
+function mergeEmptySoloFromCatalog(map) {
+  if (!map || !map.albums) return map;
+  var fresh = (typeof buildDefaultSoloMapFromParanoid === "function") ? buildDefaultSoloMapFromParanoid() : null;
+  if (!fresh || !fresh.albums) return map;
+  var byAlbum = {};
+  fresh.albums.forEach(function(a){ if (a && a.name) byAlbum[a.name] = a; });
+  map.albums.forEach(function(a){
+    var src = byAlbum[a.name];
+    if (!src) return;
+    var songBy = {};
+    (src.songs || []).forEach(function(s){ if (s && s.song) songBy[s.song] = s; });
+    (a.songs || []).forEach(function(s){
+      var n = 0;
+      (s.licks || []).forEach(function(p){ if (p && p[0]) n++; });
+      if (n === 0 && songBy[s.song] && songBy[s.song].licks && songBy[s.song].licks.length) {
+        s.licks = songBy[s.song].licks.slice();
+      }
+    });
+  });
+  return map;
+}
 function songClass(name) {
   if (/^IM-/.test(name)) return "song-im";
   if (/^P-/.test(name)) return "song-p";
   if (/^WP-/.test(name)) return "song-wp";
   if (/^HOD-/.test(name)) return "song-hod";
+  if (/^RS-/.test(name)) return "song-rs";
   if (/^LFT-/.test(name)) return "song-lft";
   if (/^KYTL2-/.test(name)) return "song-kytl2";
   if (/^KYTL-/.test(name)) return "song-kytl";
@@ -2915,7 +2940,8 @@ function rebuildColumnsB2() {
     { re: /^IM-/, label: "Iron Man" },
     { re: /^P-/, label: "Paranoid" },
     { re: /^WP-/, label: "War Pigs" },
-    { re: /^HOD-/, label: "Hand of Doom" }
+    { re: /^HOD-/, label: "Hand of Doom" },
+    { re: /^RS-/, label: "Rat Salad" }
   ];
   // Preserve document / saved order among flipped (album-art) cards
   var allFlipped = [];
