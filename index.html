@@ -1138,6 +1138,79 @@
     background: transparent;
     box-shadow: none;
   }
+  /* Solo: Excel-style outline collapse for columns 12+ */
+  .sec-outline {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    height: 16px;
+    min-height: 16px;
+    margin: 0 0 2px;
+    user-select: none;
+  }
+  .sec-outline .row-num,
+  .sec-outline .song-name-spacer {
+    flex: 0 0 auto;
+    height: 16px;
+  }
+  .sec-outline .row-num {
+    width: var(--row-g); min-width: var(--row-g); max-width: var(--row-g);
+  }
+  .sec-outline .song-name-spacer {
+    width: var(--name-w); min-width: var(--name-w); max-width: var(--name-w);
+  }
+  .sec-outline .song-secs {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0;
+    height: 16px;
+  }
+  .sec-outline .col-outline-pad {
+    box-sizing: border-box;
+    width: var(--chip-w); min-width: var(--chip-w); max-width: var(--chip-w);
+    height: 16px;
+  }
+  .col-group-toggle {
+    box-sizing: border-box;
+    height: 14px;
+    min-height: 14px;
+    margin: 0;
+    padding: 0 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+    color: rgba(0,0,0,.45);
+    background: #f3f4f6;
+    border: 1px solid rgba(0,0,0,.22);
+    border-radius: 2px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .col-group-toggle:hover {
+    color: rgba(0,0,0,.7);
+    background: #e8eaed;
+    border-color: rgba(0,0,0,.35);
+  }
+  body.sections-solo.solo-cols-collapsed .col-num.col-group-member,
+  body.sections-solo.solo-cols-collapsed .sec-chip.col-group-member {
+    display: none !important;
+  }
+  body.sections-solo:not(.solo-cols-collapsed) .col-group-toggle {
+    width: auto;
+    min-width: calc(var(--chip-w) * var(--solo-group-cols, 1));
+    max-width: none;
+    flex: 0 0 auto;
+  }
+  body.sections-solo.solo-cols-collapsed .col-group-toggle {
+    width: var(--chip-w);
+    min-width: var(--chip-w);
+    max-width: var(--chip-w);
+  }
   .album-block {
     position: relative;
     width: 100%;
@@ -1744,6 +1817,7 @@ function updateSoloUi() {
     btn.setAttribute("aria-pressed", soloMode ? "true" : "false");
   }
   document.body.classList.toggle("sections-solo", !!soloMode);
+  if (!soloMode) document.body.classList.remove("solo-cols-collapsed");
 }
 function setSoloMode(on) {
   soloMode = !!on;
@@ -1987,6 +2061,24 @@ if (repairAlbumsFromDefaults(ALBUMS) > 0 || totalAlbumChips(ALBUMS) === 0) {
 }
 SOLO_MAP = loadSoloMap();
 
+var SOLO_COL_GROUP_START = 12; // 1-based; collapse 12..end in Solo
+var SOLO_COLS_COLLAPSED_KEY = "lick-solo-cols-collapsed";
+var soloColsCollapsed = true;
+try {
+  var _scc = localStorage.getItem(SOLO_COLS_COLLAPSED_KEY);
+  if (_scc === "0") soloColsCollapsed = false;
+  else if (_scc === "1") soloColsCollapsed = true;
+} catch (e) {}
+function setSoloColsCollapsed(on) {
+  soloColsCollapsed = !!on;
+  try { localStorage.setItem(SOLO_COLS_COLLAPSED_KEY, soloColsCollapsed ? "1" : "0"); } catch (e) {}
+  document.body.classList.toggle("solo-cols-collapsed", !!soloMode && soloColsCollapsed);
+  if (soloMode) showSections(true);
+}
+function toggleSoloColsCollapsed() {
+  setSoloColsCollapsed(!soloColsCollapsed);
+}
+
 function showSections(keepScroll) {
   var sx = window.scrollX || window.pageXOffset || 0;
   var sy = window.scrollY || window.pageYOffset || 0;
@@ -2015,8 +2107,28 @@ function showSections(keepScroll) {
     });
     if (maxCols < 10) maxCols = 10;
   }
+  var groupStart = SOLO_COL_GROUP_START; // 1-based
+  var hasSoloGroup = soloMode && maxCols >= groupStart;
+  var displayCols = (hasSoloGroup && soloColsCollapsed) ? (groupStart - 1) : maxCols;
   var colNums = "";
-  for (var c = 1; c <= maxCols; c++) colNums += '<span class="col-num">'+c+'</span>';
+  for (var c = 1; c <= maxCols; c++) {
+    var gCls = (hasSoloGroup && c >= groupStart) ? " col-group-member" : "";
+    colNums += '<span class="col-num'+gCls+'" data-ci="'+(c-1)+'">'+c+'</span>';
+  }
+  var outline = "";
+  if (hasSoloGroup) {
+    var pads = "";
+    for (var p = 1; p < groupStart; p++) pads += '<span class="col-outline-pad"></span>';
+    var groupCols = maxCols - groupStart + 1;
+    var btnLabel = soloColsCollapsed ? "+" : "−";
+    var btnTitle = soloColsCollapsed
+      ? ("Expand columns "+groupStart+"–"+maxCols)
+      : ("Collapse columns "+groupStart+"–"+maxCols);
+    outline = '<div class="sec-outline"><div class="row-num"></div><div class="song-name-spacer"></div><div class="song-secs">'
+      + pads
+      + '<button type="button" class="col-group-toggle" id="soloColGroupToggle" title="'+btnTitle+'" aria-expanded="'+(soloColsCollapsed?"false":"true")+'">'+btnLabel+'</button>'
+      + '</div></div>';
+  }
   var headLabel = soloMode ? "Lick" : "Section";
   var head = '<div class="sec-head"><div class="sec-head-label song">Song</div><div class="sec-head-label section">'+headLabel+'</div><div class="sec-head-label album">Album</div></div>';
   var ruler = '<div class="sec-ruler"><div class="row-num"></div><div class="song-name"></div><div class="song-secs">'+colNums+'</div></div>';
@@ -2030,12 +2142,14 @@ function showSections(keepScroll) {
         for (ci = 0; ci < maxCols; ci++) {
           var lp = licks[ci];
           if (!isChipPair(lp)) {
-            chipArr.push('<button type="button" class="sec-chip empty" data-solo="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty solo slot"></button>');
+            var gEmpty = (hasSoloGroup && (ci + 1) >= groupStart) ? " col-group-member" : "";
+            chipArr.push('<button type="button" class="sec-chip empty'+gEmpty+'" data-solo="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty solo slot"></button>');
           } else {
             var lcode = lp[0], ltier = lp[1], llick = lp[2] || lp[0] || "";
             var ltyp = "S";
             n++;
-            chipArr.push('<button type="button" class="sec-chip '+ltyp+' tier-'+ltier+'" data-solo="1" data-song="'+s.song+'" data-sec="'+lcode+'" data-type="'+ltyp+'" data-tier="'+ltier+'" data-lick="'+llick+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+lcode+'</button>');
+            var gMem = (hasSoloGroup && (ci + 1) >= groupStart) ? " col-group-member" : "";
+            chipArr.push('<button type="button" class="sec-chip '+ltyp+' tier-'+ltier+gMem+'" data-solo="1" data-song="'+s.song+'" data-sec="'+lcode+'" data-type="'+ltyp+'" data-tier="'+ltier+'" data-lick="'+llick+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+lcode+'</button>');
           }
         }
       } else {
@@ -2059,9 +2173,21 @@ function showSections(keepScroll) {
     }).join("");
     return '<div class="album-block" data-ai="'+ai+'"><div class="album-songs">'+rows+'</div></div>';
   }).join("");
-  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+ruler+html+'</div></div>';
+  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+outline+ruler+html+'</div></div>';
   var wrapEl = document.querySelector("#sectionsSheet .sections-wrap");
-  if (wrapEl) wrapEl.style.setProperty("--cols", String(maxCols));
+  if (wrapEl) {
+    wrapEl.style.setProperty("--cols", String(displayCols));
+    if (hasSoloGroup) wrapEl.style.setProperty("--solo-group-cols", String(maxCols - groupStart + 1));
+  }
+  document.body.classList.toggle("solo-cols-collapsed", !!soloMode && hasSoloGroup && soloColsCollapsed);
+  var groupBtn = document.getElementById("soloColGroupToggle");
+  if (groupBtn) {
+    groupBtn.addEventListener("click", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      toggleSoloColsCollapsed();
+    });
+  }
   document.getElementById("sectionsCount").textContent = soloMode ? (n + " licks") : (n + " sections");
   buildSecFilters();
   applySecFilters();
