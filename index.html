@@ -185,10 +185,8 @@
   body.sections-edit .sec-filters { opacity: .55; pointer-events: none; }
 
   body.sections-play .sec-filters { opacity: 1; }
-  /* Edit/Play: no in-map preview pane. View: show one lick on the right. Play uses Playboard window. */
-  body.sections-edit .sec-play-pane,
-  body.sections-play .sec-play-pane { display: none !important; }
-  body.sections-mode:not(.sections-edit):not(.sections-play) .sec-play-pane { display: flex; }
+  /* Song Map: map only (no right preview). Play queues to Playboard window. */
+  body.sections-mode .sec-play-pane { display: none !important; }
   body.playboard-mode {
     background: #0a0a0c;
     margin: 0;
@@ -569,24 +567,7 @@
       max-height: 50vh;
     }
   }
-  body.sections-mode:not(.sections-edit):not(.sections-play) .sec-chip:not(.empty) { cursor: pointer; }
-  body.sections-mode:not(.sections-edit):not(.sections-play) .sec-chip.viewing {
-    outline: 2px solid #7030a0; outline-offset: -2px;
-  }
-  .sec-view-card {
-    display: flex; flex-direction: column; gap: 8px;
-    align-items: stretch; min-height: 0; overflow: auto;
-    flex: 1 1 auto;
-  }
-  .sec-view-card img {
-    width: 100%; height: auto; max-height: calc(100vh - 180px);
-    object-fit: contain; background: #fff; border-radius: 8px;
-    display: block;
-  }
-  .sec-view-card .cap {
-    color: rgba(255,255,255,.75); font-size: 0.78rem; font-weight: 700;
-    letter-spacing: .04em;
-  }
+  body.sections-mode:not(.sections-edit):not(.sections-play) .sec-chip:not(.empty) { cursor: default; }
   body.sections-edit .sec-chip { cursor: pointer; }
   body.sections-edit .sec-chip:not(.empty) {
     cursor: grab;
@@ -1709,19 +1690,13 @@ function showSections(keepScroll) {
     }).join("");
     return '<div class="album-block" data-ai="'+ai+'"><div class="album-songs">'+rows+'</div></div>';
   }).join("");
-  var playPane = '<aside class="sec-play-pane" id="secPlayPane">'
-    + '<div class="sec-play-meta" id="secPlayMeta">Play — click sections to add · click again to remove</div>'
-    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty" id="secPlayEmpty">Click linked sections to fill this panel.</div></div>'
-    + '</aside>';
-  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+ruler+html+'</div>'+playPane+'</div>';
+  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+ruler+html+'</div></div>';
   document.getElementById("sectionsCount").textContent = n + " sections";
   buildSecFilters();
   applySecFilters();
   if (sectionsMode === "play") {
     pullPlayQueue();
     syncPlayChipClasses();
-  } else if (sectionsMode === "view") {
-    resetViewPane();
   }
   if (keepScroll) window.scrollTo(sx, sy);
   else window.scrollTo(0, 0);
@@ -1973,14 +1948,12 @@ function setSectionsMode(mode) {
   if (keys) {
     if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · Esc closes";
     else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · section clicks queue · Playboard window · Esc/0 home";
-    else keys.textContent = "Numpad 1/2/3 · click section to preview on the right · Esc/0 home";
+    else keys.textContent = "Numpad 1/2/3 · Song Map · filters · Esc/0 home";
   }
   if (sectionsMode === "play") {
     pullPlayQueue();
     openPlayWindow();
     publishPlayQueue();
-  } else if (sectionsMode === "view") {
-    resetViewPane();
   }
   updateEditSaveUi();
   if (document.getElementById("sections") && !document.getElementById("sections").classList.contains("hidden")) {
@@ -2287,35 +2260,6 @@ function togglePlayPhrase(el) {
   syncPlayLibraryClasses();
 }
 function playSectionChip(chip) { togglePlayChip(chip); }
-function clearViewHighlight() {
-  document.querySelectorAll(".sec-chip.viewing").forEach(function(c){ c.classList.remove("viewing"); });
-}
-function viewSectionLick(chip) {
-  if (!chip || chip.classList.contains("empty") || chip.classList.contains("filtered-out")) return;
-  var code = chip.getAttribute("data-sec") || "";
-  var song = chip.getAttribute("data-song") || "";
-  var lick = (chip.getAttribute("data-lick") || "").trim();
-  var meta = document.getElementById("secPlayMeta");
-  var board = document.getElementById("secPlayBoard");
-  if (!board) return;
-  clearViewHighlight();
-  chip.classList.add("viewing");
-  if (!lick) {
-    if (meta) meta.innerHTML = "<strong>"+code+"</strong> has no link — set it in Edit";
-    board.innerHTML = '<div class="sec-play-empty" id="secPlayEmpty">No linked tab for this section.</div>';
-    return;
-  }
-  var src = lickSrc(lick);
-  if (meta) meta.innerHTML = "<strong>"+song+"</strong> · "+code+" · "+lick;
-  board.innerHTML = '<div class="sec-view-card"><img src="'+src+'" alt="'+lick+'"><div class="cap">'+lick+'</div></div>';
-}
-function resetViewPane() {
-  clearViewHighlight();
-  var meta = document.getElementById("secPlayMeta");
-  var board = document.getElementById("secPlayBoard");
-  if (meta) meta.textContent = "View — click a linked section to preview here";
-  if (board) board.innerHTML = '<div class="sec-play-empty" id="secPlayEmpty">Click a linked section to preview its tab.</div>';
-}
 function closeChipEditor() {
   chipEditState = null;
   var ed = document.getElementById("chipEditor");
@@ -2980,9 +2924,7 @@ document.getElementById("sectionsSheet").onclick = function(e){
     playSectionChip(chip);
     return;
   }
-  // View mode: one lick at a time in the right pane (same window)
-  if (chip.classList.contains("empty") || chip.classList.contains("filtered-out")) return;
-  viewSectionLick(chip);
+  // View mode: Song Map only (no side preview)
 };
 
 window.addEventListener("resize", function(){
