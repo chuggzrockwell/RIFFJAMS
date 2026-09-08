@@ -159,10 +159,6 @@
   .sec-mode-btn.on {
     background: #111; color: #fff; border-color: #111;
   }
-  body.sections-solo.sections-edit .sec-edit-tools {
-    opacity: .45;
-    pointer-events: none;
-  }
   .sec-edit-tools {
     display: none;
     align-items: center;
@@ -1487,8 +1483,8 @@
     <div class="sheet stage" id="sectionsSheet"></div>
   </section>
   <div id="chipEditor" class="chip-editor" aria-hidden="true">
-    <label for="chipEditId">Section ID</label>
-    <input type="text" id="chipEditId" maxlength="8" placeholder="e.g. V1" autocomplete="off">
+    <label for="chipEditId" id="chipEditIdLabel">Section ID</label>
+    <input type="text" id="chipEditId" maxlength="16" placeholder="e.g. V1" autocomplete="off">
     <label for="chipEditLick">Lick (for Play)</label>
     <input type="text" id="chipEditLick" maxlength="20" placeholder="e.g. P-1A" autocomplete="off">
     <label>Tier</label>
@@ -1641,21 +1637,76 @@ function normalizeSoloMap(map, albumsFallback) {
   return { albums: albums };
 }
 function loadSoloMap() {
-  // Prefer Paranoid lick-library chips as the Solo map defaults.
-  if (typeof CATALOG !== "undefined" && CATALOG && CATALOG.length) {
-    return buildDefaultSoloMapFromParanoid();
-  }
   try {
     var raw = localStorage.getItem(SOLO_MAP_KEY);
-    if (!raw) return normalizeSoloMap(null, ALBUMS_DEFAULT);
-    var parsed = JSON.parse(raw);
-    return normalizeSoloMap(parsed, ALBUMS_DEFAULT);
-  } catch (e) {
-    return normalizeSoloMap(null, ALBUMS_DEFAULT);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      if (parsed && (parsed.albums || Array.isArray(parsed))) {
+        return normalizeSoloMap(parsed, ALBUMS_DEFAULT);
+      }
+    }
+  } catch (e) {}
+  if (typeof buildDefaultSoloMapFromParanoid === "function" && typeof CATALOG !== "undefined" && CATALOG && CATALOG.length) {
+    return buildDefaultSoloMapFromParanoid();
   }
+  return normalizeSoloMap(null, ALBUMS_DEFAULT);
 }
 function saveSoloMap() {
   try { localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP)); } catch (e) {}
+}
+var soloHistory = [];
+var soloDirty = false;
+function pushSoloHistory() {
+  try {
+    soloHistory.push(JSON.parse(JSON.stringify(SOLO_MAP)));
+    if (soloHistory.length > 40) soloHistory.shift();
+  } catch (e) {}
+  soloDirty = true;
+  updateEditSaveUi();
+}
+function undoSoloMap() {
+  if (!soloHistory.length) return;
+  SOLO_MAP = soloHistory.pop();
+  soloDirty = true;
+  closeChipEditor();
+  saveSoloMap();
+  updateEditSaveUi();
+  showSections(true);
+  setSaveStatus("Undid");
+}
+function saveSoloMapNow() {
+  saveSoloMap();
+  soloDirty = false;
+  updateEditSaveUi();
+  setSaveStatus("Saved");
+  var btn = document.getElementById("secSaveBtn");
+  if (btn) {
+    btn.classList.add("saved");
+    btn.textContent = "Saved";
+    setTimeout(function(){ btn.classList.remove("saved"); btn.textContent = "Save"; }, 1200);
+  }
+}
+function ensureSoloSlots(song) {
+  if (!song) return;
+  var slots = (typeof SONG_SLOTS === "number" && SONG_SLOTS > 0) ? SONG_SLOTS : 10;
+  var src = song.licks || [];
+  var out = [];
+  var i;
+  for (i = 0; i < Math.max(slots, src.length); i++) out[i] = isChipPair(src[i]) ? src[i] : null;
+  while (out.length < slots) out.push(null);
+  song.licks = out;
+}
+function countSoloSongChips(song) {
+  var n = 0;
+  (song.licks || []).forEach(function(pair){ if (isChipPair(pair)) n++; });
+  return n;
+}
+function getEditSong(ai, si) {
+  if (soloMode) {
+    var a = SOLO_MAP && SOLO_MAP.albums && SOLO_MAP.albums[ai];
+    return a && a.songs ? a.songs[si] : null;
+  }
+  return ALBUMS[ai] && ALBUMS[ai].songs ? ALBUMS[ai].songs[si] : null;
 }
 function countSoloChips(song) {
   var n = 0;
@@ -1681,9 +1732,7 @@ function setSoloMode(on) {
   soloMode = !!on;
   closeChipEditor();
   updateSoloUi();
-  if (soloMode && sectionsMode === "edit") {
-    // Edit is section-map only; keep Edit selected but grid is read-only in Solo mode
-  }
+  updateEditSaveUi();
   if (document.getElementById("sections") && !document.getElementById("sections").classList.contains("hidden")) {
     showSections(true);
   } else {
@@ -1802,16 +1851,16 @@ function updateEditSaveUi() {
   var undoBtn = document.getElementById("secUndoBtn");
   var saveBtn = document.getElementById("secSaveBtn");
   if (tools) {
-    if (sectionsMode === "edit" && !soloMode) tools.removeAttribute("hidden");
+    if (sectionsMode === "edit") tools.removeAttribute("hidden");
     else tools.setAttribute("hidden", "");
   }
-  if (undoBtn) undoBtn.disabled = !albumHistory.length || soloMode;
-  if (saveBtn) saveBtn.disabled = !!soloMode;
+  if (undoBtn) undoBtn.disabled = soloMode ? !soloHistory.length : !albumHistory.length;
+  if (saveBtn) saveBtn.disabled = false;
   var keys = document.getElementById("sectionsKeys");
   if (keys && document.body.className.indexOf("sections-mode") >= 0) {
     if (soloMode) {
       if (sectionsMode === "play") keys.textContent = "Solo · lick clicks queue · Esc/0 home";
-      else if (sectionsMode === "edit") keys.textContent = "Solo · Edit disabled · Esc/0 home";
+      else if (sectionsMode === "edit") keys.textContent = "Solo · Edit · drag · Undo/Save · Esc/0 home";
       else keys.textContent = "Solo · Esc/0 home";
     }
   }
@@ -2148,7 +2197,7 @@ function applySecFilters() {
   var sheet = document.getElementById("sectionsSheet");
   if (!sheet) return;
   // Edit mode always shows every chip so creates/edits are visible (section map only)
-  var active = (sectionsMode !== "edit" || soloMode) && secFiltersActive();
+  var active = (sectionsMode !== "edit") && secFiltersActive();
   var shown = 0;
   sheet.querySelectorAll(".album-block").forEach(function(block){
     block.classList.remove("filtered-out");
@@ -2254,7 +2303,7 @@ function setSectionsMode(mode) {
   var keys = document.getElementById("sectionsKeys");
   if (keys) {
     if (soloMode) {
-      if (sectionsMode === "edit") keys.textContent = "Solo · Edit disabled · Esc/0 home";
+      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · drag · Undo/Save · Esc/0 home";
       else if (sectionsMode === "play") keys.textContent = "Solo · lick clicks queue · Esc/0 home";
       else keys.textContent = "Solo · Esc/0 home";
     } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · Esc closes";
@@ -2615,6 +2664,8 @@ function closeChipEditor() {
 function openChipEditor(anchor, state) {
   chipEditState = state;
   var ed = document.getElementById("chipEditor");
+  var idLabel = document.getElementById("chipEditIdLabel");
+  if (idLabel) idLabel.textContent = soloMode ? "Lick label" : "Section ID";
   var idInput = document.getElementById("chipEditId");
   idInput.value = state.code || "";
   var lickInput = document.getElementById("chipEditLick");
@@ -2636,46 +2687,54 @@ function openChipEditor(anchor, state) {
 }
 function saveChipEditor() {
   if (!chipEditState) return;
-  var code = (document.getElementById("chipEditId").value || "").trim().toUpperCase();
+  var code = (document.getElementById("chipEditId").value || "").trim();
+  if (!soloMode) code = code.toUpperCase();
   if (!code) { document.getElementById("chipEditId").focus(); return; }
   var tierBtn = document.querySelector("#chipEditTiers .tier-pick.on");
   var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : (chipEditState.tier || 3);
   if (tier < 1 || tier > 5) tier = 3;
   var ai = chipEditState.ai, si = chipEditState.si, ci = chipEditState.ci;
-  var song = ALBUMS[ai] && ALBUMS[ai].songs[si];
+  var song = getEditSong(ai, si);
   if (!song) return;
   var lick = (document.getElementById("chipEditLick").value || "").trim();
+  if (soloMode && !lick) lick = code;
   var entry = lick ? [code, tier, lick] : [code, tier];
-  pushAlbumHistory();
-  ensureSongSlots(song);
-  if (chipEditState.isNew) {
-    if (countSongChips(song) >= SONG_SLOTS) {
+  if (soloMode) {
+    pushSoloHistory();
+    ensureSoloSlots(song);
+    song.licks[ci] = entry;
+    saveSoloMap();
+  } else {
+    pushAlbumHistory();
+    ensureSongSlots(song);
+    if (chipEditState.isNew && countSongChips(song) >= SONG_SLOTS) {
       alert("This song already has 10 chips.");
       return;
     }
     song.sections[ci] = entry;
-  } else {
-    song.sections[ci] = entry;
+    saveAlbums();
   }
-  // Keep filters from hiding the chip you just saved
-  var typ = secType(code);
-  if (Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; })) {
-    secTypeFilter[typ] = true;
-  }
-  if (Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; })) {
-    secTierFilter[tier] = true;
-  }
-  saveAlbums();
+  var typ = soloMode ? "S" : secType(code);
+  if (Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; })) secTypeFilter[typ] = true;
+  if (Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; })) secTierFilter[tier] = true;
   closeChipEditor();
   showSections();
 }
 function deleteChipEditor() {
   if (!chipEditState || chipEditState.isNew) return;
-  pushAlbumHistory();
-  var song = ALBUMS[chipEditState.ai].songs[chipEditState.si];
-  ensureSongSlots(song);
-  song.sections[chipEditState.ci] = null;
-  saveAlbums();
+  var song = getEditSong(chipEditState.ai, chipEditState.si);
+  if (!song) return;
+  if (soloMode) {
+    pushSoloHistory();
+    ensureSoloSlots(song);
+    song.licks[chipEditState.ci] = null;
+    saveSoloMap();
+  } else {
+    pushAlbumHistory();
+    ensureSongSlots(song);
+    song.sections[chipEditState.ci] = null;
+    saveAlbums();
+  }
   closeChipEditor();
   showSections();
 }
@@ -2689,8 +2748,12 @@ function copySongSectionFromPair(pair) {
   return true;
 }
 function copySongSectionAt(ai, si, ci) {
-  var song = ALBUMS[ai] && ALBUMS[ai].songs[si];
+  var song = getEditSong(ai, si);
   if (!song) return false;
+  if (soloMode) {
+    ensureSoloSlots(song);
+    return copySongSectionFromPair(song.licks[ci]);
+  }
   ensureSongSlots(song);
   return copySongSectionFromPair(song.sections[ci]);
 }
@@ -2709,17 +2772,25 @@ function copyFromChipEditor() {
 }
 function pasteSongSectionAt(ai, si, ci) {
   if (!sectionClipboard || !isChipPair(sectionClipboard)) return false;
-  var song = ALBUMS[ai] && ALBUMS[ai].songs[si];
+  var song = getEditSong(ai, si);
   if (!song) return false;
-  ensureSongSlots(song);
-  if (ci < 0 || ci >= SONG_SLOTS) return false;
-  var dest = song.sections[ci];
-  // Pasting into a different song that is already full (and target empty) is blocked
-  var sameFocus = lastSectionFocus && lastSectionFocus.ai === ai && lastSectionFocus.si === si;
-  if (!isChipPair(dest) && countSongChips(song) >= SONG_SLOTS) return false;
-  pushAlbumHistory();
-  song.sections[ci] = sectionClipboard.slice();
-  saveAlbums();
+  if (soloMode) {
+    ensureSoloSlots(song);
+    if (ci < 0 || ci >= song.licks.length) return false;
+    var destS = song.licks[ci];
+    if (!isChipPair(destS) && countSoloSongChips(song) >= song.licks.length) return false;
+    pushSoloHistory();
+    song.licks[ci] = sectionClipboard.slice();
+    saveSoloMap();
+  } else {
+    ensureSongSlots(song);
+    if (ci < 0 || ci >= SONG_SLOTS) return false;
+    var dest = song.sections[ci];
+    if (!isChipPair(dest) && countSongChips(song) >= SONG_SLOTS) return false;
+    pushAlbumHistory();
+    song.sections[ci] = sectionClipboard.slice();
+    saveAlbums();
+  }
   closeChipEditor();
   showSections(true);
   return true;
@@ -2742,7 +2813,7 @@ var FOLDER = { A: "a-crops/", B: "b-crops/", B2: "b-crops/", C: "svg/", D: "svg/
 var COVER = { A: "covers/sbs.png", B: "covers/paranoid.png", B2: "covers/paranoid.png" };
 var currentLetter = "";
 SOLO_MAP = loadSoloMap();
-try { localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP)); } catch (e) {}
+try { if (!localStorage.getItem(SOLO_MAP_KEY)) localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP)); } catch (e) {}
 var dragged = null;
 var didDrag = false;
 function orderKey(letter) { return "lick-order-" + letter; }
@@ -3104,8 +3175,8 @@ document.addEventListener("click", function(e){
 });
 
 document.getElementById("secModes").onclick = function(e){
-  if (e.target.closest("#secUndoBtn")) { undoAlbums(); return; }
-  if (e.target.closest("#secSaveBtn")) { saveAlbumsNow(); return; }
+  if (e.target.closest("#secUndoBtn")) { if (soloMode) undoSoloMap(); else undoAlbums(); return; }
+  if (e.target.closest("#secSaveBtn")) { if (soloMode) saveSoloMapNow(); else saveAlbumsNow(); return; }
   if (e.target.closest("#secSoloModeBtn")) {
     setSoloMode(!soloMode);
     return;
@@ -3148,9 +3219,41 @@ function clearChipDragOver() {
   });
 }
 function moveSongMapChip(fromAi, fromSi, fromCi, toAi, toSi, toCi, copy) {
-  var fromSong = ALBUMS[fromAi] && ALBUMS[fromAi].songs[fromSi];
-  var toSong = ALBUMS[toAi] && ALBUMS[toAi].songs[toSi];
+  var fromSong = getEditSong(fromAi, fromSi);
+  var toSong = getEditSong(toAi, toSi);
   if (!fromSong || !toSong) return false;
+  if (soloMode) {
+    ensureSoloSlots(fromSong);
+    ensureSoloSlots(toSong);
+    var fromArr = fromSong.licks;
+    var toArr = toSong.licks;
+    if (fromCi < 0 || fromCi >= fromArr.length || toCi < 0 || toCi >= toArr.length) return false;
+    if (fromAi === toAi && fromSi === toSi && fromCi === toCi) return false;
+    var itemS = fromArr[fromCi];
+    if (!isChipPair(itemS)) return false;
+    var destS = toArr[toCi];
+    if (!(fromAi === toAi && fromSi === toSi) && !isChipPair(destS) && countSoloSongChips(toSong) >= toArr.length) return false;
+    pushSoloHistory();
+    if (copy) {
+      toArr[toCi] = itemS.slice();
+    } else if (fromAi === toAi && fromSi === toSi) {
+      if (isChipPair(destS)) {
+        fromArr[fromCi] = destS;
+        fromArr[toCi] = itemS;
+      } else {
+        fromArr[fromCi] = null;
+        fromArr[toCi] = itemS;
+      }
+    } else if (isChipPair(destS)) {
+      fromArr[fromCi] = destS;
+      toArr[toCi] = itemS;
+    } else {
+      fromArr[fromCi] = null;
+      toArr[toCi] = itemS;
+    }
+    saveSoloMap();
+    return true;
+  }
   ensureSongSlots(fromSong);
   ensureSongSlots(toSong);
   if (fromCi < 0 || fromCi >= SONG_SLOTS || toCi < 0 || toCi >= SONG_SLOTS) return false;
@@ -3158,27 +3261,19 @@ function moveSongMapChip(fromAi, fromSi, fromCi, toAi, toSi, toCi, copy) {
   var item = fromSong.sections[fromCi];
   if (!isChipPair(item)) return false;
   var dest = toSong.sections[toCi];
-  // Cross-song into empty: need a free slot count
   if (!(fromAi === toAi && fromSi === toSi) && !isChipPair(dest) && countSongChips(toSong) >= SONG_SLOTS) return false;
   pushAlbumHistory();
   if (copy) {
     toSong.sections[toCi] = item.slice();
-    saveAlbums();
-    return true;
-  }
-  if (fromAi === toAi && fromSi === toSi) {
+  } else if (fromAi === toAi && fromSi === toSi) {
     if (isChipPair(dest)) {
-      // Swap within the row (fixes adjacent / across-row moves)
-
       fromSong.sections[fromCi] = dest;
       fromSong.sections[toCi] = item;
     } else {
-      // Move into an empty square (can leave a gap)
       fromSong.sections[fromCi] = null;
       fromSong.sections[toCi] = item;
     }
   } else if (isChipPair(dest)) {
-    // Swap across songs
     fromSong.sections[fromCi] = dest;
     toSong.sections[toCi] = item;
   } else {
@@ -3266,7 +3361,7 @@ function onChipPointerUp(e) {
 }
 var sectionsSheetEl = document.getElementById("sectionsSheet");
 sectionsSheetEl.addEventListener("pointerdown", function(e){
-  if (sectionsMode !== "edit" || soloMode) return;
+  if (sectionsMode !== "edit") return;
   if (e.pointerType === "mouse" && e.button !== 0) return;
   var chip = e.target.closest(".sec-chip");
   if (!chip || chip.classList.contains("empty")) return;
@@ -3312,20 +3407,20 @@ document.getElementById("sectionsSheet").onclick = function(e){
   if (didChipDrag) { didChipDrag = false; return; }
   if (chip.classList.contains("filtered-out") && sectionsMode !== "edit") return;
   if (sectionsMode === "edit") {
-    if (soloMode) {
-      setSaveStatus("Edit disabled in Solo mode — upload JSON");
-      return;
-    }
     var ai = parseInt(chip.getAttribute("data-ai"),10);
     var si = parseInt(chip.getAttribute("data-si"),10);
     var ci = parseInt(chip.getAttribute("data-ci"),10);
     lastSectionFocus = { ai: ai, si: si, ci: ci };
+    var song = getEditSong(ai, si);
+    if (!song) return;
     if (chip.classList.contains("empty")) {
-      ensureSongSlots(ALBUMS[ai].songs[si]);
+      if (soloMode) ensureSoloSlots(song); else ensureSongSlots(song);
       if (sectionClipboard && (e.shiftKey || e.altKey)) {
         if (pasteSongSectionAt(ai, si, ci)) return;
       }
-      if (countSongChips(ALBUMS[ai].songs[si]) >= SONG_SLOTS) return;
+      if (soloMode) {
+        if (ci >= song.licks.length) return;
+      } else if (countSongChips(song) >= SONG_SLOTS) return;
       openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "" });
       return;
     }
@@ -3441,8 +3536,8 @@ document.addEventListener("keydown", function(e){
     var tag0 = (e.target && e.target.tagName) || "";
     if (tag0 !== "INPUT" && tag0 !== "TEXTAREA") {
       var key = (e.key || "").toLowerCase();
-      if (key === "z" && !e.shiftKey) { e.preventDefault(); undoAlbums(); return; }
-      if (key === "s") { e.preventDefault(); saveAlbumsNow(); return; }
+      if (key === "z" && !e.shiftKey) { e.preventDefault(); if (soloMode) undoSoloMap(); else undoAlbums(); return; }
+      if (key === "s") { e.preventDefault(); if (soloMode) saveSoloMapNow(); else saveAlbumsNow(); return; }
       if (key === "c") {
         e.preventDefault();
         if (chipEditState && !chipEditState.isNew) copySongSectionAt(chipEditState.ai, chipEditState.si, chipEditState.ci);
