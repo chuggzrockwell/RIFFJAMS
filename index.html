@@ -1549,7 +1549,7 @@ var ALBUMS_DEFAULT = [
     { song: "Electric Funeral", sections: [["I1",4],["V1",4],["B1",5],["B2",5],["B3",5],["B4",5]] },
     { song: "Hand of Doom", sections: [["V1",5],["V2",5],["B1",2],["B2",2],["S1",1,"HOD-S1"]] },
     { song: "Rat Salad", sections: [["V1",4],["V2",4],["S1",1]] },
-    { song: "Fairies Wear Boots", sections: [["I1",2],["I2",2],["S1",1],["V1",4],["B1",4],["S2",1,"JTS-S2"],["F1",5]] },
+    { song: "Fairies Wear Boots", sections: [["I1",2],["I2",2],["S1",1],["V1",4],["B1",4],["S2",1,"FOB-S2"],["F1",5]] },
   ]},
   { name: "Sabbath Bloody Sabbath", cover: "covers/sbs.png", font: "font-sbs", songs: [
     { song: "Sabbath Bloody Sabbath", sections: [["V1",1],["PC1",2],["PC2",2],["S1",1],["B1",4],["B2",2],["B3",2],["B4",2],["S2",2]] },
@@ -1810,13 +1810,17 @@ function loadAlbums() {
         if (s.song === "Jack the Stripper") s.song = "Fairies Wear Boots";
         if (s.song === "Fairies Wear Boots") {
           if (!s.sections) s.sections = [];
-          var jtsHit = null;
-          s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === "S2") jtsHit = p; });
-          if (jtsHit) {
-            jtsHit[1] = 1;
-            jtsHit[2] = "JTS-S2";
+          var fobHit = null;
+          s.sections.forEach(function(p){
+            if (isChipPair(p) && p[0] === "S2") fobHit = p;
+            // old Jack the Stripper crop id → Fairies Wear Boots
+            if (isChipPair(p) && p[2] === "JTS-S2") p[2] = "FOB-S2";
+          });
+          if (fobHit) {
+            fobHit[1] = 1;
+            fobHit[2] = "FOB-S2";
           } else if (!s.sections.length) {
-            s.sections.push(["S2",1,"JTS-S2"]);
+            s.sections.push(["S2",1,"FOB-S2"]);
           }
         }
       });
