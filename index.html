@@ -2476,8 +2476,10 @@ function rebuildColumns() {
     board.className = "cover-board hidden";
     return;
   }
-  var anyTab = document.querySelector(".phrase:not(.flipped)");
-  board.className = "cover-board"; // keep flipped covers native/full size (no 50% shrunk mode)
+  // Jacob: flipped = tab (full size); unflipped = album art.
+  // CSS .flipped = album art. When any tabs show, album-art tiles go to half (75px).
+  var anyTab = !!document.querySelector("#tabWrap .phrase");
+  board.className = anyTab ? "cover-board shrunk" : "cover-board";
   function cardsPerRow(cardSize) {
     var w = board.clientWidth || board.parentElement.clientWidth || window.innerWidth;
     var gap = 6;
@@ -2527,11 +2529,12 @@ function afterLibraryRelayout() {
 }
 function toggleEls(els) {
   if (!els.length) return;
-  // If any of this set are face-up tabs, flip ALL to album art; if all are covers, flip back to tabs
+  // Jacob: flipped=tab, unflipped=album art. CSS .flipped = album art (inverted name).
+  // If any of this kind still show as tabs, set them all to album art; if all album art, show tabs.
   var anyTab = els.some(function(el){ return !el.classList.contains("flipped"); });
   els.forEach(function(el){
-    if (anyTab) el.classList.add("flipped");
-    else el.classList.remove("flipped");
+    if (anyTab) el.classList.add("flipped"); // → album art (Jacob: unflipped)
+    else el.classList.remove("flipped");    // → tab (Jacob: flipped, full size)
   });
   relayout();
   afterLibraryRelayout();
