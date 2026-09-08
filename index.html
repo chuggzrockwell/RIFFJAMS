@@ -1525,7 +1525,7 @@ var ALBUMS_DEFAULT = [
     { song: "Electric Funeral", sections: [["I1",4],["V1",4],["B1",5],["B2",5],["B3",5],["B4",5]] },
     { song: "Hand of Doom", sections: [["V1",5],["V2",5],["B1",2],["B2",2],["S1",1,"HOD-S1"]] },
     { song: "Rat Salad", sections: [["V1",4],["V2",4],["S1",1]] },
-    { song: "Jack the Stripper", sections: [["I1",2],["I2",2],["S1",1],["V1",4],["B1",4],["S2",1,"JTS-S2"],["F1",5]] },
+    { song: "Fairies Wear Boots", sections: [["I1",2],["I2",2],["S1",1],["V1",4],["B1",4],["S2",1,"JTS-S2"],["F1",5]] },
   ]},
   { name: "Sabbath Bloody Sabbath", cover: "covers/sbs.png", font: "font-sbs", songs: [
     { song: "Sabbath Bloody Sabbath", sections: [["V1",1],["PC1",2],["PC2",2],["S1",1],["B1",4],["B2",2],["B3",2],["B4",2],["S2",2]] },
@@ -1783,7 +1783,8 @@ function loadAlbums() {
             s.sections.push(["S1",1,"HOD-S1"]);
           }
         }
-        if (s.song === "Jack the Stripper") {
+        if (s.song === "Jack the Stripper") s.song = "Fairies Wear Boots";
+        if (s.song === "Fairies Wear Boots") {
           if (!s.sections) s.sections = [];
           var jtsHit = null;
           s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === "S2") jtsHit = p; });
@@ -2333,11 +2334,12 @@ function lickLetter(id) {
   if (/C$/.test(id)) return "C";
   if (/B$/.test(id)) return "B";
   if (/A$/.test(id)) {
-    if (/^(IM|P-|WP-|HOD-|RS-)/.test(id)) return "B";
+    if (/^(IM|P-|WP-|HOD-|RS-|FOB-)/.test(id)) return "B";
     return "A";
   }
   if (/^HOD-/.test(id)) return "B";
   if (/^RS-/.test(id)) return "B";
+  if (/^FOB-/.test(id)) return "B";
   return "B";
 }
 function lickSrc(id) {
@@ -2813,6 +2815,7 @@ var CATALOG = [
   ["WP-2-1B","B"],["WP-2-2B","B"],["WP-2-3B","B"],["WP-2-4B","B"],
   ["HOD-1","B"],["HOD-2E","B"],["HOD-3E","B"],["HOD-4E","B"],["HOD-5E","B"],["HOD-6E","B"],
   ["RS-1","B"],["RS-2E","B"],["RS-3E","B"],["RS-4E","B"],["RS-5E","B"],
+  ["FOB-1-1A","B"],["FOB-1-2A","B"],["FOB-1-3A","B"],["FOB-1-4A","B"],
   ["LFT-1C","C"],["LFT-1D","D"]
 ];
 var FOLDER = { A: "a-crops/", B: "b-crops/", B2: "b-crops/", C: "svg/", D: "svg/" };
@@ -2862,7 +2865,7 @@ function lickKind(name) {
   return "A";
 }
 function buildDefaultSoloMapFromParanoid() {
-  var buckets = { "Iron Man": [], "Paranoid": [], "War Pigs": [], "Hand of Doom": [], "Rat Salad": [] };
+  var buckets = { "Iron Man": [], "Paranoid": [], "War Pigs": [], "Hand of Doom": [], "Rat Salad": [], "Fairies Wear Boots": [] };
   (CATALOG || []).forEach(function(x){
     if (!x || x[1] !== "B") return;
     var id = x[0];
@@ -2871,12 +2874,13 @@ function buildDefaultSoloMapFromParanoid() {
     else if (id.indexOf("WP-") === 0) song = "War Pigs";
     else if (id.indexOf("HOD-") === 0) song = "Hand of Doom";
     else if (id.indexOf("RS-") === 0) song = "Rat Salad";
+    else if (id.indexOf("FOB-") === 0) song = "Fairies Wear Boots";
     else if (id.indexOf("P-") === 0) song = "Paranoid";
     if (!song || !buckets[song]) return;
     var k = lickKind(id);
     var tier = (k === "A") ? 1 : (k === "B") ? 2 : (k === "E") ? 1 : 1;
     // Chip text: drop song prefix; keep full id for Play
-    var label = id.replace(/^(IM|WP|P|HOD|RS)-/, "");
+    var label = id.replace(/^(IM|WP|P|HOD|RS|FOB)-/, "");
     buckets[song].push([label, tier, id]);
   });
   var albums = blankSoloMapFromAlbums(ALBUMS_DEFAULT);
@@ -2914,6 +2918,7 @@ function songClass(name) {
   if (/^WP-/.test(name)) return "song-wp";
   if (/^HOD-/.test(name)) return "song-hod";
   if (/^RS-/.test(name)) return "song-rs";
+  if (/^FOB-/.test(name)) return "song-fob";
   if (/^LFT-/.test(name)) return "song-lft";
   if (/^KYTL2-/.test(name)) return "song-kytl2";
   if (/^KYTL-/.test(name)) return "song-kytl";
@@ -2945,7 +2950,8 @@ function rebuildColumnsB2() {
     { re: /^P-/, label: "Paranoid" },
     { re: /^WP-/, label: "War Pigs" },
     { re: /^HOD-/, label: "Hand of Doom" },
-    { re: /^RS-/, label: "Rat Salad" }
+    { re: /^RS-/, label: "Rat Salad" },
+    { re: /^FOB-/, label: "Fairies Wear Boots" }
   ];
   // Preserve document / saved order among flipped (album-art) cards
   var allFlipped = [];
