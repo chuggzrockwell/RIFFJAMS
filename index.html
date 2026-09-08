@@ -1338,31 +1338,27 @@
     .cover-board.shrunk .col-head.tall { width: 40px; }
   }
 
-  /* Phone landscape: all home modules fit on one screen */
+  /* Phone landscape: home modules stay square (not full-height stretch) */
   @media (max-height: 500px) and (orientation: landscape) {
     .wrap { padding: 6px 8px 10px; }
     h1 { margin: 0 0 6px 4px; font-size: 0.75rem; }
     .grid {
       grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 8px;
-      max-width: 100%;
+      max-width: min(100%, calc(5 * (100vh - 64px) + 4 * 8px));
       width: 100%;
+      justify-items: stretch;
     }
     .tile {
       padding: 10px 12px;
       border-radius: 10px;
-      font-size: clamp(1.4rem, 6vh, 2.4rem);
-      aspect-ratio: auto;
-      height: min(42vw, calc(100vh - 52px));
-      max-height: calc(100vh - 52px);
+      font-size: clamp(1.2rem, 5vh, 2rem);
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      height: auto;
+      max-height: none;
     }
     .tile small { font-size: 0.65rem; margin-bottom: 2px; }
-  }
-  @media (max-height: 430px) and (orientation: landscape) {
-    .tile {
-      height: calc(100vh - 44px);
-      max-height: calc(100vh - 44px);
-    }
   }
 </style>
 </head>
