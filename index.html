@@ -794,9 +794,9 @@
       0 0 18px 4px rgba(46,180,90,.7),
       0 0 40px 10px rgba(46,180,90,.4);
   }
-  /* cover-up: album art at the SAME footprint as the full-size tab (100%) */
+  /* cover-up: uniform 150×150 album tiles (100% cover size) */
   .phrase.flipped {
-    width: auto; height: auto;
+    width: 150px; height: 150px;
     border-radius: 8px;
     background: transparent;
     overflow: hidden;
@@ -823,15 +823,10 @@
       0 8px 22px rgba(0,0,0,.65);
   }
   .phrase.flipped .card-inner {
-    position: relative;
-    width: auto; height: auto;
+    width: 100%; height: 100%;
     transform: none;
   }
-  /* Keep tab img in layout for native size; hide it visually so cover can fill 100% */
-  .phrase.flipped .face-tab {
-    display: block;
-    visibility: hidden;
-  }
+  .phrase.flipped .face-tab { display: none; }
   .phrase.flipped .face-cover {
     display: block;
     position: absolute; inset: 0;
@@ -2481,13 +2476,20 @@ function rebuildColumns() {
     board.className = "cover-board hidden";
     return;
   }
-  // Flipped covers keep full tab footprint (100%); leftover tabs half-scale via syncLibraryHalfScale
+  // Uniform 150px cover tiles (never shrunk). Leftover tabs half-scale via syncLibraryHalfScale.
   board.className = "cover-board";
+  function cardsPerRow() {
+    var w = board.clientWidth || board.parentElement.clientWidth || window.innerWidth;
+    var gap = 6;
+    return Math.max(1, Math.floor((w + gap) / (150 + gap)) - 1);
+  }
   function addCols(items, label) {
     if (!items.length) return;
+    var tall = items.length > cardsPerRow();
     var group = document.createElement("div");
-    group.className = "group";
-    group.innerHTML = '<div class="col-head">'+label+'</div><div class="col-body"></div>';
+    group.className = tall ? "group tall-head" : "group";
+    var headClass = tall ? "col-head tall" : "col-head";
+    group.innerHTML = '<div class="'+headClass+'">'+label+'</div><div class="col-body"></div>';
     var body = group.querySelector(".col-body");
     items.forEach(function(el){ body.appendChild(el); });
     board.appendChild(group);
