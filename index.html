@@ -695,37 +695,37 @@
   }
   .tab-wrap { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; width: 100%; }
   .cover-board {
-    display: flex; flex-direction: column; gap: 12px;
-    align-items: stretch; width: 100%; order: -1;
+    display: flex; flex-direction: row; flex-wrap: nowrap;
+    align-items: flex-start; gap: 14px;
+    width: 100%; order: -1;
   }
   .group {
-    display: flex; flex-direction: row; flex-wrap: wrap;
-    gap: 6px; align-items: flex-start; width: 100%;
-  }
-  .group.tall-head {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 150px);
-    grid-auto-rows: 150px;
-    gap: 6px;
-    align-items: stretch;
+    display: flex; flex-direction: column;
+    gap: 8px; align-items: stretch;
+    flex: 1 1 0; min-width: 0;
   }
   .col-head {
-    width: 150px; height: 150px; box-sizing: border-box;
+    width: 100%; height: auto; min-height: 44px;
+    box-sizing: border-box;
     background: #050607; color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 3rem; letter-spacing: .12em;
-    border-radius: 8px; flex: 0 0 150px;
+    text-align: center;
+    font-weight: 800; font-size: 0.95rem; letter-spacing: .06em;
+    text-transform: uppercase;
+    border-radius: 8px; flex: 0 0 auto;
+    padding: 10px 8px;
     box-shadow: 0 0 0 1px #22262f, 0 8px 20px rgba(0,0,0,.45);
     cursor: pointer; user-select: none;
   }
   .col-head:hover { filter: brightness(1.15); }
-  .col-head.tall {
-    grid-row: span 2;
-    height: auto;
-    width: 150px;
-  }
   .col-body {
-    display: contents;
+    display: flex; flex-direction: row; flex-wrap: wrap;
+    gap: 6px; align-items: flex-start;
+  }
+  .cover-board.shrunk .col-head {
+    min-height: 36px;
+    font-size: 0.72rem;
+    padding: 6px 4px;
   }
   .phrase {
     box-sizing: border-box; padding: 0; cursor: grab;
@@ -2506,35 +2506,75 @@ function songClass(name) {
   return "song-other";
 }
 var COL_MAX = 5;
-function collectFlipped(kind) {
+function lickSongKey(name) {
+  if (/^IM-/.test(name)) return "im";
+  if (/^P-/.test(name)) return "p";
+  if (/^WP-/.test(name)) return "wp";
+  if (/^KYTL2-/.test(name)) return "kytl2";
+  if (/^KYTL-/.test(name)) return "kytl";
+  if (/^LFT-/.test(name)) return "lft";
+  return "other";
+}
+function lickSongLabel(key) {
+  return ({
+    im: "Iron Man",
+    p: "Paranoid",
+    wp: "War Pigs",
+    lft: "Looking for Today",
+    kytl: "Killing Yourself to Live",
+    kytl2: "Killing Yourself to Live 2",
+    other: "Other"
+  })[key] || key;
+}
+function songColumnsForLibrary() {
+  if (currentLetter === "B") {
+    return [
+      { key: "im", label: "Iron Man" },
+      { key: "p", label: "Paranoid" },
+      { key: "wp", label: "War Pigs" }
+    ];
+  }
+  if (currentLetter === "A") {
+    return [
+      { key: "lft", label: "Looking for Today" },
+      { key: "kytl", label: "Killing Yourself to Live" },
+      { key: "kytl2", label: "Killing Yourself to Live 2" }
+    ];
+  }
+  return [
+    { key: "im", label: "Iron Man" },
+    { key: "p", label: "Paranoid" },
+    { key: "wp", label: "War Pigs" },
+    { key: "lft", label: "Looking for Today" },
+    { key: "kytl", label: "Killing Yourself to Live" },
+    { key: "kytl2", label: "Killing Yourself to Live 2" },
+    { key: "other", label: "Other" }
+  ];
+}
+function collectFlippedBySong(songKey) {
   var out = [];
   [].forEach.call(document.querySelectorAll(".phrase.flipped"), function(el){
     if (el.classList.contains("filtered-out")) return;
     var n = el.getAttribute("data-name") || "";
-    if (lickKind(n) === kind) out.push(el);
+    if (lickSongKey(n) === songKey) out.push(el);
   });
   out.sort(function(a, b){
-    var an = a.getAttribute("data-name");
-    var bn = b.getAttribute("data-name");
-    if (kind === "B") {
-      if (an === "WP-1-1B") return -1;
-      if (bn === "WP-1-1B") return 1;
-    }
-    return an.localeCompare(bn, undefined, {numeric: true, sensitivity: "base"});
+    return (a.getAttribute("data-name") || "").localeCompare(
+      b.getAttribute("data-name") || "", undefined, { numeric: true, sensitivity: "base" }
+    );
   });
   return out;
 }
 function rebuildColumns() {
   var board = document.getElementById("coverBoard");
-  var tabWrap = document.getElementById("tabWrap");
-  var a = collectFlipped("A");
-  var b = collectFlipped("B");
-  var c = collectFlipped("C");
-  var d = collectFlipped("D");
+  var cols = songColumnsForLibrary();
+  var groups = cols.map(function(c){
+    return { key: c.key, label: c.label, items: collectFlippedBySong(c.key) };
+  }).filter(function(g){ return g.items.length; });
   var hold = document.createDocumentFragment();
-  a.concat(b, c, d).forEach(function(el){ hold.appendChild(el); });
+  groups.forEach(function(g){ g.items.forEach(function(el){ hold.appendChild(el); }); });
   board.innerHTML = "";
-  if (!a.length && !b.length && !c.length && !d.length) {
+  if (!groups.length) {
     board.className = "cover-board hidden";
     return;
   }
@@ -2542,28 +2582,19 @@ function rebuildColumns() {
   // CSS .flipped = album art. When any tabs show, album-art tiles go to half (75px).
   var anyTab = !!document.querySelector("#tabWrap .phrase");
   board.className = anyTab ? "cover-board shrunk" : "cover-board";
-  function cardsPerRow(cardSize) {
-    var w = board.clientWidth || board.parentElement.clientWidth || window.innerWidth;
-    var gap = 6;
-    var cols = Math.max(1, Math.floor((w + gap) / (cardSize + gap)));
-    return Math.max(1, cols - 1);
-  }
-  function addCols(items, label) {
-    if (!items.length) return;
-    var cardSize = board.classList.contains("shrunk") ? 75 : 150;
-    var tall = items.length > cardsPerRow(cardSize);
+  groups.forEach(function(g){
     var group = document.createElement("div");
-    group.className = tall ? "group tall-head" : "group";
-    var headClass = tall ? "col-head tall" : "col-head";
-    group.innerHTML = '<div class="'+headClass+'">'+label+'</div><div class="col-body"></div>';
+    group.className = "group";
+    group.innerHTML = '<div class="col-head" data-song="'+g.key+'">'+g.label+'</div><div class="col-body"></div>';
     var body = group.querySelector(".col-body");
-    items.forEach(function(el){ body.appendChild(el); });
+    g.items.forEach(function(el){ body.appendChild(el); });
     board.appendChild(group);
-  }
-  addCols(a, "A");
-  addCols(b, "B");
-  addCols(c, "C");
-  addCols(d, "D");
+  });
+}
+function revealSong(songKey) {
+  toggleEls([].filter.call(document.querySelectorAll(".phrase"), function(el){
+    return lickSongKey(el.getAttribute("data-name")) === songKey;
+  }));
 }
 function placePhrase(el) {
   var tabWrap = document.getElementById("tabWrap");
@@ -2971,7 +3002,9 @@ document.getElementById("coverBoard").onclick = function(e){
   var head = e.target.closest(".col-head");
   if (!head) return;
   e.stopPropagation();
-  showKind(head.textContent.trim());
+  var song = head.getAttribute("data-song");
+  if (song) revealSong(song);
+  else showKind(head.textContent.trim());
 };
 var sheet = document.getElementById("licks");
 sheet.ondragstart = function(e){
