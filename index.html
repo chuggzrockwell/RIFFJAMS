@@ -398,10 +398,8 @@
     outline: 2px dashed rgba(237,28,36,.45);
     outline-offset: 2px;
   }
-  /* Selected lick lives in the preview pane only — don't also show a full tab in the strip */
-  .phrase.preview-dup {
-    display: none !important;
-  }
+  /* Selected licks are parked off-strip; full tab shows only in the preview pane */
+  .preview-park { display: none !important; }
   .sheet.has-lib-preview {
     display: flex;
     flex-direction: column;
@@ -1411,6 +1409,7 @@
     <div class="sheet" id="licks">
       <div class="cover-board hidden" id="coverBoard"></div>
       <div class="tab-wrap" id="tabWrap"></div>
+      <div id="previewPark" class="preview-park" aria-hidden="true"></div>
       <div class="lib-preview hidden" id="libPreview">
         <div class="lib-preview-meta" id="libPreviewMeta">Click licks to add · click again to remove</div>
         <div class="lib-preview-board" id="libPreviewBoard"></div>
@@ -2189,13 +2188,13 @@ function renderLibraryPreviewBoard() {
     prev.classList.add("hidden");
     board.innerHTML = "";
     if (meta) meta.textContent = "Click licks to add · click again to remove";
-    document.querySelectorAll(".phrase.preview-dup, .phrase.playing").forEach(function(el){
+    document.querySelectorAll(".phrase.playing, .phrase.playing-offscreen, .phrase.preview-dup").forEach(function(el){
       el.classList.remove("preview-dup");
       el.classList.remove("playing");
       el.classList.remove("playing-offscreen");
     });
     compactLibraryStrip(false);
-    rebuildColumns();
+    relayout();
     return;
   }
   sheet.classList.add("has-lib-preview");
@@ -2207,12 +2206,11 @@ function renderLibraryPreviewBoard() {
   var selected = {};
   libPreviewQueue.forEach(function(item){ selected[item.name] = true; });
   document.querySelectorAll(".phrase").forEach(function(el){
-    var n = el.getAttribute("data-name") || "";
+    el.classList.remove("playing");
+    el.classList.remove("playing-offscreen");
     el.classList.remove("preview-dup");
-    if (selected[n]) {
-      el.classList.add("playing");
-      el.classList.add("preview-dup"); // hide strip copy — full tab only in preview
-    }
+    var n = el.getAttribute("data-name") || "";
+    if (selected[n]) el.classList.add("playing");
   });
   board.innerHTML = libPreviewQueue.map(function(item){
     return '<button type="button" class="lib-preview-card" data-name="'+item.name+'">'
@@ -2220,10 +2218,9 @@ function renderLibraryPreviewBoard() {
       + '<div class="cap">'+item.name+'</div>'
       + '</button>';
   }).join("");
-  // Do NOT half-scale tabs here — that was shrinking other classes (e.g. B after click A).
-  // Album-art half-size is only cover-board.shrunk when any tabs are showing.
+  // Pull selected licks out of A/B/D strip entirely (preview pane only)
   compactLibraryStrip(false);
-  rebuildColumns();
+  relayout();
 }
 function clearLibraryPreview() {
   libPreviewQueue = [];
@@ -2459,11 +2456,28 @@ function songClass(name) {
   return "song-other";
 }
 var COL_MAX = 5;
+function previewSelectedSet() {
+  var s = {};
+  (libPreviewQueue || []).forEach(function(item){ s[item.name] = true; });
+  return s;
+}
+function parkPreviewSelected() {
+  var park = document.getElementById("previewPark");
+  if (!park) return;
+  var skip = previewSelectedSet();
+  document.querySelectorAll(".phrase").forEach(function(el){
+    var n = el.getAttribute("data-name") || "";
+    if (skip[n]) park.appendChild(el);
+  });
+}
 function collectFlipped(kind) {
   var out = [];
+  var skip = previewSelectedSet();
   [].forEach.call(document.querySelectorAll(".phrase.flipped"), function(el){
     if (el.classList.contains("filtered-out")) return;
-    if (lickKind(el.getAttribute("data-name")) === kind) out.push(el);
+    var n = el.getAttribute("data-name") || "";
+    if (skip[n]) return; // selected → preview pane only
+    if (lickKind(n) === kind) out.push(el);
   });
   out.sort(function(a, b){
     var an = a.getAttribute("data-name");
@@ -2528,7 +2542,14 @@ function lickGroup(name) {
 }
 function relayout() {
   var tabWrap = document.getElementById("tabWrap");
+  var skip = previewSelectedSet();
+  var park = document.getElementById("previewPark");
   [].forEach.call(document.querySelectorAll(".phrase"), function(el){
+    var n = el.getAttribute("data-name") || "";
+    if (skip[n]) {
+      if (park) park.appendChild(el);
+      return;
+    }
     if (!el.classList.contains("flipped")) tabWrap.appendChild(el);
   });
   rebuildColumns();
