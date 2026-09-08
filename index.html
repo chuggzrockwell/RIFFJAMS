@@ -729,17 +729,17 @@
   }
   .group.tall-head {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 150px);
-    grid-auto-rows: 150px;
+    grid-template-columns: repeat(auto-fill, 100px);
+    grid-auto-rows: 100px;
     gap: 6px;
     align-items: stretch;
   }
   .col-head {
-    width: 150px; height: 150px; box-sizing: border-box;
+    width: 100px; height: 100px; box-sizing: border-box;
     background: #050607; color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 3rem; letter-spacing: .12em;
-    border-radius: 8px; flex: 0 0 150px;
+    font-weight: 800; font-size: 2.2rem; letter-spacing: .12em;
+    border-radius: 8px; flex: 0 0 100px;
     box-shadow: 0 0 0 1px #22262f, 0 8px 20px rgba(0,0,0,.45);
     cursor: pointer; user-select: none;
   }
@@ -747,7 +747,7 @@
   .col-head.tall {
     grid-row: span 2;
     height: auto;
-    width: 150px;
+    width: 100px;
   }
   .col-body {
     display: contents;
@@ -760,7 +760,7 @@
     align-items: flex-start;
   }
   .song-col {
-    --card: 150px;
+    --card: 100px;
     --gap: 6px;
     display: flex;
     flex-direction: column;
@@ -790,7 +790,7 @@
     width: 100%;
     justify-content: start;
   }
-  .cover-board.shrunk .song-col { --card: 75px; }
+  .cover-board.shrunk .song-col { --card: 50px; }
   .cover-board.shrunk .song-col-head {
     font-size: 0.78rem;
     padding: 6px 4px;
@@ -899,7 +899,7 @@
   }
   /* cover-up resting state: real album art, not the tab backface */
   .phrase.flipped {
-    width: 150px; height: 150px;
+    width: 100px; height: 100px;
     border-radius: 8px;
     background: transparent;
     overflow: hidden;
@@ -950,11 +950,11 @@
   .phrase.flipped .ref {
     display: flex; align-items: center; justify-content: center;
     position: absolute; left: 0; right: 0; top: auto; bottom: 0;
-    height: 48px; padding: 0 4px;
+    height: 32px; padding: 0 3px;
     background: rgba(0,0,0,.42); color: #fff;
     border-radius: 0 0 8px 8px;
     font-family: "Paranoid Title", "Black Ops One", cursive;
-    font-size: 20px; line-height: 1; letter-spacing: .04em;
+    font-size: 14px; line-height: 1; letter-spacing: .04em;
     font-weight: 400;
     white-space: nowrap; overflow: hidden;
     pointer-events: none;
@@ -966,12 +966,12 @@
   .phrase.d.flipped .ref,
   .phrase.e.flipped .ref {
     font-family: "Paranoid Title", "Black Ops One", cursive;
-    font-size: 20px;
+    font-size: 14px;
     color: #fff;
     background: rgba(0,0,0,.42);
   }
   .cover-board.shrunk .phrase.flipped {
-    width: 75px; height: 75px;
+    width: 50px; height: 50px;
   }
   .cover-board.shrunk .phrase.flipped img.cover {
     border-radius: 4px;
@@ -987,12 +987,12 @@
   .cover-board.shrunk .phrase.d.flipped .ref { font-size: 9px; }
   .cover-board.shrunk .phrase.e.flipped .ref { font-size: 9px; }
   .cover-board.shrunk .col-head {
-    width: 75px; height: 75px; flex-basis: 75px;
+    width: 50px; height: 50px; flex-basis: 50px;
     font-size: 1.6rem; border-radius: 4px;
   }
   .cover-board.shrunk .group.tall-head {
-    grid-template-columns: repeat(auto-fill, 75px);
-    grid-auto-rows: 75px;
+    grid-template-columns: repeat(auto-fill, 50px);
+    grid-auto-rows: 50px;
   }
   .cover-board.shrunk .col-head.tall {
     height: auto;
@@ -3072,7 +3072,7 @@ function rebuildColumns() {
     return;
   }
   // Jacob: flipped = tab (full size); unflipped = album art.
-  // CSS .flipped = album art. When any tabs show, album-art tiles go to half (75px).
+  // CSS .flipped = album art. When any tabs show, album-art tiles go to half (50px).
   var anyTab = !!document.querySelector("#tabWrap .phrase");
   board.className = anyTab ? "cover-board shrunk" : "cover-board";
   function cardsPerRow(cardSize) {
@@ -3083,7 +3083,7 @@ function rebuildColumns() {
   }
   function addCols(items, label) {
     if (!items.length) return;
-    var cardSize = board.classList.contains("shrunk") ? 75 : 150;
+    var cardSize = board.classList.contains("shrunk") ? 50 : 100;
     var tall = items.length > cardsPerRow(cardSize);
     var group = document.createElement("div");
     group.className = tall ? "group tall-head" : "group";
