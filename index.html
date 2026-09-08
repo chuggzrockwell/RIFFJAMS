@@ -450,11 +450,38 @@
   }
   .lib-preview-card {
     flex: 0 0 auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    overflow: visible; /* glow must not be clipped */
+  }
+  .lib-preview-card .lib-preview-face {
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
-    cursor: pointer;
-    box-shadow: 0 0 6px 1px rgba(237,28,36,.85), 0 0 18px 4px rgba(237,28,36,.45);
+    box-shadow:
+      0 0 6px 1px rgba(237,28,36,.95),
+      0 0 18px 4px rgba(237,28,36,.7),
+      0 0 40px 10px rgba(237,28,36,.4);
+  }
+  .lib-preview-card.a .lib-preview-face {
+    box-shadow:
+      0 0 6px 1px rgba(163,73,164,.95),
+      0 0 18px 4px rgba(163,73,164,.7),
+      0 0 40px 10px rgba(163,73,164,.4);
+  }
+  .lib-preview-card.b .lib-preview-face {
+    box-shadow:
+      0 0 6px 1px rgba(237,28,36,.95),
+      0 0 18px 4px rgba(237,28,36,.7),
+      0 0 40px 10px rgba(237,28,36,.4);
+  }
+  .lib-preview-card.d .lib-preview-face {
+    box-shadow:
+      0 0 6px 1px rgba(46,180,90,.95),
+      0 0 18px 4px rgba(46,180,90,.7),
+      0 0 40px 10px rgba(46,180,90,.4);
   }
   .lib-preview-card img {
     display: block;
@@ -2213,10 +2240,12 @@ function renderLibraryPreviewBoard() {
     if (selected[n]) el.classList.add("playing");
   });
   board.innerHTML = libPreviewQueue.map(function(item){
-    return '<button type="button" class="lib-preview-card" data-name="'+item.name+'">'
+    var kind = lickKind(item.name).toLowerCase();
+    return '<button type="button" class="lib-preview-card '+kind+'" data-name="'+item.name+'">'
+      + '<div class="lib-preview-face">'
       + '<img src="'+item.src+'" alt="'+item.name+'">'
       + '<div class="cap">'+item.name+'</div>'
-      + '</button>';
+      + '</div></button>';
   }).join("");
   // Pull selected licks out of A/B/D strip entirely (preview pane only)
   compactLibraryStrip(false);
