@@ -390,9 +390,13 @@
     outline-offset: -2px;
     box-shadow: inset 0 0 0 2px rgba(237,28,36,.45) !important;
   }
-  .phrase.playing {
+  .phrase.playing:not(.flipped) {
     outline: 2px solid #ed1c24;
     outline-offset: 2px;
+  }
+  .phrase.playing:not(.flipped) .face-tab {
+    /* keep class glow; reinforce deployed selection */
+    filter: brightness(1.02);
   }
   .phrase.playing-offscreen {
     outline: 2px dashed rgba(237,28,36,.45);
@@ -2186,13 +2190,14 @@ function renderLibraryPreviewBoard() {
     board.innerHTML = "";
     if (meta) meta.textContent = "Click licks to add · click again to remove";
     compactLibraryStrip(false);
+    rebuildColumns();
     return;
   }
   sheet.classList.add("has-lib-preview");
   prev.classList.remove("hidden");
   if (meta) {
     meta.textContent = librarySongLabel() + " · " + libPreviewQueue.length +
-      " selected · library at 50% · previews at native size";
+      " selected · tabs full size · previews at native size";
   }
   var selected = {};
   libPreviewQueue.forEach(function(item){ selected[item.name] = true; });
@@ -2206,10 +2211,10 @@ function renderLibraryPreviewBoard() {
       + '<div class="cap">'+item.name+'</div>'
       + '</button>';
   }).join("");
-  // Apply 50% strip after layout; again after images settle
-  compactLibraryStrip(true);
-  requestAnimationFrame(function(){ compactLibraryStrip(true); });
-  setTimeout(function(){ compactLibraryStrip(true); }, 50);
+  // Do NOT half-scale tabs here — that was shrinking other classes (e.g. B after click A).
+  // Album-art half-size is only cover-board.shrunk when any tabs are showing.
+  compactLibraryStrip(false);
+  rebuildColumns();
 }
 function clearLibraryPreview() {
   libPreviewQueue = [];
@@ -2224,8 +2229,16 @@ function toggleLibraryPreview(el) {
   for (var i = 0; i < libPreviewQueue.length; i++) {
     if (libPreviewQueue[i].name === name) { idx = i; break; }
   }
-  if (idx >= 0) libPreviewQueue.splice(idx, 1);
-  else libPreviewQueue.push({ name: name, src: src });
+  if (idx >= 0) {
+    libPreviewQueue.splice(idx, 1);
+  } else {
+    // Deploy = show as tab (Jacob: flipped) at full size with glow — never leave as album art
+    if (el.classList.contains("flipped")) {
+      el.classList.remove("flipped");
+      relayout();
+    }
+    libPreviewQueue.push({ name: name, src: src });
+  }
   renderLibraryPreviewBoard();
 }
 function togglePlayPhrase(el) {
@@ -2521,11 +2534,8 @@ function relayout() {
   saveFlipped();
 }
 function afterLibraryRelayout() {
-  if (document.getElementById("licks") &&
-      document.getElementById("licks").classList.contains("has-lib-preview")) {
-    compactLibraryStrip(true);
-    requestAnimationFrame(function(){ compactLibraryStrip(true); });
-  }
+  // Tabs stay full size; album-art shrink is handled in rebuildColumns (cover-board.shrunk)
+  compactLibraryStrip(false);
 }
 function toggleEls(els) {
   if (!els.length) return;
