@@ -1564,7 +1564,7 @@ var lastSectionFocus = null; // {ai,si,ci} last clicked pad in Edit
 /* Solo-map: same Song Map grid; Paranoid library licks as chips (label = lick ID).
 Shape: { albums: [{ name, songs: [{ song, licks: [[lickId,tier,lickId], ...] }] }] }
 */
-var SOLO_MAP_KEY = "lick-solo-map-v2";
+var SOLO_MAP_KEY = "lick-solo-map-v3";
 var soloMode = false;
 var SOLO_MAP = null;
 
@@ -2777,7 +2777,9 @@ function buildDefaultSoloMapFromParanoid() {
     if (!song || !buckets[song]) return;
     var k = lickKind(id);
     var tier = (k === "A") ? 1 : (k === "B") ? 2 : 1;
-    buckets[song].push([id, tier, id]);
+    // Chip text: drop song prefix (IM-/P-/WP-); keep full id for Play
+    var label = id.replace(/^(IM|WP|P)-/, "");
+    buckets[song].push([label, tier, id]);
   });
   var albums = blankSoloMapFromAlbums(ALBUMS_DEFAULT);
   albums.forEach(function(a){
