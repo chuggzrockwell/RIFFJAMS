@@ -2476,9 +2476,8 @@ function rebuildColumns() {
     board.className = "cover-board hidden";
     return;
   }
-  var anyTab = !!document.querySelector("#tabWrap .phrase:not(.flipped), #tabWrap .phrase");
-  // When tabs remain, covers go to half tiles (75px); remaining tabs scale via syncLibraryHalfScale
-  board.className = anyTab ? "cover-board shrunk" : "cover-board";
+  // Flipped covers always full size (150px); remaining tabs half-scale via syncLibraryHalfScale
+  board.className = "cover-board";
   function cardsPerRow(cardSize) {
     var w = board.clientWidth || board.parentElement.clientWidth || window.innerWidth;
     var gap = 6;
@@ -2525,7 +2524,7 @@ function syncLibraryHalfScale() {
   var preview = !!(sheet && sheet.classList.contains("has-lib-preview"));
   var anyFlipped = !!document.querySelector("#coverBoard .phrase.flipped");
   var anyTab = !!document.querySelector("#tabWrap .phrase");
-  // Preview strip, or leftover face-up tabs while some class is flipped to covers → 50%
+  // Preview strip, or leftover face-up tabs while covers show → tabs at 50% (covers stay 100%)
   compactLibraryStrip(preview || (anyFlipped && anyTab));
 }
 function afterLibraryRelayout() {
