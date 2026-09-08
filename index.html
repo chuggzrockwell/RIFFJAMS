@@ -695,20 +695,17 @@
   }
   .tab-wrap { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; width: 100%; }
   .cover-board {
-    display: flex; flex-direction: row; flex-wrap: wrap;
+    display: flex; flex-direction: row; flex-wrap: nowrap;
     align-items: flex-start; gap: 14px;
     width: 100%; order: -1;
   }
   .group {
     display: flex; flex-direction: column;
-    gap: 8px; align-items: flex-start;
-    flex: 0 0 auto; /* only as wide as the lick cards */
-    width: max-content;
-    max-width: 100%;
+    gap: 8px; align-items: stretch;
+    flex: 1 1 0; min-width: 0;
   }
   .col-head {
-    width: 100%; /* match group = lick-card stack width */
-    height: auto; min-height: 44px;
+    width: 100%; height: auto; min-height: 44px;
     box-sizing: border-box;
     background: #050607; color: #fff;
     display: flex; align-items: center; justify-content: center;
@@ -724,8 +721,6 @@
   .col-body {
     display: flex; flex-direction: row; flex-wrap: wrap;
     gap: 6px; align-items: flex-start;
-    width: max-content;
-    max-width: 100%;
   }
   .cover-board.shrunk .col-head {
     min-height: 36px;
