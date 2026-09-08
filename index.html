@@ -876,6 +876,12 @@
       0 0 18px 4px rgba(237,28,36,.7),
       0 0 40px 10px rgba(237,28,36,.4);
   }
+  .phrase.e:not(.flipped) .face-tab {
+    box-shadow:
+      0 0 6px 1px rgba(255,140,40,.95),
+      0 0 18px 4px rgba(255,140,40,.7),
+      0 0 40px 10px rgba(255,140,40,.4);
+  }
   .phrase.c:not(.flipped) .face-tab {
     box-shadow:
       0 0 6px 1px rgba(255,210,40,.9),
@@ -908,6 +914,12 @@
     box-shadow:
       0 0 8px 2px rgba(237,28,36,.55),
       0 0 22px 6px rgba(237,28,36,.28),
+      0 8px 22px rgba(0,0,0,.65);
+  }
+  .phrase.e.flipped {
+    box-shadow:
+      0 0 8px 2px rgba(255,140,40,.55),
+      0 0 22px 6px rgba(255,140,40,.28),
       0 8px 22px rgba(0,0,0,.65);
   }
   .phrase.d.flipped {
@@ -977,6 +989,7 @@
   .cover-board.shrunk .phrase.a.flipped .ref { font-size: 11px; }
   .cover-board.shrunk .phrase.b.flipped .ref { font-size: 9px; }
   .cover-board.shrunk .phrase.d.flipped .ref { font-size: 9px; }
+  .cover-board.shrunk .phrase.e.flipped .ref { font-size: 9px; }
   .cover-board.shrunk .col-head {
     width: 75px; height: 75px; flex-basis: 75px;
     font-size: 1.6rem; border-radius: 4px;
@@ -1498,7 +1511,7 @@
       <button type="button" class="back" id="back">Back</button>
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
-      <span class="keys">Click a lick to flip · A/B/C/D class · I/P/W songs · 1–9 = *-N · Esc/0 home</span>
+      <span class="keys">Click a lick to flip · A/B/C/D/E class · I/P/W songs · 1–9 = *-N · Esc/0 home</span>
     </div>
     <div class="sheet" id="licks">
       <div class="cover-board hidden" id="coverBoard"></div>
@@ -1556,7 +1569,7 @@ var lastSectionFocus = null; // {ai,si,ci} last clicked pad in Edit
 /* Solo-map: same Song Map grid; Paranoid library licks as chips (label = lick ID).
 Shape: { albums: [{ name, songs: [{ song, licks: [[lickId,tier,lickId], ...] }] }] }
 */
-var SOLO_MAP_KEY = "lick-solo-map-v3";
+var SOLO_MAP_KEY = "lick-solo-map-v4";
 var soloMode = false;
 var SOLO_MAP = null;
 
@@ -2267,9 +2280,10 @@ function lickLetter(id) {
   if (/C$/.test(id)) return "C";
   if (/B$/.test(id)) return "B";
   if (/A$/.test(id)) {
-    if (/^(IM|P-|WP-)/.test(id)) return "B";
+    if (/^(IM|P-|WP-|HOD-)/.test(id)) return "B";
     return "A";
   }
+  if (/^HOD-/.test(id)) return "B";
   return "B";
 }
 function lickSrc(id) {
@@ -2721,6 +2735,7 @@ var CATALOG = [
   ["P-1A","B"],["P-1B","B"],["P-2B","B"],["P-3B","B"],["P-4B","B"],
   ["WP-1-1A","B"],["WP-1-2A","B"],["WP-1-3A","B"],["WP-1-4A","B"],["WP-1-1B","B"],["WP-1-1D","B"],
   ["WP-2-1B","B"],["WP-2-2B","B"],["WP-2-3B","B"],["WP-2-4B","B"],
+  ["HOD-1","B"],["HOD-2E","B"],["HOD-3E","B"],["HOD-4E","B"],["HOD-5E","B"],["HOD-6E","B"],
   ["LFT-1C","C"],["LFT-1D","D"]
 ];
 var FOLDER = { A: "a-crops/", B: "b-crops/", B2: "b-crops/", C: "svg/", D: "svg/" };
@@ -2763,25 +2778,27 @@ function flippedSet(letter) {
   try { return JSON.parse(localStorage.getItem(flipKey(letter)) || "[]"); } catch (e) { return []; }
 }
 function lickKind(name) {
+  if (/E$/i.test(name) || name === "HOD-1") return "E";
   if (/D$/.test(name)) return "D";
   if (/B$/.test(name)) return "B";
   if (/C$/.test(name)) return "C";
   return "A";
 }
 function buildDefaultSoloMapFromParanoid() {
-  var buckets = { "Iron Man": [], "Paranoid": [], "War Pigs": [] };
+  var buckets = { "Iron Man": [], "Paranoid": [], "War Pigs": [], "Hand of Doom": [] };
   (CATALOG || []).forEach(function(x){
     if (!x || x[1] !== "B") return;
     var id = x[0];
     var song = null;
     if (id.indexOf("IM-") === 0) song = "Iron Man";
     else if (id.indexOf("WP-") === 0) song = "War Pigs";
+    else if (id.indexOf("HOD-") === 0) song = "Hand of Doom";
     else if (id.indexOf("P-") === 0) song = "Paranoid";
     if (!song || !buckets[song]) return;
     var k = lickKind(id);
-    var tier = (k === "A") ? 1 : (k === "B") ? 2 : 1;
-    // Chip text: drop song prefix (IM-/P-/WP-); keep full id for Play
-    var label = id.replace(/^(IM|WP|P)-/, "");
+    var tier = (k === "A") ? 1 : (k === "B") ? 2 : (k === "E") ? 1 : 1;
+    // Chip text: drop song prefix; keep full id for Play
+    var label = id.replace(/^(IM|WP|P|HOD)-/, "");
     buckets[song].push([label, tier, id]);
   });
   var albums = blankSoloMapFromAlbums(ALBUMS_DEFAULT);
@@ -2796,6 +2813,7 @@ function songClass(name) {
   if (/^IM-/.test(name)) return "song-im";
   if (/^P-/.test(name)) return "song-p";
   if (/^WP-/.test(name)) return "song-wp";
+  if (/^HOD-/.test(name)) return "song-hod";
   if (/^LFT-/.test(name)) return "song-lft";
   if (/^KYTL2-/.test(name)) return "song-kytl2";
   if (/^KYTL-/.test(name)) return "song-kytl";
@@ -2825,7 +2843,8 @@ function rebuildColumnsB2() {
   var songs = [
     { re: /^IM-/, label: "Iron Man" },
     { re: /^P-/, label: "Paranoid" },
-    { re: /^WP-/, label: "War Pigs" }
+    { re: /^WP-/, label: "War Pigs" },
+    { re: /^HOD-/, label: "Hand of Doom" }
   ];
   // Preserve document / saved order among flipped (album-art) cards
   var allFlipped = [];
@@ -2870,10 +2889,11 @@ function rebuildColumns() {
   var b = collectFlipped("B");
   var c = collectFlipped("C");
   var d = collectFlipped("D");
+  var e = collectFlipped("E");
   var hold = document.createDocumentFragment();
-  a.concat(b, c, d).forEach(function(el){ hold.appendChild(el); });
+  a.concat(b, c, d, e).forEach(function(el){ hold.appendChild(el); });
   board.innerHTML = "";
-  if (!a.length && !b.length && !c.length && !d.length) {
+  if (!a.length && !b.length && !c.length && !d.length && !e.length) {
     board.className = "cover-board hidden";
     return;
   }
@@ -2903,6 +2923,7 @@ function rebuildColumns() {
   addCols(b, "B");
   addCols(c, "C");
   addCols(d, "D");
+  addCols(e, "E");
 }
 function placePhrase(el) {
   var tabWrap = document.getElementById("tabWrap");
@@ -3490,7 +3511,7 @@ document.addEventListener("keydown", function(e){
     showHome();
     return;
   }
-  if (k === "a" || k === "b" || k === "c" || k === "d") {
+  if (k === "a" || k === "b" || k === "c" || k === "d" || k === "e") {
     revealKind(k.toUpperCase());
     return;
   }
