@@ -81,6 +81,15 @@
   .tile:hover { filter: brightness(1.12); }
   .hidden { display: none !important; }
   .bar { display: flex; align-items: center; gap: 12px; margin: 0 0 12px 4px; }
+  body.sheet-mode #series > .bar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    margin: 0 0 12px 0;
+    padding: 10px 8px 12px 4px;
+    background: #0b0d11;
+    box-shadow: 0 10px 24px rgba(0,0,0,.45);
+  }
   .back {
     background: transparent; color: inherit; border: 1px solid #bbb;
     border-radius: 999px; padding: 6px 14px; cursor: pointer;
@@ -1595,9 +1604,10 @@
       <button type="button" class="back" id="back">Back</button>
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
-      <button type="button" class="btn-randomize" id="btnRandomize" title="Shuffle revealed tabs">Randomize</button>
-      <button type="button" class="btn-randomize" id="btnReorder" title="Sort revealed tabs and cover cards by lick ID">Reorder</button>
-      <span class="keys">Click a lick to flip · A/B/C/D/E class · I/P/W/H/R songs · 1–8 tracks · Esc/0 home</span>
+      <button type="button" class="btn-randomize" id="btnRandomize" title="Shuffle revealed tabs (Z)">Randomize</button>
+      <button type="button" class="btn-randomize" id="btnReorder" title="Sort revealed tabs and cover cards by lick ID (O)">Reorder</button>
+      <button type="button" class="btn-randomize" id="btnClear" title="Hide all revealed tabs (C)">Clear</button>
+      <span class="keys">Click to flip · A/B/D/E class · Z/O/C · I/P/W/H/R · 1–8 · Esc/0</span>
     </div>
     <div class="sheet" id="licks">
       <div class="cover-board hidden" id="coverBoard"></div>
@@ -3052,6 +3062,14 @@ function reorderRevealedTabs() {
   }
   saveOrder();
 }
+/** Hide all revealed tabs (Jacob: flipped = tab) → album art. */
+function clearRevealedLicks() {
+  var tabs = revealedTabCards();
+  if (!tabs.length) return;
+  tabs.forEach(function(el){ el.classList.add("flipped"); });
+  relayout();
+  if (typeof afterLibraryRelayout === "function") afterLibraryRelayout();
+}
 function saveOrder() {
   if (!currentLetter) return;
   var names = [].map.call(document.querySelectorAll(".phrase"), function(el){
@@ -3392,6 +3410,7 @@ document.getElementById("btnHP").onclick = showSections;
 document.getElementById("back").onclick = showHome;
 document.getElementById("btnRandomize").onclick = function(){ randomizeCoverBoard(); };
 document.getElementById("btnReorder").onclick = function(){ reorderRevealedTabs(); };
+document.getElementById("btnClear").onclick = function(){ clearRevealedLicks(); };
 document.getElementById("backSections").onclick = showHome;
 document.getElementById("secFilters").onclick = function(e){
   var toggle = e.target.closest("#excludeDdToggle");
@@ -3876,7 +3895,10 @@ document.addEventListener("keydown", function(e){
     showHome();
     return;
   }
-  if (k === "a" || k === "b" || k === "c" || k === "d" || k === "e") {
+  if (k === "z") { randomizeCoverBoard(); return; }
+  if (k === "o") { reorderRevealedTabs(); return; }
+  if (k === "c") { clearRevealedLicks(); return; }
+  if (k === "a" || k === "b" || k === "d" || k === "e") {
     revealKind(k.toUpperCase());
     return;
   }
