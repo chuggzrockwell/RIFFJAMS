@@ -668,6 +668,7 @@
   .cover-board {
     display: flex; flex-direction: column; gap: 12px;
     align-items: stretch; width: 100%; order: -1;
+    transform: none; /* never share the leftover-tab 50% scale */
   }
   .group {
     display: flex; flex-direction: row; flex-wrap: wrap;
@@ -793,9 +794,9 @@
       0 0 18px 4px rgba(46,180,90,.7),
       0 0 40px 10px rgba(46,180,90,.4);
   }
-  /* cover-up resting state: real album art, not the tab backface */
+  /* cover-up: album art at the SAME footprint as the full-size tab (100%) */
   .phrase.flipped {
-    width: 150px; height: 150px;
+    width: auto; height: auto;
     border-radius: 8px;
     background: transparent;
     overflow: hidden;
@@ -822,10 +823,15 @@
       0 8px 22px rgba(0,0,0,.65);
   }
   .phrase.flipped .card-inner {
-    width: 100%; height: 100%;
+    position: relative;
+    width: auto; height: auto;
     transform: none;
   }
-  .phrase.flipped .face-tab { display: none; }
+  /* Keep tab img in layout for native size; hide it visually so cover can fill 100% */
+  .phrase.flipped .face-tab {
+    display: block;
+    visibility: hidden;
+  }
   .phrase.flipped .face-cover {
     display: block;
     position: absolute; inset: 0;
@@ -2464,7 +2470,6 @@ function collectFlipped(kind) {
 }
 function rebuildColumns() {
   var board = document.getElementById("coverBoard");
-  var tabWrap = document.getElementById("tabWrap");
   var a = collectFlipped("A");
   var b = collectFlipped("B");
   var c = collectFlipped("C");
@@ -2476,22 +2481,13 @@ function rebuildColumns() {
     board.className = "cover-board hidden";
     return;
   }
-  // Flipped covers always full size (150px); remaining tabs half-scale via syncLibraryHalfScale
+  // Flipped covers keep full tab footprint (100%); leftover tabs half-scale via syncLibraryHalfScale
   board.className = "cover-board";
-  function cardsPerRow(cardSize) {
-    var w = board.clientWidth || board.parentElement.clientWidth || window.innerWidth;
-    var gap = 6;
-    var cols = Math.max(1, Math.floor((w + gap) / (cardSize + gap)));
-    return Math.max(1, cols - 1);
-  }
   function addCols(items, label) {
     if (!items.length) return;
-    var cardSize = board.classList.contains("shrunk") ? 75 : 150;
-    var tall = items.length > cardsPerRow(cardSize);
     var group = document.createElement("div");
-    group.className = tall ? "group tall-head" : "group";
-    var headClass = tall ? "col-head tall" : "col-head";
-    group.innerHTML = '<div class="'+headClass+'">'+label+'</div><div class="col-body"></div>';
+    group.className = "group";
+    group.innerHTML = '<div class="col-head">'+label+'</div><div class="col-body"></div>';
     var body = group.querySelector(".col-body");
     items.forEach(function(el){ body.appendChild(el); });
     board.appendChild(group);
