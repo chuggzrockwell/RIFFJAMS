@@ -163,6 +163,14 @@
     opacity: .45;
     pointer-events: none;
   }
+  body.sections-solo .sec-chip:not(.empty) {
+    font-size: 0.58rem;
+    letter-spacing: -0.03em;
+    padding: 0 1px;
+    overflow: hidden;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
   .sec-edit-tools {
     display: none;
     align-items: center;
@@ -1553,12 +1561,10 @@ var chipEditState = null;
 var sectionClipboard = null; // copied song section pair [code, tier, lick?]
 var lastSectionFocus = null; // {ai,si,ci} last clicked pad in Edit
 
-/* Solo-map data (localStorage key lick-solo-map-v1). Loaded by assistant from Excel, not in-app upload.
-Shape: { albums: [{ name, songs: [{ song, licks: [[label,tier,lickId], ...] }] }] }
-Each lick chip is [label, tier, lickId] — same tuple shape as section chips.
-Albums/songs mirror Song Map rows; missing songs stay blank. Solo mode starts blank until map is loaded.
+/* Solo-map: same Song Map grid; Paranoid library licks as chips (label = lick ID).
+Shape: { albums: [{ name, songs: [{ song, licks: [[lickId,tier,lickId], ...] }] }] }
 */
-var SOLO_MAP_KEY = "lick-solo-map-v1";
+var SOLO_MAP_KEY = "lick-solo-map-v2";
 var soloMode = false;
 var SOLO_MAP = null;
 
@@ -1579,7 +1585,8 @@ function normalizeSoloSong(song) {
   var src = song.licks || song.sections || [];
   var out = [];
   var i;
-  for (i = 0; i < SONG_SLOTS; i++) out[i] = isChipPair(src[i]) ? src[i] : null;
+  for (i = 0; i < src.length; i++) if (isChipPair(src[i])) out.push(src[i]);
+  while (out.length < SONG_SLOTS) out.push(null);
   return { song: song.song || "", licks: out };
 }
 function normalizeSoloMap(map, albumsFallback) {
@@ -1629,6 +1636,10 @@ function normalizeSoloMap(map, albumsFallback) {
   return { albums: albums };
 }
 function loadSoloMap() {
+  // Prefer Paranoid lick-library chips as the Solo map defaults.
+  if (typeof CATALOG !== "undefined" && CATALOG && CATALOG.length) {
+    return buildDefaultSoloMapFromParanoid();
+  }
   try {
     var raw = localStorage.getItem(SOLO_MAP_KEY);
     if (!raw) return normalizeSoloMap(null, ALBUMS_DEFAULT);
@@ -1894,13 +1905,23 @@ function showSections(keepScroll) {
   document.getElementById("sections").className = "";
   var n = 0;
   var rowN = 0;
+  var sourceAlbums = soloMode ? ((SOLO_MAP && SOLO_MAP.albums) || []) : ALBUMS;
   var maxCols = 10;
+  if (soloMode) {
+    sourceAlbums.forEach(function(album){
+      (album.songs || []).forEach(function(s){
+        var len = 0;
+        (s.licks || []).forEach(function(lp){ if (isChipPair(lp)) len++; });
+        if (len > maxCols) maxCols = len;
+      });
+    });
+    if (maxCols < 10) maxCols = 10;
+  }
   var colNums = "";
   for (var c = 1; c <= maxCols; c++) colNums += '<span class="col-num">'+c+'</span>';
   var headLabel = soloMode ? "Lick" : "Section";
   var head = '<div class="sec-head"><div class="sec-head-label song">Song</div><div class="sec-head-label section">'+headLabel+'</div><div class="sec-head-label album">Album</div></div>';
   var ruler = '<div class="sec-ruler"><div class="row-num"></div><div class="song-name"></div><div class="song-secs">'+colNums+'</div></div>';
-  var sourceAlbums = soloMode ? ((SOLO_MAP && SOLO_MAP.albums) || []) : ALBUMS;
   var html = sourceAlbums.map(function(album, ai){
     var rows = (album.songs || []).map(function(s, si){
       rowN += 1;
@@ -1908,14 +1929,13 @@ function showSections(keepScroll) {
       var ci;
       if (soloMode) {
         var licks = (s.licks || []);
-        // ensure 10 slots visually
         for (ci = 0; ci < maxCols; ci++) {
           var lp = licks[ci];
           if (!isChipPair(lp)) {
             chipArr.push('<button type="button" class="sec-chip empty" data-solo="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty solo slot"></button>');
           } else {
-            var lcode = lp[0], ltier = lp[1], llick = lp[2] || "";
-            var ltyp = secType(lcode) || "S";
+            var lcode = lp[0], ltier = lp[1], llick = lp[2] || lp[0] || "";
+            var ltyp = "S";
             n++;
             chipArr.push('<button type="button" class="sec-chip '+ltyp+' tier-'+ltier+'" data-solo="1" data-song="'+s.song+'" data-sec="'+lcode+'" data-type="'+ltyp+'" data-tier="'+ltier+'" data-lick="'+llick+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+lcode+'</button>');
           }
@@ -1942,6 +1962,8 @@ function showSections(keepScroll) {
     return '<div class="album-block" data-ai="'+ai+'"><div class="album-songs">'+rows+'</div></div>';
   }).join("");
   document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+ruler+html+'</div></div>';
+  var wrapEl = document.querySelector("#sectionsSheet .sections-wrap");
+  if (wrapEl) wrapEl.style.setProperty("--cols", String(maxCols));
   document.getElementById("sectionsCount").textContent = soloMode ? (n + " licks") : (n + " sections");
   buildSecFilters();
   applySecFilters();
@@ -2701,6 +2723,8 @@ var CATALOG = [
 var FOLDER = { A: "a-crops/", B: "b-crops/", B2: "b-crops/", C: "svg/", D: "svg/" };
 var COVER = { A: "covers/sbs.png", B: "covers/paranoid.png", B2: "covers/paranoid.png" };
 var currentLetter = "";
+SOLO_MAP = loadSoloMap();
+try { localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP)); } catch (e) {}
 var dragged = null;
 var didDrag = false;
 function orderKey(letter) { return "lick-order-" + letter; }
@@ -2740,6 +2764,28 @@ function lickKind(name) {
   if (/B$/.test(name)) return "B";
   if (/C$/.test(name)) return "C";
   return "A";
+}
+function buildDefaultSoloMapFromParanoid() {
+  var buckets = { "Iron Man": [], "Paranoid": [], "War Pigs": [] };
+  (CATALOG || []).forEach(function(x){
+    if (!x || x[1] !== "B") return;
+    var id = x[0];
+    var song = null;
+    if (id.indexOf("IM-") === 0) song = "Iron Man";
+    else if (id.indexOf("WP-") === 0) song = "War Pigs";
+    else if (id.indexOf("P-") === 0) song = "Paranoid";
+    if (!song || !buckets[song]) return;
+    var k = lickKind(id);
+    var tier = (k === "A") ? 1 : (k === "B") ? 2 : 1;
+    buckets[song].push([id, tier, id]);
+  });
+  var albums = blankSoloMapFromAlbums(ALBUMS_DEFAULT);
+  albums.forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      if (buckets[s.song] && buckets[s.song].length) s.licks = buckets[s.song].slice();
+    });
+  });
+  return { albums: albums };
 }
 function songClass(name) {
   if (/^IM-/.test(name)) return "song-im";
