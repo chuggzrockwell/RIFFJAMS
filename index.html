@@ -1508,7 +1508,7 @@
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
       <button type="button" class="btn-randomize" id="btnRandomize" title="Shuffle revealed tabs">Randomize</button>
-      <button type="button" class="btn-randomize" id="btnReorder" title="Sort revealed tabs by lick ID">Reorder</button>
+      <button type="button" class="btn-randomize" id="btnReorder" title="Sort revealed tabs and cover cards by lick ID">Reorder</button>
       <span class="keys">Click a lick to flip · A/B/C/D/E class · I/P/W/H/R songs · 1–9 = *-N · Esc/0 home</span>
     </div>
     <div class="sheet" id="licks">
@@ -2874,18 +2874,36 @@ function randomizeCoverBoard() {
   cards.forEach(function(el){ tabWrap.appendChild(el); });
   saveOrder();
 }
-/** Sort revealed tabs (tablature showing) by lick ID numeric order. */
-function reorderRevealedTabs() {
-  var tabWrap = document.getElementById("tabWrap");
-  if (!tabWrap) return;
-  var cards = revealedTabCards();
-  if (cards.length < 2) return;
+function sortPhraseCards(cards) {
   cards.sort(function(a, b){
     var an = a.getAttribute("data-name") || "";
     var bn = b.getAttribute("data-name") || "";
     return an.localeCompare(bn, undefined, { numeric: true, sensitivity: "base" });
   });
-  cards.forEach(function(el){ tabWrap.appendChild(el); });
+  return cards;
+}
+/** Sort revealed tabs AND hidden cover cards by lick ID numeric order. */
+function reorderRevealedTabs() {
+  var tabWrap = document.getElementById("tabWrap");
+  if (tabWrap) {
+    var tabs = revealedTabCards();
+    if (tabs.length > 1) {
+      sortPhraseCards(tabs).forEach(function(el){ tabWrap.appendChild(el); });
+    }
+  }
+  var board = document.getElementById("coverBoard");
+  if (board && !board.classList.contains("hidden")) {
+    var parents = [].slice.call(board.querySelectorAll(".song-col-body"));
+    if (!parents.length) parents = [].slice.call(board.querySelectorAll(".group"));
+    if (!parents.length) parents = [board];
+    parents.forEach(function(parent){
+      var covers = [].filter.call(parent.children, function(el){
+        return el.classList && el.classList.contains("phrase") && el.classList.contains("flipped");
+      });
+      if (covers.length < 2) return;
+      sortPhraseCards(covers).forEach(function(el){ parent.appendChild(el); });
+    });
+  }
   saveOrder();
 }
 function saveOrder() {
