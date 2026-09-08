@@ -690,17 +690,17 @@
   }
   .group.tall-head {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 150px);
-    grid-auto-rows: 150px;
-    gap: 6px;
+    grid-template-columns: repeat(auto-fill, 300px);
+    grid-auto-rows: 300px;
+    gap: 8px;
     align-items: stretch;
   }
   .col-head {
-    width: 150px; height: 150px; box-sizing: border-box;
+    width: 300px; height: 300px; box-sizing: border-box;
     background: #050607; color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 3rem; letter-spacing: .12em;
-    border-radius: 8px; flex: 0 0 150px;
+    font-weight: 800; font-size: 5rem; letter-spacing: .12em;
+    border-radius: 8px; flex: 0 0 300px;
     box-shadow: 0 0 0 1px #22262f, 0 8px 20px rgba(0,0,0,.45);
     cursor: pointer; user-select: none;
   }
@@ -708,7 +708,7 @@
   .col-head.tall {
     grid-row: span 2;
     height: auto;
-    width: 150px;
+    width: 300px;
   }
   .col-body {
     display: contents;
@@ -808,9 +808,9 @@
       0 0 18px 4px rgba(46,180,90,.7),
       0 0 40px 10px rgba(46,180,90,.4);
   }
-  /* cover-up: uniform 150×150 album tiles (100% cover size) */
+  /* cover-up: uniform 300×300 album tiles (100% class deployment) */
   .phrase.flipped {
-    width: 150px; height: 150px;
+    width: 300px; height: 300px;
     border-radius: 8px;
     background: transparent;
     overflow: hidden;
@@ -855,10 +855,10 @@
   .phrase.flipped .ref {
     display: flex; align-items: center; justify-content: center;
     position: absolute; left: 0; right: 0; top: auto; bottom: 0;
-    height: 48px; padding: 0 4px;
+    height: 56px; padding: 0 8px;
     background: rgba(0,0,0,.42); color: #fff;
     border-radius: 0 0 8px 8px;
-    font-size: 22px; line-height: 1; letter-spacing: .04em;
+    font-size: 28px; line-height: 1; letter-spacing: .04em;
     font-weight: 400;
     white-space: nowrap; overflow: hidden;
     pointer-events: none;
@@ -866,19 +866,19 @@
   }
   .phrase.a.flipped .ref {
     font-family: "SBS Title", "Metal Mania", cursive;
-    font-size: 22px;
+    font-size: 28px;
     color: #fff;
     background: rgba(0,0,0,.42);
   }
   .phrase.b.flipped .ref {
     font-family: "Paranoid Title", "Black Ops One", cursive;
-    font-size: 20px;
+    font-size: 26px;
     color: #fff;
     background: rgba(0,0,0,.42);
   }
   .phrase.d.flipped .ref {
     font-family: "Paranoid Title", "Black Ops One", cursive;
-    font-size: 20px;
+    font-size: 26px;
     color: #fff;
     background: rgba(0,0,0,.42);
   }
@@ -2479,12 +2479,12 @@ function rebuildColumns() {
     board.className = "cover-board hidden";
     return;
   }
-  // Uniform 150px cover tiles (never shrunk). Leftover tabs half-scale via syncLibraryHalfScale.
+  // Uniform 300px cover tiles (100% class deployment). Leftover tabs half-scale via syncLibraryHalfScale.
   board.className = "cover-board";
   function cardsPerRow() {
     var w = board.clientWidth || board.parentElement.clientWidth || window.innerWidth;
-    var gap = 6;
-    return Math.max(1, Math.floor((w + gap) / (150 + gap)) - 1);
+    var gap = 8;
+    return Math.max(1, Math.floor((w + gap) / (300 + gap)) - 1);
   }
   function addCols(items, label) {
     if (!items.length) return;
@@ -2525,7 +2525,7 @@ function syncLibraryHalfScale() {
   var preview = !!(sheet && sheet.classList.contains("has-lib-preview"));
   var anyFlipped = !!document.querySelector("#coverBoard .phrase.flipped");
   var anyTab = !!document.querySelector("#tabWrap .phrase");
-  // Preview strip, or leftover face-up tabs while covers show → tabs at 50% (covers stay 100%)
+  // Preview strip, or leftover face-up tabs while a class is deployed as covers → tabs 50%; covers stay 300px (100%)
   compactLibraryStrip(preview || (anyFlipped && anyTab));
 }
 function afterLibraryRelayout() {
