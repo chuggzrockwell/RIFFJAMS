@@ -98,6 +98,13 @@
   .badge.a { background: #3ec8ff; } .badge.b { background: #3ee45e; }
   .badge.b2 { background: #9bffb0; } .badge.c { background: #ffe44a; } .badge.d { background: #ff3d4e; }
   .count { opacity: .65; font-size: 0.9rem; }
+  .btn-randomize {
+    background: transparent; color: inherit; border: 1px solid #4a4e5a;
+    border-radius: 999px; padding: 5px 12px; cursor: pointer;
+    font-size: 0.78rem; font-weight: 700;
+  }
+  .btn-randomize:hover { filter: brightness(1.15); border-color: #7a8090; }
+  body.sheet-mode .btn-randomize { color: #e8e6e1; }
   .keys { margin-left: auto; opacity: .5; font-size: 0.78rem; letter-spacing: .04em; }
   .phrase.filtered-out { display: none !important; }
 
@@ -1500,6 +1507,7 @@
       <button type="button" class="back" id="back">Back</button>
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
+      <button type="button" class="btn-randomize" id="btnRandomize" title="Shuffle cover cards on the board">Randomize</button>
       <span class="keys">Click a lick to flip · A/B/C/D/E class · I/P/W songs · 1–9 = *-N · Esc/0 home</span>
     </div>
     <div class="sheet" id="licks">
@@ -2839,6 +2847,35 @@ function applySavedOrder(items, letter) {
   items.forEach(function(x){ if (map[x[0]]) out.push(x); });
   return out;
 }
+function shuffleInPlace(arr) {
+  var i, j, t;
+  for (i = arr.length - 1; i > 0; i--) {
+    j = Math.floor(Math.random() * (i + 1));
+    t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+  }
+  return arr;
+}
+/** Shuffle album-art cards currently on the cover board (CSS .flipped). */
+function randomizeCoverBoard() {
+  var board = document.getElementById("coverBoard");
+  if (!board || board.classList.contains("hidden")) return;
+  var parents = [].slice.call(board.querySelectorAll(".song-col-body"));
+  if (!parents.length) {
+    parents = [].slice.call(board.querySelectorAll(".group"));
+  }
+  if (!parents.length) parents = [board];
+  var moved = 0;
+  parents.forEach(function(parent){
+    var cards = [].filter.call(parent.children, function(el){
+      return el.classList && el.classList.contains("phrase") && el.classList.contains("flipped");
+    });
+    if (cards.length < 2) return;
+    shuffleInPlace(cards);
+    cards.forEach(function(el){ parent.appendChild(el); });
+    moved += cards.length;
+  });
+  if (moved) saveOrder();
+}
 function saveOrder() {
   if (!currentLetter) return;
   var names = [].map.call(document.querySelectorAll(".phrase"), function(el){
@@ -3158,6 +3195,7 @@ document.getElementById("btnC").onclick = function(){ showSeries("C"); };
 document.getElementById("btnD").onclick = function(){ showSeries("D"); };
 document.getElementById("btnHP").onclick = showSections;
 document.getElementById("back").onclick = showHome;
+document.getElementById("btnRandomize").onclick = function(){ randomizeCoverBoard(); };
 document.getElementById("backSections").onclick = showHome;
 document.getElementById("secFilters").onclick = function(e){
   var toggle = e.target.closest("#excludeDdToggle");
