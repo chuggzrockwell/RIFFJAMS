@@ -2476,8 +2476,9 @@ function rebuildColumns() {
     board.className = "cover-board hidden";
     return;
   }
-  var anyTab = document.querySelector(".phrase:not(.flipped)");
-  board.className = "cover-board"; // keep flipped covers native/full size (no 50% shrunk mode)
+  var anyTab = !!document.querySelector("#tabWrap .phrase:not(.flipped), #tabWrap .phrase");
+  // When tabs remain, covers go to half tiles (75px); remaining tabs scale via syncLibraryHalfScale
+  board.className = anyTab ? "cover-board shrunk" : "cover-board";
   function cardsPerRow(cardSize) {
     var w = board.clientWidth || board.parentElement.clientWidth || window.innerWidth;
     var gap = 6;
@@ -2517,13 +2518,19 @@ function relayout() {
   });
   rebuildColumns();
   saveFlipped();
+  afterLibraryRelayout();
+}
+function syncLibraryHalfScale() {
+  var sheet = document.getElementById("licks");
+  var preview = !!(sheet && sheet.classList.contains("has-lib-preview"));
+  var anyFlipped = !!document.querySelector("#coverBoard .phrase.flipped");
+  var anyTab = !!document.querySelector("#tabWrap .phrase");
+  // Preview strip, or leftover face-up tabs while some class is flipped to covers → 50%
+  compactLibraryStrip(preview || (anyFlipped && anyTab));
 }
 function afterLibraryRelayout() {
-  if (document.getElementById("licks") &&
-      document.getElementById("licks").classList.contains("has-lib-preview")) {
-    compactLibraryStrip(true);
-    requestAnimationFrame(function(){ compactLibraryStrip(true); });
-  }
+  syncLibraryHalfScale();
+  requestAnimationFrame(syncLibraryHalfScale);
 }
 function toggleEls(els) {
   if (!els.length) return;
