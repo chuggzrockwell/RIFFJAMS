@@ -1521,7 +1521,7 @@ var ALBUMS_DEFAULT = [
     { song: "Planet Caravan", sections: [["V",5],["S1",1]] },
     { song: "Iron Man", sections: [["V1",1],["V2",2],["V3",2],["V4",2],["S1",1],["S2",1],["O1",1]] },
     { song: "Electric Funeral", sections: [["I1",4],["V1",4],["B1",5],["B2",5],["B3",5],["B4",5]] },
-    { song: "Hand of Doom", sections: [["V1",5],["V2",5],["B1",2],["B2",2],["S1",1]] },
+    { song: "Hand of Doom", sections: [["V1",5],["V2",5],["B1",2],["B2",2],["S1",1,"HOD-S1"]] },
     { song: "Rat Salad", sections: [["V1",4],["V2",4],["S1",1]] },
     { song: "Jack the Stripper", sections: [["I1",2],["I2",2],["S1",1],["V1",4],["B1",4],["S2",1],["F1",5]] },
   ]},
@@ -1716,6 +1716,17 @@ function loadAlbums() {
               s.sections.push(want.slice());
             }
           });
+        }
+        if (s.song === "Hand of Doom") {
+          if (!s.sections) s.sections = [];
+          var hodHit = null;
+          s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === "S1") hodHit = p; });
+          if (hodHit) {
+            hodHit[1] = 1;
+            hodHit[2] = "HOD-S1";
+          } else if (!s.sections.length) {
+            s.sections.push(["S1",1,"HOD-S1"]);
+          }
         }
       });
     });
