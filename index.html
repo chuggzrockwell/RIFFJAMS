@@ -1606,8 +1606,8 @@
       <span class="count" id="count"></span>
       <button type="button" class="btn-randomize" id="btnRandomize" title="Shuffle revealed tabs (Z)">Randomize</button>
       <button type="button" class="btn-randomize" id="btnReorder" title="Sort revealed tabs and cover cards by lick ID (O)">Reorder</button>
-      <button type="button" class="btn-randomize" id="btnClear" title="Hide all revealed tabs (C)">Clear</button>
-      <span class="keys">Click to flip · A/B/D/E class · Z/O/C · I/P/W/H/R · 1–8 · Esc/0</span>
+      <button type="button" class="btn-randomize" id="btnClear" title="Hide all revealed tabs (Shift+C)">Clear</button>
+      <span class="keys">Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Esc/0</span>
     </div>
     <div class="sheet" id="licks">
       <div class="cover-board hidden" id="coverBoard"></div>
@@ -3897,8 +3897,8 @@ document.addEventListener("keydown", function(e){
   }
   if (k === "z") { randomizeCoverBoard(); return; }
   if (k === "o") { reorderRevealedTabs(); return; }
-  if (k === "c") { clearRevealedLicks(); return; }
-  if (k === "a" || k === "b" || k === "d" || k === "e") {
+  if (e.shiftKey && k === "c") { clearRevealedLicks(); return; }
+  if (!e.shiftKey && (k === "a" || k === "b" || k === "c" || k === "d" || k === "e")) {
     revealKind(k.toUpperCase());
     return;
   }
