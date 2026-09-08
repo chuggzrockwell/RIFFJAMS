@@ -409,26 +409,7 @@
     order: 0;
     gap: 8px;
     align-items: flex-start;
-  }
-  /* Deployed lick (.playing) stays 100%; all remaining face-up tabs go to 50% */
-  #tabWrap.lib-half {
-    gap: 8px;
-    align-items: flex-start;
-  }
-  #tabWrap.lib-half .phrase:not(.playing) img.tab {
-    height: 84px !important; /* 50% of native 169 */
-    width: auto !important;
-    max-width: none !important;
-  }
-  #tabWrap.lib-half .phrase:not(.playing):not(.flipped) .ref {
-    top: 4px; left: 5px;
-    padding: 2px 6px;
-    font-size: 11px;
-    border-radius: 4px;
-  }
-  #tabWrap.lib-half .phrase.playing img.tab {
-    height: auto !important; /* deployed = full native */
-    width: auto !important;
+    transform-origin: top left;
   }
   .sheet.has-lib-preview .tab-wrap .phrase.playing {
     outline: 2px solid #ed1c24;
@@ -687,7 +668,6 @@
   .cover-board {
     display: flex; flex-direction: column; gap: 12px;
     align-items: stretch; width: 100%; order: -1;
-    transform: none; /* never share the leftover-tab 50% scale */
   }
   .group {
     display: flex; flex-direction: row; flex-wrap: wrap;
@@ -695,17 +675,17 @@
   }
   .group.tall-head {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 300px);
-    grid-auto-rows: 300px;
-    gap: 8px;
+    grid-template-columns: repeat(auto-fill, 150px);
+    grid-auto-rows: 150px;
+    gap: 6px;
     align-items: stretch;
   }
   .col-head {
-    width: 300px; height: 300px; box-sizing: border-box;
+    width: 150px; height: 150px; box-sizing: border-box;
     background: #050607; color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 5rem; letter-spacing: .12em;
-    border-radius: 8px; flex: 0 0 300px;
+    font-weight: 800; font-size: 3rem; letter-spacing: .12em;
+    border-radius: 8px; flex: 0 0 150px;
     box-shadow: 0 0 0 1px #22262f, 0 8px 20px rgba(0,0,0,.45);
     cursor: pointer; user-select: none;
   }
@@ -713,7 +693,7 @@
   .col-head.tall {
     grid-row: span 2;
     height: auto;
-    width: 300px;
+    width: 150px;
   }
   .col-body {
     display: contents;
@@ -813,9 +793,9 @@
       0 0 18px 4px rgba(46,180,90,.7),
       0 0 40px 10px rgba(46,180,90,.4);
   }
-  /* cover-up: uniform 300×300 album tiles (100% class deployment) */
+  /* cover-up resting state: real album art, not the tab backface */
   .phrase.flipped {
-    width: 300px; height: 300px;
+    width: 150px; height: 150px;
     border-radius: 8px;
     background: transparent;
     overflow: hidden;
@@ -860,10 +840,10 @@
   .phrase.flipped .ref {
     display: flex; align-items: center; justify-content: center;
     position: absolute; left: 0; right: 0; top: auto; bottom: 0;
-    height: 56px; padding: 0 8px;
+    height: 48px; padding: 0 4px;
     background: rgba(0,0,0,.42); color: #fff;
     border-radius: 0 0 8px 8px;
-    font-size: 28px; line-height: 1; letter-spacing: .04em;
+    font-size: 22px; line-height: 1; letter-spacing: .04em;
     font-weight: 400;
     white-space: nowrap; overflow: hidden;
     pointer-events: none;
@@ -871,19 +851,19 @@
   }
   .phrase.a.flipped .ref {
     font-family: "SBS Title", "Metal Mania", cursive;
-    font-size: 28px;
+    font-size: 22px;
     color: #fff;
     background: rgba(0,0,0,.42);
   }
   .phrase.b.flipped .ref {
     font-family: "Paranoid Title", "Black Ops One", cursive;
-    font-size: 26px;
+    font-size: 20px;
     color: #fff;
     background: rgba(0,0,0,.42);
   }
   .phrase.d.flipped .ref {
     font-family: "Paranoid Title", "Black Ops One", cursive;
-    font-size: 26px;
+    font-size: 20px;
     color: #fff;
     background: rgba(0,0,0,.42);
   }
@@ -2166,18 +2146,29 @@ var libPreviewQueue = []; // [{name, src}] — multiple native-size previews on 
 function compactLibraryStrip(on) {
   var wrap = document.getElementById("tabWrap");
   if (!wrap) return;
-  // Drop old transform / per-card hacks
-  wrap.style.transform = "";
-  wrap.style.transformOrigin = "";
-  wrap.style.width = "";
-  wrap.style.marginBottom = "";
+  // Clear any old per-card hacks
   wrap.querySelectorAll(".phrase").forEach(function(el){
     el.style.transform = "";
     el.style.transformOrigin = "";
     el.style.marginRight = "";
     el.style.marginBottom = "";
   });
-  wrap.classList.toggle("lib-half", !!on);
+  if (!on) {
+    wrap.style.transform = "";
+    wrap.style.transformOrigin = "";
+    wrap.style.width = "";
+    wrap.style.marginBottom = "";
+    return;
+  }
+  // Scale the whole strip as one unit so spacing stays even
+  wrap.style.transform = "";
+  wrap.style.marginBottom = "";
+  wrap.style.width = "200%"; // wrap as if double-width, then scale to 50% => normal width
+  wrap.style.transformOrigin = "top left";
+  // force layout at 200% width
+  var h = wrap.scrollHeight;
+  wrap.style.transform = "scale(0.5)";
+  wrap.style.marginBottom = (-Math.round(h / 2)) + "px";
 }
 function renderLibraryPreviewBoard() {
   var sheet = document.getElementById("licks");
@@ -2473,6 +2464,7 @@ function collectFlipped(kind) {
 }
 function rebuildColumns() {
   var board = document.getElementById("coverBoard");
+  var tabWrap = document.getElementById("tabWrap");
   var a = collectFlipped("A");
   var b = collectFlipped("B");
   var c = collectFlipped("C");
@@ -2484,16 +2476,18 @@ function rebuildColumns() {
     board.className = "cover-board hidden";
     return;
   }
-  // Uniform 300px cover tiles (100% class deployment). Leftover tabs half-scale via syncLibraryHalfScale.
-  board.className = "cover-board";
-  function cardsPerRow() {
+  var anyTab = document.querySelector(".phrase:not(.flipped)");
+  board.className = "cover-board"; // keep flipped covers native/full size (no 50% shrunk mode)
+  function cardsPerRow(cardSize) {
     var w = board.clientWidth || board.parentElement.clientWidth || window.innerWidth;
-    var gap = 8;
-    return Math.max(1, Math.floor((w + gap) / (300 + gap)) - 1);
+    var gap = 6;
+    var cols = Math.max(1, Math.floor((w + gap) / (cardSize + gap)));
+    return Math.max(1, cols - 1);
   }
   function addCols(items, label) {
     if (!items.length) return;
-    var tall = items.length > cardsPerRow();
+    var cardSize = board.classList.contains("shrunk") ? 75 : 150;
+    var tall = items.length > cardsPerRow(cardSize);
     var group = document.createElement("div");
     group.className = tall ? "group tall-head" : "group";
     var headClass = tall ? "col-head tall" : "col-head";
@@ -2523,19 +2517,13 @@ function relayout() {
   });
   rebuildColumns();
   saveFlipped();
-  afterLibraryRelayout();
-}
-function syncLibraryHalfScale() {
-  var sheet = document.getElementById("licks");
-  var preview = !!(sheet && sheet.classList.contains("has-lib-preview"));
-  var anyFlipped = !!document.querySelector("#coverBoard .phrase.flipped");
-  var anyTab = !!document.querySelector("#tabWrap .phrase");
-  // Single lick deployed (preview) OR leftovers while covers show → remaining tabs 50%
-  compactLibraryStrip(preview || (anyFlipped && anyTab));
 }
 function afterLibraryRelayout() {
-  syncLibraryHalfScale();
-  requestAnimationFrame(syncLibraryHalfScale);
+  if (document.getElementById("licks") &&
+      document.getElementById("licks").classList.contains("has-lib-preview")) {
+    compactLibraryStrip(true);
+    requestAnimationFrame(function(){ compactLibraryStrip(true); });
+  }
 }
 function toggleEls(els) {
   if (!els.length) return;
