@@ -2518,69 +2518,44 @@ function relayout() {
   rebuildColumns();
   saveFlipped();
 }
+function afterLibraryRelayout() {
+  if (document.getElementById("licks") &&
+      document.getElementById("licks").classList.contains("has-lib-preview")) {
+    compactLibraryStrip(true);
+    requestAnimationFrame(function(){ compactLibraryStrip(true); });
+  }
+}
 function toggleEls(els) {
   if (!els.length) return;
-  var allUp = els.every(function(el){ return !el.classList.contains("flipped"); });
+  // If any of this set are face-up tabs, flip ALL to album art; if all are covers, flip back to tabs
+  var anyTab = els.some(function(el){ return !el.classList.contains("flipped"); });
   els.forEach(function(el){
-    if (allUp) el.classList.add("flipped");
+    if (anyTab) el.classList.add("flipped");
     else el.classList.remove("flipped");
   });
   relayout();
+  afterLibraryRelayout();
 }
 function revealKind(kind) {
-  // SBS / Paranoid: A/B/C/D filters the strip to that kind at normal card scale (no cover-flip / no scatter)
-  if (COVER[currentLetter]) {
-    var phrases = [].slice.call(document.querySelectorAll(".phrase"));
-    var showingOnly = phrases.length && phrases.every(function(el){
-      var match = lickKind(el.getAttribute("data-name")) === kind;
-      return match ? !el.classList.contains("filtered-out") : el.classList.contains("filtered-out");
-    });
-    var tabWrap = document.getElementById("tabWrap");
-    var board = document.getElementById("coverBoard");
-    phrases.forEach(function(el){
-      el.classList.remove("flipped");
-      if (showingOnly) el.classList.remove("filtered-out");
-      else el.classList.toggle("filtered-out", lickKind(el.getAttribute("data-name")) !== kind);
-      if (tabWrap) tabWrap.appendChild(el);
-    });
-    if (board) {
-      board.innerHTML = "";
-      board.className = "cover-board hidden";
-    }
-    if (document.getElementById("licks") &&
-        document.getElementById("licks").classList.contains("has-lib-preview")) {
-      compactLibraryStrip(true);
-      requestAnimationFrame(function(){ compactLibraryStrip(true); });
-    }
-    return;
-  }
+  // Drop leftover filter state from the short-lived A-filter experiment
+  document.querySelectorAll(".phrase.filtered-out").forEach(function(el){
+    el.classList.remove("filtered-out");
+  });
   toggleEls([].filter.call(document.querySelectorAll(".phrase"), function(el){
     return lickKind(el.getAttribute("data-name")) === kind;
   }));
 }
 function showKind(kind) {
+  document.querySelectorAll(".phrase.filtered-out").forEach(function(el){
+    el.classList.remove("filtered-out");
+  });
   var els = [].filter.call(document.querySelectorAll(".phrase"), function(el){
     return lickKind(el.getAttribute("data-name")) === kind;
   });
   if (!els.length) return;
-  if (COVER[currentLetter]) {
-    var tabWrap = document.getElementById("tabWrap");
-    var board = document.getElementById("coverBoard");
-    document.querySelectorAll(".phrase").forEach(function(el){
-      el.classList.remove("flipped");
-      el.classList.toggle("filtered-out", lickKind(el.getAttribute("data-name")) !== kind);
-      if (tabWrap) tabWrap.appendChild(el);
-    });
-    if (board) { board.innerHTML = ""; board.className = "cover-board hidden"; }
-    if (document.getElementById("licks") &&
-        document.getElementById("licks").classList.contains("has-lib-preview")) {
-      compactLibraryStrip(true);
-      requestAnimationFrame(function(){ compactLibraryStrip(true); });
-    }
-    return;
-  }
   els.forEach(function(el){ el.classList.remove("flipped"); });
   relayout();
+  afterLibraryRelayout();
 }
 function revealGroup(group) {
   toggleEls([].filter.call(document.querySelectorAll(".phrase"), function(el){
