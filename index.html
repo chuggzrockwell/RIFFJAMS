@@ -1390,7 +1390,7 @@
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
       <button type="button" class="sec-mode-btn" data-sec-mode="edit">Edit</button>
       <button type="button" class="sec-mode-btn" data-sec-mode="play">Play</button>
-      <button type="button" class="sec-mode-btn" id="secSoloModeBtn" aria-pressed="false">Solo mode</button>
+      <button type="button" class="sec-mode-btn" id="secSoloModeBtn" aria-pressed="false">Solo</button>
       <span class="sec-edit-tools" id="secEditTools" hidden>
         <button type="button" class="sec-tool-btn" id="secUndoBtn" title="Undo (Ctrl+Z)">Undo</button>
         <button type="button" class="sec-tool-btn primary" id="secSaveBtn" title="Save (Ctrl+S)">Save</button>
@@ -1721,9 +1721,9 @@ function updateEditSaveUi() {
   var keys = document.getElementById("sectionsKeys");
   if (keys && document.body.className.indexOf("sections-mode") >= 0) {
     if (soloMode) {
-      if (sectionsMode === "play") keys.textContent = "Solo mode · lick clicks queue · Esc/0 home";
-      else if (sectionsMode === "edit") keys.textContent = "Solo mode · Edit disabled · Esc/0 home";
-      else keys.textContent = "Solo mode · Esc/0 home";
+      if (sectionsMode === "play") keys.textContent = "Solo · lick clicks queue · Esc/0 home";
+      else if (sectionsMode === "edit") keys.textContent = "Solo · Edit disabled · Esc/0 home";
+      else keys.textContent = "Solo · Esc/0 home";
     }
   }
 }
@@ -2154,9 +2154,9 @@ function setSectionsMode(mode) {
   var keys = document.getElementById("sectionsKeys");
   if (keys) {
     if (soloMode) {
-      if (sectionsMode === "edit") keys.textContent = "Solo mode · Edit disabled · Esc/0 home";
-      else if (sectionsMode === "play") keys.textContent = "Solo mode · lick clicks queue · Esc/0 home";
-      else keys.textContent = "Solo mode · Esc/0 home";
+      if (sectionsMode === "edit") keys.textContent = "Solo · Edit disabled · Esc/0 home";
+      else if (sectionsMode === "play") keys.textContent = "Solo · lick clicks queue · Esc/0 home";
+      else keys.textContent = "Solo · Esc/0 home";
     } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · Esc closes";
     else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · section clicks queue · Playboard window · Esc/0 home";
     else keys.textContent = "Numpad 1/2/3 · Song Map · filters · Esc/0 home";
