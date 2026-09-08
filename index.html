@@ -771,6 +771,10 @@
   .song-col-head {
     box-sizing: border-box;
     width: 100%;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: #050607;
     color: #fff;
     font-family: "Paranoid Title", "Black Ops One", cursive;
@@ -783,6 +787,11 @@
     box-shadow: 0 0 0 1px #22262f, 0 8px 20px rgba(0,0,0,.45);
     user-select: none;
   }
+  .song-col-head.long {
+    font-size: 0.72rem;
+    letter-spacing: .02em;
+    padding: 10px 4px;
+  }
   .song-col-body {
     display: grid;
     grid-template-columns: var(--card) var(--card);
@@ -792,9 +801,15 @@
   }
   .cover-board.shrunk .song-col { --card: 75px; width: 200px; }
   .cover-board.shrunk .song-col-head {
+    min-height: 32px;
     font-size: 0.78rem;
     padding: 6px 4px;
     border-radius: 4px;
+  }
+  .cover-board.shrunk .song-col-head.long {
+    font-size: 0.55rem;
+    letter-spacing: .01em;
+    padding: 6px 2px;
   }
   .phrase {
     box-sizing: border-box; padding: 0; cursor: grab;
@@ -1509,7 +1524,7 @@
       <span class="count" id="count"></span>
       <button type="button" class="btn-randomize" id="btnRandomize" title="Shuffle revealed tabs">Randomize</button>
       <button type="button" class="btn-randomize" id="btnReorder" title="Sort revealed tabs and cover cards by lick ID">Reorder</button>
-      <span class="keys">Click a lick to flip · A/B/C/D/E class · I/P/W/H/R songs · 1–9 = *-N · Esc/0 home</span>
+      <span class="keys">Click a lick to flip · A/B/C/D/E class · I/P/W/H/R songs · 1–8 tracks · Esc/0 home</span>
     </div>
     <div class="sheet" id="licks">
       <div class="cover-board hidden" id="coverBoard"></div>
@@ -3013,12 +3028,12 @@ function collectFlipped(kind) {
 function rebuildColumnsB2() {
   var board = document.getElementById("coverBoard");
   var songs = [
-    { re: /^IM-/, label: "Iron Man" },
-    { re: /^P-/, label: "Paranoid" },
-    { re: /^WP-/, label: "War Pigs" },
-    { re: /^HOD-/, label: "Hand of Doom" },
-    { re: /^RS-/, label: "Rat Salad" },
-    { re: /^FOB-/, label: "Fairies Wear Boots" }
+    { re: /^IM-/, label: "Iron Man", track: 4 },
+    { re: /^P-/, label: "Paranoid", track: 2 },
+    { re: /^WP-/, label: "War Pigs", track: 1 },
+    { re: /^HOD-/, label: "Hand of Doom", track: 6 },
+    { re: /^RS-/, label: "Rat Salad", track: 7 },
+    { re: /^FOB-/, label: "Fairies Wear Boots", track: 8 }
   ];
   // Preserve document / saved order among flipped (album-art) cards
   var allFlipped = [];
@@ -3042,8 +3057,8 @@ function rebuildColumnsB2() {
     var col = document.createElement("div");
     col.className = "song-col";
     var head = document.createElement("div");
-    head.className = "song-col-head";
-    head.textContent = song.label;
+    head.className = "song-col-head" + (song.label === "Fairies Wear Boots" ? " long" : "");
+    head.textContent = (song.track ? song.track + " " : "") + song.label;
     var body = document.createElement("div");
     body.className = "song-col-body";
     items.forEach(function(el){ body.appendChild(el); });
@@ -3140,6 +3155,22 @@ function revealKind(kind) {
   toggleEls([].filter.call(document.querySelectorAll(".phrase"), function(el){
     return lickKind(el.getAttribute("data-name")) === kind;
   }));
+}
+// Song Map Paranoid track order → lick prefix (1–8). Empty prefix = no library licks yet.
+var PARANOID_TRACK_PREFIX = {
+  "1": "WP-",
+  "2": "P-",
+  "3": "",
+  "4": "IM-",
+  "5": "",
+  "6": "HOD-",
+  "7": "RS-",
+  "8": "FOB-"
+};
+function revealParanoidTrack(digit) {
+  var prefix = PARANOID_TRACK_PREFIX[String(digit)];
+  if (!prefix) return;
+  revealSong(prefix);
 }
 function revealSong(prefix) {
   // I/P/W/H/R: toggle song licks (IM-/P-/WP-/HOD-/RS-). Same flip rule as A/B/C/D.
@@ -3720,6 +3751,11 @@ document.addEventListener("keydown", function(e){
   if (k === "w") { revealSong("WP-"); return; }
   if (k === "h") { revealSong("HOD-"); return; }
   if (k === "r") { revealSong("RS-"); return; }
+  if (k === "f") { revealSong("FOB-"); return; }
+  if (k >= "1" && k <= "8" && (currentLetter === "B" || currentLetter === "B2")) {
+    revealParanoidTrack(k);
+    return;
+  }
   if (k >= "1" && k <= "9") {
     revealGroup(k);
   }
