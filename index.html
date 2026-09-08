@@ -409,7 +409,21 @@
     order: 0;
     gap: 8px;
     align-items: flex-start;
-    transform-origin: top left;
+  }
+  /* Half-size leftover / preview library tabs — real layout size, not transform hacks */
+  #tabWrap.lib-half {
+    gap: 8px;
+  }
+  #tabWrap.lib-half .phrase img.tab {
+    height: 84px; /* 50% of native 169 */
+    width: auto;
+    max-width: none;
+  }
+  #tabWrap.lib-half .phrase:not(.flipped) .ref {
+    top: 4px; left: 5px;
+    padding: 2px 6px;
+    font-size: 11px;
+    border-radius: 4px;
   }
   .sheet.has-lib-preview .tab-wrap .phrase.playing {
     outline: 2px solid #ed1c24;
@@ -2147,29 +2161,18 @@ var libPreviewQueue = []; // [{name, src}] — multiple native-size previews on 
 function compactLibraryStrip(on) {
   var wrap = document.getElementById("tabWrap");
   if (!wrap) return;
-  // Clear any old per-card hacks
+  // Drop old transform / per-card hacks
+  wrap.style.transform = "";
+  wrap.style.transformOrigin = "";
+  wrap.style.width = "";
+  wrap.style.marginBottom = "";
   wrap.querySelectorAll(".phrase").forEach(function(el){
     el.style.transform = "";
     el.style.transformOrigin = "";
     el.style.marginRight = "";
     el.style.marginBottom = "";
   });
-  if (!on) {
-    wrap.style.transform = "";
-    wrap.style.transformOrigin = "";
-    wrap.style.width = "";
-    wrap.style.marginBottom = "";
-    return;
-  }
-  // Scale the whole strip as one unit so spacing stays even
-  wrap.style.transform = "";
-  wrap.style.marginBottom = "";
-  wrap.style.width = "200%"; // wrap as if double-width, then scale to 50% => normal width
-  wrap.style.transformOrigin = "top left";
-  // force layout at 200% width
-  var h = wrap.scrollHeight;
-  wrap.style.transform = "scale(0.5)";
-  wrap.style.marginBottom = (-Math.round(h / 2)) + "px";
+  wrap.classList.toggle("lib-half", !!on);
 }
 function renderLibraryPreviewBoard() {
   var sheet = document.getElementById("licks");
