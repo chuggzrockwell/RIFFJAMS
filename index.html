@@ -429,7 +429,7 @@
     flex-direction: column;
     gap: 8px;
   }
-  .lib-preview.hidden { display: none !important; }
+  .lib-preview, .lib-preview.hidden, .preview-park { display: none !important; }
   .lib-preview-meta {
     flex: 0 0 auto;
     color: rgba(255,255,255,.8);
@@ -1431,7 +1431,7 @@
       <button type="button" class="back" id="back">Back</button>
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
-      <span class="keys">Click a lick to preview here · 1–9 = *-N · Esc/0 home</span>
+      <span class="keys">Click a lick to flip · A/B/C/D flip class · 1–9 = *-N · Esc/0 home</span>
     </div>
     <div class="sheet" id="licks">
       <div class="cover-board hidden" id="coverBoard"></div>
@@ -2252,8 +2252,26 @@ function renderLibraryPreviewBoard() {
   relayout();
 }
 function clearLibraryPreview() {
+  if (!libPreviewQueue.length &&
+      !(document.getElementById("licks") &&
+        document.getElementById("licks").classList.contains("has-lib-preview"))) {
+    return;
+  }
   libPreviewQueue = [];
-  renderLibraryPreviewBoard();
+  var sheet = document.getElementById("licks");
+  var prev = document.getElementById("libPreview");
+  var board = document.getElementById("libPreviewBoard");
+  if (sheet) sheet.classList.remove("has-lib-preview");
+  if (prev) prev.classList.add("hidden");
+  if (board) board.innerHTML = "";
+  document.querySelectorAll(".phrase.playing, .phrase.playing-offscreen, .phrase.preview-dup").forEach(function(el){
+    el.classList.remove("playing");
+    el.classList.remove("playing-offscreen");
+    el.classList.remove("preview-dup");
+  });
+  compactLibraryStrip(false);
+  // Return any parked phrases to normal layout
+  relayout();
 }
 function toggleLibraryPreview(el) {
   if (!el) return;
@@ -2272,9 +2290,12 @@ function togglePlayPhrase(el) {
   if (!el) return;
   var name = (el.getAttribute("data-name") || "").trim();
   if (!name) return;
-  // COVER libraries (SBS / Paranoid): preview on the same screen — keep all cards visible (half size)
+  // COVER libraries: click toggles the SAME flip as A/B/C/D keys (no separate preview section)
   if (COVER[currentLetter]) {
-    toggleLibraryPreview(el);
+    clearLibraryPreview();
+    el.classList.toggle("flipped");
+    relayout();
+    afterLibraryRelayout();
     return;
   }
   var key = libraryPlayKey(el);
@@ -2485,27 +2506,11 @@ function songClass(name) {
   return "song-other";
 }
 var COL_MAX = 5;
-function previewSelectedSet() {
-  var s = {};
-  (libPreviewQueue || []).forEach(function(item){ s[item.name] = true; });
-  return s;
-}
-function parkPreviewSelected() {
-  var park = document.getElementById("previewPark");
-  if (!park) return;
-  var skip = previewSelectedSet();
-  document.querySelectorAll(".phrase").forEach(function(el){
-    var n = el.getAttribute("data-name") || "";
-    if (skip[n]) park.appendChild(el);
-  });
-}
 function collectFlipped(kind) {
   var out = [];
-  var skip = previewSelectedSet();
   [].forEach.call(document.querySelectorAll(".phrase.flipped"), function(el){
     if (el.classList.contains("filtered-out")) return;
     var n = el.getAttribute("data-name") || "";
-    if (skip[n]) return; // selected → preview pane only
     if (lickKind(n) === kind) out.push(el);
   });
   out.sort(function(a, b){
@@ -2571,14 +2576,7 @@ function lickGroup(name) {
 }
 function relayout() {
   var tabWrap = document.getElementById("tabWrap");
-  var skip = previewSelectedSet();
-  var park = document.getElementById("previewPark");
   [].forEach.call(document.querySelectorAll(".phrase"), function(el){
-    var n = el.getAttribute("data-name") || "";
-    if (skip[n]) {
-      if (park) park.appendChild(el);
-      return;
-    }
     if (!el.classList.contains("flipped")) tabWrap.appendChild(el);
   });
   rebuildColumns();
