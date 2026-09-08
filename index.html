@@ -1498,7 +1498,7 @@
       <button type="button" class="back" id="back">Back</button>
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
-      <span class="keys">Click a lick to flip · A/B/C/D flip class · 1–9 = *-N · Esc/0 home</span>
+      <span class="keys">Click a lick to flip · A/B/C/D class · I/P/W songs · 1–9 = *-N · Esc/0 home</span>
     </div>
     <div class="sheet" id="licks">
       <div class="cover-board hidden" id="coverBoard"></div>
@@ -2895,6 +2895,16 @@ function revealKind(kind) {
     return lickKind(el.getAttribute("data-name")) === kind;
   }));
 }
+function revealSong(prefix) {
+  // I/P/W: toggle all licks for a song (IM- / P- / WP-). Same flip rule as A/B/C/D.
+  document.querySelectorAll(".phrase.filtered-out").forEach(function(el){
+    el.classList.remove("filtered-out");
+  });
+  toggleEls([].filter.call(document.querySelectorAll(".phrase"), function(el){
+    var n = el.getAttribute("data-name") || "";
+    return n.indexOf(prefix) === 0;
+  }));
+}
 function showKind(kind) {
   document.querySelectorAll(".phrase.filtered-out").forEach(function(el){
     el.classList.remove("filtered-out");
@@ -3433,6 +3443,9 @@ document.addEventListener("keydown", function(e){
     revealKind(k.toUpperCase());
     return;
   }
+  if (k === "i") { revealSong("IM-"); return; }
+  if (k === "p") { revealSong("P-"); return; }
+  if (k === "w") { revealSong("WP-"); return; }
   if (k >= "1" && k <= "9") {
     revealGroup(k);
   }
