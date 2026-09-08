@@ -766,7 +766,7 @@
     flex-direction: column;
     gap: var(--gap);
     flex: 0 0 auto;
-    width: calc(var(--card) * 2 + var(--gap));
+    width: 200px;
   }
   .song-col-head {
     box-sizing: border-box;
@@ -790,7 +790,7 @@
     width: 100%;
     justify-content: start;
   }
-  .cover-board.shrunk .song-col { --card: 50px; }
+  .cover-board.shrunk .song-col { --card: 75px; width: 200px; }
   .cover-board.shrunk .song-col-head {
     font-size: 0.78rem;
     padding: 6px 4px;
@@ -971,7 +971,7 @@
     background: rgba(0,0,0,.42);
   }
   .cover-board.shrunk .phrase.flipped {
-    width: 50px; height: 50px;
+    width: 75px; height: 75px;
   }
   .cover-board.shrunk .phrase.flipped img.cover {
     border-radius: 4px;
@@ -987,16 +987,16 @@
   .cover-board.shrunk .phrase.d.flipped .ref { font-size: 9px; }
   .cover-board.shrunk .phrase.e.flipped .ref { font-size: 9px; }
   .cover-board.shrunk .col-head {
-    width: 50px; height: 50px; flex-basis: 50px;
+    width: 75px; height: 75px; flex-basis: 75px;
     font-size: 1.6rem; border-radius: 4px;
   }
   .cover-board.shrunk .group.tall-head {
-    grid-template-columns: repeat(auto-fill, 50px);
-    grid-auto-rows: 50px;
+    grid-template-columns: repeat(auto-fill, 75px);
+    grid-auto-rows: 75px;
   }
   .cover-board.shrunk .col-head.tall {
     height: auto;
-    width: 50px;
+    width: 75px;
   }
   .lightbox {
     position: fixed; inset: 0; background: rgba(20,18,14,.82);
@@ -1408,7 +1408,7 @@
     .cover-board.shrunk .group.tall-head { grid-template-columns: repeat(auto-fill, 40px); grid-auto-rows: 40px; }
     .cover-board.shrunk .col-head.tall { width: 40px; }
     .song-col { --card: 48px; }
-    .cover-board.shrunk .song-col { --card: 40px; }
+    .cover-board.shrunk .song-col { --card: 48px; width: 200px; }
     .song-col-head { font-size: 0.65rem; padding: 4px 2px; }
   }
 
@@ -3072,7 +3072,7 @@ function rebuildColumns() {
     return;
   }
   // Jacob: flipped = tab (full size); unflipped = album art.
-  // CSS .flipped = album art. When any tabs show, album-art tiles go to half (50px).
+  // CSS .flipped = album art. When any tabs show, album-art tiles go to 75px (full covers stay 100).
   var anyTab = !!document.querySelector("#tabWrap .phrase");
   board.className = anyTab ? "cover-board shrunk" : "cover-board";
   function cardsPerRow(cardSize) {
@@ -3083,7 +3083,7 @@ function rebuildColumns() {
   }
   function addCols(items, label) {
     if (!items.length) return;
-    var cardSize = board.classList.contains("shrunk") ? 50 : 100;
+    var cardSize = board.classList.contains("shrunk") ? 75 : 100;
     var tall = items.length > cardsPerRow(cardSize);
     var group = document.createElement("div");
     group.className = tall ? "group tall-head" : "group";
