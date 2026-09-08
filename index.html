@@ -1508,6 +1508,7 @@
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
       <button type="button" class="btn-randomize" id="btnRandomize" title="Shuffle revealed tabs">Randomize</button>
+      <button type="button" class="btn-randomize" id="btnReorder" title="Sort revealed tabs by lick ID">Reorder</button>
       <span class="keys">Click a lick to flip · A/B/C/D/E class · I/P/W/H/R songs · 1–9 = *-N · Esc/0 home</span>
     </div>
     <div class="sheet" id="licks">
@@ -2856,14 +2857,34 @@ function shuffleInPlace(arr) {
   return arr;
 }
 /** Shuffle revealed tabs (Jacob: flipped = tab = CSS without .flipped). */
+function revealedTabCards() {
+  var tabWrap = document.getElementById("tabWrap");
+  if (!tabWrap) return [];
+  return [].filter.call(tabWrap.children, function(el){
+    return el.classList && el.classList.contains("phrase") && !el.classList.contains("flipped") && !el.classList.contains("filtered-out");
+  });
+}
+/** Shuffle revealed tabs (Jacob: flipped = tab = CSS without .flipped). */
 function randomizeCoverBoard() {
   var tabWrap = document.getElementById("tabWrap");
   if (!tabWrap) return;
-  var cards = [].filter.call(tabWrap.children, function(el){
-    return el.classList && el.classList.contains("phrase") && !el.classList.contains("flipped") && !el.classList.contains("filtered-out");
-  });
+  var cards = revealedTabCards();
   if (cards.length < 2) return;
   shuffleInPlace(cards);
+  cards.forEach(function(el){ tabWrap.appendChild(el); });
+  saveOrder();
+}
+/** Sort revealed tabs (tablature showing) by lick ID numeric order. */
+function reorderRevealedTabs() {
+  var tabWrap = document.getElementById("tabWrap");
+  if (!tabWrap) return;
+  var cards = revealedTabCards();
+  if (cards.length < 2) return;
+  cards.sort(function(a, b){
+    var an = a.getAttribute("data-name") || "";
+    var bn = b.getAttribute("data-name") || "";
+    return an.localeCompare(bn, undefined, { numeric: true, sensitivity: "base" });
+  });
   cards.forEach(function(el){ tabWrap.appendChild(el); });
   saveOrder();
 }
@@ -3187,6 +3208,7 @@ document.getElementById("btnD").onclick = function(){ showSeries("D"); };
 document.getElementById("btnHP").onclick = showSections;
 document.getElementById("back").onclick = showHome;
 document.getElementById("btnRandomize").onclick = function(){ randomizeCoverBoard(); };
+document.getElementById("btnReorder").onclick = function(){ reorderRevealedTabs(); };
 document.getElementById("backSections").onclick = showHome;
 document.getElementById("secFilters").onclick = function(e){
   var toggle = e.target.closest("#excludeDdToggle");
