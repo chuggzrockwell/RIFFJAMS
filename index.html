@@ -390,17 +390,17 @@
     outline-offset: -2px;
     box-shadow: inset 0 0 0 2px rgba(237,28,36,.45) !important;
   }
-  .phrase.playing:not(.flipped) {
+  .phrase.playing {
     outline: 2px solid #ed1c24;
     outline-offset: 2px;
-  }
-  .phrase.playing:not(.flipped) .face-tab {
-    /* keep class glow; reinforce deployed selection */
-    filter: brightness(1.02);
   }
   .phrase.playing-offscreen {
     outline: 2px dashed rgba(237,28,36,.45);
     outline-offset: 2px;
+  }
+  /* Selected lick lives in the preview pane only — don't also show a full tab in the strip */
+  .phrase.preview-dup {
+    display: none !important;
   }
   .sheet.has-lib-preview {
     display: flex;
@@ -2189,6 +2189,11 @@ function renderLibraryPreviewBoard() {
     prev.classList.add("hidden");
     board.innerHTML = "";
     if (meta) meta.textContent = "Click licks to add · click again to remove";
+    document.querySelectorAll(".phrase.preview-dup, .phrase.playing").forEach(function(el){
+      el.classList.remove("preview-dup");
+      el.classList.remove("playing");
+      el.classList.remove("playing-offscreen");
+    });
     compactLibraryStrip(false);
     rebuildColumns();
     return;
@@ -2203,7 +2208,11 @@ function renderLibraryPreviewBoard() {
   libPreviewQueue.forEach(function(item){ selected[item.name] = true; });
   document.querySelectorAll(".phrase").forEach(function(el){
     var n = el.getAttribute("data-name") || "";
-    if (selected[n]) el.classList.add("playing");
+    el.classList.remove("preview-dup");
+    if (selected[n]) {
+      el.classList.add("playing");
+      el.classList.add("preview-dup"); // hide strip copy — full tab only in preview
+    }
   });
   board.innerHTML = libPreviewQueue.map(function(item){
     return '<button type="button" class="lib-preview-card" data-name="'+item.name+'">'
@@ -2229,16 +2238,8 @@ function toggleLibraryPreview(el) {
   for (var i = 0; i < libPreviewQueue.length; i++) {
     if (libPreviewQueue[i].name === name) { idx = i; break; }
   }
-  if (idx >= 0) {
-    libPreviewQueue.splice(idx, 1);
-  } else {
-    // Deploy = show as tab (Jacob: flipped) at full size with glow — never leave as album art
-    if (el.classList.contains("flipped")) {
-      el.classList.remove("flipped");
-      relayout();
-    }
-    libPreviewQueue.push({ name: name, src: src });
-  }
+  if (idx >= 0) libPreviewQueue.splice(idx, 1);
+  else libPreviewQueue.push({ name: name, src: src });
   renderLibraryPreviewBoard();
 }
 function togglePlayPhrase(el) {
