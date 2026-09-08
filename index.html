@@ -141,30 +141,6 @@
   .sec-mode-btn.on {
     background: #111; color: #fff; border-color: #111;
   }
-  .sec-solo-tools {
-    display: none;
-    align-items: center;
-    gap: 6px;
-    margin-left: 8px;
-  }
-  body.sections-solo .sec-solo-tools { display: inline-flex; }
-  .sec-solo-upload {
-    border: 1px solid rgba(0,0,0,.14);
-    background: #fff;
-    color: rgba(0,0,0,.7);
-    border-radius: 8px;
-    padding: 5px 12px;
-    font-size: 0.78rem; font-weight: 700;
-    cursor: pointer;
-  }
-  .sec-solo-upload input {
-    display: none;
-  }
-  .sec-solo-hint {
-    font-size: 0.72rem;
-    color: rgba(0,0,0,.45);
-    font-weight: 600;
-  }
   body.sections-solo.sections-edit .sec-edit-tools {
     opacity: .45;
     pointer-events: none;
@@ -1415,11 +1391,6 @@
       <button type="button" class="sec-mode-btn" data-sec-mode="edit">Edit</button>
       <button type="button" class="sec-mode-btn" data-sec-mode="play">Play</button>
       <button type="button" class="sec-mode-btn" id="secSoloModeBtn" aria-pressed="false">Solo mode</button>
-      <span class="sec-solo-tools" id="secSoloTools">
-        <label class="sec-solo-upload" title="Upload solo-map JSON">Upload JSON<input type="file" id="secSoloUpload" accept="application/json,.json"></label>
-        <button type="button" class="sec-tool-btn" id="secSoloClearBtn" title="Clear solo map to blank">Clear</button>
-        <span class="sec-solo-hint" id="secSoloHint">Blank until you upload a solo-map JSON</span>
-      </span>
       <span class="sec-edit-tools" id="secEditTools" hidden>
         <button type="button" class="sec-tool-btn" id="secUndoBtn" title="Undo (Ctrl+Z)">Undo</button>
         <button type="button" class="sec-tool-btn primary" id="secSaveBtn" title="Save (Ctrl+S)">Save</button>
@@ -1520,23 +1491,10 @@ var chipEditState = null;
 var sectionClipboard = null; // copied song section pair [code, tier, lick?]
 var lastSectionFocus = null; // {ai,si,ci} last clicked pad in Edit
 
-/* Solo-map JSON shape (upload replaces localStorage key lick-solo-map-v1):
-{
-  "albums": [
-    {
-      "name": "Paranoid",
-      "songs": [
-        {
-          "song": "Iron Man",
-          "licks": [["1A",1,"IM-1-1A"],["2A",1,"IM-1-2A"],["3A",1,"IM-1-3A"]]
-        }
-      ]
-    }
-  ]
-}
+/* Solo-map data (localStorage key lick-solo-map-v1). Loaded by assistant from Excel, not in-app upload.
+Shape: { albums: [{ name, songs: [{ song, licks: [[label,tier,lickId], ...] }] }] }
 Each lick chip is [label, tier, lickId] — same tuple shape as section chips.
-Albums/songs should mirror Song Map rows; missing songs stay blank (empty 10-col grid).
-Solo mode starts blank (no seeded library licks) until a file is uploaded.
+Albums/songs mirror Song Map rows; missing songs stay blank. Solo mode starts blank until map is loaded.
 */
 var SOLO_MAP_KEY = "lick-solo-map-v1";
 var soloMode = false;
@@ -1635,16 +1593,11 @@ function totalSoloChips(map) {
 }
 function updateSoloUi() {
   var btn = document.getElementById("secSoloModeBtn");
-  var hint = document.getElementById("secSoloHint");
   if (btn) {
     btn.classList.toggle("on", !!soloMode);
     btn.setAttribute("aria-pressed", soloMode ? "true" : "false");
   }
   document.body.classList.toggle("sections-solo", !!soloMode);
-  if (hint) {
-    var n = totalSoloChips(SOLO_MAP);
-    hint.textContent = n ? (n + " solo lick chips loaded") : "Blank until you upload a solo-map JSON";
-  }
 }
 function setSoloMode(on) {
   soloMode = !!on;
@@ -1659,31 +1612,6 @@ function setSoloMode(on) {
     updateEditSaveUi();
   }
 }
-function applySoloUploadFile(file) {
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(){
-    try {
-      var parsed = JSON.parse(String(reader.result || ""));
-      SOLO_MAP = normalizeSoloMap(parsed, ALBUMS_DEFAULT);
-      saveSoloMap();
-      updateSoloUi();
-      if (!soloMode) setSoloMode(true);
-      else showSections(true);
-      setSaveStatus("Solo map loaded");
-    } catch (err) {
-      alert("Could not parse solo-map JSON: " + (err && err.message ? err.message : err));
-    }
-  };
-  reader.readAsText(file);
-}
-function clearSoloMap() {
-  SOLO_MAP = normalizeSoloMap(null, ALBUMS_DEFAULT);
-  saveSoloMap();
-  updateSoloUi();
-  if (soloMode) showSections(true);
-}
-
 function cloneAlbums(src) {
   return JSON.parse(JSON.stringify(src));
 }
@@ -1793,9 +1721,9 @@ function updateEditSaveUi() {
   var keys = document.getElementById("sectionsKeys");
   if (keys && document.body.className.indexOf("sections-mode") >= 0) {
     if (soloMode) {
-      if (sectionsMode === "play") keys.textContent = "Solo mode · lick clicks queue · Upload JSON · Esc/0 home";
-      else if (sectionsMode === "edit") keys.textContent = "Solo mode · Edit disabled (upload JSON to change lick map) · Esc/0 home";
-      else keys.textContent = "Solo mode · blank until Upload JSON · Esc/0 home";
+      if (sectionsMode === "play") keys.textContent = "Solo mode · lick clicks queue · Esc/0 home";
+      else if (sectionsMode === "edit") keys.textContent = "Solo mode · Edit disabled · Esc/0 home";
+      else keys.textContent = "Solo mode · Esc/0 home";
     }
   }
 }
@@ -2226,9 +2154,9 @@ function setSectionsMode(mode) {
   var keys = document.getElementById("sectionsKeys");
   if (keys) {
     if (soloMode) {
-      if (sectionsMode === "edit") keys.textContent = "Solo mode · Edit disabled (upload JSON to change lick map) · Esc/0 home";
-      else if (sectionsMode === "play") keys.textContent = "Solo mode · lick clicks queue · Upload JSON · Esc/0 home";
-      else keys.textContent = "Solo mode · blank until Upload JSON · Esc/0 home";
+      if (sectionsMode === "edit") keys.textContent = "Solo mode · Edit disabled · Esc/0 home";
+      else if (sectionsMode === "play") keys.textContent = "Solo mode · lick clicks queue · Esc/0 home";
+      else keys.textContent = "Solo mode · Esc/0 home";
     } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · Esc closes";
     else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · section clicks queue · Playboard window · Esc/0 home";
     else keys.textContent = "Numpad 1/2/3 · Song Map · filters · Esc/0 home";
@@ -2987,7 +2915,6 @@ document.addEventListener("click", function(e){
 document.getElementById("secModes").onclick = function(e){
   if (e.target.closest("#secUndoBtn")) { undoAlbums(); return; }
   if (e.target.closest("#secSaveBtn")) { saveAlbumsNow(); return; }
-  if (e.target.closest("#secSoloClearBtn")) { clearSoloMap(); return; }
   if (e.target.closest("#secSoloModeBtn")) {
     setSoloMode(!soloMode);
     return;
@@ -2996,11 +2923,6 @@ document.getElementById("secModes").onclick = function(e){
   if (!btn) return;
   setSectionsMode(btn.getAttribute("data-sec-mode"));
 };
-document.getElementById("secSoloUpload").addEventListener("change", function(e){
-  var f = e.target.files && e.target.files[0];
-  applySoloUploadFile(f);
-  e.target.value = "";
-});
 document.getElementById("chipEditSave").onclick = saveChipEditor;
 document.getElementById("chipEditCancel").onclick = closeChipEditor;
 document.getElementById("chipEditDelete").onclick = deleteChipEditor;
