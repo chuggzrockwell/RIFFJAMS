@@ -1472,15 +1472,25 @@
     background: transparent;
     color: transparent;
   }
-  .sec-ruler .song-name {
-    height: 20px; max-height: 20px; line-height: 20px;
-    background: transparent !important;
-    color: transparent;
-    box-shadow: none !important;
-    padding: 0 10px;
+  .sec-ruler .song-name,
+  .sec-ruler .song-name-wrap,
+  body.sections-mode .sec-ruler .song-name,
+  body.sections-mode .sec-ruler .song-name-wrap {
+    display: none !important;
   }
-  .sec-ruler .song-name::before,
-  .sec-ruler .song-name::after { display: none !important; }
+  .sec-ruler .song-name-spacer {
+    flex: 0 0 var(--name-w);
+    width: var(--name-w);
+    min-width: var(--name-w);
+    max-width: var(--name-w);
+    height: 20px;
+    background: transparent !important;
+    border: 0;
+    box-shadow: none !important;
+  }
+  body.sections-mode .sec-ruler .song-name-spacer {
+    background: transparent !important;
+  }
   .col-num {
     box-sizing: border-box;
     width: var(--chip-w); min-width: var(--chip-w); max-width: var(--chip-w);
@@ -2878,7 +2888,7 @@ function showSections(keepScroll) {
   }
   var headLabel = soloMode ? "Lick" : "Section";
   var head = '<div class="sec-head"><div class="sec-head-label song">Song</div><div class="sec-head-label section">'+headLabel+'</div><div class="sec-head-label album">Album</div></div>';
-  var ruler = '<div class="sec-ruler"><div class="row-num"></div><div class="song-name"></div><div class="song-secs">'+colNums+'</div></div>';
+  var ruler = '<div class="sec-ruler"><div class="row-num"></div><div class="song-name-spacer" aria-hidden="true"></div><div class="song-secs">'+colNums+'</div></div>';
   var html = sourceAlbums.map(function(album, ai){
     var rows = (album.songs || []).map(function(s, si){
       rowN += 1;
