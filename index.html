@@ -3554,6 +3554,42 @@ var SM_YT_IDS = {
   "St. Vitus Dance": "PLDudvvvcyc",
   "Under the Sun": "T_YpGOfvsLU"
 };
+/* Playalong / jam / backing — row-number clicks (Snowblind = user pick) */
+var SM_YT_PLAYALONG = {
+  "War Pigs": "F90ecz1Qr6Y",
+  "Paranoid": "a4QhGwuMJqk",
+  "Planet Caravan": "6muMFXrAIXg",
+  "Iron Man": "V6F678gzfRQ",
+  "Electric Funeral": "Sm9gdZKNG7E",
+  "Hand of Doom": "5Tw9Je9mpMc",
+  "Rat Salad": "Gxldytxy5Xo",
+  "Fairies Wear Boots": "lAuHpY8Hp-A",
+  "Sabbath Bloody Sabbath": "eflcnuSzwck",
+  "A National Acrobat": "b1DmKfMGw9Y",
+  "Sabbra Cadabra": "zt0bL39XMBM",
+  "Killing Yourself to Live": "r_5whfC5y5Q",
+  "Spiral Architect": "gmRJznD9SaE",
+  "Sweet Leaf": "b709TwtYD3c",
+  "After Forever": "BwLTI68u6LA",
+  "Children of the Grave": "2oLrmNvicgo",
+  "Lord of This World": "jZs81WWn2eY",
+  "Solitude": "_Gojk_UnTLk",
+  "Into the Void": "9kkyIiSsXTE",
+  "Wheels of Confusion": "BYid-aVKxSQ",
+  "Tomorrow's Dream": "LO3E_SmC4-0",
+  "Changes": "rf_DlidZHxg",
+  "Supernaut": "vRe6oIaJUG4",
+  "Snowblind": "aw-B5B1ndds",
+  "Cornucopia": "aDNJiPSK21Q",
+  "Laguna Sunrise": "zrxpCxuGqtc",
+  "St. Vitus Dance": "z43VbSdH0-Q",
+  "Under the Sun": "-CMokv4ySkA",
+  "Fluff": "7eGoc1DvCNI",
+  "Orchid": "kl24Q1droTQ",
+  "Looking for Today": "Fad_9mI64iM",
+  "Who Are You?": "OmJtY6tL7sY",
+  "Embryo": "eC0Q7oNY4QU"
+};
 var smYtReady = false;
 var smYtPlayer = null;
 var smYtApiLoading = false;
@@ -3565,6 +3601,7 @@ var smRepeat = true; /* loop playlist when ON (green) */
 var smPlaying = false;
 var smTickTimer = null;
 var smSeeking = false;
+var smPlayalongActive = false;
 
 function smFmtTime(sec) {
   sec = Math.max(0, Math.floor(sec || 0));
@@ -3608,7 +3645,8 @@ function smUpdateMeta() {
   if (!el) return;
   var cur = smCurrent();
   if (!cur) { el.innerHTML = "No mapped YouTube tracks yet"; return; }
-  el.innerHTML = "<strong>"+cur.song+"</strong> · "+cur.album;
+  var tag = smPlayalongActive ? "playalong" : cur.album;
+  el.innerHTML = "<strong>"+cur.song+"</strong> · "+tag;
 }
 function smSetPlayIcon(playing) {
   smPlaying = !!playing;
@@ -3653,6 +3691,8 @@ function smEnsureApi(cb) {
 }
 function smLoadCurrent(autoplay) {
   var cur = smCurrent();
+  /* next/prev/shuffle load clears one-shot playalong override */
+  smPlayalongActive = false;
   smUpdateMeta();
   if (!cur) return;
   smEnsureApi(function(){
@@ -3692,13 +3732,14 @@ function smCtrlLeftArrow() {
     }
   });
 }
-function smPlaySongName(name, autoplay) {
+function smPlaySongName(name, autoplay, playalong) {
   smBuildPlaylist();
   var pi = -1;
   for (var i = 0; i < smPlaylist.length; i++) {
     if (smPlaylist[i].song === name) { pi = i; break; }
   }
   if (pi < 0) {
+    smPlayalongActive = false;
     smUpdateMeta();
     var el = document.getElementById("smPlayerMeta");
     if (el) el.innerHTML = "<strong>"+name+"</strong> · no YouTube id mapped yet";
@@ -3706,7 +3747,24 @@ function smPlaySongName(name, autoplay) {
   }
   if (smShuffle) smRebuildOrder(false);
   var oi = smOrder.indexOf(pi);
-  smPlayIndex(oi >= 0 ? oi : 0, autoplay !== false);
+  smIndex = oi >= 0 ? oi : 0;
+  var cur = smCurrent();
+  var yt = cur ? cur.yt : "";
+  smPlayalongActive = false;
+  if (playalong) {
+    var pa = SM_YT_PLAYALONG[name] || "";
+    if (pa) {
+      yt = pa;
+      smPlayalongActive = true;
+    }
+  }
+  smUpdateMeta();
+  if (!yt) return;
+  smEnsureApi(function(){
+    if (!smYtPlayer || !smYtPlayer.loadVideoById) return;
+    if (autoplay !== false) smYtPlayer.loadVideoById(yt);
+    else smYtPlayer.cueVideoById(yt);
+  });
 }
 function smOnEnded() {
   if (smRepeat) smPlayIndex(smIndex + 1, true);
@@ -5130,14 +5188,14 @@ document.getElementById("sectionsSheet").addEventListener("scroll", hideHighligh
 window.addEventListener("scroll", function(){ if (highlightMode) hideHighlightTip(); }, true);
 
 document.getElementById("sectionsSheet").onclick = function(e){
-  /* Nameplate / album art / row # → play that song */
+  /* Nameplate / art → song; row # → playalong (falls back to song) */
   var playHit = e.target.closest(".song-name, .song-name-wrap, .song-thumb, .row-num");
   if (playHit && !e.target.closest(".sec-chip") && document.body.classList.contains("sections-mode")) {
     var row = playHit.closest(".song-row");
     if (row) {
       var titleEl = row.querySelector(".song-name");
       var title = titleEl ? (titleEl.textContent || "").trim() : "";
-      if (title) smPlaySongName(title, true);
+      if (title) smPlaySongName(title, true, playHit.classList.contains("row-num"));
       return;
     }
   }
