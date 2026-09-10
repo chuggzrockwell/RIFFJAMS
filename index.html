@@ -1190,7 +1190,17 @@
   body.sections-mode .row-num {
     background: #fff;
     color: #111;
-    border-radius: 4px 0 0 4px;
+    border-radius: 4px;
+    height: calc(var(--chip-h) - 4px);
+    min-height: calc(var(--chip-h) - 4px);
+    max-height: calc(var(--chip-h) - 4px);
+    width: calc(var(--row-g) - 4px);
+    min-width: calc(var(--row-g) - 4px);
+    max-width: calc(var(--row-g) - 4px);
+    flex: 0 0 calc(var(--row-g) - 4px);
+    align-self: center;
+    margin-right: 2px;
+    font-size: 0.58rem;
   }
   body.sections-mode .col-num {
     color: rgba(232,230,225,.4);
@@ -1207,6 +1217,7 @@
     background: #1a1d26;
     border-color: #4a4e5a;
   }
+  body.sections-mode .album-songs { gap: 6px; }
   body.sections-mode .song-row:hover { background: rgba(163,101,209,.08); }
   body.sections-mode .song-name-wrap,
   body.sections-mode .song-name-wrap.np-paranoid-wrap,
@@ -1216,6 +1227,9 @@
     background: #fff;
     border-radius: 8px;
     overflow: hidden;
+    height: calc(var(--chip-h) - 4px);
+    max-height: calc(var(--chip-h) - 4px);
+    align-self: center;
   }
   body.sections-mode .song-name,
   body.sections-mode .song-name.np-paranoid,
@@ -1224,61 +1238,64 @@
   body.sections-mode .song-name.np-vol4 {
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
     font-weight: 600;
-    font-size: 0.88rem;
+    font-size: 0.78rem;
     letter-spacing: -0.015em;
     background: #fff;
     color: #111;
-    border-radius: 6px;
+    border-radius: 0;
+    height: 100%;
+    max-height: 100%;
+    line-height: calc(var(--chip-h) - 4px);
   }
   /* Per-album glow: titles + row numbers */
   body.sections-mode .song-name.np-paranoid,
-  body.sections-mode .row-num.np-paranoid {
+  body.sections-mode .row-num.np-paranoid,
+  body.sections-mode .song-name-wrap.np-paranoid-wrap {
     box-shadow:
-      0 0 5px 1px rgba(220,40,50,.85),
-      0 0 14px 4px rgba(220,40,50,.45),
-      0 0 28px 8px rgba(180,20,30,.28);
+      0 0 3px 1px rgba(220,40,50,.8),
+      0 0 8px 2px rgba(220,40,50,.35);
   }
   body.sections-mode .song-name-wrap.np-paranoid-wrap {
-    filter: drop-shadow(0 0 6px rgba(220,40,50,.4));
+    filter: none;
   }
   body.sections-mode .song-name.np-paranoid::after {
     background: linear-gradient(90deg, rgba(220,40,50,.45), rgba(220,40,50,0));
   }
   body.sections-mode .song-name.np-sbs,
-  body.sections-mode .row-num.np-sbs {
+  body.sections-mode .row-num.np-sbs,
+  body.sections-mode .song-name-wrap.np-sbs-wrap {
     box-shadow:
-      0 0 5px 1px rgba(163,101,209,.85),
-      0 0 14px 4px rgba(163,101,209,.45),
-      0 0 28px 8px rgba(112,48,160,.28);
+      0 0 3px 1px rgba(163,101,209,.8),
+      0 0 8px 2px rgba(163,101,209,.35);
   }
   body.sections-mode .song-name-wrap.np-sbs-wrap {
-    filter: drop-shadow(0 0 6px rgba(163,101,209,.4));
+    filter: none;
   }
   body.sections-mode .song-name.np-sbs::after {
     background: linear-gradient(90deg, rgba(112,48,160,.5), rgba(112,48,160,0));
   }
   body.sections-mode .song-name.np-mor,
-  body.sections-mode .row-num.np-mor {
+  body.sections-mode .row-num.np-mor,
+  body.sections-mode .song-name-wrap.np-mor-wrap {
     box-shadow:
-      0 0 5px 1px rgba(200,160,70,.85),
-      0 0 14px 4px rgba(180,140,50,.45),
-      0 0 28px 8px rgba(140,100,30,.28);
+      0 0 3px 1px rgba(200,160,70,.8),
+      0 0 8px 2px rgba(180,140,50,.35);
   }
   body.sections-mode .song-name-wrap.np-mor-wrap {
-    filter: drop-shadow(0 0 6px rgba(200,160,70,.4));
+    filter: none;
   }
   body.sections-mode .song-name.np-mor::after {
     background: linear-gradient(90deg, rgba(180,140,50,.5), rgba(180,140,50,0));
   }
   body.sections-mode .song-name.np-vol4,
-  body.sections-mode .row-num.np-vol4 {
+  body.sections-mode .row-num.np-vol4,
+  body.sections-mode .song-name-wrap.np-vol4-wrap {
     box-shadow:
-      0 0 5px 1px rgba(232,140,20,.9),
-      0 0 14px 4px rgba(232,140,20,.45),
-      0 0 28px 8px rgba(200,100,10,.28);
+      0 0 3px 1px rgba(232,140,20,.85),
+      0 0 8px 2px rgba(232,140,20,.35);
   }
   body.sections-mode .song-name-wrap.np-vol4-wrap {
-    filter: drop-shadow(0 0 6px rgba(232,140,20,.4));
+    filter: none;
   }
   body.sections-mode .song-name.np-vol4::after {
     background: linear-gradient(90deg, rgba(232,140,20,.55), rgba(232,140,20,0));
