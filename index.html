@@ -179,18 +179,21 @@
     z-index: 9999;
     display: none;
     pointer-events: none;
-    padding: 6px;
+    padding: 8px;
     background: #111;
     border-radius: 10px;
-    box-shadow: 0 10px 28px rgba(0,0,0,.35);
+    box-shadow: 0 10px 28px rgba(0,0,0,.45);
+    box-sizing: border-box;
+    overflow: auto;
   }
   #secHighlightTip.open { display: block; }
   #secHighlightTip img {
     display: block;
     width: auto;
     height: auto;
-    max-width: none;
-    max-height: none;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
     background: #fff;
     border-radius: 6px;
   }
@@ -3375,21 +3378,34 @@ function hideHighlightTip() {
 }
 function placeHighlightTip(anchor) {
   var tip = document.getElementById("secHighlightTip");
-  if (!tip || !anchor) return;
-  var r = anchor.getBoundingClientRect();
-  var pad = 8;
+  if (!tip) return;
+  var wrap = document.querySelector("#sectionsSheet .sections-wrap") || document.getElementById("sectionsSheet");
+  if (!wrap) return;
+  var wr = wrap.getBoundingClientRect();
+  var pad = 12;
   tip.style.left = "0px";
   tip.style.top = "0px";
+  tip.style.maxWidth = "";
+  tip.style.maxHeight = "";
   tip.classList.add("open");
   tip.setAttribute("aria-hidden", "false");
-  var tw = tip.offsetWidth || 240;
-  var th = tip.offsetHeight || 120;
-  var left = r.right + pad;
-  if (left + tw > window.innerWidth - pad) left = r.left - tw - pad;
-  if (left < pad) left = pad;
-  var top = r.top;
-  if (top + th > window.innerHeight - pad) top = window.innerHeight - th - pad;
-  if (top < pad) top = pad;
+  /* Dock in empty space to the right of the chip grid */
+  var left = Math.round(wr.right + pad);
+  var availW = Math.max(160, window.innerWidth - left - pad);
+  var top = Math.max(pad, Math.round(wr.top));
+  var availH = Math.max(120, window.innerHeight - top - pad);
+  tip.style.maxWidth = availW + "px";
+  tip.style.maxHeight = availH + "px";
+  var img = tip.querySelector("img");
+  if (img) {
+    img.style.maxWidth = Math.max(120, availW - 16) + "px";
+    img.style.maxHeight = Math.max(80, availH - 16) + "px";
+  }
+  /* Measure after constraints, then clamp into the dock column */
+  var tw = tip.offsetWidth || Math.min(availW, 240);
+  var th = tip.offsetHeight || Math.min(availH, 120);
+  if (left + tw > window.innerWidth - pad) left = Math.max(pad, window.innerWidth - tw - pad);
+  if (top + th > window.innerHeight - pad) top = Math.max(pad, window.innerHeight - th - pad);
   tip.style.left = left + "px";
   tip.style.top = top + "px";
 }
