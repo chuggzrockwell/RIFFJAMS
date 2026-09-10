@@ -1660,7 +1660,7 @@
       <button type="button" class="tier-pick t4" data-tier="4">4</button>
       <button type="button" class="tier-pick t5" data-tier="5">5</button>
     </div>
-    <label>Position</label>
+    <label>Position <span style="font-weight:500;opacity:.65">(multi)</span></label>
     <div class="tier-row" id="chipEditPos">
       <button type="button" class="pos-pick" data-pos="1">1</button>
       <button type="button" class="pos-pick" data-pos="2">2</button>
@@ -2263,19 +2263,47 @@ function slotCss(prefix, v) {
 function chipTier(pair) {
   return slotBase(normalizeSlot(pair && pair[1], 3));
 }
+function parsePosList(raw) {
+  if (raw == null || raw === "") return [1];
+  var list;
+  if (Array.isArray(raw)) list = raw;
+  else if (typeof raw === "string") {
+    list = raw.split(/[\s,]+/).filter(function(x){ return !!x; });
+  } else list = [raw];
+  var out = [];
+  var seen = {};
+  list.forEach(function(x){
+    var n = normalizeSlot(x, null);
+    if (n == null) return;
+    var key = String(n);
+    if (seen[key]) return;
+    seen[key] = true;
+    out.push(n);
+  });
+  return out.length ? out : [1];
+}
+function chipPositions(pair) {
+  return parsePosList(pair && pair[3]);
+}
 function chipPosition(pair) {
-  return normalizeSlot(pair && pair[3], 1);
+  // primary/first position (back-compat)
+  return chipPositions(pair)[0];
 }
-function isDefaultPos(pos) {
-  return normalizeSlot(pos, 1) === 1;
+function posListAttr(list) {
+  return parsePosList(list).join(",");
 }
-function makeChipEntry(code, tier, lick, pos) {
-  tier = normalizeSlot(tier, 3);
-  pos = normalizeSlot(pos, 1);
+function isDefaultPosList(list) {
+  var p = parsePosList(list);
+  return p.length === 1 && p[0] === 1;
+}
+function makeChipEntry(code, tier, lick, positions) {
+  tier = slotBase(normalizeSlot(tier, 3));
+  var posList = parsePosList(positions);
   lick = lick || "";
-  if (isDefaultPos(pos) && !lick) return [code, tier];
-  if (isDefaultPos(pos)) return [code, tier, lick];
-  return [code, tier, lick, pos];
+  if (isDefaultPosList(posList) && !lick) return [code, tier];
+  if (isDefaultPosList(posList)) return [code, tier, lick];
+  var stored = posList.length === 1 ? posList[0] : posList.slice();
+  return [code, tier, lick, stored];
 }
 function countSongChips(song) {
   var n = 0;
@@ -2437,7 +2465,7 @@ function showSections(keepScroll) {
             var gEmpty = (hasSoloGroup && (ci + 1) >= groupStart) ? " col-group-member" : "";
             chipArr.push('<button type="button" class="sec-chip empty'+gEmpty+'" data-solo="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty solo slot"></button>');
           } else {
-            var lcode = lp[0], ltier = chipTier(lp), llick = lp[2] || lp[0] || "", lpos = chipPosition(lp);
+            var lcode = lp[0], ltier = chipTier(lp), llick = lp[2] || lp[0] || "", lpos = posListAttr(chipPositions(lp));
             var ltyp = "S";
             n++;
             var gMem = (hasSoloGroup && (ci + 1) >= groupStart) ? " col-group-member" : "";
@@ -2452,7 +2480,7 @@ function showSections(keepScroll) {
           if (!isChipPair(pair)) {
             chipArr.push('<button type="button" class="sec-chip empty" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Add section"></button>');
           } else {
-            var code = pair[0], tier = chipTier(pair), lick = pair[2] || "", pos = chipPosition(pair);
+            var code = pair[0], tier = chipTier(pair), lick = pair[2] || "", pos = posListAttr(chipPositions(pair));
             var typ = secType(code);
             chipArr.push('<button type="button" class="sec-chip '+typ+' '+slotCss("tier", tier)+'" data-song="'+s.song+'" data-sec="'+code+'" data-type="'+typ+'" data-tier="'+tier+'" data-lick="'+lick+'" data-position="'+pos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+code+'</button>');
           }
@@ -2664,18 +2692,19 @@ function chipMatchesPosFilter(pos) {
   if (posOn && !oOn && pOn) return isP && !!secPosFilter[base];
   if (posOn && oOn && pOn) return (isO || isP) && !!secPosFilter[base];
   // numbers only: plain (non-O/P) positions in the selected set
-  return plain && !!secPosFilter[base];
+  return plain && !!(secPosFilter[base] || secPosFilter[String(base)]);
 }
 function chipMatchesFilter(chip) {
   var typ = chip.getAttribute("data-type") || "";
-  var tier = normalizeSlot(chip.getAttribute("data-tier"), 3);
-  var pos = normalizeSlot(chip.getAttribute("data-position"), 1);
+  var tier = slotBase(normalizeSlot(chip.getAttribute("data-tier"), 3));
+  var positions = parsePosList(chip.getAttribute("data-position"));
   if (secExcludeTypes[typ]) return false;
   var typeOn = Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; });
   var tierOn = Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; });
   if (typeOn && !secTypeFilter[typ]) return false;
   if (tierOn && !secTierFilter[tier]) return false;
-  if (!chipMatchesPosFilter(pos)) return false;
+  // Match if ANY of the chip's positions pass the position filter
+  if (!positions.some(function(pos){ return chipMatchesPosFilter(pos); })) return false;
   return true;
 }
 function applySecFilters() {
@@ -3236,14 +3265,23 @@ function openChipEditor(anchor, state) {
   document.querySelectorAll("#chipEditTiers .tier-pick").forEach(function(b){
     b.classList.toggle("on", parseInt(b.getAttribute("data-tier"),10) === tier);
   });
-  var pos = normalizeSlot(state.position, 1);
+  var posList = parsePosList(state.positions != null ? state.positions : state.position);
+  var baseSet = {};
+  var anyO = false, anyP = false, allO = true, allP = true;
+  posList.forEach(function(pos){
+    baseSet[slotBase(pos)] = true;
+    if (slotIsO(pos)) anyO = true; else allO = false;
+    if (slotIsP(pos)) anyP = true; else allP = false;
+  });
+  if (!posList.length) { baseSet[1] = true; allO = false; allP = false; }
   document.querySelectorAll("#chipEditPos .pos-pick").forEach(function(b){
-    b.classList.toggle("on", parseInt(b.getAttribute("data-pos"),10) === slotBase(pos));
+    var n = parseInt(b.getAttribute("data-pos"),10);
+    b.classList.toggle("on", !!baseSet[n]);
   });
   var posO = document.getElementById("chipEditPosO");
-  if (posO) posO.classList.toggle("on", slotIsO(pos));
+  if (posO) posO.classList.toggle("on", anyO && !anyP);
   var posP = document.getElementById("chipEditPosP");
-  if (posP) posP.classList.toggle("on", slotIsP(pos));
+  if (posP) posP.classList.toggle("on", anyP && !anyO);
   document.getElementById("chipEditDelete").style.display = state.isNew ? "none" : "";
   ed.classList.add("open");
   ed.setAttribute("aria-hidden", "false");
@@ -3269,13 +3307,17 @@ function saveChipEditor() {
   if (!song) return;
   var lick = (document.getElementById("chipEditLick").value || "").trim();
   if (soloMode && !lick) lick = code;
-  var posBtn = document.querySelector("#chipEditPos .pos-pick.on");
-  var posBase = posBtn ? parseInt(posBtn.getAttribute("data-pos"),10) : slotBase(chipEditState.position || 1);
+  var posBases = [];
+  document.querySelectorAll("#chipEditPos .pos-pick.on").forEach(function(b){
+    var n = parseInt(b.getAttribute("data-pos"),10);
+    if (n >= 1 && n <= 5) posBases.push(n);
+  });
+  if (!posBases.length) posBases = [1];
   var posOOn = !!(document.getElementById("chipEditPosO") && document.getElementById("chipEditPosO").classList.contains("on"));
   var posPOn = !!(document.getElementById("chipEditPosP") && document.getElementById("chipEditPosP").classList.contains("on"));
   var posSuf = posPOn ? "P" : (posOOn ? "O" : "");
-  var pos = normalizeSlot(posBase + posSuf, 1);
-  var entry = makeChipEntry(code, tier, lick, pos);
+  var posList = posBases.map(function(n){ return normalizeSlot(n + posSuf, 1); });
+  var entry = makeChipEntry(code, tier, lick, posList);
   if (soloMode) {
     pushSoloHistory();
     ensureSoloSlots(song);
@@ -3295,9 +3337,11 @@ function saveChipEditor() {
   if (Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; })) secTypeFilter[typ] = true;
   if (Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; })) secTierFilter[tier] = true;
   if (Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter || secPosPFilter) {
-    secPosFilter[slotBase(pos)] = true;
-    if (slotIsO(pos)) secPosOFilter = true;
-    if (slotIsP(pos)) secPosPFilter = true;
+    posList.forEach(function(pos){
+      secPosFilter[slotBase(pos)] = true;
+      if (slotIsO(pos)) secPosOFilter = true;
+      if (slotIsP(pos)) secPosPFilter = true;
+    });
   }
   closeChipEditor();
   showSections();
@@ -3348,13 +3392,17 @@ function copyFromChipEditor() {
     var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : slotBase(chipEditState.tier || 3);
     if (!(tier >= 1 && tier <= 5)) tier = 3;
     var lick = (document.getElementById("chipEditLick").value || "").trim();
-    var posBtn = document.querySelector("#chipEditPos .pos-pick.on");
-    var posBase = posBtn ? parseInt(posBtn.getAttribute("data-pos"),10) : slotBase(chipEditState.position || 1);
+    var posBases = [];
+    document.querySelectorAll("#chipEditPos .pos-pick.on").forEach(function(b){
+      var n = parseInt(b.getAttribute("data-pos"),10);
+      if (n >= 1 && n <= 5) posBases.push(n);
+    });
+    if (!posBases.length) posBases = [1];
     var posOOn = !!(document.getElementById("chipEditPosO") && document.getElementById("chipEditPosO").classList.contains("on"));
     var posPOn = !!(document.getElementById("chipEditPosP") && document.getElementById("chipEditPosP").classList.contains("on"));
     var posSuf = posPOn ? "P" : (posOOn ? "O" : "");
-    var pos = normalizeSlot(posBase + posSuf, 1);
-    sectionClipboard = makeChipEntry(code, tier, lick, pos);
+    var posList = posBases.map(function(n){ return normalizeSlot(n + posSuf, 1); });
+    sectionClipboard = makeChipEntry(code, tier, lick, posList);
     return true;
   }
   return copySongSectionAt(chipEditState.ai, chipEditState.si, chipEditState.ci);
@@ -3953,8 +4001,9 @@ document.getElementById("chipEditPos").onclick = function(e){
   }
   var b = e.target.closest(".pos-pick");
   if (!b) return;
-  document.querySelectorAll("#chipEditPos .pos-pick").forEach(function(x){ x.classList.remove("on"); });
-  b.classList.add("on");
+  b.classList.toggle("on");
+  // Keep at least one position selected
+  if (!document.querySelector("#chipEditPos .pos-pick.on")) b.classList.add("on");
 };
 document.getElementById("chipEditId").addEventListener("keydown", function(e){
   if (e.key === "Enter") { e.preventDefault(); saveChipEditor(); }
@@ -4195,7 +4244,7 @@ document.getElementById("sectionsSheet").onclick = function(e){
       if (soloMode) {
         if (ci >= song.licks.length) return;
       } else if (countSongChips(song) >= SONG_SLOTS) return;
-      openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "", position: 1 });
+      openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "", positions: [1] });
       return;
     }
     openChipEditor(chip, {
@@ -4203,7 +4252,7 @@ document.getElementById("sectionsSheet").onclick = function(e){
       code: chip.getAttribute("data-sec") || "",
       tier: normalizeSlot(chip.getAttribute("data-tier"), 3),
       lick: chip.getAttribute("data-lick") || "",
-      position: normalizeSlot(chip.getAttribute("data-position"), 1)
+      positions: parsePosList(chip.getAttribute("data-position"))
     });
     return;
   }
