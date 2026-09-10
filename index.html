@@ -2683,16 +2683,17 @@ function chipMatchesPosFilter(pos) {
   var isO = slotIsO(pos);
   var isP = slotIsP(pos);
   var base = slotBase(pos);
+  var baseOn = !!(secPosFilter[base] || secPosFilter[String(base)]);
   var plain = !isO && !isP;
   if (!posOn && !oOn && !pOn) return true;
   if (!posOn && oOn && !pOn) return isO;
   if (!posOn && !oOn && pOn) return isP;
   if (!posOn && oOn && pOn) return isO || isP;
-  if (posOn && oOn && !pOn) return isO && !!secPosFilter[base];
-  if (posOn && !oOn && pOn) return isP && !!secPosFilter[base];
-  if (posOn && oOn && pOn) return (isO || isP) && !!secPosFilter[base];
+  if (posOn && oOn && !pOn) return isO && baseOn;
+  if (posOn && !oOn && pOn) return isP && baseOn;
+  if (posOn && oOn && pOn) return (isO || isP) && baseOn;
   // numbers only: plain (non-O/P) positions in the selected set
-  return plain && !!(secPosFilter[base] || secPosFilter[String(base)]);
+  return plain && baseOn;
 }
 function chipMatchesFilter(chip) {
   var typ = chip.getAttribute("data-type") || "";
