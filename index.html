@@ -1288,86 +1288,23 @@
     display: none !important;
     content: none !important;
   }
-  /* Per-album glow: titles / numbers text-shadow; art box-shadow */
-  body.sections-mode .song-name.np-paranoid {
-    color: #fff;
-    text-shadow:
-      0 0 4px rgba(237,28,36,.95),
-      0 0 10px rgba(237,28,36,.7),
-      0 0 18px rgba(237,28,36,.45);
-  }
-  body.sections-mode .row-num.np-paranoid {
-    color: #fff;
-    text-shadow:
-      0 0 4px rgba(237,28,36,.95),
-      0 0 10px rgba(237,28,36,.7),
-      0 0 18px rgba(237,28,36,.45);
-  }
-  body.sections-mode .song-thumb.np-paranoid {
-    box-shadow:
-      0 0 8px 2px rgba(237,28,36,.55),
-      0 0 22px 6px rgba(237,28,36,.28),
-      0 8px 22px rgba(0,0,0,.65);
-  }
-  body.sections-mode .song-name.np-sbs {
-    color: #fff;
-    text-shadow:
-      0 0 4px rgba(163,73,164,.95),
-      0 0 10px rgba(163,73,164,.7),
-      0 0 18px rgba(163,73,164,.45);
-  }
-  body.sections-mode .row-num.np-sbs {
-    color: #fff;
-    text-shadow:
-      0 0 4px rgba(163,73,164,.95),
-      0 0 10px rgba(163,73,164,.7),
-      0 0 18px rgba(163,73,164,.45);
-  }
-  body.sections-mode .song-thumb.np-sbs {
-    box-shadow:
-      0 0 8px 2px rgba(163,73,164,.55),
-      0 0 22px 6px rgba(163,73,164,.28),
-      0 8px 22px rgba(0,0,0,.65);
-  }
-  body.sections-mode .song-name.np-mor {
-    color: #fff;
-    text-shadow:
-      0 0 4px rgba(200,160,70,.95),
-      0 0 10px rgba(180,140,50,.7),
-      0 0 18px rgba(180,140,50,.45);
-  }
-  body.sections-mode .row-num.np-mor {
-    color: #fff;
-    text-shadow:
-      0 0 4px rgba(200,160,70,.95),
-      0 0 10px rgba(180,140,50,.7),
-      0 0 18px rgba(180,140,50,.45);
-  }
-  body.sections-mode .song-thumb.np-mor {
-    box-shadow:
-      0 0 8px 2px rgba(200,160,70,.55),
-      0 0 22px 6px rgba(180,140,50,.28),
-      0 8px 22px rgba(0,0,0,.65);
-  }
-  body.sections-mode .song-name.np-vol4 {
-    color: #fff;
-    text-shadow:
-      0 0 4px rgba(255,140,40,.95),
-      0 0 10px rgba(255,140,40,.7),
-      0 0 18px rgba(255,140,40,.45);
-  }
+  /* No glow on titles / numbers / album art */
+  body.sections-mode .song-name.np-paranoid,
+  body.sections-mode .song-name.np-sbs,
+  body.sections-mode .song-name.np-mor,
+  body.sections-mode .song-name.np-vol4,
+  body.sections-mode .row-num.np-paranoid,
+  body.sections-mode .row-num.np-sbs,
+  body.sections-mode .row-num.np-mor,
   body.sections-mode .row-num.np-vol4 {
     color: #fff;
-    text-shadow:
-      0 0 4px rgba(255,140,40,.95),
-      0 0 10px rgba(255,140,40,.7),
-      0 0 18px rgba(255,140,40,.45);
+    text-shadow: none;
   }
+  body.sections-mode .song-thumb.np-paranoid,
+  body.sections-mode .song-thumb.np-sbs,
+  body.sections-mode .song-thumb.np-mor,
   body.sections-mode .song-thumb.np-vol4 {
-    box-shadow:
-      0 0 8px 2px rgba(255,140,40,.55),
-      0 0 22px 6px rgba(255,140,40,.28),
-      0 8px 22px rgba(0,0,0,.65);
+    box-shadow: none;
   }
   body.sections-mode .sec-chip {
     border-radius: 3px;
