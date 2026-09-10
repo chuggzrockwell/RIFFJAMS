@@ -728,7 +728,13 @@
     background: #fff; color: #7030a0; font-weight: 800; cursor: pointer; margin-left: 4px;
   }
   .chip-editor .o-pick.on { background: #7030a0; color: #fff; outline: 2px solid #111; outline-offset: 1px; }
-  .sec-filter-btn.pos.o-pos.on { background: #333; border-color: #333; color: #fff; }
+  .sec-filter-btn.pos.o-pos {
+    font-weight: 800;
+    min-width: 28px;
+  }
+  .sec-filter-btn.pos.o-pos.on {
+    background: #7030a0; border-color: #7030a0; color: #fff;
+  }
   .chip-editor .pos-pick {
     width: 32px; height: 32px; border-radius: 6px; border: none;
     font-weight: 700; cursor: pointer;
@@ -2476,6 +2482,7 @@ function showSections(keepScroll) {
 var secTypeFilter = {};
 var secTierFilter = {};
 var secPosFilter = {};
+var secPosOFilter = false;
 var secExcludeTypes = {};
 var playQueue = [];
 var PLAY_QUEUE_KEY = "lick-play-queue";
@@ -2610,21 +2617,29 @@ function buildSecFilters() {
     return '<button type="button" class="sec-filter-btn tier t'+t+on+'" data-filter-tier="'+t+'">T'+t+'</button>';
   }).join("");
   if (posHost) {
-    var posKeys = [1,2,3,4,5,"1O","2O","3O","4O","5O"];
-    posHost.innerHTML = '<span class="sec-filter-label">Position</span>' + posKeys.map(function(t){
-      var on = secPosFilter[t] ? ' on' : '';
-      var isO = typeof t === "string";
-      var cls = isO ? "sec-filter-btn pos o-pos" : "sec-filter-btn pos";
-      return '<button type="button" class="'+cls+on+'" data-filter-pos="'+t+'">'+t+'</button>';
-    }).join("");
+    posHost.innerHTML = '<span class="sec-filter-label">Position</span>' + [1,2,3,4,5].map(function(n){
+      var on = secPosFilter[n] ? ' on' : '';
+      return '<button type="button" class="sec-filter-btn pos'+on+'" data-filter-pos="'+n+'">'+n+'</button>';
+    }).join("") + '<button type="button" class="sec-filter-btn pos o-pos'+(secPosOFilter ? ' on' : '')+'" data-filter-pos-o="1" title="Open / O positions">O</button>';
   }
 }
 function secFiltersActive() {
   var t = Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; });
   var r = Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; });
-  var p = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; });
+  var p = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter;
   var x = Object.keys(secExcludeTypes).some(function(k){ return secExcludeTypes[k]; });
   return t || r || p || x;
+}
+function chipMatchesPosFilter(pos) {
+  pos = normalizeSlot(pos, 1);
+  var posOn = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; });
+  var isO = slotIsO(pos);
+  var base = slotBase(pos);
+  if (!posOn && !secPosOFilter) return true;
+  if (secPosOFilter && !posOn) return isO;
+  if (secPosOFilter && posOn) return isO && !!secPosFilter[base];
+  // numbers only: match non-O positions in the selected set
+  return !isO && !!secPosFilter[base];
 }
 function chipMatchesFilter(chip) {
   var typ = chip.getAttribute("data-type") || "";
@@ -2633,10 +2648,9 @@ function chipMatchesFilter(chip) {
   if (secExcludeTypes[typ]) return false;
   var typeOn = Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; });
   var tierOn = Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; });
-  var posOn = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; });
   if (typeOn && !secTypeFilter[typ]) return false;
   if (tierOn && !secTierFilter[tier]) return false;
-  if (posOn && !secPosFilter[pos]) return false;
+  if (!chipMatchesPosFilter(pos)) return false;
   return true;
 }
 function applySecFilters() {
@@ -2733,6 +2747,7 @@ function clearSecFilters() {
   secTypeFilter = {};
   secTierFilter = {};
   secPosFilter = {};
+  secPosOFilter = false;
   secExcludeTypes = {};
   buildSecFilters();
   applySecFilters();
@@ -3238,7 +3253,10 @@ function saveChipEditor() {
   var typ = soloMode ? "S" : secType(code);
   if (Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; })) secTypeFilter[typ] = true;
   if (Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; })) secTierFilter[tier] = true;
-  if (Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; })) secPosFilter[pos] = true;
+  if (Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter) {
+    secPosFilter[slotBase(pos)] = true;
+    if (slotIsO(pos)) secPosOFilter = true;
+  }
   closeChipEditor();
   showSections();
 }
@@ -3804,6 +3822,7 @@ document.getElementById("secFilters").onclick = function(e){
     var t = btn.getAttribute("data-filter-type");
     var r = btn.getAttribute("data-filter-tier");
     var p = btn.getAttribute("data-filter-pos");
+    var po = btn.getAttribute("data-filter-pos-o");
     if (t) {
       secTypeFilter[t] = !secTypeFilter[t];
       if (!secTypeFilter[t]) delete secTypeFilter[t];
@@ -3814,10 +3833,13 @@ document.getElementById("secFilters").onclick = function(e){
       secTierFilter[n] = !secTierFilter[n];
       if (!secTierFilter[n]) delete secTierFilter[n];
     }
-    if (p) {
-      var pk = /^[1-5]O$/.test(p) ? p : parseInt(p, 10);
-      secPosFilter[pk] = !secPosFilter[pk];
-      if (!secPosFilter[pk]) delete secPosFilter[pk];
+    if (po) {
+      secPosOFilter = !secPosOFilter;
+    } else if (p) {
+      var pn = parseInt(p, 10);
+      if (!(pn >= 1 && pn <= 5)) return;
+      secPosFilter[pn] = !secPosFilter[pn];
+      if (!secPosFilter[pn]) delete secPosFilter[pn];
     }
     btn.classList.toggle("on");
     applySecFilters();
