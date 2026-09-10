@@ -3676,7 +3676,7 @@ function smSeekBy(deltaSec) {
     smTick();
   });
 }
-/* Ctrl+Left: restart if >3s into track; else previous (standard media-player behavior) */
+/* Ctrl+Left: if <=3s into track → restart; else → previous song */
 function smCtrlLeftArrow() {
   smEnsureApi(function(){
     if (!smYtPlayer || !smYtPlayer.getCurrentTime) {
@@ -3684,7 +3684,7 @@ function smCtrlLeftArrow() {
       return;
     }
     var cur = smYtPlayer.getCurrentTime() || 0;
-    if (cur > 3) {
+    if (cur <= 3) {
       smYtPlayer.seekTo(0, true);
       smTick();
     } else {
