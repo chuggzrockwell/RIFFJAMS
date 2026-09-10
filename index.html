@@ -1640,7 +1640,7 @@ var ALBUMS_DEFAULT = [
     { song: "Electric Funeral", sections: [["I1",4],["V1",4],["B1",5],["B2",5],["B3",5],["B4",5]] },
     { song: "Hand of Doom", sections: [["V1",5],["V2",5],["B1",2],["B2",2],["S1",1,"HOD-S1"]] },
     { song: "Rat Salad", sections: [["V1",4],["V2",4],["S1",1]] },
-    { song: "Fairies Wear Boots", sections: [["I1",2,"FOB-I1"],["I2",2],["S1",1],["V1",4],["B1",4],["S2",1,"FOB-S2"],["F1",5]] },
+    { song: "Fairies Wear Boots", sections: [["I1",2,"FOB-I1"],["I2",2,"FOB-I2"],["S1",1],["V1",4],["B1",4],["S2",1,"FOB-S2"],["F1",5]] },
   ]},
   { name: "Sabbath Bloody Sabbath", cover: "covers/sbs.png", font: "font-sbs", songs: [
     { song: "Sabbath Bloody Sabbath", sections: [["V1",1],["PC1",2],["PC2",2],["S1",1],["B1",4],["B2",2],["B3",2],["B4",2],["S2",2]] },
@@ -1973,6 +1973,22 @@ function loadAlbums() {
             // ensure I1 exists with link when song already has other chips
             var hasI1 = s.sections.some(function(p){ return isChipPair(p) && p[0] === "I1"; });
             if (!hasI1) s.sections.unshift(["I1",2,"FOB-I1"]);
+          }
+          var fobI2 = null;
+          s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === "I2") fobI2 = p; });
+          if (fobI2) {
+            fobI2[1] = 2;
+            fobI2[2] = "FOB-I2";
+          } else {
+            var hasI2 = s.sections.some(function(p){ return isChipPair(p) && p[0] === "I2"; });
+            if (!hasI2) {
+              // insert I2 after I1 when possible
+              var i1idx = -1;
+              s.sections.forEach(function(p, idx){ if (isChipPair(p) && p[0] === "I1") i1idx = idx; });
+              var row = ["I2",2,"FOB-I2"];
+              if (i1idx >= 0) s.sections.splice(i1idx + 1, 0, row);
+              else s.sections.unshift(row);
+            }
           }
         }
       });
