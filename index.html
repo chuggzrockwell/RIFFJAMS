@@ -1636,7 +1636,7 @@ var ALBUMS_DEFAULT = [
     { song: "War Pigs", sections: [["I1",2,"WP-I1"],["V1",5,"WP-V1"],["V2",2,"WP-V2"],["V3",2,"WP-V3"],["V4",2,"WP-V4"],["S1",1,"WP-S1"],["O1",2,"WP-O1"],["O2",1,"WP-O2"],["S2",1,"WP-S2"]] },
     { song: "Paranoid", sections: [["I1",2,"P-I1"],["V1",4,"P-V1"],["V2",4,"P-V2"],["S1",1]] },
     { song: "Planet Caravan", sections: [["V",5],["S1",1]] },
-    { song: "Iron Man", sections: [["V1",1],["V2",2],["V3",2],["V4",2],["S1",1],["S2",1],["O1",1]] },
+    { song: "Iron Man", sections: [["V1",1,"IM-V1"],["V2",2],["V3",2],["V4",2],["S1",1],["S2",1],["O1",1]] },
     { song: "Electric Funeral", sections: [["I1",4],["V1",4],["B1",5],["B2",5],["B3",5],["B4",5]] },
     { song: "Hand of Doom", sections: [["V1",5],["V2",5],["B1",2],["B2",2],["S1",1,"HOD-S1"]] },
     { song: "Rat Salad", sections: [["V1",4],["V2",4],["S1",1]] },
@@ -1935,6 +1935,20 @@ function loadAlbums() {
               s.sections.push(want.slice());
             }
           });
+        }
+        if (s.song === "Iron Man") {
+          if (!s.sections) s.sections = [];
+          var imV1 = null;
+          s.sections.forEach(function(pair){ if (isChipPair(pair) && pair[0] === "V1") imV1 = pair; });
+          if (imV1) {
+            imV1[1] = 1;
+            imV1[2] = "IM-V1";
+          } else if (!s.sections.length) {
+            s.sections.push(["V1",1,"IM-V1"]);
+          } else {
+            var hasImV1 = s.sections.some(function(pair){ return isChipPair(pair) && pair[0] === "V1"; });
+            if (!hasImV1) s.sections.unshift(["V1",1,"IM-V1"]);
+          }
         }
         if (s.song === "Paranoid") {
           if (!s.sections) s.sections = [];
