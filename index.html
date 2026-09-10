@@ -647,7 +647,7 @@
     max-width: calc(var(--chip-h) - 6px);
     max-height: calc(var(--chip-h) - 6px);
     object-fit: cover;
-    border-radius: 0;
+    border-radius: 6px;
     display: block;
     background: #111;
     margin: 3px 4px 3px 3px;
@@ -1230,6 +1230,15 @@
     height: calc(var(--chip-h) - 4px);
     max-height: calc(var(--chip-h) - 4px);
     align-self: center;
+  }
+  body.sections-mode .song-thumb {
+    border-radius: 6px;
+    margin: 2px 4px 2px 2px;
+    flex: 0 0 calc(var(--chip-h) - 8px);
+    width: calc(var(--chip-h) - 8px);
+    height: calc(var(--chip-h) - 8px);
+    max-width: calc(var(--chip-h) - 8px);
+    max-height: calc(var(--chip-h) - 8px);
   }
   body.sections-mode .song-name,
   body.sections-mode .song-name.np-paranoid,
