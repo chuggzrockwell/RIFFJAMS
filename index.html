@@ -234,8 +234,24 @@
     box-sizing: border-box;
     color: #fff;
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    align-items: center;
+    gap: 14px;
   }
-  body.sections-mode .sm-player { display: block; }
+  body.sections-mode .sm-player { display: flex; }
+  .sm-player-main {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .sm-player-art {
+    flex: 0 0 auto;
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #111;
+    display: none;
+  }
+  .sm-player-art.show { display: block; }
   .sm-player-meta {
     text-align: center;
     font-size: 0.72rem;
@@ -405,8 +421,8 @@
     align-items: stretch !important;
   }
   body.sections-play .sections-wrap {
-    --grid-left: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w));
-    width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w));
+    --grid-left: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
+    width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
     max-width: none;
     flex: 0 0 auto;
   }
@@ -427,7 +443,7 @@
   }
   body.sections-play .sections-layout .sections-wrap {
     flex: 0 0 auto;
-    width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w));
+    width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
   }
   .sec-play-pane {
     display: none;
@@ -1366,7 +1382,7 @@
     background: #1a1d26;
     border-color: #4a4e5a;
   }
-  body.sections-mode .album-songs { gap: 0; }
+  body.sections-mode .album-songs { gap: var(--chip-gap, 0px); padding: var(--chip-gap, 0px) 0; }
   body.sections-mode .song-row .row-num,
   body.sections-mode .song-row .song-thumb,
   body.sections-mode .song-row .song-name-wrap,
@@ -1518,12 +1534,13 @@
     --name-w: 200px;
     --chip-w: 48px;
     --chip-h: 28px;
+    --chip-gap: 3px;
     --cols: 10;
     --cover-rows: 6;
     --cover: calc(var(--chip-h) * var(--cover-rows));
-    --grid-left: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w));
+    --grid-left: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
     width: 100%;
-    max-width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w));
+    max-width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -1560,10 +1577,10 @@
     justify-content: center;
   }
   .sec-head-label.section {
-    flex: 0 0 calc(var(--cols) * var(--chip-w));
-    width: calc(var(--cols) * var(--chip-w));
-    min-width: calc(var(--cols) * var(--chip-w));
-    max-width: calc(var(--cols) * var(--chip-w));
+    flex: 0 0 calc(var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
+    width: calc(var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
+    min-width: calc(var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
+    max-width: calc(var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
     justify-content: center;
   }
   .sec-head-label.album {
@@ -1623,7 +1640,7 @@
   }
   .col-num {
     box-sizing: border-box;
-    width: var(--chip-w); min-width: var(--chip-w); max-width: var(--chip-w);
+    width: calc(var(--chip-w) - var(--chip-gap, 0px)); min-width: calc(var(--chip-w) - var(--chip-gap, 0px)); max-width: calc(var(--chip-w) - var(--chip-gap, 0px));
     height: 20px;
     display: inline-flex; align-items: center; justify-content: center;
     font-family: "Segoe UI", system-ui, sans-serif;
@@ -1664,7 +1681,7 @@
   }
   .sec-outline .col-outline-pad {
     box-sizing: border-box;
-    width: var(--chip-w); min-width: var(--chip-w); max-width: var(--chip-w);
+    width: calc(var(--chip-w) - var(--chip-gap, 0px)); min-width: calc(var(--chip-w) - var(--chip-gap, 0px)); max-width: calc(var(--chip-w) - var(--chip-gap, 0px));
     height: 16px;
   }
   .col-group-toggle {
@@ -1724,7 +1741,7 @@
     z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: var(--chip-gap, 0px);
     min-width: 0;
   }
   /* Album art vertically centered in that album's song stack */
@@ -1792,7 +1809,7 @@
   }
   .song-row:hover { background: rgba(112,48,160,.04); }
   .song-secs {
-    display: flex; flex-wrap: nowrap; gap: 0; align-items: stretch;
+    display: flex; flex-wrap: nowrap; gap: var(--chip-gap, 0px); align-items: stretch;
     flex: 0 0 auto;
     min-width: 0;
     margin-left: 0;
@@ -1800,7 +1817,7 @@
   .sec-chip {
     border: 0; cursor: pointer;
     box-sizing: border-box;
-    width: var(--chip-w); min-width: var(--chip-w); max-width: var(--chip-w);
+    width: calc(var(--chip-w) - var(--chip-gap, 0px)); min-width: calc(var(--chip-w) - var(--chip-gap, 0px)); max-width: calc(var(--chip-w) - var(--chip-gap, 0px));
     height: var(--chip-h); min-height: var(--chip-h); max-height: var(--chip-h);
     padding: 0;
     display: inline-flex; align-items: center; justify-content: center;
@@ -1922,7 +1939,7 @@
     .keys { display: none; }
     .bar { flex-wrap: wrap; gap: 8px; }
     .sections-wrap {
-      --row-g: 22px; --name-w: 140px; --chip-w: 30px; --chip-h: 20px; --cover-rows: 6; --cover: calc(var(--chip-h) * var(--cover-rows));
+      --row-g: 22px; --name-w: 140px; --chip-w: 30px; --chip-h: 20px; --chip-gap: 2px; --cover-rows: 6; --cover: calc(var(--chip-h) * var(--cover-rows));
       max-width: 100%; gap: 0;
     }
     .song-name { flex: 0 0 var(--name-w); width: var(--name-w); min-width: var(--name-w); max-width: var(--name-w); font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; }
@@ -1937,7 +1954,7 @@
     .grid { grid-template-columns: 1fr 1fr; gap: 8px; }
     .tile { padding: 12px 14px; font-size: clamp(1.6rem, 12vw, 2.8rem); }
     .sections-wrap {
-      --row-g: 20px; --name-w: 110px; --chip-w: 28px; --chip-h: 22px; --cover-rows: 4; --cover: calc(var(--chip-h) * var(--cover-rows));
+      --row-g: 20px; --name-w: 110px; --chip-w: 28px; --chip-h: 22px; --chip-gap: 2px; --cover-rows: 4; --cover: calc(var(--chip-h) * var(--cover-rows));
     }
     .song-row {
       flex-wrap: nowrap;
@@ -2076,31 +2093,34 @@
     <div class="sheet stage" id="sectionsSheet"></div>
     <div id="ytPlayerHost" aria-hidden="true"></div>
     <div class="sm-player" id="smPlayer" aria-label="Song player">
-      <div class="sm-player-meta" id="smPlayerMeta">Pick a song on the map</div>
-      <div class="sm-player-controls">
-        <button type="button" class="sm-player-btn" id="smShuffle" title="Shuffle" aria-pressed="false">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
-        </button>
-        <button type="button" class="sm-player-btn" id="smPrev" title="Previous">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h2v12H6V6zm3.5 6 8.5 6V6l-8.5 6z"/></svg>
-        </button>
-        <button type="button" class="sm-player-btn play" id="smPlay" title="Play">
-          <svg id="smPlayIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg>
-        </button>
-        <button type="button" class="sm-player-btn" id="smNext" title="Next">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-        </button>
-        <button type="button" class="sm-player-btn repeat on" id="smRepeat" title="Repeat playlist" aria-pressed="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
-        </button>
-      </div>
-      <div class="sm-player-progress">
-        <span class="sm-player-time" id="smTimeCur">0:00</span>
-        <div class="sm-player-scrub" id="smScrub" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
-          <div class="sm-player-scrub-fill" id="smScrubFill"></div>
+      <div class="sm-player-main">
+        <div class="sm-player-meta" id="smPlayerMeta">Pick a song on the map</div>
+        <div class="sm-player-controls">
+          <button type="button" class="sm-player-btn" id="smShuffle" title="Shuffle" aria-pressed="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+          </button>
+          <button type="button" class="sm-player-btn" id="smPrev" title="Previous">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h2v12H6V6zm3.5 6 8.5 6V6l-8.5 6z"/></svg>
+          </button>
+          <button type="button" class="sm-player-btn play" id="smPlay" title="Play">
+            <svg id="smPlayIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg>
+          </button>
+          <button type="button" class="sm-player-btn" id="smNext" title="Next">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+          <button type="button" class="sm-player-btn repeat on" id="smRepeat" title="Repeat playlist" aria-pressed="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+          </button>
         </div>
-        <span class="sm-player-time end" id="smTimeDur">0:00</span>
+        <div class="sm-player-progress">
+          <span class="sm-player-time" id="smTimeCur">0:00</span>
+          <div class="sm-player-scrub" id="smScrub" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="sm-player-scrub-fill" id="smScrubFill"></div>
+          </div>
+          <span class="sm-player-time end" id="smTimeDur">0:00</span>
+        </div>
       </div>
+      <img class="sm-player-art" id="smPlayerArt" alt="" width="72" height="72" decoding="async">
     </div>
   </section>
   <div id="secHighlightTip" aria-hidden="true"></div>
@@ -3616,7 +3636,7 @@ function smBuildPlaylist() {
     (a.songs || []).forEach(function(s){
       var id = SM_YT_IDS[s.song];
       if (!id) return;
-      out.push({ song: s.song, album: a.name, yt: id });
+      out.push({ song: s.song, album: a.name, yt: id, cover: a.cover || "" });
     });
   });
   smPlaylist = out;
@@ -3642,11 +3662,27 @@ function smCurrent() {
 }
 function smUpdateMeta() {
   var el = document.getElementById("smPlayerMeta");
+  var art = document.getElementById("smPlayerArt");
   if (!el) return;
   var cur = smCurrent();
-  if (!cur) { el.innerHTML = "No mapped YouTube tracks yet"; return; }
+  if (!cur) {
+    el.innerHTML = "No mapped YouTube tracks yet";
+    if (art) { art.removeAttribute("src"); art.alt = ""; art.classList.remove("show"); }
+    return;
+  }
   var tag = smPlayalongActive ? "playalong" : cur.album;
   el.innerHTML = "<strong>"+cur.song+"</strong> · "+tag;
+  if (art) {
+    if (cur.cover) {
+      art.src = cur.cover;
+      art.alt = cur.album || cur.song || "";
+      art.classList.add("show");
+    } else {
+      art.removeAttribute("src");
+      art.alt = "";
+      art.classList.remove("show");
+    }
+  }
 }
 function smSetPlayIcon(playing) {
   smPlaying = !!playing;
