@@ -1409,6 +1409,14 @@
   .song-name.np-mor::after {
     background: linear-gradient(90deg, rgba(138,106,58,.35), rgba(138,106,58,0));
   }
+  .song-name-wrap.np-vol4-wrap { background: #fff; }
+  .song-name.np-vol4 {
+    background: linear-gradient(90deg, #fff4e6 0%, #ffffff 75%);
+    color: #1a1208;
+  }
+  .song-name.np-vol4::after {
+    background: linear-gradient(90deg, rgba(232,140,20,.45), rgba(232,140,20,0));
+  }
   /* Excel fills ranked by darkness: T1 darkest → T5 near-white */
   .sec-chip.tier-1 { background: #7030a0; color: #fff; }
   .sec-chip.tier-2 { background: #a365d1; color: #fff; }
@@ -1653,6 +1661,18 @@ var ALBUMS_DEFAULT = [
     { song: "Lord of This World", sections: [] },
     { song: "Solitude", sections: [] },
     { song: "Into the Void", sections: [["I1",2,"ITV-I1"],["I2",3],["V1",1],["B1",3],["S1",1],["B2",1],["B3",1],["S2",1]] },
+  ]},
+  { name: "Vol. 4", cover: "covers/vol4.png", font: "font-vol4", songs: [
+    { song: "Wheels of Confusion", sections: [] },
+    { song: "Tomorrow's Dream", sections: [] },
+    { song: "Changes", sections: [] },
+    { song: "FX", sections: [] },
+    { song: "Supernaut", sections: [] },
+    { song: "Snowblind", sections: [] },
+    { song: "Cornucopia", sections: [] },
+    { song: "Laguna Sunrise", sections: [] },
+    { song: "St. Vitus Dance", sections: [] },
+    { song: "Under the Sun", sections: [] },
   ]},
 ];
 var ALBUMS_KEY = "lick-sections-albums-v3";
@@ -1908,6 +1928,14 @@ function loadAlbums() {
           }
         }
       });
+    });
+    // Append any new default albums (e.g. Vol. 4) not yet in saved Song Map
+    var have = {};
+    albums.forEach(function(a){ if (a && a.name) have[a.name] = true; });
+    ALBUMS_DEFAULT.forEach(function(da){
+      if (!da || !da.name || have[da.name]) return;
+      albums.push(JSON.parse(JSON.stringify(da)));
+      have[da.name] = true;
     });
     try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(albums)); } catch (err) {}
     return albums;
@@ -2177,7 +2205,7 @@ function showSections(keepScroll) {
         }
       }
       var chips = chipArr.join("");
-      var np = (album.font === 'font-sbs') ? 'np-sbs' : (album.font === 'font-mor') ? 'np-mor' : 'np-paranoid';
+      var np = (album.font === 'font-sbs') ? 'np-sbs' : (album.font === 'font-mor') ? 'np-mor' : (album.font === 'font-vol4') ? 'np-vol4' : 'np-paranoid';
       var thumb = album.cover ? '<img class="song-thumb" src="'+album.cover+'" alt="">' : '';
       return '<div class="song-row" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num">'+rowN+'</div><div class="song-name-wrap '+np+'-wrap">'+thumb+'<div class="song-name '+np+'">'+s.song+'</div></div><div class="song-secs">'+chips+'</div></div>';
     }).join("");
