@@ -2705,8 +2705,8 @@ function chipMatchesPosFilter(pos) {
   if (posOn && oOn && !pOn) return isO && baseOn;
   if (posOn && !oOn && pOn) return isP && baseOn;
   if (posOn && oOn && pOn) return (isO || isP) && baseOn;
-  // numbers only: plain (non-O/P) positions in the selected set
-  return plain && baseOn;
+  // numbers only: any variant of that base (plain, O, or P)
+  return baseOn;
 }
 function chipMatchesFilter(chip) {
   var typ = chip.getAttribute("data-type") || "";
