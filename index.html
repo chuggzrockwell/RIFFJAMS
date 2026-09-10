@@ -97,12 +97,17 @@
   body.sheet-mode .back { border-color: #4a4e5a; color: #e8e6e1; }
   body.sheet-mode .count, body.sheet-mode .keys { opacity: .55; color: #c8c6c0; }
   body.sections-mode {
-    background: #fff;
-    background-image: none;
-    color: #111;
+    background: #0b0d11;
+    background-image:
+      radial-gradient(ellipse 90% 60% at 50% 0%, #1a2030 0%, transparent 55%),
+      radial-gradient(circle at 20% 80%, rgba(80,40,120,.12), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(120,20,30,.1), transparent 42%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.015) 0 1px, transparent 1px 48px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.015) 0 1px, transparent 1px 48px);
+    color: #e8e6e1;
   }
-  body.sections-mode .back { border-color: #333; color: #111; }
-  body.sections-mode .count, body.sections-mode .keys { opacity: .55; color: #444; }
+  body.sections-mode .back { border-color: #4a4e5a; color: #e8e6e1; }
+  body.sections-mode .count, body.sections-mode .keys { opacity: .55; color: #c8c6c0; }
   .badge { font-size: 1.15rem; font-weight: 800; padding: 4px 12px; border-radius: 8px; color: #111; }
   .badge.a { background: #3ec8ff; } .badge.b { background: #3ee45e; }
   .badge.b2 { background: #9bffb0; } .badge.c { background: #ffe44a; } .badge.d { background: #ff3d4e; }
@@ -1117,11 +1122,156 @@
   .lightbox img { max-width: 98vw; max-height: 94vh; background: #fff; border-radius: 4px; image-rendering: crisp-edges; }
 
   #sectionsSheet {
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
-    padding: 0 4px 8px !important;
+    background: linear-gradient(160deg, #1a1d26 0%, #12141a 40%, #0e1016 100%) !important;
+    border: 1px solid #2c3040 !important;
+    border-radius: 14px !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.06),
+      inset 0 -40px 80px rgba(0,0,0,.35),
+      0 16px 48px rgba(0,0,0,.55) !important;
+    padding: 12px 10px 14px !important;
   }
+  /* Song Map — LL-p / pedalboard coloring */
+  body.sections-mode .sec-filters {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  body.sections-mode .sec-filter-label { color: rgba(232,230,225,.45); }
+  body.sections-mode .sec-filter-clear { color: rgba(232,230,225,.5); }
+  body.sections-mode .sec-filter-clear:hover { color: #c9a0e8; }
+  body.sections-mode .filter-dd-toggle {
+    background: #12141a;
+    color: #e8e6e1;
+    border-color: #2c3040;
+  }
+  body.sections-mode .filter-dd-toggle.has-sel {
+    background: #7030a0;
+    border-color: #7030a0;
+    color: #fff;
+  }
+  body.sections-mode .filter-dd-menu {
+    background: #161920;
+    border-color: #2c3040;
+    box-shadow: 0 12px 32px rgba(0,0,0,.55);
+  }
+  body.sections-mode .filter-dd-item { color: #e8e6e1; }
+  body.sections-mode .filter-dd-item:hover { background: rgba(255,255,255,.06); }
+  body.sections-mode .filter-dd-item input {
+    border-color: rgba(255,255,255,.35);
+    background: #0e1016;
+  }
+  body.sections-mode .filter-dd-item input:checked {
+    border-color: #a365d1;
+    background: #7030a0;
+    box-shadow: inset 0 0 0 3px #161920;
+  }
+  body.sections-mode .sec-mode-btn {
+    background: #12141a;
+    color: rgba(232,230,225,.65);
+    border-color: #2c3040;
+  }
+  body.sections-mode .sec-mode-btn.on {
+    background: #e8e6e1;
+    color: #111;
+    border-color: #e8e6e1;
+  }
+  body.sections-mode .sec-tool-btn {
+    background: #12141a;
+    color: #e8e6e1;
+    border-color: #2c3040;
+  }
+  body.sections-mode .sec-tool-btn.primary {
+    background: #7030a0;
+    border-color: #7030a0;
+    color: #fff;
+  }
+  body.sections-mode .sec-save-status { color: rgba(232,230,225,.45); }
+  body.sections-mode .sec-head-label { color: rgba(232,230,225,.4); }
+  body.sections-mode .row-num { color: rgba(232,230,225,.32); }
+  body.sections-mode .col-num {
+    color: rgba(232,230,225,.4);
+    background: transparent;
+    border-color: transparent;
+  }
+  body.sections-mode .col-group-toggle {
+    color: rgba(232,230,225,.55);
+    background: #12141a;
+    border-color: #2c3040;
+  }
+  body.sections-mode .col-group-toggle:hover {
+    color: #e8e6e1;
+    background: #1a1d26;
+    border-color: #4a4e5a;
+  }
+  body.sections-mode .song-row:hover { background: rgba(163,101,209,.08); }
+  body.sections-mode .song-name-wrap,
+  body.sections-mode .song-name-wrap.np-paranoid-wrap,
+  body.sections-mode .song-name-wrap.np-sbs-wrap,
+  body.sections-mode .song-name-wrap.np-mor-wrap,
+  body.sections-mode .song-name-wrap.np-vol4-wrap {
+    background: transparent;
+  }
+  body.sections-mode .song-name {
+    background: #050607;
+    color: #fff;
+    box-shadow: 0 0 0 1px #22262f, 0 4px 14px rgba(0,0,0,.35);
+    border-radius: 6px 0 0 6px;
+  }
+  body.sections-mode .song-name.np-paranoid {
+    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-weight: 400;
+    letter-spacing: .04em;
+    background: #050607;
+    color: #fff;
+  }
+  body.sections-mode .song-name.np-sbs {
+    font-family: "SBS Title", "Metal Mania", cursive;
+    font-weight: 400;
+    background: #050607;
+    color: #f3edf7;
+  }
+  body.sections-mode .song-name.np-mor,
+  body.sections-mode .song-name.np-vol4 {
+    background: #050607;
+    color: #fff;
+  }
+  body.sections-mode .song-name::after {
+    background: linear-gradient(90deg, rgba(163,101,209,.45), rgba(163,101,209,0));
+  }
+  body.sections-mode .sec-chip {
+    border-radius: 3px;
+    box-shadow:
+      inset -1px 0 0 rgba(0,0,0,.25),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 0 1px rgba(0,0,0,.35);
+  }
+  body.sections-mode .sec-chip.S {
+    text-shadow: 0 0 8px rgba(255,228,74,.55);
+  }
+  body.sections-mode .sec-chip.L {
+    text-shadow: 0 0 8px rgba(126,200,255,.55);
+  }
+  body.sections-mode .sec-chip.tier-1 {
+    box-shadow:
+      0 0 4px 1px rgba(112,48,160,.7),
+      0 0 12px 2px rgba(112,48,160,.35);
+  }
+  body.sections-mode .sec-chip.tier-2 {
+    box-shadow:
+      0 0 4px 1px rgba(163,101,209,.65),
+      0 0 12px 2px rgba(163,101,209,.3);
+  }
+  body.sections-mode .sec-chip.empty,
+  body.sections-mode .sec-chip.filtered-out,
+  body.sections-mode .sec-chip.filtered-out.S,
+  body.sections-mode .sec-chip.filtered-out.L,
+  body.sections-mode .sec-chip.S.filtered-out,
+  body.sections-mode .sec-chip.L.filtered-out {
+    background: rgba(255,255,255,.03) !important;
+    box-shadow: inset -1px 0 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(255,255,255,.06) !important;
+    text-shadow: none !important;
+  }
+
   /* Song lists + Excel-style grid; covers hug max chip column (Acrobat = 10) */
   .sections-wrap {
     --row-g: 28px;
