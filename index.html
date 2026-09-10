@@ -1604,7 +1604,7 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · i/v/… types · 1–5 tiers · Esc/0 home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · 4 Solo · 5 Peek · i/v/… types · 1–5 tiers · Esc/0 home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
@@ -2750,12 +2750,12 @@ function setSectionsMode(mode) {
   var keys = document.getElementById("sectionsKeys");
   if (keys) {
     if (soloMode) {
-      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · drag · Undo/Save · Esc/0 home";
-      else if (sectionsMode === "play") keys.textContent = "Solo · lick clicks queue · Esc/0 home";
-      else keys.textContent = "Solo · Esc/0 home";
-    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · Esc closes";
-    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · section clicks queue · Playboard window · Esc/0 home";
-    else keys.textContent = "Numpad 1/2/3 · Song Map · filters · Esc/0 home";
+      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 4/5 Solo/Peek · drag · Undo/Save · Esc/0 home";
+      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 4/5 · lick clicks queue · Esc/0 home";
+      else keys.textContent = "Solo · Numpad 4/5 Solo/Peek · Esc/0 home";
+    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · Esc closes";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · section clicks queue · Playboard window · Esc/0 home";
+    else keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Song Map · filters · Esc/0 home";
   }
   if (sectionsMode === "play") {
     pullPlayQueue();
@@ -4270,6 +4270,8 @@ document.addEventListener("keydown", function(e){
     if (isNumpadKey(e, "1")) { setSectionsMode("view"); return; }
     if (isNumpadKey(e, "2")) { setSectionsMode("edit"); return; }
     if (isNumpadKey(e, "3")) { setSectionsMode("play"); return; }
+    if (isNumpadKey(e, "4")) { setSoloMode(!soloMode); return; }
+    if (isNumpadKey(e, "5")) { setHighlightMode(!highlightMode); return; }
     if (e.shiftKey && k === "v") { setSectionsMode("view"); return; }
     if (e.shiftKey && k === "e") { setSectionsMode("edit"); return; }
     if (e.shiftKey && k === "p") { setSectionsMode("play"); return; }
