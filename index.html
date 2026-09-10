@@ -3587,6 +3587,10 @@ var SM_YT_PLAYALONG = {
   "Snowblind": "aw-B5B1ndds",
   "Iron Man": "z5lj36TFJYc"
 };
+/* Target speedup for playalongs (nativeBpm → desired). YT only allows discrete rates; we snap to nearest. */
+var SM_YT_PLAYALONG_RATE = {
+  "Paranoid": 166 / 142
+};
 var smYtReady = false;
 var smYtPlayer = null;
 var smYtApiLoading = false;
@@ -3686,7 +3690,7 @@ function smEnsureApi(cb) {
         onReady: function(){ cb && cb(); },
         onStateChange: function(e){
           if (e.data === YT.PlayerState.ENDED) smOnEnded();
-          if (e.data === YT.PlayerState.PLAYING) { smSetPlayIcon(true); smStartTick(); }
+          if (e.data === YT.PlayerState.PLAYING) { smSetPlayIcon(true); smStartTick(); smApplyPlaybackRate(); }
           if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.CUED) { smSetPlayIcon(false); smStopTick(); }
         }
       }
@@ -3702,6 +3706,30 @@ function smEnsureApi(cb) {
   tag.src = "https://www.youtube.com/iframe_api";
   document.head.appendChild(tag);
 }
+function smDesiredPlayRate() {
+  if (!smPlayalongActive) return 1;
+  var cur = smCurrent();
+  var name = cur ? cur.song : "";
+  var r = name && SM_YT_PLAYALONG_RATE[name];
+  return (typeof r === "number" && r > 0) ? r : 1;
+}
+function smApplyPlaybackRate() {
+  if (!smYtPlayer || !smYtPlayer.setPlaybackRate) return;
+  var want = smDesiredPlayRate();
+  var rate = want;
+  try {
+    var avail = smYtPlayer.getAvailablePlaybackRates && smYtPlayer.getAvailablePlaybackRates();
+    if (avail && avail.length) {
+      var best = avail[0], bestDiff = Math.abs(avail[0] - want);
+      for (var i = 1; i < avail.length; i++) {
+        var d = Math.abs(avail[i] - want);
+        if (d < bestDiff) { best = avail[i]; bestDiff = d; }
+      }
+      rate = best;
+    }
+    smYtPlayer.setPlaybackRate(rate);
+  } catch (err) {}
+}
 function smLoadCurrent(autoplay) {
   var cur = smCurrent();
   /* next/prev/shuffle load clears one-shot playalong override */
@@ -3712,6 +3740,7 @@ function smLoadCurrent(autoplay) {
     if (!smYtPlayer || !smYtPlayer.loadVideoById) return;
     if (autoplay) smYtPlayer.loadVideoById(cur.yt);
     else smYtPlayer.cueVideoById(cur.yt);
+    smApplyPlaybackRate();
   });
 }
 function smPlayIndex(i, autoplay) {
@@ -3777,6 +3806,10 @@ function smPlaySongName(name, autoplay, playalong) {
     if (!smYtPlayer || !smYtPlayer.loadVideoById) return;
     if (autoplay !== false) smYtPlayer.loadVideoById(yt);
     else smYtPlayer.cueVideoById(yt);
+    smApplyPlaybackRate();
+    /* YT often applies rate only after the video is playing */
+    setTimeout(smApplyPlaybackRate, 400);
+    setTimeout(smApplyPlaybackRate, 1200);
   });
 }
 function smOnEnded() {
@@ -3806,6 +3839,8 @@ function smTogglePlay() {
         var pa = name ? (SM_YT_PLAYALONG[name] || "") : "";
         if (pa) {
           smYtPlayer.loadVideoById(pa);
+          smApplyPlaybackRate();
+          setTimeout(smApplyPlaybackRate, 400);
           return;
         }
       }
