@@ -1634,7 +1634,7 @@
 var ALBUMS_DEFAULT = [
   { name: "Paranoid", cover: "covers/paranoid.png", font: "font-paranoid", songs: [
     { song: "War Pigs", sections: [["I1",2,"WP-I1"],["V1",5,"WP-V1"],["V2",2,"WP-V2"],["V3",2,"WP-V3"],["V4",2,"WP-V4"],["S1",1,"WP-S1"],["O1",2,"WP-O1"],["O2",1,"WP-O2"],["S2",1,"WP-S2"]] },
-    { song: "Paranoid", sections: [["I",2],["V1",4,"P-V1"],["S1",1]] },
+    { song: "Paranoid", sections: [["I1",2,"P-I1"],["V1",4,"P-V1"],["S1",1]] },
     { song: "Planet Caravan", sections: [["V",5],["S1",1]] },
     { song: "Iron Man", sections: [["V1",1],["V2",2],["V3",2],["V4",2],["S1",1],["S2",1],["O1",1]] },
     { song: "Electric Funeral", sections: [["I1",4],["V1",4],["B1",5],["B2",5],["B3",5],["B4",5]] },
@@ -1938,8 +1938,25 @@ function loadAlbums() {
         }
         if (s.song === "Paranoid") {
           if (!s.sections) s.sections = [];
+          // Rename legacy intro chip I → I1
+          s.sections.forEach(function(pair){
+            if (isChipPair(pair) && pair[0] === "I") pair[0] = "I1";
+          });
+          var pI1 = null;
           var pV1 = null;
-          s.sections.forEach(function(pair){ if (isChipPair(pair) && pair[0] === "V1") pV1 = pair; });
+          s.sections.forEach(function(pair){
+            if (isChipPair(pair) && pair[0] === "I1") pI1 = pair;
+            if (isChipPair(pair) && pair[0] === "V1") pV1 = pair;
+          });
+          if (pI1) {
+            pI1[1] = 2;
+            pI1[2] = "P-I1";
+          } else if (!s.sections.length) {
+            s.sections.unshift(["I1",2,"P-I1"]);
+          } else {
+            var hasI1 = s.sections.some(function(pair){ return isChipPair(pair) && pair[0] === "I1"; });
+            if (!hasI1) s.sections.unshift(["I1",2,"P-I1"]);
+          }
           if (pV1) {
             pV1[1] = 4;
             pV1[2] = "P-V1";
