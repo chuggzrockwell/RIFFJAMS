@@ -1724,7 +1724,7 @@ var ALBUMS_DEFAULT = [
     { song: "Electric Funeral", sections: [["I1",4],["V1",4],["B1",5],["B2",5],["B3",5],["B4",5]] },
     { song: "Hand of Doom", sections: [["V1",5],["V2",5],["B1",2],["B2",2],["S1",1,"HOD-S1"]] },
     { song: "Rat Salad", sections: [["V1",4],["V2",4],["S1",1]] },
-    { song: "Fairies Wear Boots", sections: [["I1",2,"FOB-I1"],["I2",2,"FOB-I2"],["I3",2,"FOB-I3"],["S1",1],["V1",4],["B1",4],["S2",1,"FOB-S2"],["F1",5]] },
+    { song: "Fairies Wear Boots", sections: [["I1",2,"FOB-I1"],["I2",2,"FOB-I2"],["I3",2,"FOB-I3"],["S1",1,"FOB-S1"],["V1",4],["B1",4],["S2",1,"FOB-S2"],["F1",5]] },
   ]},
   { name: "Sabbath Bloody Sabbath", cover: "covers/sbs.png", font: "font-sbs", songs: [
     { song: "Sabbath Bloody Sabbath", sections: [["V1",1],["PC1",2],["PC2",2],["S1",1],["B1",4],["B2",2],["B3",2],["B4",2],["S2",2]] },
@@ -2159,6 +2159,21 @@ function loadAlbums() {
               var row3 = ["I3",2,"FOB-I3"];
               if (i2idx >= 0) s.sections.splice(i2idx + 1, 0, row3);
               else s.sections.push(row3);
+            }
+          }
+          var fobS1 = null;
+          s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === "S1") fobS1 = p; });
+          if (fobS1) {
+            fobS1[1] = 1;
+            fobS1[2] = "FOB-S1";
+          } else {
+            var hasS1 = s.sections.some(function(p){ return isChipPair(p) && p[0] === "S1"; });
+            if (!hasS1) {
+              var i3idx = -1;
+              s.sections.forEach(function(p, idx){ if (isChipPair(p) && p[0] === "I3") i3idx = idx; });
+              var rowS1 = ["S1",1,"FOB-S1"];
+              if (i3idx >= 0) s.sections.splice(i3idx + 1, 0, rowS1);
+              else s.sections.push(rowS1);
             }
           }
         }
