@@ -175,6 +175,35 @@
   .sec-mode-btn.on {
     background: #111; color: #fff; border-color: #111;
   }
+  #secHighlightTip {
+    position: fixed;
+    z-index: 9999;
+    display: none;
+    pointer-events: none;
+    max-width: min(92vw, 720px);
+    max-height: min(70vh, 420px);
+    padding: 6px;
+    background: #111;
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(0,0,0,.35);
+  }
+  #secHighlightTip.open { display: block; }
+  #secHighlightTip img {
+    display: block;
+    max-width: min(90vw, 700px);
+    max-height: min(66vh, 400px);
+    width: auto;
+    height: auto;
+    background: #fff;
+    border-radius: 6px;
+  }
+  #secHighlightTip .hl-empty {
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+  body.sec-peek-on .sec-chip:not(.empty) { cursor: zoom-in; }
   .sec-edit-tools {
     display: none;
     align-items: center;
@@ -1584,6 +1613,7 @@
       <button type="button" class="sec-mode-btn" data-sec-mode="edit">Edit</button>
       <button type="button" class="sec-mode-btn" data-sec-mode="play">Play</button>
       <button type="button" class="sec-mode-btn" id="secSoloModeBtn" aria-pressed="false">Solo</button>
+      <button type="button" class="sec-mode-btn" id="secPeekBtn" aria-pressed="false" title="Hover chips to peek tabs">Peek</button>
       <span class="sec-edit-tools" id="secEditTools" hidden>
         <button type="button" class="sec-tool-btn" id="secUndoBtn" title="Undo (Ctrl+Z)">Undo</button>
         <button type="button" class="sec-tool-btn primary" id="secSaveBtn" title="Save (Ctrl+S)">Save</button>
@@ -1607,6 +1637,7 @@
     </div>
     <div class="sheet stage" id="sectionsSheet"></div>
   </section>
+  <div id="secHighlightTip" aria-hidden="true"></div>
   <div id="chipEditor" class="chip-editor" aria-hidden="true">
     <label for="chipEditId" id="chipEditIdLabel">Section ID</label>
     <input type="text" id="chipEditId" maxlength="16" placeholder="e.g. V1" autocomplete="off">
@@ -2756,6 +2787,66 @@ function lickLetter(id) {
   if (/^PC-/.test(id)) return "B";
   return "B";
 }
+var highlightMode = false;
+function setHighlightMode(on) {
+  highlightMode = !!on;
+  document.body.classList.toggle("sec-peek-on", highlightMode);
+  var btn = document.getElementById("secPeekBtn");
+  if (btn) {
+    btn.classList.toggle("on", highlightMode);
+    btn.setAttribute("aria-pressed", highlightMode ? "true" : "false");
+  }
+  if (!highlightMode) hideHighlightTip();
+}
+function hideHighlightTip() {
+  var tip = document.getElementById("secHighlightTip");
+  if (!tip) return;
+  tip.classList.remove("open");
+  tip.setAttribute("aria-hidden", "true");
+  tip.innerHTML = "";
+}
+function placeHighlightTip(anchor) {
+  var tip = document.getElementById("secHighlightTip");
+  if (!tip || !anchor) return;
+  var r = anchor.getBoundingClientRect();
+  var pad = 8;
+  tip.style.left = "0px";
+  tip.style.top = "0px";
+  tip.classList.add("open");
+  tip.setAttribute("aria-hidden", "false");
+  var tw = tip.offsetWidth || 240;
+  var th = tip.offsetHeight || 120;
+  var left = r.right + pad;
+  if (left + tw > window.innerWidth - pad) left = r.left - tw - pad;
+  if (left < pad) left = pad;
+  var top = r.top;
+  if (top + th > window.innerHeight - pad) top = window.innerHeight - th - pad;
+  if (top < pad) top = pad;
+  tip.style.left = left + "px";
+  tip.style.top = top + "px";
+}
+function showHighlightTip(chip) {
+  if (!highlightMode || !chip || chip.classList.contains("empty")) return;
+  var tip = document.getElementById("secHighlightTip");
+  if (!tip) return;
+  var lick = (chip.getAttribute("data-lick") || "").trim();
+  if (!lick) {
+    tip.innerHTML = '<div class="hl-empty">No tab linked</div>';
+    placeHighlightTip(chip);
+    return;
+  }
+  var src = lickSrc(lick);
+  tip.innerHTML = '<img alt="" src="'+src+'">';
+  var img = tip.querySelector("img");
+  if (img) {
+    img.onload = function(){ placeHighlightTip(chip); };
+    img.onerror = function(){
+      tip.innerHTML = '<div class="hl-empty">Tab missing</div>';
+      placeHighlightTip(chip);
+    };
+  }
+  placeHighlightTip(chip);
+}
 function lickSrc(id) {
   if (!id) return "";
   for (var i = 0; i < CATALOG.length; i++) {
@@ -3751,6 +3842,10 @@ document.getElementById("secModes").onclick = function(e){
     setSoloMode(!soloMode);
     return;
   }
+  if (e.target.closest("#secPeekBtn")) {
+    setHighlightMode(!highlightMode);
+    return;
+  }
   var btn = e.target.closest(".sec-mode-btn[data-sec-mode]");
   if (!btn) return;
   setSectionsMode(btn.getAttribute("data-sec-mode"));
@@ -3967,6 +4062,24 @@ sectionsSheetEl.addEventListener("pointerdown", function(e){
 sectionsSheetEl.addEventListener("dragstart", function(e){
   if (e.target.closest(".sec-chip")) e.preventDefault();
 });
+
+
+document.getElementById("sectionsSheet").addEventListener("mouseover", function(e){
+  if (!highlightMode) return;
+  var chip = e.target.closest(".sec-chip");
+  if (!chip || chip.classList.contains("empty") || chip.classList.contains("filtered-out")) return;
+  if (e.relatedTarget && chip.contains(e.relatedTarget)) return;
+  showHighlightTip(chip);
+});
+document.getElementById("sectionsSheet").addEventListener("mouseout", function(e){
+  if (!highlightMode) return;
+  var chip = e.target.closest(".sec-chip");
+  if (!chip) return;
+  if (e.relatedTarget && chip.contains(e.relatedTarget)) return;
+  hideHighlightTip();
+});
+document.getElementById("sectionsSheet").addEventListener("scroll", hideHighlightTip, true);
+window.addEventListener("scroll", function(){ if (highlightMode) hideHighlightTip(); }, true);
 
 document.getElementById("sectionsSheet").onclick = function(e){
   var playCard = e.target.closest(".sec-play-card");
