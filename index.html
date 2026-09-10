@@ -1211,29 +1211,19 @@
   body.sections-mode .song-name-wrap.np-vol4-wrap {
     background: transparent;
   }
-  body.sections-mode .song-name {
+  body.sections-mode .song-name,
+  body.sections-mode .song-name.np-paranoid,
+  body.sections-mode .song-name.np-sbs,
+  body.sections-mode .song-name.np-mor,
+  body.sections-mode .song-name.np-vol4 {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    letter-spacing: -0.015em;
     background: #050607;
     color: #fff;
     box-shadow: 0 0 0 1px #22262f, 0 4px 14px rgba(0,0,0,.35);
     border-radius: 6px 0 0 6px;
-  }
-  body.sections-mode .song-name.np-paranoid {
-    font-family: "Paranoid Title", "Black Ops One", cursive;
-    font-weight: 400;
-    letter-spacing: .04em;
-    background: #050607;
-    color: #fff;
-  }
-  body.sections-mode .song-name.np-sbs {
-    font-family: "SBS Title", "Metal Mania", cursive;
-    font-weight: 400;
-    background: #050607;
-    color: #f3edf7;
-  }
-  body.sections-mode .song-name.np-mor,
-  body.sections-mode .song-name.np-vol4 {
-    background: #050607;
-    color: #fff;
   }
   body.sections-mode .song-name::after {
     background: linear-gradient(90deg, rgba(163,101,209,.45), rgba(163,101,209,0));
@@ -1592,7 +1582,11 @@
     box-shadow: inset -1px 0 0 rgba(0,0,0,.1), inset 0 -1px 0 rgba(0,0,0,.1) !important;
   }
   .sec-chip.empty:hover { filter: none; }
-  .song-name {
+  .song-name,
+  .song-name.np-paranoid,
+  .song-name.np-sbs,
+  .song-name.np-mor,
+  .song-name.np-vol4 {
     flex: 0 0 var(--name-w); width: var(--name-w); min-width: var(--name-w); max-width: var(--name-w);
     height: var(--chip-h); max-height: var(--chip-h);
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
