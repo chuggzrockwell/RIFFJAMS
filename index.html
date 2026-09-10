@@ -560,11 +560,11 @@
   }
 
 
-  .exclude-dd {
+  .filter-dd {
     position: relative;
     display: inline-block;
   }
-  .exclude-dd-toggle {
+  .filter-dd-toggle {
     border: 1px solid rgba(0,0,0,.14);
     background: #fff;
     color: #333;
@@ -574,21 +574,25 @@
     font-weight: 700;
     cursor: pointer;
     min-width: 72px;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     text-align: left;
   }
-  .exclude-dd-toggle.has-excludes {
+  .filter-dd-toggle.has-sel {
     background: #333;
     color: #fff;
     border-color: #333;
   }
-  .exclude-dd-menu {
+  .filter-dd-menu {
     display: none;
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
     z-index: 40;
-    min-width: 140px;
-    max-height: 240px;
+    min-width: 160px;
+    max-height: 280px;
     overflow: auto;
     background: #fff;
     border: 1px solid rgba(0,0,0,.14);
@@ -596,8 +600,8 @@
     box-shadow: 0 10px 28px rgba(0,0,0,.16);
     padding: 6px;
   }
-  .exclude-dd.open .exclude-dd-menu { display: block; }
-  .exclude-dd-item {
+  .filter-dd.open .filter-dd-menu { display: block; }
+  .filter-dd-item {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -608,9 +612,30 @@
     color: #222;
     cursor: pointer;
   }
-  .exclude-dd-item:hover { background: rgba(0,0,0,.05); }
-  .exclude-dd-item input { margin: 0; }
-    .song-thumb {
+  .filter-dd-item:hover { background: rgba(0,0,0,.05); }
+  .filter-dd-item input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    margin: 0;
+    border: 2px solid rgba(0,0,0,.35);
+    border-radius: 50%;
+    background: #fff;
+    flex: 0 0 auto;
+    cursor: pointer;
+    position: relative;
+  }
+  .filter-dd-item input:checked {
+    border-color: #7030a0;
+    background: #7030a0;
+    box-shadow: inset 0 0 0 3px #fff;
+  }
+  .filter-dd-item input:focus-visible {
+    outline: 2px solid #a365d1;
+    outline-offset: 1px;
+  }
+  .album-block.filtered-out { display: none !important; }
+  .song-thumb {
     flex: 0 0 calc(var(--chip-h) - 6px);
     width: calc(var(--chip-h) - 6px);
     height: calc(var(--chip-h) - 6px);
@@ -1637,6 +1662,9 @@
       </span>
     </div>
     <div class="sec-filters" id="secFilters" aria-label="Filter song map">
+      <div class="sec-filter-group" id="secAlbumFilters">
+        <span class="sec-filter-label">Album</span>
+      </div>
       <div class="sec-filter-group" id="secTypeFilters">
         <span class="sec-filter-label">Type</span>
       </div>
@@ -2636,7 +2664,8 @@ function showSections(keepScroll) {
       var thumb = album.cover ? '<img class="song-thumb" src="'+album.cover+'" alt="">' : '';
       return '<div class="song-row" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num">'+rowN+'</div><div class="song-name-wrap '+np+'-wrap">'+thumb+'<div class="song-name '+np+'">'+s.song+'</div></div><div class="song-secs">'+chips+'</div></div>';
     }).join("");
-    return '<div class="album-block" data-ai="'+ai+'"><div class="album-songs">'+rows+'</div></div>';
+    var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
+    return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
   }).join("");
   document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+outline+ruler+html+'</div></div>';
   var wrapEl = document.querySelector("#sectionsSheet .sections-wrap");
@@ -2673,6 +2702,7 @@ var secPosOFilter = false;
 var secPosPFilter = false;
 var secPosDFilter = false;
 var secExcludeTypes = {};
+var secAlbumFilter = {};
 var playQueue = [];
 var PLAY_QUEUE_KEY = "lick-play-queue";
 var playChannel = null;
@@ -2777,42 +2807,88 @@ function collectSecTypes() {
   });
   return ordered;
 }
+function filterDdLabel(keys, emptyLabel) {
+  if (!keys || !keys.length) return emptyLabel || "All";
+  if (keys.length <= 3) return keys.join(", ");
+  return keys.slice(0, 2).join(", ") + " +" + (keys.length - 2);
+}
+function buildFilterDd(id, labelEmpty, itemsHtml, selectedKeys) {
+  var has = !!(selectedKeys && selectedKeys.length);
+  return '<div class="filter-dd'+(has ? " has" : "")+'" id="'+id+'">'
+    + '<button type="button" class="filter-dd-toggle'+(has ? " has-sel" : "")+'" data-filter-dd-toggle="'+id+'">'
+    + filterDdLabel(selectedKeys, labelEmpty) + " ▾</button>"
+    + '<div class="filter-dd-menu">'+itemsHtml+'</div></div>';
+}
 function buildSecFilters() {
+  var albumHost = document.getElementById("secAlbumFilters");
   var typeHost = document.getElementById("secTypeFilters");
   var exclHost = document.getElementById("secExcludeFilters");
   var tierHost = document.getElementById("secTierFilters");
   var posHost = document.getElementById("secPosFilters");
   if (!typeHost || !tierHost) return;
   var types = collectSecTypes();
-  typeHost.innerHTML = '<span class="sec-filter-label">Type</span>' + types.map(function(t){
-    var on = secTypeFilter[t] ? ' on' : '';
-    return '<button type="button" class="sec-filter-btn type'+on+'" data-filter-type="'+t+'">'+t+'</button>';
+  var openId = null;
+  var openEl = document.querySelector(".filter-dd.open");
+  if (openEl) openId = openEl.id;
+
+  if (albumHost) {
+    var albums = (soloMode && SOLO_MAP && SOLO_MAP.albums) ? SOLO_MAP.albums : (ALBUMS || []);
+    var albumNames = albums.map(function(a){ return a && a.name; }).filter(Boolean);
+    var albumKeys = Object.keys(secAlbumFilter).filter(function(k){ return secAlbumFilter[k]; });
+    var albumItems = albumNames.map(function(name){
+      var checked = secAlbumFilter[name] ? " checked" : "";
+      var esc = String(name).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+      return '<label class="filter-dd-item"><input type="checkbox" data-filter-album="'+esc+'"'+checked+'><span>'+esc+'</span></label>';
+    }).join("");
+    albumHost.innerHTML = '<span class="sec-filter-label">Album</span>'
+      + buildFilterDd("albumDd", "All", albumItems, albumKeys);
+  }
+
+  var typeKeys = Object.keys(secTypeFilter).filter(function(k){ return secTypeFilter[k]; });
+  var typeItems = types.map(function(tp){
+    var checked = secTypeFilter[tp] ? " checked" : "";
+    return '<label class="filter-dd-item"><input type="checkbox" data-filter-type="'+tp+'"'+checked+'><span>'+tp+'</span></label>';
   }).join("");
+  typeHost.innerHTML = '<span class="sec-filter-label">Type</span>'
+    + buildFilterDd("typeDd", "All", typeItems, typeKeys);
+
   if (exclHost) {
     var exclKeys = Object.keys(secExcludeTypes).filter(function(k){ return secExcludeTypes[k]; });
-    var label = exclKeys.length ? ("−" + exclKeys.join(",")) : "None";
-    var items = types.map(function(tp){
+    var exclItems = types.map(function(tp){
       var checked = secExcludeTypes[tp] ? " checked" : "";
-      return '<label class="exclude-dd-item"><input type="checkbox" data-exclude-type="'+tp+'"'+checked+'>'+tp+'</label>';
+      return '<label class="filter-dd-item"><input type="checkbox" data-exclude-type="'+tp+'"'+checked+'><span>'+tp+'</span></label>';
     }).join("");
     exclHost.innerHTML = '<span class="sec-filter-label">Exclude</span>'
-      + '<div class="exclude-dd'+(exclKeys.length ? " has" : "")+'" id="excludeDd">'
-      + '<button type="button" class="exclude-dd-toggle'+(exclKeys.length ? " has-excludes" : "")+'" id="excludeDdToggle">'+label+' ▾</button>'
-      + '<div class="exclude-dd-menu" id="excludeDdMenu">'+items+'</div>'
-      + '</div>';
+      + buildFilterDd("excludeDd", "None", exclItems, exclKeys.map(function(k){ return "−"+k; }));
   }
-  tierHost.innerHTML = '<span class="sec-filter-label">Tier</span>' + [1,2,3,4,5].map(function(t){
-    var on = secTierFilter[t] ? ' on' : '';
-    return '<button type="button" class="sec-filter-btn tier t'+t+on+'" data-filter-tier="'+t+'">T'+t+'</button>';
+
+  var tierKeys = [1,2,3,4,5].filter(function(n){ return secTierFilter[n]; }).map(function(n){ return "T"+n; });
+  var tierItems = [1,2,3,4,5].map(function(n){
+    var checked = secTierFilter[n] ? " checked" : "";
+    return '<label class="filter-dd-item"><input type="checkbox" data-filter-tier="'+n+'"'+checked+'><span>T'+n+'</span></label>';
   }).join("");
+  tierHost.innerHTML = '<span class="sec-filter-label">Tier</span>'
+    + buildFilterDd("tierDd", "All", tierItems, tierKeys);
+
   if (posHost) {
-    posHost.innerHTML = '<span class="sec-filter-label">Position</span>' + [1,2,3,4,5].map(function(n){
-      var on = secPosFilter[n] ? ' on' : '';
-      return '<button type="button" class="sec-filter-btn pos'+on+'" data-filter-pos="'+n+'">'+n+'</button>';
+    var posKeys = [1,2,3,4,5].filter(function(n){ return secPosFilter[n]; }).map(String);
+    if (secPosOFilter) posKeys.push("O");
+    if (secPosPFilter) posKeys.push("P");
+    if (secPosDFilter) posKeys.push("D");
+    var posItems = [1,2,3,4,5].map(function(n){
+      var checked = secPosFilter[n] ? " checked" : "";
+      return '<label class="filter-dd-item"><input type="checkbox" data-filter-pos="'+n+'"'+checked+'><span>'+n+'</span></label>';
     }).join("")
-      + '<button type="button" class="sec-filter-btn pos o-pos'+(secPosOFilter ? ' on' : '')+'" data-filter-pos-o="1" title="O positions">O</button>'
-      + '<button type="button" class="sec-filter-btn pos p-pos'+(secPosPFilter ? ' on' : '')+'" data-filter-pos-p="1" title="P positions">P</button>'
-      + '<button type="button" class="sec-filter-btn pos d-pos'+(secPosDFilter ? ' on' : '')+'" data-filter-pos-d="1" title="Dorian positions">D</button>';
+      + '<label class="filter-dd-item"><input type="checkbox" data-filter-pos-o="1"'+(secPosOFilter?" checked":"")+'><span>O · Open</span></label>'
+      + '<label class="filter-dd-item"><input type="checkbox" data-filter-pos-p="1"'+(secPosPFilter?" checked":"")+'><span>P · Pedal</span></label>'
+      + '<label class="filter-dd-item"><input type="checkbox" data-filter-pos-d="1"'+(secPosDFilter?" checked":"")+'><span>D · Dorian</span></label>';
+    posHost.innerHTML = '<span class="sec-filter-label">Position</span>'
+      + buildFilterDd("posDd", "All", posItems, posKeys);
+  }
+
+  if (openId) {
+    var reopen = document.getElementById(openId);
+    if (reopen) reopen.classList.add("open");
   }
 }
 function secFiltersActive() {
@@ -2820,7 +2896,8 @@ function secFiltersActive() {
   var r = Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; });
   var p = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter || secPosPFilter || secPosDFilter;
   var x = Object.keys(secExcludeTypes).some(function(k){ return secExcludeTypes[k]; });
-  return t || r || p || x;
+  var a = Object.keys(secAlbumFilter).some(function(k){ return secAlbumFilter[k]; });
+  return t || r || p || x || a;
 }
 function chipMatchesPosFilter(pos) {
   pos = normalizeSlot(pos, 1);
@@ -2863,8 +2940,12 @@ function applySecFilters() {
   // Edit mode always shows every chip so creates/edits are visible (section map only)
   var active = (sectionsMode !== "edit") && secFiltersActive();
   var shown = 0;
+  var albumOn = Object.keys(secAlbumFilter).some(function(k){ return secAlbumFilter[k]; });
   sheet.querySelectorAll(".album-block").forEach(function(block){
-    block.classList.remove("filtered-out");
+    var albumName = block.getAttribute("data-album") || "";
+    var albumOk = !active || !albumOn || !!secAlbumFilter[albumName];
+    block.classList.toggle("filtered-out", active && !albumOk);
+    if (!albumOk) return;
     block.querySelectorAll(".song-row").forEach(function(row){
       row.classList.remove("filtered-out");
       row.querySelectorAll(".sec-chip").forEach(function(chip){
@@ -2917,9 +2998,7 @@ function sizeAlbumCovers() {
 function toggleSecTierKey(n) {
   if (secTierFilter[n]) delete secTierFilter[n];
   else secTierFilter[n] = true;
-  var btn = document.querySelector('.sec-filter-btn.tier[data-filter-tier="'+n+'"]');
-  if (btn) btn.classList.toggle("on", !!secTierFilter[n]);
-  else buildSecFilters();
+  buildSecFilters();
   applySecFilters();
   if (sectionsMode === "play") renderPlayBoard();
 }
@@ -2928,9 +3007,7 @@ function toggleSecPosKey(n) {
   if (!(n >= 1 && n <= 5)) return;
   if (secPosFilter[n]) delete secPosFilter[n];
   else secPosFilter[n] = true;
-  var btn = document.querySelector('.sec-filter-btn.pos[data-filter-pos="'+n+'"]');
-  if (btn) btn.classList.toggle("on", !!secPosFilter[n]);
-  else buildSecFilters();
+  buildSecFilters();
   applySecFilters();
   if (sectionsMode === "play") renderPlayBoard();
 }
@@ -2939,9 +3016,7 @@ function toggleSecTypeKey(typ) {
   if (!typ) return;
   if (secTypeFilter[typ]) delete secTypeFilter[typ];
   else secTypeFilter[typ] = true;
-  var btn = document.querySelector('.sec-filter-btn.type[data-filter-type="'+typ+'"]');
-  if (btn) btn.classList.toggle("on", !!secTypeFilter[typ]);
-  else buildSecFilters();
+  buildSecFilters();
   applySecFilters();
   if (sectionsMode === "play") renderPlayBoard();
 }
@@ -2966,6 +3041,7 @@ function clearSecFilters() {
   secPosPFilter = false;
   secPosDFilter = false;
   secExcludeTypes = {};
+  secAlbumFilter = {};
   buildSecFilters();
   applySecFilters();
 }
@@ -4030,71 +4106,66 @@ document.getElementById("btnReorder").onclick = function(){ reorderRevealedTabs(
 document.getElementById("btnClear").onclick = function(){ clearRevealedLicks(); };
 document.getElementById("backSections").onclick = showHome;
 document.getElementById("secFilters").onclick = function(e){
-  var toggle = e.target.closest("#excludeDdToggle");
+  var toggle = e.target.closest("[data-filter-dd-toggle]");
   if (toggle) {
-    var dd = document.getElementById("excludeDd");
+    var id = toggle.getAttribute("data-filter-dd-toggle");
+    var dd = document.getElementById(id);
+    document.querySelectorAll(".filter-dd.open").forEach(function(el){
+      if (el !== dd) el.classList.remove("open");
+    });
     if (dd) dd.classList.toggle("open");
     e.stopPropagation();
     return;
   }
-  var exclBox = e.target.closest("input[data-exclude-type]");
-  if (exclBox) {
-    var xt = exclBox.getAttribute("data-exclude-type");
-    if (exclBox.checked) secExcludeTypes[xt] = true;
-    else delete secExcludeTypes[xt];
-    var exclKeys = Object.keys(secExcludeTypes).filter(function(k){ return secExcludeTypes[k]; });
-    var tg = document.getElementById("excludeDdToggle");
-    if (tg) {
-      tg.textContent = (exclKeys.length ? ("−" + exclKeys.join(",")) : "None") + " ▾";
-      tg.classList.toggle("has-excludes", !!exclKeys.length);
+  var inp = e.target.closest(".filter-dd-item input");
+  if (inp) {
+    var album = inp.getAttribute("data-filter-album");
+    var t = inp.getAttribute("data-filter-type");
+    var xt = inp.getAttribute("data-exclude-type");
+    var r = inp.getAttribute("data-filter-tier");
+    var p = inp.getAttribute("data-filter-pos");
+    var po = inp.getAttribute("data-filter-pos-o");
+    var pp = inp.getAttribute("data-filter-pos-p");
+    var pd = inp.getAttribute("data-filter-pos-d");
+    if (album != null) {
+      if (inp.checked) secAlbumFilter[album] = true;
+      else delete secAlbumFilter[album];
+    } else if (t) {
+      if (inp.checked) secTypeFilter[t] = true;
+      else delete secTypeFilter[t];
+    } else if (xt) {
+      if (inp.checked) secExcludeTypes[xt] = true;
+      else delete secExcludeTypes[xt];
+    } else if (r) {
+      var n = parseInt(r, 10);
+      if (n >= 1 && n <= 5) {
+        if (inp.checked) secTierFilter[n] = true;
+        else delete secTierFilter[n];
+      }
+    } else if (po) {
+      secPosOFilter = !!inp.checked;
+    } else if (pp) {
+      secPosPFilter = !!inp.checked;
+    } else if (pd) {
+      secPosDFilter = !!inp.checked;
+    } else if (p) {
+      var pn = parseInt(p, 10);
+      if (pn >= 1 && pn <= 5) {
+        if (inp.checked) secPosFilter[pn] = true;
+        else delete secPosFilter[pn];
+      }
     }
+    buildSecFilters();
     applySecFilters();
     if (sectionsMode === "play") renderPlayBoard();
     e.stopPropagation();
-    return;
-  }
-  var btn = e.target.closest(".sec-filter-btn");
-  if (btn) {
-    var t = btn.getAttribute("data-filter-type");
-    var r = btn.getAttribute("data-filter-tier");
-    var p = btn.getAttribute("data-filter-pos");
-    var po = btn.getAttribute("data-filter-pos-o");
-    var pp = btn.getAttribute("data-filter-pos-p");
-    var pd = btn.getAttribute("data-filter-pos-d");
-    if (t) {
-      secTypeFilter[t] = !secTypeFilter[t];
-      if (!secTypeFilter[t]) delete secTypeFilter[t];
-    }
-    if (r) {
-      var n = parseInt(r, 10);
-      if (!(n >= 1 && n <= 5)) return;
-      secTierFilter[n] = !secTierFilter[n];
-      if (!secTierFilter[n]) delete secTierFilter[n];
-    }
-    if (po) {
-      secPosOFilter = !secPosOFilter;
-    } else if (pp) {
-      secPosPFilter = !secPosPFilter;
-    } else if (pd) {
-      secPosDFilter = !secPosDFilter;
-    } else if (p) {
-      var pn = parseInt(p, 10);
-      if (!(pn >= 1 && pn <= 5)) return;
-      secPosFilter[pn] = !secPosFilter[pn];
-      if (!secPosFilter[pn]) delete secPosFilter[pn];
-    }
-    btn.classList.toggle("on");
-    applySecFilters();
-    if (sectionsMode === "play") renderPlayBoard();
     return;
   }
   if (e.target.id === "secFilterClear" || e.target.closest("#secFilterClear")) clearSecFilters();
 };
 document.addEventListener("click", function(e){
-  var dd = document.getElementById("excludeDd");
-  if (!dd || !dd.classList.contains("open")) return;
-  if (e.target.closest("#excludeDd")) return;
-  dd.classList.remove("open");
+  if (e.target.closest(".filter-dd")) return;
+  document.querySelectorAll(".filter-dd.open").forEach(function(el){ el.classList.remove("open"); });
 });
 
 document.getElementById("secModes").onclick = function(e){
