@@ -1191,10 +1191,6 @@
     background: #fff;
     color: #111;
     border-radius: 4px 0 0 4px;
-    box-shadow:
-      0 0 4px 1px rgba(163,101,209,.75),
-      0 0 12px 3px rgba(163,101,209,.4),
-      0 0 22px 6px rgba(112,48,160,.25);
   }
   body.sections-mode .col-num {
     color: rgba(232,230,225,.4);
@@ -1231,17 +1227,59 @@
     background: #fff;
     color: #111;
     border-radius: 6px 0 0 6px;
+  }
+  /* Per-album glow: titles + row numbers */
+  body.sections-mode .song-name.np-paranoid,
+  body.sections-mode .row-num.np-paranoid {
     box-shadow:
-      0 0 0 1px rgba(255,255,255,.1),
-      0 0 5px 1px rgba(163,101,209,.8),
+      0 0 5px 1px rgba(220,40,50,.85),
+      0 0 14px 4px rgba(220,40,50,.45),
+      0 0 28px 8px rgba(180,20,30,.28);
+  }
+  body.sections-mode .song-name-wrap.np-paranoid-wrap {
+    filter: drop-shadow(0 0 6px rgba(220,40,50,.4));
+  }
+  body.sections-mode .song-name.np-paranoid::after {
+    background: linear-gradient(90deg, rgba(220,40,50,.45), rgba(220,40,50,0));
+  }
+  body.sections-mode .song-name.np-sbs,
+  body.sections-mode .row-num.np-sbs {
+    box-shadow:
+      0 0 5px 1px rgba(163,101,209,.85),
       0 0 14px 4px rgba(163,101,209,.45),
       0 0 28px 8px rgba(112,48,160,.28);
   }
-  body.sections-mode .song-name-wrap {
-    filter: drop-shadow(0 0 6px rgba(163,101,209,.35));
+  body.sections-mode .song-name-wrap.np-sbs-wrap {
+    filter: drop-shadow(0 0 6px rgba(163,101,209,.4));
   }
-  body.sections-mode .song-name::after {
-    background: linear-gradient(90deg, rgba(112,48,160,.4), rgba(112,48,160,0));
+  body.sections-mode .song-name.np-sbs::after {
+    background: linear-gradient(90deg, rgba(112,48,160,.5), rgba(112,48,160,0));
+  }
+  body.sections-mode .song-name.np-mor,
+  body.sections-mode .row-num.np-mor {
+    box-shadow:
+      0 0 5px 1px rgba(200,160,70,.85),
+      0 0 14px 4px rgba(180,140,50,.45),
+      0 0 28px 8px rgba(140,100,30,.28);
+  }
+  body.sections-mode .song-name-wrap.np-mor-wrap {
+    filter: drop-shadow(0 0 6px rgba(200,160,70,.4));
+  }
+  body.sections-mode .song-name.np-mor::after {
+    background: linear-gradient(90deg, rgba(180,140,50,.5), rgba(180,140,50,0));
+  }
+  body.sections-mode .song-name.np-vol4,
+  body.sections-mode .row-num.np-vol4 {
+    box-shadow:
+      0 0 5px 1px rgba(232,140,20,.9),
+      0 0 14px 4px rgba(232,140,20,.45),
+      0 0 28px 8px rgba(200,100,10,.28);
+  }
+  body.sections-mode .song-name-wrap.np-vol4-wrap {
+    filter: drop-shadow(0 0 6px rgba(232,140,20,.4));
+  }
+  body.sections-mode .song-name.np-vol4::after {
+    background: linear-gradient(90deg, rgba(232,140,20,.55), rgba(232,140,20,0));
   }
   body.sections-mode .sec-chip {
     border-radius: 3px;
@@ -2821,7 +2859,7 @@ function showSections(keepScroll) {
       var chips = chipArr.join("");
       var np = (album.font === 'font-sbs') ? 'np-sbs' : (album.font === 'font-mor') ? 'np-mor' : (album.font === 'font-vol4') ? 'np-vol4' : 'np-paranoid';
       var thumb = album.cover ? '<img class="song-thumb" src="'+album.cover+'" alt="">' : '';
-      return '<div class="song-row" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num">'+rowN+'</div><div class="song-name-wrap '+np+'-wrap">'+thumb+'<div class="song-name '+np+'">'+s.song+'</div></div><div class="song-secs">'+chips+'</div></div>';
+      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div><div class="song-name-wrap '+np+'-wrap">'+thumb+'<div class="song-name '+np+'">'+s.song+'</div></div><div class="song-secs">'+chips+'</div></div>';
     }).join("");
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
