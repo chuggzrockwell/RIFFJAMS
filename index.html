@@ -1703,7 +1703,7 @@
 
 var ALBUMS_DEFAULT = [
   { name: "Paranoid", cover: "covers/paranoid.png", font: "font-paranoid", songs: [
-    { song: "War Pigs", sections: [["I1",2,"WP-I1"],["V1",5,"WP-V1"],["V2",2,"WP-V2"],["V3",2,"WP-V3"],["V4",2,"WP-V4"],["S1",1,"WP-S1"],["O1",2,"WP-O1"],["O2",1,"WP-O2"],["S2",1,"WP-S2"]] },
+    { song: "War Pigs", sections: [["I1",2,"WP-I1",3],["V1",5,"WP-V1"],["V2",2,"WP-V2"],["V3",2,"WP-V3"],["V4",2,"WP-V4"],["S1",1,"WP-S1"],["O1",2,"WP-O1"],["O2",1,"WP-O2"],["S2",1,"WP-S2"]] },
     { song: "Paranoid", sections: [["I1",2,"P-I1"],["V1",4,"P-V1"],["V2",4,"P-V2"],["S1",1]] },
     { song: "Planet Caravan", sections: [["V",5],["S1",1]] },
     { song: "Iron Man", sections: [["V1",1,"IM-V1"],["V2",2,"IM-V2"],["V3",2,"IM-V3"],["V4",2,"IM-V4"],["S1",1,"IM-S1"],["S2",1,"IM-S2"],["O1",1,"IM-O1"]] },
@@ -1993,7 +1993,7 @@ function loadAlbums() {
           }
         }
         if (s.song === "War Pigs") {
-          var links = { "I1": ["I1",2,"WP-I1"], "V1": ["V1",5,"WP-V1"], "V2": ["V2",2,"WP-V2"], "V3": ["V3",2,"WP-V3"], "V4": ["V4",2,"WP-V4"], "S1": ["S1",1,"WP-S1"] , "O1": ["O1",2,"WP-O1"] , "O2": ["O2",1,"WP-O2"] , "S2": ["S2",1,"WP-S2"] };
+          var links = { "I1": ["I1",2,"WP-I1",3], "V1": ["V1",5,"WP-V1"], "V2": ["V2",2,"WP-V2"], "V3": ["V3",2,"WP-V3"], "V4": ["V4",2,"WP-V4"], "S1": ["S1",1,"WP-S1"] , "O1": ["O1",2,"WP-O1"] , "O2": ["O2",1,"WP-O2"] , "S2": ["S2",1,"WP-S2"] };
           if (!s.sections) s.sections = [];
           Object.keys(links).forEach(function(code){
             var want = links[code];
@@ -2001,6 +2001,14 @@ function loadAlbums() {
             s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === code) hit = p; });
             if (hit) {
               if (hit[2] !== want[2]) { hit[1] = want[1]; hit[2] = want[2]; }
+              // War Pigs I1 is position 3 — upgrade chips that still default to pos 1 only
+              if (code === "I1") {
+                var plist = parsePosList(hit[3]);
+                var has3 = plist.some(function(x){ return slotBase(x) === 3; });
+                if (!has3 && plist.length === 1 && slotBase(plist[0]) === 1 && !slotIsO(plist[0]) && !slotIsP(plist[0])) {
+                  hit[3] = 3;
+                }
+              }
             } else if (!s.sections.length) {
               s.sections.push(want.slice());
             }
