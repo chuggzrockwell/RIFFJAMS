@@ -179,15 +179,16 @@
     z-index: 9999;
     display: none;
     pointer-events: none;
-    padding: 0;
+    padding: 18px; /* room so tab glow is not clipped */
     background: transparent;
-    border-radius: 10px;
+    border-radius: 0;
     box-shadow: none;
     box-sizing: border-box;
     overflow: visible;
   }
   #secHighlightTip.open { display: block; }
-  #secHighlightTip img {
+  /* Glow only on the Peek tab image — not on empty/missing text */
+  #secHighlightTip img.peek-tab {
     display: block;
     width: auto;
     height: auto;
@@ -196,7 +197,6 @@
     object-fit: contain;
     background: #fff;
     border-radius: 10px;
-    /* LL-p class-B / Paranoid red pedalboard glow */
     box-shadow:
       0 0 6px 1px rgba(237,28,36,.95),
       0 0 18px 4px rgba(237,28,36,.7),
@@ -207,6 +207,9 @@
     font-size: 0.8rem;
     padding: 8px 10px;
     white-space: nowrap;
+    background: #111;
+    border-radius: 8px;
+    box-shadow: none;
   }
   body.sec-peek-on .sec-chip:not(.empty) { cursor: zoom-in; }
   .sec-edit-tools {
@@ -3401,10 +3404,11 @@ function placeHighlightTip(anchor) {
   var availH = Math.max(120, window.innerHeight - top - pad);
   tip.style.maxWidth = availW + "px";
   tip.style.maxHeight = availH + "px";
-  var img = tip.querySelector("img");
+  var glowPad = 36;
+  var img = tip.querySelector("img.peek-tab");
   if (img) {
-    img.style.maxWidth = Math.max(120, availW - 16) + "px";
-    img.style.maxHeight = Math.max(80, availH - 16) + "px";
+    img.style.maxWidth = Math.max(120, availW - glowPad) + "px";
+    img.style.maxHeight = Math.max(80, availH - glowPad) + "px";
   }
   /* Measure after constraints, then clamp into the dock column */
   var tw = tip.offsetWidth || Math.min(availW, 240);
@@ -3425,7 +3429,7 @@ function showHighlightTip(chip) {
     return;
   }
   var src = lickSrc(lick);
-  tip.innerHTML = '<img alt="" src="'+src+'">';
+  tip.innerHTML = '<img class="peek-tab" alt="" src="'+src+'">';
   var img = tip.querySelector("img");
   if (img) {
     img.onload = function(){ placeHighlightTip(chip); };
