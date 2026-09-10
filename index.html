@@ -1936,6 +1936,20 @@ function loadAlbums() {
             }
           });
         }
+        if (s.song === "Paranoid") {
+          if (!s.sections) s.sections = [];
+          var pV1 = null;
+          s.sections.forEach(function(pair){ if (isChipPair(pair) && pair[0] === "V1") pV1 = pair; });
+          if (pV1) {
+            pV1[1] = 4;
+            pV1[2] = "P-V1";
+          } else if (!s.sections.length) {
+            s.sections.push(["V1",4,"P-V1"]);
+          } else {
+            var hasV1 = s.sections.some(function(pair){ return isChipPair(pair) && pair[0] === "V1"; });
+            if (!hasV1) s.sections.push(["V1",4,"P-V1"]);
+          }
+        }
         if (s.song === "Hand of Doom") {
           if (!s.sections) s.sections = [];
           var hodHit = null;
