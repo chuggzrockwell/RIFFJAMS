@@ -130,11 +130,7 @@
   .sec-filter-group {
     display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
   }
-  .sec-filter-label {
-    font-size: 0.68rem; font-weight: 700; letter-spacing: .12em;
-    text-transform: uppercase; color: rgba(0,0,0,.38);
-    margin-right: 2px;
-  }
+  .sec-filter-label { display: none !important; }
   .sec-filter-btn {
     border: 1px solid rgba(0,0,0,.12);
     background: #fff;
@@ -568,25 +564,48 @@
     display: inline-block;
   }
   .filter-dd-toggle {
-    border: 1px solid rgba(0,0,0,.14);
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border: 1px solid #d0d0d0;
     background: #fff;
-    color: #333;
-    border-radius: 999px;
-    padding: 3px 12px;
-    font-size: 0.72rem;
-    font-weight: 700;
+    color: #222;
+    border-radius: 8px;
+    padding: 7px 12px 7px 14px;
+    font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
     cursor: pointer;
-    min-width: 72px;
-    max-width: 180px;
+    min-width: 118px;
+    max-width: 220px;
+    line-height: 1.2;
+    box-sizing: border-box;
+  }
+  .filter-dd-toggle .filter-dd-text {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     text-align: left;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .filter-dd-toggle .filter-dd-caret {
+    flex: 0 0 auto;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #333;
+    margin-left: 2px;
   }
   .filter-dd-toggle.has-sel {
-    background: #333;
-    color: #fff;
-    border-color: #333;
+    background: #fff;
+    color: #111;
+    border-color: #a365d1;
+  }
+  .filter-dd-toggle.has-sel .filter-dd-caret {
+    border-top-color: #7030a0;
   }
   .filter-dd-menu {
     display: none;
@@ -1131,18 +1150,23 @@
     background: rgba(255,255,255,.04);
     border: 1px solid rgba(255,255,255,.08);
   }
-  body.sections-mode .sec-filter-label { color: rgba(232,230,225,.45); }
-  body.sections-mode .sec-filter-clear { color: rgba(232,230,225,.5); }
+  body.sections-mode .sec-filter-clear { color: rgba(232,230,225,.55); }
   body.sections-mode .sec-filter-clear:hover { color: #c9a0e8; }
   body.sections-mode .filter-dd-toggle {
-    background: #12141a;
-    color: #e8e6e1;
-    border-color: #2c3040;
+    background: #fff;
+    color: #222;
+    border-color: #d0d0d0;
   }
   body.sections-mode .filter-dd-toggle.has-sel {
-    background: #7030a0;
-    border-color: #7030a0;
-    color: #fff;
+    background: #fff;
+    border-color: #a365d1;
+    color: #111;
+  }
+  body.sections-mode .filter-dd-toggle .filter-dd-caret {
+    border-top-color: #333;
+  }
+  body.sections-mode .filter-dd-toggle.has-sel .filter-dd-caret {
+    border-top-color: #7030a0;
   }
   body.sections-mode .filter-dd-menu {
     background: #161920;
@@ -1902,21 +1926,11 @@
       </span>
     </div>
     <div class="sec-filters" id="secFilters" aria-label="Filter song map">
-      <div class="sec-filter-group" id="secAlbumFilters">
-        <span class="sec-filter-label">Album</span>
-      </div>
-      <div class="sec-filter-group" id="secTypeFilters">
-        <span class="sec-filter-label">Type</span>
-      </div>
-      <div class="sec-filter-group" id="secExcludeFilters">
-        <span class="sec-filter-label">Exclude</span>
-      </div>
-      <div class="sec-filter-group" id="secTierFilters">
-        <span class="sec-filter-label">Tier</span>
-      </div>
-      <div class="sec-filter-group" id="secPosFilters">
-        <span class="sec-filter-label">Position</span>
-      </div>
+      <div class="sec-filter-group" id="secAlbumFilters"></div>
+      <div class="sec-filter-group" id="secTypeFilters"></div>
+      <div class="sec-filter-group" id="secExcludeFilters"></div>
+      <div class="sec-filter-group" id="secTierFilters"></div>
+      <div class="sec-filter-group" id="secPosFilters"></div>
       <button type="button" class="sec-filter-clear" id="secFilterClear">Clear</button>
     </div>
     <div class="sheet stage" id="sectionsSheet"></div>
@@ -3054,9 +3068,11 @@ function filterDdLabel(keys, emptyLabel) {
 }
 function buildFilterDd(id, labelEmpty, itemsHtml, selectedKeys) {
   var has = !!(selectedKeys && selectedKeys.length);
+  var text = filterDdLabel(selectedKeys, labelEmpty);
   return '<div class="filter-dd'+(has ? " has" : "")+'" id="'+id+'">'
     + '<button type="button" class="filter-dd-toggle'+(has ? " has-sel" : "")+'" data-filter-dd-toggle="'+id+'">'
-    + filterDdLabel(selectedKeys, labelEmpty) + " ▾</button>"
+    + '<span class="filter-dd-text">'+text+'</span>'
+    + '<span class="filter-dd-caret" aria-hidden="true"></span></button>'
     + '<div class="filter-dd-menu">'+itemsHtml+'</div></div>';
 }
 function buildSecFilters() {
@@ -3080,8 +3096,7 @@ function buildSecFilters() {
       var esc = String(name).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
       return '<label class="filter-dd-item"><input type="checkbox" data-filter-album="'+esc+'"'+checked+'><span>'+esc+'</span></label>';
     }).join("");
-    albumHost.innerHTML = '<span class="sec-filter-label">Album</span>'
-      + buildFilterDd("albumDd", "All", albumItems, albumKeys);
+    albumHost.innerHTML = buildFilterDd("albumDd", "All albums", albumItems, albumKeys);
   }
 
   var typeKeys = Object.keys(secTypeFilter).filter(function(k){ return secTypeFilter[k]; });
@@ -3089,8 +3104,7 @@ function buildSecFilters() {
     var checked = secTypeFilter[tp] ? " checked" : "";
     return '<label class="filter-dd-item"><input type="checkbox" data-filter-type="'+tp+'"'+checked+'><span>'+tp+'</span></label>';
   }).join("");
-  typeHost.innerHTML = '<span class="sec-filter-label">Type</span>'
-    + buildFilterDd("typeDd", "All", typeItems, typeKeys);
+  typeHost.innerHTML = buildFilterDd("typeDd", "All types", typeItems, typeKeys);
 
   if (exclHost) {
     var exclKeys = Object.keys(secExcludeTypes).filter(function(k){ return secExcludeTypes[k]; });
@@ -3098,8 +3112,7 @@ function buildSecFilters() {
       var checked = secExcludeTypes[tp] ? " checked" : "";
       return '<label class="filter-dd-item"><input type="checkbox" data-exclude-type="'+tp+'"'+checked+'><span>'+tp+'</span></label>';
     }).join("");
-    exclHost.innerHTML = '<span class="sec-filter-label">Exclude</span>'
-      + buildFilterDd("excludeDd", "None", exclItems, exclKeys.map(function(k){ return "−"+k; }));
+    exclHost.innerHTML = buildFilterDd("excludeDd", "No excludes", exclItems, exclKeys.map(function(k){ return "−"+k; }));
   }
 
   var tierKeys = [1,2,3,4,5].filter(function(n){ return secTierFilter[n]; }).map(function(n){ return "T"+n; });
@@ -3107,8 +3120,7 @@ function buildSecFilters() {
     var checked = secTierFilter[n] ? " checked" : "";
     return '<label class="filter-dd-item"><input type="checkbox" data-filter-tier="'+n+'"'+checked+'><span>T'+n+'</span></label>';
   }).join("");
-  tierHost.innerHTML = '<span class="sec-filter-label">Tier</span>'
-    + buildFilterDd("tierDd", "All", tierItems, tierKeys);
+  tierHost.innerHTML = buildFilterDd("tierDd", "All tiers", tierItems, tierKeys);
 
   if (posHost) {
     var posKeys = [1,2,3,4,5].filter(function(n){ return secPosFilter[n]; }).map(String);
@@ -3122,8 +3134,7 @@ function buildSecFilters() {
       + '<label class="filter-dd-item"><input type="checkbox" data-filter-pos-o="1"'+(secPosOFilter?" checked":"")+'><span>O · Open</span></label>'
       + '<label class="filter-dd-item"><input type="checkbox" data-filter-pos-p="1"'+(secPosPFilter?" checked":"")+'><span>P · Pedal</span></label>'
       + '<label class="filter-dd-item"><input type="checkbox" data-filter-pos-d="1"'+(secPosDFilter?" checked":"")+'><span>D · Dorian</span></label>';
-    posHost.innerHTML = '<span class="sec-filter-label">Position</span>'
-      + buildFilterDd("posDd", "All", posItems, posKeys);
+    posHost.innerHTML = buildFilterDd("posDd", "Any position", posItems, posKeys);
   }
 
   if (openId) {
