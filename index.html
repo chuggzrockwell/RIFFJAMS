@@ -2051,7 +2051,7 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · 4 Solo · 5 Peek · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · 4 Solo · 5 Peek · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
@@ -3665,6 +3665,32 @@ function smPlayIndex(i, autoplay) {
   if (!smOrder.length) return;
   smIndex = ((i % smOrder.length) + smOrder.length) % smOrder.length;
   smLoadCurrent(autoplay !== false);
+}
+function smSeekBy(deltaSec) {
+  smEnsureApi(function(){
+    if (!smYtPlayer || !smYtPlayer.getCurrentTime) return;
+    var cur = smYtPlayer.getCurrentTime() || 0;
+    var dur = smYtPlayer.getDuration() || 0;
+    var next = Math.max(0, Math.min(dur || 1e9, cur + deltaSec));
+    smYtPlayer.seekTo(next, true);
+    smTick();
+  });
+}
+/* Ctrl+Left: restart if >3s into track; else previous (standard media-player behavior) */
+function smCtrlLeftArrow() {
+  smEnsureApi(function(){
+    if (!smYtPlayer || !smYtPlayer.getCurrentTime) {
+      smPlayIndex(smIndex - 1, true);
+      return;
+    }
+    var cur = smYtPlayer.getCurrentTime() || 0;
+    if (cur > 3) {
+      smYtPlayer.seekTo(0, true);
+      smTick();
+    } else {
+      smPlayIndex(smIndex - 1, true);
+    }
+  });
 }
 function smPlaySongName(name, autoplay) {
   smBuildPlaylist();
@@ -5294,6 +5320,17 @@ document.addEventListener("keydown", function(e){
         toggleSecPosKey(parseInt(posDigit, 10));
         return;
       }
+      /* Player: Ctrl/Cmd + arrows */
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        smPlayIndex(smIndex + 1, true);
+        return;
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        smCtrlLeftArrow();
+        return;
+      }
     }
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -5320,6 +5357,11 @@ document.addEventListener("keydown", function(e){
   if (document.body.classList.contains("sections-mode")) {
     var tag = (e.target && e.target.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA") return;
+    if (e.shiftKey && !e.altKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+      e.preventDefault();
+      smSeekBy(e.key === "ArrowLeft" ? -5 : 5);
+      return;
+    }
     if (isNumpadKey(e, "1")) { setSectionsMode("view"); return; }
     if (isNumpadKey(e, "2")) { setSectionsMode("edit"); return; }
     if (isNumpadKey(e, "3")) { setSectionsMode("play"); return; }
