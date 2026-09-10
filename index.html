@@ -1125,12 +1125,13 @@
   .lightbox img { max-width: 98vw; max-height: 94vh; background: #fff; border-radius: 4px; image-rendering: crisp-edges; }
 
   #sectionsSheet {
-    background: #fff !important;
-    border: 1px solid rgba(0,0,0,.12) !important;
+    background: linear-gradient(160deg, #1a1d26 0%, #12141a 40%, #0e1016 100%) !important;
+    border: 1px solid #2c3040 !important;
     border-radius: 14px !important;
     box-shadow:
-      0 1px 2px rgba(0,0,0,.06),
-      0 12px 32px rgba(0,0,0,.18) !important;
+      inset 0 1px 0 rgba(255,255,255,.06),
+      inset 0 -40px 80px rgba(0,0,0,.35),
+      0 16px 48px rgba(0,0,0,.55) !important;
     padding: 12px 10px 14px !important;
   }
   /* Song Map — LL-p / pedalboard coloring */
@@ -1188,12 +1189,12 @@
     color: #fff;
   }
   body.sections-mode .sec-save-status { color: rgba(232,230,225,.45); }
-  body.sections-mode .sec-head-label { color: rgba(0,0,0,.38); }
+  body.sections-mode .sec-head-label { color: rgba(232,230,225,.4); }
   body.sections-mode .row-num {
     background: transparent;
     border: 0;
     border-radius: 0;
-    color: #333;
+    color: #fff;
     height: calc(var(--chip-h) - 4px);
     min-height: calc(var(--chip-h) - 4px);
     max-height: calc(var(--chip-h) - 4px);
@@ -1211,7 +1212,7 @@
     box-shadow: none;
   }
   body.sections-mode .col-num {
-    color: rgba(0,0,0,.35);
+    color: rgba(232,230,225,.4);
     background: transparent;
     border-color: transparent;
   }
@@ -1226,7 +1227,7 @@
     border-color: #4a4e5a;
   }
   body.sections-mode .album-songs { gap: 0; }
-  body.sections-mode .song-row:hover { background: rgba(112,48,160,.06); }
+  body.sections-mode .song-row:hover { background: rgba(163,101,209,.08); }
   body.sections-mode .song-name-wrap,
   body.sections-mode .song-name-wrap.np-paranoid-wrap,
   body.sections-mode .song-name-wrap.np-sbs-wrap,
@@ -1359,11 +1360,8 @@
   body.sections-mode .sec-chip.filtered-out.L,
   body.sections-mode .sec-chip.S.filtered-out,
   body.sections-mode .sec-chip.L.filtered-out {
-    background: #111 !important;
-    color: transparent !important;
-    box-shadow:
-      inset -1px 0 0 rgba(255,255,255,.08),
-      inset 0 -1px 0 rgba(255,255,255,.08) !important;
+    background: rgba(255,255,255,.03) !important;
+    box-shadow: inset -1px 0 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(255,255,255,.06) !important;
     text-shadow: none !important;
   }
 
