@@ -1188,19 +1188,25 @@
   body.sections-mode .sec-save-status { color: rgba(232,230,225,.45); }
   body.sections-mode .sec-head-label { color: rgba(232,230,225,.4); }
   body.sections-mode .row-num {
-    background: #fff;
-    color: #111;
-    border-radius: 4px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    color: #fff;
     height: calc(var(--chip-h) - 4px);
     min-height: calc(var(--chip-h) - 4px);
     max-height: calc(var(--chip-h) - 4px);
-    width: calc(var(--row-g) - 4px);
-    min-width: calc(var(--row-g) - 4px);
-    max-width: calc(var(--row-g) - 4px);
-    flex: 0 0 calc(var(--row-g) - 4px);
+    width: var(--row-g);
+    min-width: var(--row-g);
+    max-width: var(--row-g);
+    flex: 0 0 var(--row-g);
     align-self: center;
-    margin-right: 2px;
-    font-size: 0.58rem;
+    margin-right: 0;
+    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: .04em;
+    line-height: 1;
+    box-shadow: none;
   }
   body.sections-mode .col-num {
     color: rgba(232,230,225,.4);
@@ -1268,14 +1274,20 @@
     max-height: 100%;
     line-height: calc(var(--chip-h) - 4px);
   }
-  /* Per-album glow: titles / numbers / nameplates (art glow separate below) */
+  /* Per-album glow: titles / nameplates (numbers use text-shadow; art separate) */
   body.sections-mode .song-name.np-paranoid,
-  body.sections-mode .row-num.np-paranoid,
   body.sections-mode .song-name-wrap.np-paranoid-wrap {
     box-shadow:
       0 0 4px 1px rgba(220,40,50,.9),
       0 0 10px 3px rgba(220,40,50,.45),
       0 0 18px 5px rgba(180,20,30,.28);
+  }
+  body.sections-mode .row-num.np-paranoid {
+    color: #fff;
+    text-shadow:
+      0 0 4px rgba(237,28,36,.95),
+      0 0 10px rgba(237,28,36,.7),
+      0 0 18px rgba(237,28,36,.45);
   }
   body.sections-mode .song-thumb.np-paranoid {
     box-shadow:
@@ -1287,12 +1299,18 @@
     background: linear-gradient(90deg, rgba(220,40,50,.45), rgba(220,40,50,0));
   }
   body.sections-mode .song-name.np-sbs,
-  body.sections-mode .row-num.np-sbs,
   body.sections-mode .song-name-wrap.np-sbs-wrap {
     box-shadow:
       0 0 4px 1px rgba(163,101,209,.9),
       0 0 10px 3px rgba(163,101,209,.45),
       0 0 18px 5px rgba(112,48,160,.28);
+  }
+  body.sections-mode .row-num.np-sbs {
+    color: #fff;
+    text-shadow:
+      0 0 4px rgba(163,73,164,.95),
+      0 0 10px rgba(163,73,164,.7),
+      0 0 18px rgba(163,73,164,.45);
   }
   body.sections-mode .song-thumb.np-sbs {
     box-shadow:
@@ -1304,12 +1322,18 @@
     background: linear-gradient(90deg, rgba(112,48,160,.5), rgba(112,48,160,0));
   }
   body.sections-mode .song-name.np-mor,
-  body.sections-mode .row-num.np-mor,
   body.sections-mode .song-name-wrap.np-mor-wrap {
     box-shadow:
       0 0 4px 1px rgba(200,160,70,.9),
       0 0 10px 3px rgba(180,140,50,.45),
       0 0 18px 5px rgba(140,100,30,.28);
+  }
+  body.sections-mode .row-num.np-mor {
+    color: #fff;
+    text-shadow:
+      0 0 4px rgba(200,160,70,.95),
+      0 0 10px rgba(180,140,50,.7),
+      0 0 18px rgba(180,140,50,.45);
   }
   body.sections-mode .song-thumb.np-mor {
     box-shadow:
@@ -1321,12 +1345,18 @@
     background: linear-gradient(90deg, rgba(180,140,50,.5), rgba(180,140,50,0));
   }
   body.sections-mode .song-name.np-vol4,
-  body.sections-mode .row-num.np-vol4,
   body.sections-mode .song-name-wrap.np-vol4-wrap {
     box-shadow:
       0 0 4px 1px rgba(232,140,20,.95),
       0 0 10px 3px rgba(232,140,20,.45),
       0 0 18px 5px rgba(200,100,10,.28);
+  }
+  body.sections-mode .row-num.np-vol4 {
+    color: #fff;
+    text-shadow:
+      0 0 4px rgba(255,140,40,.95),
+      0 0 10px rgba(255,140,40,.7),
+      0 0 18px rgba(255,140,40,.45);
   }
   body.sections-mode .song-thumb.np-vol4 {
     box-shadow:
