@@ -696,6 +696,12 @@
   .chip-editor .tier-pick.t4 { background: #d4bbe3; color: #1a1020; }
   .chip-editor .tier-pick.t5 { background: #f3edf7; color: #1a1020; }
   .chip-editor .tier-pick.on { outline: 2px solid #111; outline-offset: 1px; }
+  .chip-editor .pos-pick {
+    width: 32px; height: 32px; border-radius: 6px; border: 1px solid #ccc;
+    background: #f5f5f5; color: #333; font-weight: 700; cursor: pointer;
+  }
+  .chip-editor .pos-pick.on { outline: 2px solid #111; outline-offset: 1px; background: #333; color: #fff; border-color: #333; }
+  .sec-filter-btn.pos.on { background: #333; border-color: #333; color: #fff; }
   .chip-editor .editor-actions { display: flex; gap: 8px; align-items: center; }
   .chip-editor .editor-actions button {
     border: 0; border-radius: 8px; padding: 7px 12px;
@@ -1583,6 +1589,9 @@
       <div class="sec-filter-group" id="secTierFilters">
         <span class="sec-filter-label">Tier</span>
       </div>
+      <div class="sec-filter-group" id="secPosFilters">
+        <span class="sec-filter-label">Pos</span>
+      </div>
       <button type="button" class="sec-filter-clear" id="secFilterClear">Clear</button>
     </div>
     <div class="sheet stage" id="sectionsSheet"></div>
@@ -1599,6 +1608,14 @@
       <button type="button" class="tier-pick t3" data-tier="3">3</button>
       <button type="button" class="tier-pick t4" data-tier="4">4</button>
       <button type="button" class="tier-pick t5" data-tier="5">5</button>
+    </div>
+    <label>Position</label>
+    <div class="tier-row" id="chipEditPos">
+      <button type="button" class="pos-pick" data-pos="1">1</button>
+      <button type="button" class="pos-pick" data-pos="2">2</button>
+      <button type="button" class="pos-pick" data-pos="3">3</button>
+      <button type="button" class="pos-pick" data-pos="4">4</button>
+      <button type="button" class="pos-pick" data-pos="5">5</button>
     </div>
     <div class="editor-actions">
       <button type="button" class="btn-save" id="chipEditSave">Save</button>
@@ -2166,6 +2183,18 @@ var SONG_SLOTS = 10;
 function isChipPair(pair) {
   return !!(pair && pair[0]);
 }
+function chipPosition(pair) {
+  var p = parseInt(pair && pair[3], 10);
+  return (p >= 1 && p <= 5) ? p : 1;
+}
+function makeChipEntry(code, tier, lick, pos) {
+  pos = parseInt(pos, 10);
+  if (!(pos >= 1 && pos <= 5)) pos = 1;
+  lick = lick || "";
+  if (pos === 1 && !lick) return [code, tier];
+  if (pos === 1) return [code, tier, lick];
+  return [code, tier, lick, pos];
+}
 function countSongChips(song) {
   var n = 0;
   (song.sections || []).forEach(function(pair){ if (isChipPair(pair)) n++; });
@@ -2326,11 +2355,11 @@ function showSections(keepScroll) {
             var gEmpty = (hasSoloGroup && (ci + 1) >= groupStart) ? " col-group-member" : "";
             chipArr.push('<button type="button" class="sec-chip empty'+gEmpty+'" data-solo="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty solo slot"></button>');
           } else {
-            var lcode = lp[0], ltier = lp[1], llick = lp[2] || lp[0] || "";
+            var lcode = lp[0], ltier = lp[1], llick = lp[2] || lp[0] || "", lpos = chipPosition(lp);
             var ltyp = "S";
             n++;
             var gMem = (hasSoloGroup && (ci + 1) >= groupStart) ? " col-group-member" : "";
-            chipArr.push('<button type="button" class="sec-chip '+ltyp+' tier-'+ltier+gMem+'" data-solo="1" data-song="'+s.song+'" data-sec="'+lcode+'" data-type="'+ltyp+'" data-tier="'+ltier+'" data-lick="'+llick+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+lcode+'</button>');
+            chipArr.push('<button type="button" class="sec-chip '+ltyp+' tier-'+ltier+gMem+'" data-solo="1" data-song="'+s.song+'" data-sec="'+lcode+'" data-type="'+ltyp+'" data-tier="'+ltier+'" data-lick="'+llick+'" data-position="'+lpos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+lcode+'</button>');
           }
         }
       } else {
@@ -2341,9 +2370,9 @@ function showSections(keepScroll) {
           if (!isChipPair(pair)) {
             chipArr.push('<button type="button" class="sec-chip empty" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Add section"></button>');
           } else {
-            var code = pair[0], tier = pair[1], lick = pair[2] || "";
+            var code = pair[0], tier = pair[1], lick = pair[2] || "", pos = chipPosition(pair);
             var typ = secType(code);
-            chipArr.push('<button type="button" class="sec-chip '+typ+' tier-'+tier+'" data-song="'+s.song+'" data-sec="'+code+'" data-type="'+typ+'" data-tier="'+tier+'" data-lick="'+lick+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+code+'</button>');
+            chipArr.push('<button type="button" class="sec-chip '+typ+' tier-'+tier+'" data-song="'+s.song+'" data-sec="'+code+'" data-type="'+typ+'" data-tier="'+tier+'" data-lick="'+lick+'" data-position="'+pos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+code+'</button>');
           }
         }
       }
@@ -2384,6 +2413,7 @@ function showSections(keepScroll) {
 
 var secTypeFilter = {};
 var secTierFilter = {};
+var secPosFilter = {};
 var secExcludeTypes = {};
 var playQueue = [];
 var PLAY_QUEUE_KEY = "lick-play-queue";
@@ -2493,6 +2523,7 @@ function buildSecFilters() {
   var typeHost = document.getElementById("secTypeFilters");
   var exclHost = document.getElementById("secExcludeFilters");
   var tierHost = document.getElementById("secTierFilters");
+  var posHost = document.getElementById("secPosFilters");
   if (!typeHost || !tierHost) return;
   var types = collectSecTypes();
   typeHost.innerHTML = '<span class="sec-filter-label">Type</span>' + types.map(function(t){
@@ -2516,21 +2547,32 @@ function buildSecFilters() {
     var on = secTierFilter[t] ? ' on' : '';
     return '<button type="button" class="sec-filter-btn tier t'+t+on+'" data-filter-tier="'+t+'">T'+t+'</button>';
   }).join("");
+  if (posHost) {
+    posHost.innerHTML = '<span class="sec-filter-label">Pos</span>' + [1,2,3,4,5].map(function(t){
+      var on = secPosFilter[t] ? ' on' : '';
+      return '<button type="button" class="sec-filter-btn pos'+on+'" data-filter-pos="'+t+'">'+t+'</button>';
+    }).join("");
+  }
 }
 function secFiltersActive() {
   var t = Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; });
   var r = Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; });
+  var p = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; });
   var x = Object.keys(secExcludeTypes).some(function(k){ return secExcludeTypes[k]; });
-  return t || r || x;
+  return t || r || p || x;
 }
 function chipMatchesFilter(chip) {
   var typ = chip.getAttribute("data-type") || "";
   var tier = parseInt(chip.getAttribute("data-tier") || "0", 10);
+  var pos = parseInt(chip.getAttribute("data-position") || "1", 10);
+  if (!(pos >= 1 && pos <= 5)) pos = 1;
   if (secExcludeTypes[typ]) return false;
   var typeOn = Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; });
   var tierOn = Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; });
+  var posOn = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; });
   if (typeOn && !secTypeFilter[typ]) return false;
   if (tierOn && !secTierFilter[tier]) return false;
+  if (posOn && !secPosFilter[pos]) return false;
   return true;
 }
 function applySecFilters() {
@@ -2626,6 +2668,7 @@ function normalizeChipCodes(albums) {
 function clearSecFilters() {
   secTypeFilter = {};
   secTierFilter = {};
+  secPosFilter = {};
   secExcludeTypes = {};
   buildSecFilters();
   applySecFilters();
@@ -3016,13 +3059,18 @@ function openChipEditor(anchor, state) {
   document.querySelectorAll("#chipEditTiers .tier-pick").forEach(function(b){
     b.classList.toggle("on", parseInt(b.getAttribute("data-tier"),10) === state.tier);
   });
+  var pos = parseInt(state.position, 10);
+  if (!(pos >= 1 && pos <= 5)) pos = 1;
+  document.querySelectorAll("#chipEditPos .pos-pick").forEach(function(b){
+    b.classList.toggle("on", parseInt(b.getAttribute("data-pos"),10) === pos);
+  });
   document.getElementById("chipEditDelete").style.display = state.isNew ? "none" : "";
   ed.classList.add("open");
   ed.setAttribute("aria-hidden", "false");
   var r = anchor.getBoundingClientRect();
   var left = Math.min(window.innerWidth - 240, Math.max(8, r.left));
   var top = r.bottom + 8;
-  if (top + 200 > window.innerHeight) top = Math.max(8, r.top - 200);
+  if (top + 260 > window.innerHeight) top = Math.max(8, r.top - 260);
   ed.style.left = left + "px";
   ed.style.top = top + "px";
   idInput.focus();
@@ -3041,7 +3089,10 @@ function saveChipEditor() {
   if (!song) return;
   var lick = (document.getElementById("chipEditLick").value || "").trim();
   if (soloMode && !lick) lick = code;
-  var entry = lick ? [code, tier, lick] : [code, tier];
+  var posBtn = document.querySelector("#chipEditPos .pos-pick.on");
+  var pos = posBtn ? parseInt(posBtn.getAttribute("data-pos"),10) : (chipEditState.position || 1);
+  if (!(pos >= 1 && pos <= 5)) pos = 1;
+  var entry = makeChipEntry(code, tier, lick, pos);
   if (soloMode) {
     pushSoloHistory();
     ensureSoloSlots(song);
@@ -3060,6 +3111,7 @@ function saveChipEditor() {
   var typ = soloMode ? "S" : secType(code);
   if (Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; })) secTypeFilter[typ] = true;
   if (Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; })) secTierFilter[tier] = true;
+  if (Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; })) secPosFilter[pos] = true;
   closeChipEditor();
   showSections();
 }
@@ -3108,7 +3160,9 @@ function copyFromChipEditor() {
     var tierBtn = document.querySelector("#chipEditTiers .tier-pick.on");
     var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : (chipEditState.tier || 3);
     var lick = (document.getElementById("chipEditLick").value || "").trim();
-    sectionClipboard = lick ? [code, tier, lick] : [code, tier];
+    var posBtn = document.querySelector("#chipEditPos .pos-pick.on");
+    var pos = posBtn ? parseInt(posBtn.getAttribute("data-pos"),10) : (chipEditState.position || 1);
+    sectionClipboard = makeChipEntry(code, tier, lick, pos);
     return true;
   }
   return copySongSectionAt(chipEditState.ai, chipEditState.si, chipEditState.ci);
@@ -3619,6 +3673,7 @@ document.getElementById("secFilters").onclick = function(e){
   if (btn) {
     var t = btn.getAttribute("data-filter-type");
     var r = btn.getAttribute("data-filter-tier");
+    var p = btn.getAttribute("data-filter-pos");
     if (t) {
       secTypeFilter[t] = !secTypeFilter[t];
       if (!secTypeFilter[t]) delete secTypeFilter[t];
@@ -3627,6 +3682,11 @@ document.getElementById("secFilters").onclick = function(e){
       var n = parseInt(r, 10);
       secTierFilter[n] = !secTierFilter[n];
       if (!secTierFilter[n]) delete secTierFilter[n];
+    }
+    if (p) {
+      var pn = parseInt(p, 10);
+      secPosFilter[pn] = !secPosFilter[pn];
+      if (!secPosFilter[pn]) delete secPosFilter[pn];
     }
     btn.classList.toggle("on");
     applySecFilters();
@@ -3666,6 +3726,12 @@ document.getElementById("chipEditTiers").onclick = function(e){
   var b = e.target.closest(".tier-pick");
   if (!b) return;
   document.querySelectorAll("#chipEditTiers .tier-pick").forEach(function(x){ x.classList.remove("on"); });
+  b.classList.add("on");
+};
+document.getElementById("chipEditPos").onclick = function(e){
+  var b = e.target.closest(".pos-pick");
+  if (!b) return;
+  document.querySelectorAll("#chipEditPos .pos-pick").forEach(function(x){ x.classList.remove("on"); });
   b.classList.add("on");
 };
 document.getElementById("chipEditId").addEventListener("keydown", function(e){
@@ -3889,14 +3955,15 @@ document.getElementById("sectionsSheet").onclick = function(e){
       if (soloMode) {
         if (ci >= song.licks.length) return;
       } else if (countSongChips(song) >= SONG_SLOTS) return;
-      openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "" });
+      openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "", position: 1 });
       return;
     }
     openChipEditor(chip, {
       ai: ai, si: si, ci: ci, isNew: false,
       code: chip.getAttribute("data-sec") || "",
       tier: parseInt(chip.getAttribute("data-tier"),10) || 3,
-      lick: chip.getAttribute("data-lick") || ""
+      lick: chip.getAttribute("data-lick") || "",
+      position: parseInt(chip.getAttribute("data-position"),10) || 1
     });
     return;
   }
