@@ -1367,6 +1367,12 @@
     border-color: #4a4e5a;
   }
   body.sections-mode .album-songs { gap: 0; }
+  body.sections-mode .song-row .row-num,
+  body.sections-mode .song-row .song-thumb,
+  body.sections-mode .song-row .song-name-wrap,
+  body.sections-mode .song-row .song-name {
+    cursor: pointer;
+  }
   body.sections-mode .song-row:hover { background: rgba(163,101,209,.08); }
   body.sections-mode .song-name-wrap,
   body.sections-mode .song-name-wrap.np-paranoid-wrap,
@@ -5098,14 +5104,15 @@ document.getElementById("sectionsSheet").addEventListener("scroll", hideHighligh
 window.addEventListener("scroll", function(){ if (highlightMode) hideHighlightTip(); }, true);
 
 document.getElementById("sectionsSheet").onclick = function(e){
-  var nameEl = e.target.closest(".song-name, .song-name-wrap, .song-row");
-  if (nameEl && !e.target.closest(".sec-chip") && document.body.classList.contains("sections-mode")) {
-    var row = e.target.closest(".song-row");
+  /* Nameplate / album art / row # → play that song */
+  var playHit = e.target.closest(".song-name, .song-name-wrap, .song-thumb, .row-num");
+  if (playHit && !e.target.closest(".sec-chip") && document.body.classList.contains("sections-mode")) {
+    var row = playHit.closest(".song-row");
     if (row) {
       var titleEl = row.querySelector(".song-name");
       var title = titleEl ? (titleEl.textContent || "").trim() : "";
-      if (title) { smPlaySongName(title, true); /* don't return — chips may also be clicked */ }
-      if (e.target.closest(".song-name, .song-name-wrap, .song-thumb, .row-num")) return;
+      if (title) smPlaySongName(title, true);
+      return;
     }
   }
   var playCard = e.target.closest(".sec-play-card");
