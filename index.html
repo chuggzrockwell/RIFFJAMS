@@ -1236,15 +1236,19 @@
     background: #333 !important;
     border-radius: 8px !important;
     overflow: hidden;
-    height: calc(var(--chip-h) - 4px);
-    max-height: calc(var(--chip-h) - 4px);
+    /* Shorter than chip row + side gaps so all 4 rounded corners stay clear of chips */
+    height: calc(var(--chip-h) - 6px);
+    max-height: calc(var(--chip-h) - 6px);
     align-self: center;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     width: auto;
     min-width: 0;
-    max-width: calc(var(--name-w) - (var(--chip-h) - 4px) - 6px);
+    max-width: calc(var(--name-w) - (var(--chip-h) - 4px) - 14px);
+    margin: 0 8px 0 2px;
     box-shadow: none;
     border: 0;
+    position: relative;
+    z-index: 2;
   }
   body.sections-mode .song-thumb {
     flex: 0 0 calc(var(--chip-h) - 4px);
@@ -1277,12 +1281,17 @@
     border-radius: 8px !important;
     height: 100%;
     max-height: 100%;
-    line-height: calc(var(--chip-h) - 4px);
+    line-height: calc(var(--chip-h) - 6px);
     padding: 0 10px 0 8px;
     box-shadow: none !important;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  body.sections-mode .song-secs {
+    position: relative;
+    z-index: 1;
+    margin-left: 0;
   }
   body.sections-mode .song-name::after,
   body.sections-mode .song-name.np-paranoid::after,
