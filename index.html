@@ -723,14 +723,18 @@
   .chip-editor .tier-pick.t4 { background: #d4bbe3; color: #1a1020; }
   .chip-editor .tier-pick.t5 { background: #f3edf7; color: #1a1020; }
   .chip-editor .tier-pick.on { outline: 2px solid #111; outline-offset: 1px; }
-  .chip-editor .o-pick, .chip-editor .p-pick {
-    width: 32px; height: 32px; border-radius: 6px; border: 2px solid #7030a0;
-    background: #fff; color: #7030a0; font-weight: 800; cursor: pointer; margin-left: 4px;
+  .chip-editor .type-row {
+    display: flex; align-items: center; gap: 8px; margin: 0 0 10px;
   }
-  .chip-editor .p-pick { border-color: #a365d1; color: #a365d1; }
-  .chip-editor .o-pick.on { background: #7030a0; color: #fff; outline: 2px solid #111; outline-offset: 1px; }
-  .chip-editor .p-pick.on { background: #a365d1; color: #fff; outline: 2px solid #111; outline-offset: 1px; }
-  .sec-filter-btn.pos.o-pos, .sec-filter-btn.pos.p-pos {
+  .chip-editor .type-row label {
+    margin: 0; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.04em; opacity: 0.75;
+  }
+  .chip-editor #chipEditType {
+    flex: 1; height: 32px; border-radius: 6px; border: 1px solid #ccc;
+    padding: 0 8px; font-weight: 700; background: #fff; cursor: pointer;
+  }
+  .sec-filter-btn.pos.o-pos, .sec-filter-btn.pos.p-pos, .sec-filter-btn.pos.d-pos {
     font-weight: 800;
     min-width: 28px;
   }
@@ -738,6 +742,9 @@
     background: #7030a0; border-color: #7030a0; color: #fff;
   }
   .sec-filter-btn.pos.p-pos.on {
+    background: #a365d1; border-color: #a365d1; color: #fff;
+  }
+  .sec-filter-btn.pos.d-pos.on {
     background: #2a6f97; border-color: #2a6f97; color: #fff;
   }
   .chip-editor .pos-pick {
@@ -1667,8 +1674,15 @@
       <button type="button" class="pos-pick" data-pos="3">3</button>
       <button type="button" class="pos-pick" data-pos="4">4</button>
       <button type="button" class="pos-pick" data-pos="5">5</button>
-      <button type="button" class="o-pick" id="chipEditPosO" title="Position O set (1O–5O)" aria-label="O position set">O</button>
-      <button type="button" class="p-pick" id="chipEditPosP" title="Position P set (1P–5P)" aria-label="P position set">P</button>
+    </div>
+    <div class="type-row">
+      <label for="chipEditType">Type</label>
+      <select id="chipEditType" aria-label="Position type">
+        <option value="">—</option>
+        <option value="O">O</option>
+        <option value="P">P</option>
+        <option value="D">D (Dorian)</option>
+      </select>
     </div>
     <div class="editor-actions">
       <button type="button" class="btn-save" id="chipEditSave">Save</button>
@@ -2005,7 +2019,7 @@ function loadAlbums() {
               if (code === "I1") {
                 var plist = parsePosList(hit[3]);
                 var has3 = plist.some(function(x){ return slotBase(x) === 3; });
-                if (!has3 && plist.length === 1 && slotBase(plist[0]) === 1 && !slotIsO(plist[0]) && !slotIsP(plist[0])) {
+                if (!has3 && plist.length === 1 && slotBase(plist[0]) === 1 && !slotIsO(plist[0]) && !slotIsP(plist[0]) && !slotIsD(plist[0])) {
                   hit[3] = 3;
                 }
               }
@@ -2247,7 +2261,7 @@ function isChipPair(pair) {
 function normalizeSlot(v, fallback) {
   if (v == null || v === "") return fallback;
   var s = String(v).toUpperCase();
-  var m = s.match(/^([1-5])([OP])?$/);
+  var m = s.match(/^([1-5])([OPD])?$/);
   if (!m) return fallback;
   return m[2] ? (m[1] + m[2]) : parseInt(m[1], 10);
 }
@@ -2260,9 +2274,13 @@ function slotIsO(v) {
 function slotIsP(v) {
   return /P$/i.test(String(normalizeSlot(v, 1)));
 }
+function slotIsD(v) {
+  return /D$/i.test(String(normalizeSlot(v, 1)));
+}
 function slotMod(v) {
   if (slotIsO(v)) return "O";
   if (slotIsP(v)) return "P";
+  if (slotIsD(v)) return "D";
   return "";
 }
 function slotCss(prefix, v) {
@@ -2539,6 +2557,7 @@ var secTierFilter = {};
 var secPosFilter = {};
 var secPosOFilter = false;
 var secPosPFilter = false;
+var secPosDFilter = false;
 var secExcludeTypes = {};
 var playQueue = [];
 var PLAY_QUEUE_KEY = "lick-play-queue";
@@ -2678,13 +2697,14 @@ function buildSecFilters() {
       return '<button type="button" class="sec-filter-btn pos'+on+'" data-filter-pos="'+n+'">'+n+'</button>';
     }).join("")
       + '<button type="button" class="sec-filter-btn pos o-pos'+(secPosOFilter ? ' on' : '')+'" data-filter-pos-o="1" title="O positions">O</button>'
-      + '<button type="button" class="sec-filter-btn pos p-pos'+(secPosPFilter ? ' on' : '')+'" data-filter-pos-p="1" title="P positions">P</button>';
+      + '<button type="button" class="sec-filter-btn pos p-pos'+(secPosPFilter ? ' on' : '')+'" data-filter-pos-p="1" title="P positions">P</button>'
+      + '<button type="button" class="sec-filter-btn pos d-pos'+(secPosDFilter ? ' on' : '')+'" data-filter-pos-d="1" title="Dorian positions">D</button>';
   }
 }
 function secFiltersActive() {
   var t = Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; });
   var r = Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; });
-  var p = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter || secPosPFilter;
+  var p = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter || secPosPFilter || secPosDFilter;
   var x = Object.keys(secExcludeTypes).some(function(k){ return secExcludeTypes[k]; });
   return t || r || p || x;
 }
@@ -2693,19 +2713,18 @@ function chipMatchesPosFilter(pos) {
   var posOn = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; });
   var oOn = !!secPosOFilter;
   var pOn = !!secPosPFilter;
+  var dOn = !!secPosDFilter;
+  var typeOn = oOn || pOn || dOn;
   var isO = slotIsO(pos);
   var isP = slotIsP(pos);
+  var isD = slotIsD(pos);
   var base = slotBase(pos);
   var baseOn = !!(secPosFilter[base] || secPosFilter[String(base)]);
-  var plain = !isO && !isP;
-  if (!posOn && !oOn && !pOn) return true;
-  if (!posOn && oOn && !pOn) return isO;
-  if (!posOn && !oOn && pOn) return isP;
-  if (!posOn && oOn && pOn) return isO || isP;
-  if (posOn && oOn && !pOn) return isO && baseOn;
-  if (posOn && !oOn && pOn) return isP && baseOn;
-  if (posOn && oOn && pOn) return (isO || isP) && baseOn;
-  // numbers only: any variant of that base (plain, O, or P)
+  var typeMatch = (oOn && isO) || (pOn && isP) || (dOn && isD);
+  if (!posOn && !typeOn) return true;
+  if (!posOn && typeOn) return typeMatch;
+  if (posOn && typeOn) return typeMatch && baseOn;
+  // numbers only: any variant of that base (plain, O, P, or D)
   return baseOn;
 }
 function chipMatchesFilter(chip) {
@@ -2717,7 +2736,7 @@ function chipMatchesFilter(chip) {
   var tierOn = Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; });
   if (typeOn && !secTypeFilter[typ]) return false;
   if (tierOn && !secTierFilter[tier]) return false;
-  var posFilterActive = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter || secPosPFilter;
+  var posFilterActive = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter || secPosPFilter || secPosDFilter;
   if (posFilterActive) {
     // No positions → never matches an active position filter
     if (!positions.some(function(pos){ return chipMatchesPosFilter(pos); })) return false;
@@ -2831,6 +2850,7 @@ function clearSecFilters() {
   secPosFilter = {};
   secPosOFilter = false;
   secPosPFilter = false;
+  secPosDFilter = false;
   secExcludeTypes = {};
   buildSecFilters();
   applySecFilters();
@@ -3284,20 +3304,21 @@ function openChipEditor(anchor, state) {
   });
   var posList = parsePosList(state.positions != null ? state.positions : state.position);
   var baseSet = {};
-  var anyO = false, anyP = false, allO = true, allP = true;
+  var typeVal = "";
+  var typeConflict = false;
   posList.forEach(function(pos){
     baseSet[slotBase(pos)] = true;
-    if (slotIsO(pos)) anyO = true; else allO = false;
-    if (slotIsP(pos)) anyP = true; else allP = false;
+    var m = slotMod(pos);
+    if (!typeVal) typeVal = m;
+    else if (m !== typeVal) typeConflict = true;
   });
+  if (typeConflict) typeVal = "";
   document.querySelectorAll("#chipEditPos .pos-pick").forEach(function(b){
     var n = parseInt(b.getAttribute("data-pos"),10);
     b.classList.toggle("on", !!baseSet[n]);
   });
-  var posO = document.getElementById("chipEditPosO");
-  if (posO) posO.classList.toggle("on", anyO && !anyP);
-  var posP = document.getElementById("chipEditPosP");
-  if (posP) posP.classList.toggle("on", anyP && !anyO);
+  var typeSel = document.getElementById("chipEditType");
+  if (typeSel) typeSel.value = typeVal;
   document.getElementById("chipEditDelete").style.display = state.isNew ? "none" : "";
   ed.classList.add("open");
   ed.setAttribute("aria-hidden", "false");
@@ -3309,6 +3330,16 @@ function openChipEditor(anchor, state) {
   ed.style.top = top + "px";
   idInput.focus();
   idInput.select();
+}
+function readChipEditPosList() {
+  var posBases = [];
+  document.querySelectorAll("#chipEditPos .pos-pick.on").forEach(function(b){
+    var n = parseInt(b.getAttribute("data-pos"),10);
+    if (n >= 1 && n <= 5) posBases.push(n);
+  });
+  var typeSel = document.getElementById("chipEditType");
+  var posSuf = (typeSel && /^(O|P|D)$/.test(typeSel.value)) ? typeSel.value : "";
+  return posBases.map(function(n){ return normalizeSlot(n + posSuf, 1); });
 }
 function saveChipEditor() {
   if (!chipEditState) return;
@@ -3323,15 +3354,7 @@ function saveChipEditor() {
   if (!song) return;
   var lick = (document.getElementById("chipEditLick").value || "").trim();
   if (soloMode && !lick) lick = code;
-  var posBases = [];
-  document.querySelectorAll("#chipEditPos .pos-pick.on").forEach(function(b){
-    var n = parseInt(b.getAttribute("data-pos"),10);
-    if (n >= 1 && n <= 5) posBases.push(n);
-  });
-  var posOOn = !!(document.getElementById("chipEditPosO") && document.getElementById("chipEditPosO").classList.contains("on"));
-  var posPOn = !!(document.getElementById("chipEditPosP") && document.getElementById("chipEditPosP").classList.contains("on"));
-  var posSuf = posPOn ? "P" : (posOOn ? "O" : "");
-  var posList = posBases.map(function(n){ return normalizeSlot(n + posSuf, 1); });
+  var posList = readChipEditPosList();
   var entry = makeChipEntry(code, tier, lick, posList);
   if (soloMode) {
     pushSoloHistory();
@@ -3351,11 +3374,12 @@ function saveChipEditor() {
   var typ = soloMode ? "S" : secType(code);
   if (Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; })) secTypeFilter[typ] = true;
   if (Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; })) secTierFilter[tier] = true;
-  if (Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter || secPosPFilter) {
+  if (Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter || secPosPFilter || secPosDFilter) {
     posList.forEach(function(pos){
       secPosFilter[slotBase(pos)] = true;
       if (slotIsO(pos)) secPosOFilter = true;
       if (slotIsP(pos)) secPosPFilter = true;
+      if (slotIsD(pos)) secPosDFilter = true;
     });
   }
   closeChipEditor();
@@ -3407,15 +3431,7 @@ function copyFromChipEditor() {
     var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : slotBase(chipEditState.tier || 3);
     if (!(tier >= 1 && tier <= 5)) tier = 3;
     var lick = (document.getElementById("chipEditLick").value || "").trim();
-    var posBases = [];
-    document.querySelectorAll("#chipEditPos .pos-pick.on").forEach(function(b){
-      var n = parseInt(b.getAttribute("data-pos"),10);
-      if (n >= 1 && n <= 5) posBases.push(n);
-    });
-    var posOOn = !!(document.getElementById("chipEditPosO") && document.getElementById("chipEditPosO").classList.contains("on"));
-    var posPOn = !!(document.getElementById("chipEditPosP") && document.getElementById("chipEditPosP").classList.contains("on"));
-    var posSuf = posPOn ? "P" : (posOOn ? "O" : "");
-    var posList = posBases.map(function(n){ return normalizeSlot(n + posSuf, 1); });
+    var posList = readChipEditPosList();
     sectionClipboard = makeChipEntry(code, tier, lick, posList);
     return true;
   }
@@ -3930,6 +3946,7 @@ document.getElementById("secFilters").onclick = function(e){
     var p = btn.getAttribute("data-filter-pos");
     var po = btn.getAttribute("data-filter-pos-o");
     var pp = btn.getAttribute("data-filter-pos-p");
+    var pd = btn.getAttribute("data-filter-pos-d");
     if (t) {
       secTypeFilter[t] = !secTypeFilter[t];
       if (!secTypeFilter[t]) delete secTypeFilter[t];
@@ -3944,6 +3961,8 @@ document.getElementById("secFilters").onclick = function(e){
       secPosOFilter = !secPosOFilter;
     } else if (pp) {
       secPosPFilter = !secPosPFilter;
+    } else if (pd) {
+      secPosDFilter = !secPosDFilter;
     } else if (p) {
       var pn = parseInt(p, 10);
       if (!(pn >= 1 && pn <= 5)) return;
@@ -3995,24 +4014,6 @@ document.getElementById("chipEditTiers").onclick = function(e){
   b.classList.add("on");
 };
 document.getElementById("chipEditPos").onclick = function(e){
-  var o = e.target.closest(".o-pick");
-  if (o) {
-    o.classList.toggle("on");
-    if (o.classList.contains("on")) {
-      var pBtn = document.getElementById("chipEditPosP");
-      if (pBtn) pBtn.classList.remove("on");
-    }
-    return;
-  }
-  var pb = e.target.closest(".p-pick");
-  if (pb) {
-    pb.classList.toggle("on");
-    if (pb.classList.contains("on")) {
-      var oBtn = document.getElementById("chipEditPosO");
-      if (oBtn) oBtn.classList.remove("on");
-    }
-    return;
-  }
   var b = e.target.closest(".pos-pick");
   if (!b) return;
   b.classList.toggle("on");
