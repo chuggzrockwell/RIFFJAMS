@@ -1717,6 +1717,7 @@ function normalizeSoloMap(map, albumsFallback) {
     if (Array.isArray(map) && map.length) map = { albums: map };
     else return { albums: base };
   }
+  renameJackTheStripperInAlbums(map.albums);
   var byAlbum = {};
   map.albums.forEach(function(a){ if (a && a.name) byAlbum[a.name] = a; });
   var albums = base.map(function(ba){
@@ -1863,11 +1864,46 @@ function setSoloMode(on) {
 function cloneAlbums(src) {
   return JSON.parse(JSON.stringify(src));
 }
+
+function renameJackTheStripperInAlbums(albums) {
+  (albums || []).forEach(function(a){
+    if (!a || !a.songs) return;
+    var fairies = null;
+    var kept = [];
+    a.songs.forEach(function(s){
+      if (!s) return;
+      if (s.song === "Jack the Stripper") s.song = "Fairies Wear Boots";
+      if (s.song === "Fairies Wear Boots") {
+        if (!fairies) {
+          fairies = s;
+          if (!fairies.sections) fairies.sections = fairies.sections || [];
+          kept.push(fairies);
+        } else {
+          // Merge duplicate Fairies / old Jack rows into one
+          if ((!fairies.sections || !fairies.sections.length) && s.sections && s.sections.length) {
+            fairies.sections = s.sections;
+          }
+          if (s.licks && s.licks.length) {
+            var n = 0;
+            (fairies.licks || []).forEach(function(lp){ if (lp && lp[0]) n++; });
+            if (!n) fairies.licks = s.licks;
+          }
+        }
+        return;
+      }
+      kept.push(s);
+    });
+    a.songs = kept;
+  });
+  return albums;
+}
+
 function loadAlbums() {
   try {
     var raw = localStorage.getItem(ALBUMS_KEY);
     var albums = (!raw) ? cloneAlbums(ALBUMS_DEFAULT) : JSON.parse(raw);
     if (!albums || !albums.length) albums = cloneAlbums(ALBUMS_DEFAULT);
+    renameJackTheStripperInAlbums(albums);
     albums.forEach(function(a){
       (a.songs||[]).forEach(function(s){
         if (s.song === "Into the Void") {
@@ -3163,10 +3199,18 @@ function mergeEmptySoloFromCatalog(map) {
     var songBy = {};
     (src.songs || []).forEach(function(s){ if (s && s.song) songBy[s.song] = s; });
     (a.songs || []).forEach(function(s){
+      if (s && s.song === "Jack the Stripper") s.song = "Fairies Wear Boots";
       var n = 0;
-      (s.licks || []).forEach(function(p){ if (p && p[0]) n++; });
-      if (n === 0 && songBy[s.song] && songBy[s.song].licks && songBy[s.song].licks.length) {
-        s.licks = songBy[s.song].licks.slice();
+      var hasFob = false;
+      (s.licks || []).forEach(function(p){
+        if (p && p[0]) n++;
+        if (p && p[2] && String(p[2]).indexOf("FOB-") === 0) hasFob = true;
+      });
+      var freshSong = songBy[s.song];
+      if (freshSong && freshSong.licks && freshSong.licks.length) {
+        if (n === 0 || (s.song === "Fairies Wear Boots" && !hasFob)) {
+          s.licks = freshSong.licks.slice();
+        }
       }
     });
   });
