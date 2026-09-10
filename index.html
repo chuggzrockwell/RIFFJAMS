@@ -344,35 +344,30 @@
       0 0 18px 4px rgba(163,73,164,.7),
       0 0 40px 10px rgba(163,73,164,.4);
   }
-  .sec-play-card.tier-1o .face,
   .sec-play-card.tier-1 .face {
     box-shadow:
       0 0 6px 1px rgba(112,48,160,.95),
       0 0 18px 4px rgba(112,48,160,.7),
       0 0 40px 10px rgba(112,48,160,.4);
   }
-  .sec-play-card.tier-2o .face,
   .sec-play-card.tier-2 .face {
     box-shadow:
       0 0 6px 1px rgba(163,101,209,.95),
       0 0 18px 4px rgba(163,101,209,.7),
       0 0 40px 10px rgba(163,101,209,.4);
   }
-  .sec-play-card.tier-3o .face,
   .sec-play-card.tier-3 .face {
     box-shadow:
       0 0 6px 1px rgba(188,144,218,.9),
       0 0 18px 4px rgba(188,144,218,.6),
       0 0 40px 10px rgba(188,144,218,.35);
   }
-  .sec-play-card.tier-4o .face,
   .sec-play-card.tier-4 .face {
     box-shadow:
       0 0 6px 1px rgba(212,187,227,.85),
       0 0 18px 4px rgba(212,187,227,.55),
       0 0 40px 10px rgba(212,187,227,.3);
   }
-  .sec-play-card.tier-5o .face,
   .sec-play-card.tier-5 .face {
     box-shadow:
       0 0 6px 1px rgba(243,237,247,.9),
@@ -706,7 +701,6 @@
     background: #fff; color: #7030a0; font-weight: 800; cursor: pointer; margin-left: 4px;
   }
   .chip-editor .o-pick.on { background: #7030a0; color: #fff; outline: 2px solid #111; outline-offset: 1px; }
-  .sec-filter-btn.tier.o-tier.on { background: #7030a0; border-color: #7030a0; color: #fff; }
   .sec-filter-btn.pos.o-pos.on { background: #333; border-color: #333; color: #fff; }
   .chip-editor .pos-pick {
     width: 32px; height: 32px; border-radius: 6px; border: none;
@@ -1441,14 +1435,11 @@
     background: linear-gradient(90deg, rgba(232,140,20,.45), rgba(232,140,20,0));
   }
   /* Excel fills ranked by darkness: T1 darkest → T5 near-white */
-  .sec-chip.tier-1, .sec-chip.tier-1o { background: #7030a0; color: #fff; }
-  .sec-chip.tier-2, .sec-chip.tier-2o { background: #a365d1; color: #fff; }
-  .sec-chip.tier-3, .sec-chip.tier-3o { background: #bc90da; color: #1a1020; }
-  .sec-chip.tier-4, .sec-chip.tier-4o { background: #d4bbe3; color: #1a1020; }
-  .sec-chip.tier-5, .sec-chip.tier-5o { background: #f3edf7; color: #1a1020; }
-  .sec-chip.tier-1o, .sec-chip.tier-2o, .sec-chip.tier-3o, .sec-chip.tier-4o, .sec-chip.tier-5o {
-    box-shadow: inset 0 0 0 2px rgba(0,0,0,.35);
-  }
+  .sec-chip.tier-1 { background: #7030a0; color: #fff; }
+  .sec-chip.tier-2 { background: #a365d1; color: #fff; }
+  .sec-chip.tier-3 { background: #bc90da; color: #1a1020; }
+  .sec-chip.tier-4 { background: #d4bbe3; color: #1a1020; }
+  .sec-chip.tier-5 { background: #f3edf7; color: #1a1020; }
 
   @media (max-width: 900px) {
     .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 100%; }
@@ -1628,7 +1619,6 @@
       <button type="button" class="tier-pick t3" data-tier="3">3</button>
       <button type="button" class="tier-pick t4" data-tier="4">4</button>
       <button type="button" class="tier-pick t5" data-tier="5">5</button>
-      <button type="button" class="o-pick" id="chipEditTierO" title="O set (1O–5O)" aria-label="O tier set">O</button>
     </div>
     <label>Position</label>
     <div class="tier-row" id="chipEditPos">
@@ -1637,7 +1627,7 @@
       <button type="button" class="pos-pick" data-pos="3">3</button>
       <button type="button" class="pos-pick" data-pos="4">4</button>
       <button type="button" class="pos-pick" data-pos="5">5</button>
-      <button type="button" class="o-pick" id="chipEditPosO" title="O set (1O–5O)" aria-label="O position set">O</button>
+      <button type="button" class="o-pick" id="chipEditPosO" title="Position O set (1O–5O)" aria-label="O position set">O</button>
     </div>
     <div class="editor-actions">
       <button type="button" class="btn-save" id="chipEditSave">Save</button>
@@ -2222,7 +2212,7 @@ function slotCss(prefix, v) {
   return prefix + "-" + String(normalizeSlot(v, 1)).toLowerCase();
 }
 function chipTier(pair) {
-  return normalizeSlot(pair && pair[1], 3);
+  return slotBase(normalizeSlot(pair && pair[1], 3));
 }
 function chipPosition(pair) {
   return normalizeSlot(pair && pair[3], 1);
@@ -2586,13 +2576,9 @@ function buildSecFilters() {
       + '<div class="exclude-dd-menu" id="excludeDdMenu">'+items+'</div>'
       + '</div>';
   }
-  var tierKeys = [1,2,3,4,5,"1O","2O","3O","4O","5O"];
-  tierHost.innerHTML = '<span class="sec-filter-label">Tier</span>' + tierKeys.map(function(t){
+  tierHost.innerHTML = '<span class="sec-filter-label">Tier</span>' + [1,2,3,4,5].map(function(t){
     var on = secTierFilter[t] ? ' on' : '';
-    var isO = typeof t === "string";
-    var label = isO ? t : ("T" + t);
-    var cls = isO ? ("sec-filter-btn tier o-tier t" + slotBase(t)) : ("sec-filter-btn tier t" + t);
-    return '<button type="button" class="'+cls+on+'" data-filter-tier="'+t+'">'+label+'</button>';
+    return '<button type="button" class="sec-filter-btn tier t'+t+on+'" data-filter-tier="'+t+'">T'+t+'</button>';
   }).join("");
   if (posHost) {
     var posKeys = [1,2,3,4,5,"1O","2O","3O","4O","5O"];
@@ -2850,8 +2836,8 @@ function renderPlayBoard() {
     return;
   }
   board.innerHTML = visible.map(function(item){
-    var tier = normalizeSlot(item.tier, 2);
-    return '<div class="sec-play-card '+slotCss("tier", tier)+'" data-key="'+item.key+'">'
+    var tier = slotBase(normalizeSlot(item.tier, 2));
+    return '<div class="sec-play-card tier-'+tier+'" data-key="'+item.key+'">'
       + '<div class="face">'
       + '<div class="ref">'+item.code+'</div>'
       + '<img src="'+item.src+'" alt="'+item.lick+'">'
@@ -2909,7 +2895,7 @@ function togglePlayChip(chip) {
     code: code,
     song: song,
     lick: lick,
-    tier: normalizeSlot(chip.getAttribute("data-tier"), 2),
+    tier: slotBase(normalizeSlot(chip.getAttribute("data-tier"), 2)),
     src: lickSrc(lick)
   });
   trimPlayQueueToFit();
@@ -3105,12 +3091,10 @@ function openChipEditor(anchor, state) {
   idInput.value = state.code || "";
   var lickInput = document.getElementById("chipEditLick");
   if (lickInput) lickInput.value = state.lick || "";
-  var tier = normalizeSlot(state.tier, 3);
+  var tier = slotBase(normalizeSlot(state.tier, 3));
   document.querySelectorAll("#chipEditTiers .tier-pick").forEach(function(b){
-    b.classList.toggle("on", parseInt(b.getAttribute("data-tier"),10) === slotBase(tier));
+    b.classList.toggle("on", parseInt(b.getAttribute("data-tier"),10) === tier);
   });
-  var tierO = document.getElementById("chipEditTierO");
-  if (tierO) tierO.classList.toggle("on", slotIsO(tier));
   var pos = normalizeSlot(state.position, 1);
   document.querySelectorAll("#chipEditPos .pos-pick").forEach(function(b){
     b.classList.toggle("on", parseInt(b.getAttribute("data-pos"),10) === slotBase(pos));
@@ -3135,9 +3119,8 @@ function saveChipEditor() {
   if (!soloMode) code = code.toUpperCase();
   if (!code) { document.getElementById("chipEditId").focus(); return; }
   var tierBtn = document.querySelector("#chipEditTiers .tier-pick.on");
-  var tierBase = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : slotBase(chipEditState.tier || 3);
-  var tierOOn = !!(document.getElementById("chipEditTierO") && document.getElementById("chipEditTierO").classList.contains("on"));
-  var tier = normalizeSlot(tierBase + (tierOOn ? "O" : ""), 3);
+  var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : slotBase(chipEditState.tier || 3);
+  if (!(tier >= 1 && tier <= 5)) tier = 3;
   var ai = chipEditState.ai, si = chipEditState.si, ci = chipEditState.ci;
   var song = getEditSong(ai, si);
   if (!song) return;
@@ -3213,9 +3196,8 @@ function copyFromChipEditor() {
     var code = (document.getElementById("chipEditId").value || "").trim().toUpperCase();
     if (!code) return false;
     var tierBtn = document.querySelector("#chipEditTiers .tier-pick.on");
-    var tierBase = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : slotBase(chipEditState.tier || 3);
-    var tierOOn = !!(document.getElementById("chipEditTierO") && document.getElementById("chipEditTierO").classList.contains("on"));
-    var tier = normalizeSlot(tierBase + (tierOOn ? "O" : ""), 3);
+    var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : slotBase(chipEditState.tier || 3);
+    if (!(tier >= 1 && tier <= 5)) tier = 3;
     var lick = (document.getElementById("chipEditLick").value || "").trim();
     var posBtn = document.querySelector("#chipEditPos .pos-pick.on");
     var posBase = posBtn ? parseInt(posBtn.getAttribute("data-pos"),10) : slotBase(chipEditState.position || 1);
@@ -3738,9 +3720,10 @@ document.getElementById("secFilters").onclick = function(e){
       if (!secTypeFilter[t]) delete secTypeFilter[t];
     }
     if (r) {
-      var tk = /^[1-5]O$/.test(r) ? r : parseInt(r, 10);
-      secTierFilter[tk] = !secTierFilter[tk];
-      if (!secTierFilter[tk]) delete secTierFilter[tk];
+      var n = parseInt(r, 10);
+      if (!(n >= 1 && n <= 5)) return;
+      secTierFilter[n] = !secTierFilter[n];
+      if (!secTierFilter[n]) delete secTierFilter[n];
     }
     if (p) {
       var pk = /^[1-5]O$/.test(p) ? p : parseInt(p, 10);
@@ -3782,8 +3765,6 @@ document.getElementById("chipEditCopy").onclick = function(){
   }
 };
 document.getElementById("chipEditTiers").onclick = function(e){
-  var o = e.target.closest(".o-pick");
-  if (o) { o.classList.toggle("on"); return; }
   var b = e.target.closest(".tier-pick");
   if (!b) return;
   document.querySelectorAll("#chipEditTiers .tier-pick").forEach(function(x){ x.classList.remove("on"); });
