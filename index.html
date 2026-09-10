@@ -1590,7 +1590,7 @@
         <span class="sec-filter-label">Tier</span>
       </div>
       <div class="sec-filter-group" id="secPosFilters">
-        <span class="sec-filter-label">Pos</span>
+        <span class="sec-filter-label">Position</span>
       </div>
       <button type="button" class="sec-filter-clear" id="secFilterClear">Clear</button>
     </div>
@@ -2548,7 +2548,7 @@ function buildSecFilters() {
     return '<button type="button" class="sec-filter-btn tier t'+t+on+'" data-filter-tier="'+t+'">T'+t+'</button>';
   }).join("");
   if (posHost) {
-    posHost.innerHTML = '<span class="sec-filter-label">Pos</span>' + [1,2,3,4,5].map(function(t){
+    posHost.innerHTML = '<span class="sec-filter-label">Position</span>' + [1,2,3,4,5].map(function(t){
       var on = secPosFilter[t] ? ' on' : '';
       return '<button type="button" class="sec-filter-btn pos'+on+'" data-filter-pos="'+t+'">'+t+'</button>';
     }).join("");
