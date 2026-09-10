@@ -1615,7 +1615,7 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · 4 Solo · 5 Peek · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Esc closes chip edit · 0 home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · 4 Solo · 5 Peek · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
@@ -2848,12 +2848,12 @@ function setSectionsMode(mode) {
   var keys = document.getElementById("sectionsKeys");
   if (keys) {
     if (soloMode) {
-      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 4/5 Solo/Peek · drag · Undo/Save · Esc closes chip edit · 0 home";
-      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 4/5 · lick clicks queue · Esc closes chip edit · 0 home";
-      else keys.textContent = "Solo · Numpad 4/5 Solo/Peek · Esc closes chip edit · 0 home";
-    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · Esc closes chip edit · 0 home";
-    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · section clicks queue · Playboard window · Esc closes chip edit · 0 home";
-    else keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Song Map · filters · Ctrl+1–5 positions · Esc closes chip edit · 0 home";
+      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 4/5 Solo/Peek · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
+      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 4/5 · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Solo · Numpad 4/5 Solo/Peek · 0 clear filters · Esc closes chip edit · Backspace home";
+    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · section clicks queue · Playboard window · 0 clear filters · Esc closes chip edit · Backspace home";
+    else keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
   }
   if (sectionsMode === "play") {
     pullPlayQueue();
@@ -4450,8 +4450,12 @@ document.addEventListener("keydown", function(e){
       // Chip edit popup already handled above; Esc does nothing else on Song Map
       return;
     }
-    if (isNumpadKey(e, "0") || k === "backspace") {
-      if (k === "backspace") e.preventDefault();
+    if (isNumpadKey(e, "0")) {
+      clearSecFilters();
+      return;
+    }
+    if (k === "backspace") {
+      e.preventDefault();
       showHome();
     }
     return;
