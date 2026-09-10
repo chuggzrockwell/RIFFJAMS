@@ -1191,6 +1191,10 @@
     background: #fff;
     color: #111;
     border-radius: 4px 0 0 4px;
+    box-shadow:
+      0 0 4px 1px rgba(163,101,209,.75),
+      0 0 12px 3px rgba(163,101,209,.4),
+      0 0 22px 6px rgba(112,48,160,.25);
   }
   body.sections-mode .col-num {
     color: rgba(232,230,225,.4);
@@ -1226,8 +1230,15 @@
     letter-spacing: -0.015em;
     background: #fff;
     color: #111;
-    box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 4px 14px rgba(0,0,0,.35);
     border-radius: 6px 0 0 6px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.1),
+      0 0 5px 1px rgba(163,101,209,.8),
+      0 0 14px 4px rgba(163,101,209,.45),
+      0 0 28px 8px rgba(112,48,160,.28);
+  }
+  body.sections-mode .song-name-wrap {
+    filter: drop-shadow(0 0 6px rgba(163,101,209,.35));
   }
   body.sections-mode .song-name::after {
     background: linear-gradient(90deg, rgba(112,48,160,.4), rgba(112,48,160,0));
