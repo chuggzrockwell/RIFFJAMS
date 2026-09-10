@@ -2758,6 +2758,7 @@ function setSectionsMode(mode) {
   if (mode === "edit") sectionsMode = "edit";
   else if (mode === "play") sectionsMode = "play";
   else sectionsMode = "view";
+  if (sectionsMode === "edit" && highlightMode) setHighlightMode(false);
   closeChipEditor();
   document.querySelectorAll(".sec-mode-btn[data-sec-mode]").forEach(function(btn){
     btn.classList.toggle("on", btn.getAttribute("data-sec-mode") === sectionsMode);
@@ -2803,6 +2804,7 @@ function lickLetter(id) {
 var highlightMode = false;
 function setHighlightMode(on) {
   highlightMode = !!on;
+  if (highlightMode && sectionsMode === "edit") setSectionsMode("view");
   document.body.classList.toggle("sec-peek-on", highlightMode);
   var btn = document.getElementById("secPeekBtn");
   if (btn) {
