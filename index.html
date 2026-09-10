@@ -1660,7 +1660,7 @@
       <button type="button" class="tier-pick t4" data-tier="4">4</button>
       <button type="button" class="tier-pick t5" data-tier="5">5</button>
     </div>
-    <label>Position <span style="font-weight:500;opacity:.65">(multi)</span></label>
+    <label>Position <span style="font-weight:500;opacity:.65">(multi, none ok)</span></label>
     <div class="tier-row" id="chipEditPos">
       <button type="button" class="pos-pick" data-pos="1">1</button>
       <button type="button" class="pos-pick" data-pos="2">2</button>
@@ -2272,7 +2272,10 @@ function chipTier(pair) {
   return slotBase(normalizeSlot(pair && pair[1], 3));
 }
 function parsePosList(raw) {
-  if (raw == null || raw === "") return [1];
+  // [] or "" = explicitly no positions; null/undefined = legacy default [1]
+  if (Array.isArray(raw) && raw.length === 0) return [];
+  if (raw === "") return [];
+  if (raw == null) return [1];
   var list;
   if (Array.isArray(raw)) list = raw;
   else if (typeof raw === "string") {
@@ -2288,7 +2291,7 @@ function parsePosList(raw) {
     seen[key] = true;
     out.push(n);
   });
-  return out.length ? out : [1];
+  return out;
 }
 function chipPositions(pair) {
   return parsePosList(pair && pair[3]);
@@ -2306,8 +2309,10 @@ function isDefaultPosList(list) {
 }
 function makeChipEntry(code, tier, lick, positions) {
   tier = slotBase(normalizeSlot(tier, 3));
-  var posList = parsePosList(positions);
+  // Preserve explicit empty array; don't coerce missing→[1] when caller passed []
+  var posList = Array.isArray(positions) ? parsePosList(positions) : parsePosList(positions == null ? null : positions);
   lick = lick || "";
+  if (posList.length === 0) return [code, tier, lick, []];
   if (isDefaultPosList(posList) && !lick) return [code, tier];
   if (isDefaultPosList(posList)) return [code, tier, lick];
   var stored = posList.length === 1 ? posList[0] : posList.slice();
@@ -2712,8 +2717,11 @@ function chipMatchesFilter(chip) {
   var tierOn = Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; });
   if (typeOn && !secTypeFilter[typ]) return false;
   if (tierOn && !secTierFilter[tier]) return false;
-  // Match if ANY of the chip's positions pass the position filter
-  if (!positions.some(function(pos){ return chipMatchesPosFilter(pos); })) return false;
+  var posFilterActive = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter || secPosPFilter;
+  if (posFilterActive) {
+    // No positions → never matches an active position filter
+    if (!positions.some(function(pos){ return chipMatchesPosFilter(pos); })) return false;
+  }
   return true;
 }
 function applySecFilters() {
@@ -3282,7 +3290,6 @@ function openChipEditor(anchor, state) {
     if (slotIsO(pos)) anyO = true; else allO = false;
     if (slotIsP(pos)) anyP = true; else allP = false;
   });
-  if (!posList.length) { baseSet[1] = true; allO = false; allP = false; }
   document.querySelectorAll("#chipEditPos .pos-pick").forEach(function(b){
     var n = parseInt(b.getAttribute("data-pos"),10);
     b.classList.toggle("on", !!baseSet[n]);
@@ -3321,7 +3328,6 @@ function saveChipEditor() {
     var n = parseInt(b.getAttribute("data-pos"),10);
     if (n >= 1 && n <= 5) posBases.push(n);
   });
-  if (!posBases.length) posBases = [1];
   var posOOn = !!(document.getElementById("chipEditPosO") && document.getElementById("chipEditPosO").classList.contains("on"));
   var posPOn = !!(document.getElementById("chipEditPosP") && document.getElementById("chipEditPosP").classList.contains("on"));
   var posSuf = posPOn ? "P" : (posOOn ? "O" : "");
@@ -3406,7 +3412,6 @@ function copyFromChipEditor() {
       var n = parseInt(b.getAttribute("data-pos"),10);
       if (n >= 1 && n <= 5) posBases.push(n);
     });
-    if (!posBases.length) posBases = [1];
     var posOOn = !!(document.getElementById("chipEditPosO") && document.getElementById("chipEditPosO").classList.contains("on"));
     var posPOn = !!(document.getElementById("chipEditPosP") && document.getElementById("chipEditPosP").classList.contains("on"));
     var posSuf = posPOn ? "P" : (posOOn ? "O" : "");
@@ -4011,8 +4016,6 @@ document.getElementById("chipEditPos").onclick = function(e){
   var b = e.target.closest(".pos-pick");
   if (!b) return;
   b.classList.toggle("on");
-  // Keep at least one position selected
-  if (!document.querySelector("#chipEditPos .pos-pick.on")) b.classList.add("on");
 };
 document.getElementById("chipEditId").addEventListener("keydown", function(e){
   if (e.key === "Enter") { e.preventDefault(); saveChipEditor(); }
