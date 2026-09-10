@@ -2841,7 +2841,7 @@ function buildSecFilters() {
       return '<label class="filter-dd-item"><input type="checkbox" data-filter-album="'+esc+'"'+checked+'><span>'+esc+'</span></label>';
     }).join("");
     albumHost.innerHTML = '<span class="sec-filter-label">Album</span>'
-      + buildFilterDd("albumDd", "All", albumItems, albumKeys);
+      + buildFilterDd("albumDd", "None", albumItems, albumKeys.map(function(k){ return "−"+k; }));
   }
 
   var typeKeys = Object.keys(secTypeFilter).filter(function(k){ return secTypeFilter[k]; });
@@ -2940,10 +2940,10 @@ function applySecFilters() {
   // Edit mode always shows every chip so creates/edits are visible (section map only)
   var active = (sectionsMode !== "edit") && secFiltersActive();
   var shown = 0;
-  var albumOn = Object.keys(secAlbumFilter).some(function(k){ return secAlbumFilter[k]; });
   sheet.querySelectorAll(".album-block").forEach(function(block){
     var albumName = block.getAttribute("data-album") || "";
-    var albumOk = !active || !albumOn || !!secAlbumFilter[albumName];
+    // Album filter = exclude: checked albums are hidden
+    var albumOk = !active || !secAlbumFilter[albumName];
     block.classList.toggle("filtered-out", active && !albumOk);
     if (!albumOk) return;
     block.querySelectorAll(".song-row").forEach(function(row){
