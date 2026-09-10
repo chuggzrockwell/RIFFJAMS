@@ -211,6 +211,119 @@
     border-radius: 8px;
     box-shadow: none;
   }
+
+  /* Song Map YouTube player bar (Spotify-style UI, YT under the hood) */
+  #ytPlayerHost {
+    position: absolute;
+    width: 1px; height: 1px;
+    left: -9999px; top: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .sm-player {
+    display: none;
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    margin: 16px 0 0;
+    padding: 14px 16px 12px;
+    background: #000;
+    border: 1px solid #222;
+    border-radius: 14px;
+    box-sizing: border-box;
+    color: #fff;
+    font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
+  }
+  body.sections-mode .sm-player { display: block; }
+  .sm-player-meta {
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255,255,255,.55);
+    margin: 0 0 8px;
+    min-height: 1em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sm-player-meta strong { color: #fff; font-weight: 700; }
+  .sm-player-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    margin: 0 0 10px;
+  }
+  .sm-player-btn {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    padding: 0;
+    cursor: pointer;
+    line-height: 0;
+    opacity: .92;
+  }
+  .sm-player-btn:hover { opacity: 1; }
+  .sm-player-btn svg { display: block; }
+  .sm-player-btn.on { color: #1db954; }
+  .sm-player-btn.play {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sm-player-btn.play:hover { transform: scale(1.04); }
+  .sm-player-btn.repeat.on { position: relative; }
+  .sm-player-btn.repeat.on::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    width: 4px; height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: #1db954;
+  }
+  .sm-player-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .sm-player-time {
+    flex: 0 0 auto;
+    font-size: 0.68rem;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255,255,255,.7);
+    min-width: 2.4em;
+  }
+  .sm-player-time.end { text-align: right; }
+  .sm-player-scrub {
+    flex: 1 1 auto;
+    height: 4px;
+    border-radius: 999px;
+    background: #333;
+    position: relative;
+    cursor: pointer;
+  }
+  .sm-player-scrub-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0%;
+    border-radius: 999px;
+    background: #fff;
+    pointer-events: none;
+  }
+  body.sections-mode #sections {
+    padding-bottom: 8px;
+  }
+
   body.sec-peek-on .sec-chip:not(.empty) { cursor: zoom-in; }
   .sec-edit-tools {
     display: none;
@@ -1955,6 +2068,34 @@
       <button type="button" class="sec-filter-clear" id="secFilterClear">Clear</button>
     </div>
     <div class="sheet stage" id="sectionsSheet"></div>
+    <div id="ytPlayerHost" aria-hidden="true"></div>
+    <div class="sm-player" id="smPlayer" aria-label="Song player">
+      <div class="sm-player-meta" id="smPlayerMeta">Pick a song on the map</div>
+      <div class="sm-player-controls">
+        <button type="button" class="sm-player-btn" id="smShuffle" title="Shuffle" aria-pressed="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+        </button>
+        <button type="button" class="sm-player-btn" id="smPrev" title="Previous">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h2v12H6V6zm3.5 6 8.5 6V6l-8.5 6z"/></svg>
+        </button>
+        <button type="button" class="sm-player-btn play" id="smPlay" title="Play">
+          <svg id="smPlayIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg>
+        </button>
+        <button type="button" class="sm-player-btn" id="smNext" title="Next">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+        <button type="button" class="sm-player-btn repeat on" id="smRepeat" title="Repeat playlist" aria-pressed="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+        </button>
+      </div>
+      <div class="sm-player-progress">
+        <span class="sm-player-time" id="smTimeCur">0:00</span>
+        <div class="sm-player-scrub" id="smScrub" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+          <div class="sm-player-scrub-fill" id="smScrubFill"></div>
+        </div>
+        <span class="sm-player-time end" id="smTimeDur">0:00</span>
+      </div>
+    </div>
   </section>
   <div id="secHighlightTip" aria-hidden="true"></div>
   <div id="chipEditor" class="chip-editor" aria-hidden="true">
@@ -2848,6 +2989,8 @@ function toggleSoloColsCollapsed() {
 }
 
 function showSections(keepScroll) {
+  smBuildPlaylist();
+  smUpdateMeta();
   var sx = window.scrollX || window.pageXOffset || 0;
   var sy = window.scrollY || window.pageYOffset || 0;
   currentLetter = "";
@@ -3366,6 +3509,262 @@ function lickLetter(id) {
   if (/^PC-/.test(id)) return "B";
   return "B";
 }
+
+/* —— Song Map YouTube player (custom UI; audio via YT IFrame API) —— */
+/* Repeat ON = loop whole playlist. Verified Topic/official embeds only. */
+var SM_YT_IDS = {
+  "War Pigs": "bc5Nk1DXyEY",
+  "Paranoid": "xpM59e6lyws",
+  "Iron Man": "F01UTYg79KY",
+  "Children of the Grave": "rR1nZLeQl1A",
+  "Sabbath Bloody Sabbath": "XDmUd9Euaj8",
+  "Snowblind": "d90wZYGcifA",
+  "Changes": "ESE0ohvyOmA",
+  "Into the Void": "KSSEzWXqGKY",
+  "Sweet Leaf": "pZcMp40ZMwc",
+  "Planet Caravan": "",
+  "Electric Funeral": "D0hvNgtcG0M",
+  "Hand of Doom": "CNIgt6yKgDM",
+  "Rat Salad": "",
+  "Fairies Wear Boots": "",
+  "A National Acrobat": "",
+  "Fluff": "",
+  "Sabbra Cadabra": "",
+  "Killing Yourself to Live": "",
+  "Who Are You?": "",
+  "Looking for Today": "",
+  "Spiral Architect": "",
+  "After Forever": "",
+  "Embryo": "",
+  "Orchid": "",
+  "Lord of This World": "",
+  "Solitude": "",
+  "Wheels of Confusion": "",
+  "Tomorrow's Dream": "",
+  "FX": "",
+  "Supernaut": "",
+  "Cornucopia": "",
+  "Laguna Sunrise": "",
+  "St. Vitus Dance": "",
+  "Under the Sun": ""
+};
+var smYtReady = false;
+var smYtPlayer = null;
+var smYtApiLoading = false;
+var smPlaylist = [];
+var smOrder = [];
+var smIndex = 0;
+var smShuffle = false;
+var smRepeat = true; /* loop playlist when ON (green) */
+var smPlaying = false;
+var smTickTimer = null;
+var smSeeking = false;
+
+function smFmtTime(sec) {
+  sec = Math.max(0, Math.floor(sec || 0));
+  var m = Math.floor(sec / 60);
+  var s = sec % 60;
+  return m + ":" + (s < 10 ? "0" : "") + s;
+}
+function smBuildPlaylist() {
+  var albums = (typeof ALBUMS !== "undefined" && ALBUMS) ? ALBUMS : (typeof ALBUMS_DEFAULT !== "undefined" ? ALBUMS_DEFAULT : []);
+  var out = [];
+  albums.forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      var id = SM_YT_IDS[s.song];
+      if (!id) return;
+      out.push({ song: s.song, album: a.name, yt: id });
+    });
+  });
+  smPlaylist = out;
+  smRebuildOrder(false);
+}
+function smRebuildOrder(keepSong) {
+  var cur = keepSong && smOrder.length ? smOrder[smIndex] : null;
+  smOrder = smPlaylist.map(function(_, i){ return i; });
+  if (smShuffle) {
+    for (var i = smOrder.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = smOrder[i]; smOrder[i] = smOrder[j]; smOrder[j] = tmp;
+    }
+  }
+  if (cur != null) {
+    var found = smOrder.indexOf(cur);
+    smIndex = found >= 0 ? found : 0;
+  } else smIndex = 0;
+}
+function smCurrent() {
+  if (!smOrder.length || !smPlaylist.length) return null;
+  return smPlaylist[smOrder[smIndex]] || null;
+}
+function smUpdateMeta() {
+  var el = document.getElementById("smPlayerMeta");
+  if (!el) return;
+  var cur = smCurrent();
+  if (!cur) { el.innerHTML = "No mapped YouTube tracks yet"; return; }
+  el.innerHTML = "<strong>"+cur.song+"</strong> · "+cur.album;
+}
+function smSetPlayIcon(playing) {
+  smPlaying = !!playing;
+  var icon = document.getElementById("smPlayIcon");
+  var btn = document.getElementById("smPlay");
+  if (!icon || !btn) return;
+  if (smPlaying) {
+    icon.innerHTML = '<path d="M6 5h4v14H6V5zm8 0h4v14h-4V5z"/>';
+    btn.title = "Pause";
+  } else {
+    icon.innerHTML = '<path d="M8 5v14l11-7L8 5z"/>';
+    btn.title = "Play";
+  }
+}
+function smEnsureApi(cb) {
+  if (smYtReady && smYtPlayer) { cb && cb(); return; }
+  window.onYouTubeIframeAPIReady = function(){
+    smYtReady = true;
+    smYtPlayer = new YT.Player("ytPlayerHost", {
+      height: "1",
+      width: "1",
+      playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1, playsinline: 1 },
+      events: {
+        onReady: function(){ cb && cb(); },
+        onStateChange: function(e){
+          if (e.data === YT.PlayerState.ENDED) smOnEnded();
+          if (e.data === YT.PlayerState.PLAYING) { smSetPlayIcon(true); smStartTick(); }
+          if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.CUED) { smSetPlayIcon(false); smStopTick(); }
+        }
+      }
+    });
+  };
+  if (window.YT && window.YT.Player) {
+    window.onYouTubeIframeAPIReady();
+    return;
+  }
+  if (smYtApiLoading) return;
+  smYtApiLoading = true;
+  var tag = document.createElement("script");
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(tag);
+}
+function smLoadCurrent(autoplay) {
+  var cur = smCurrent();
+  smUpdateMeta();
+  if (!cur) return;
+  smEnsureApi(function(){
+    if (!smYtPlayer || !smYtPlayer.loadVideoById) return;
+    if (autoplay) smYtPlayer.loadVideoById(cur.yt);
+    else smYtPlayer.cueVideoById(cur.yt);
+  });
+}
+function smPlayIndex(i, autoplay) {
+  if (!smOrder.length) return;
+  smIndex = ((i % smOrder.length) + smOrder.length) % smOrder.length;
+  smLoadCurrent(autoplay !== false);
+}
+function smPlaySongName(name, autoplay) {
+  smBuildPlaylist();
+  var pi = -1;
+  for (var i = 0; i < smPlaylist.length; i++) {
+    if (smPlaylist[i].song === name) { pi = i; break; }
+  }
+  if (pi < 0) {
+    smUpdateMeta();
+    var el = document.getElementById("smPlayerMeta");
+    if (el) el.innerHTML = "<strong>"+name+"</strong> · no YouTube id mapped yet";
+    return;
+  }
+  if (smShuffle) smRebuildOrder(false);
+  var oi = smOrder.indexOf(pi);
+  smPlayIndex(oi >= 0 ? oi : 0, autoplay !== false);
+}
+function smOnEnded() {
+  if (smRepeat) smPlayIndex(smIndex + 1, true);
+  else if (smIndex + 1 < smOrder.length) smPlayIndex(smIndex + 1, true);
+  else smSetPlayIcon(false);
+}
+function smTogglePlay() {
+  smEnsureApi(function(){
+    if (!smYtPlayer) return;
+    var st = smYtPlayer.getPlayerState && smYtPlayer.getPlayerState();
+    if (st === YT.PlayerState.PLAYING) smYtPlayer.pauseVideo();
+    else {
+      if (!smCurrent()) { smBuildPlaylist(); smPlayIndex(0, true); return; }
+      smYtPlayer.playVideo();
+    }
+  });
+}
+function smStartTick() {
+  smStopTick();
+  smTickTimer = setInterval(smTick, 250);
+  smTick();
+}
+function smStopTick() {
+  if (smTickTimer) clearInterval(smTickTimer);
+  smTickTimer = null;
+}
+function smTick() {
+  if (smSeeking || !smYtPlayer || !smYtPlayer.getCurrentTime) return;
+  var cur = smYtPlayer.getCurrentTime() || 0;
+  var dur = smYtPlayer.getDuration() || 0;
+  var pct = dur ? (cur / dur) * 100 : 0;
+  var fill = document.getElementById("smScrubFill");
+  var tc = document.getElementById("smTimeCur");
+  var td = document.getElementById("smTimeDur");
+  var scrub = document.getElementById("smScrub");
+  if (fill) fill.style.width = pct + "%";
+  if (tc) tc.textContent = smFmtTime(cur);
+  if (td) td.textContent = smFmtTime(dur);
+  if (scrub) scrub.setAttribute("aria-valuenow", String(Math.round(pct)));
+}
+function smSeekFromClientX(clientX) {
+  var scrub = document.getElementById("smScrub");
+  if (!scrub || !smYtPlayer || !smYtPlayer.getDuration) return;
+  var r = scrub.getBoundingClientRect();
+  var pct = r.width ? Math.min(1, Math.max(0, (clientX - r.left) / r.width)) : 0;
+  var dur = smYtPlayer.getDuration() || 0;
+  smYtPlayer.seekTo(dur * pct, true);
+  smTick();
+}
+function smInitPlayerUi() {
+  smBuildPlaylist();
+  smUpdateMeta();
+  var shuffle = document.getElementById("smShuffle");
+  var prev = document.getElementById("smPrev");
+  var play = document.getElementById("smPlay");
+  var next = document.getElementById("smNext");
+  var repeat = document.getElementById("smRepeat");
+  var scrub = document.getElementById("smScrub");
+  if (shuffle) shuffle.onclick = function(){
+    smShuffle = !smShuffle;
+    shuffle.classList.toggle("on", smShuffle);
+    shuffle.setAttribute("aria-pressed", smShuffle ? "true" : "false");
+    smRebuildOrder(true);
+  };
+  if (prev) prev.onclick = function(){ smPlayIndex(smIndex - 1, true); };
+  if (next) next.onclick = function(){ smPlayIndex(smIndex + 1, true); };
+  if (play) play.onclick = smTogglePlay;
+  if (repeat) repeat.onclick = function(){
+    smRepeat = !smRepeat;
+    repeat.classList.toggle("on", smRepeat);
+    repeat.setAttribute("aria-pressed", smRepeat ? "true" : "false");
+  };
+  if (scrub) {
+    scrub.addEventListener("pointerdown", function(e){
+      smSeeking = true;
+      smSeekFromClientX(e.clientX);
+      function move(ev){ smSeekFromClientX(ev.clientX); }
+      function up(ev){
+        smSeekFromClientX(ev.clientX);
+        smSeeking = false;
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+      }
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+    });
+  }
+}
+smInitPlayerUi();
+
 var highlightMode = false;
 function setHighlightMode(on) {
   highlightMode = !!on;
@@ -4699,6 +5098,16 @@ document.getElementById("sectionsSheet").addEventListener("scroll", hideHighligh
 window.addEventListener("scroll", function(){ if (highlightMode) hideHighlightTip(); }, true);
 
 document.getElementById("sectionsSheet").onclick = function(e){
+  var nameEl = e.target.closest(".song-name, .song-name-wrap, .song-row");
+  if (nameEl && !e.target.closest(".sec-chip") && document.body.classList.contains("sections-mode")) {
+    var row = e.target.closest(".song-row");
+    if (row) {
+      var titleEl = row.querySelector(".song-name");
+      var title = titleEl ? (titleEl.textContent || "").trim() : "";
+      if (title) { smPlaySongName(title, true); /* don't return — chips may also be clicked */ }
+      if (e.target.closest(".song-name, .song-name-wrap, .song-thumb, .row-num")) return;
+    }
+  }
   var playCard = e.target.closest(".sec-play-card");
   if (playCard && sectionsMode === "play") {
     var key = playCard.getAttribute("data-key");
