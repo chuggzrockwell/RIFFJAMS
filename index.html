@@ -1615,7 +1615,7 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · 4 Solo · 5 Peek · i/v/… types · 1–5 tiers · Esc closes chip edit · 0 home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · 4 Solo · 5 Peek · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Esc closes chip edit · 0 home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
@@ -2744,6 +2744,17 @@ function toggleSecTierKey(n) {
   applySecFilters();
   if (sectionsMode === "play") renderPlayBoard();
 }
+function toggleSecPosKey(n) {
+  n = parseInt(n, 10);
+  if (!(n >= 1 && n <= 5)) return;
+  if (secPosFilter[n]) delete secPosFilter[n];
+  else secPosFilter[n] = true;
+  var btn = document.querySelector('.sec-filter-btn.pos[data-filter-pos="'+n+'"]');
+  if (btn) btn.classList.toggle("on", !!secPosFilter[n]);
+  else buildSecFilters();
+  applySecFilters();
+  if (sectionsMode === "play") renderPlayBoard();
+}
 function toggleSecTypeKey(typ) {
   typ = (typ || "").toUpperCase();
   if (!typ) return;
@@ -2796,7 +2807,7 @@ function setSectionsMode(mode) {
       else keys.textContent = "Solo · Numpad 4/5 Solo/Peek · Esc closes chip edit · 0 home";
     } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · Esc closes chip edit · 0 home";
     else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · section clicks queue · Playboard window · Esc closes chip edit · 0 home";
-    else keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Song Map · filters · Esc closes chip edit · 0 home";
+    else keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Song Map · filters · Ctrl+1–5 positions · Esc closes chip edit · 0 home";
   }
   if (sectionsMode === "play") {
     pullPlayQueue();
@@ -4313,6 +4324,19 @@ document.addEventListener("keydown", function(e){
         var dest = lastSectionFocus;
         if (chipEditState) dest = { ai: chipEditState.ai, si: chipEditState.si, ci: chipEditState.ci };
         if (dest) pasteSongSectionAt(dest.ai, dest.si, dest.ci);
+        return;
+      }
+    }
+  }
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && document.body.classList.contains("sections-mode")) {
+    var tagPos = (e.target && e.target.tagName) || "";
+    if (tagPos !== "INPUT" && tagPos !== "TEXTAREA") {
+      var posDigit = null;
+      if (e.code && e.code.indexOf("Digit") === 0) posDigit = e.code.slice(5);
+      else if (e.key >= "1" && e.key <= "5") posDigit = e.key;
+      if (posDigit >= "1" && posDigit <= "5") {
+        e.preventDefault();
+        toggleSecPosKey(parseInt(posDigit, 10));
         return;
       }
     }
