@@ -535,9 +535,10 @@
       0 0 18px 4px rgba(163,73,164,.7),
       0 0 40px 10px rgba(163,73,164,.4);
   }
-  .sec-play-card:hover .face { filter: brightness(1.03); }
-  /* Pressed-in click feedback */
-  .sec-play-card:active .face {
+  .sec-play-card:hover:not(.is-active) .face { filter: brightness(1.03); }
+  /* Pressed-in while held OR while activated */
+  .sec-play-card:active .face,
+  .sec-play-card.is-active .face {
     transform: translateY(3px) scale(0.97);
     filter: brightness(0.92);
     box-shadow:
@@ -545,31 +546,36 @@
       0 0 4px 0 rgba(163,73,164,.55),
       0 0 10px 2px rgba(163,73,164,.35);
   }
-  .sec-play-card.tier-1:active .face {
+  .sec-play-card.tier-1:active .face,
+  .sec-play-card.tier-1.is-active .face {
     box-shadow:
       inset 0 3px 8px rgba(0,0,0,.35),
       0 0 4px 0 rgba(112,48,160,.55),
       0 0 10px 2px rgba(112,48,160,.35);
   }
-  .sec-play-card.tier-2:active .face {
+  .sec-play-card.tier-2:active .face,
+  .sec-play-card.tier-2.is-active .face {
     box-shadow:
       inset 0 3px 8px rgba(0,0,0,.35),
       0 0 4px 0 rgba(163,101,209,.55),
       0 0 10px 2px rgba(163,101,209,.35);
   }
-  .sec-play-card.tier-3:active .face {
+  .sec-play-card.tier-3:active .face,
+  .sec-play-card.tier-3.is-active .face {
     box-shadow:
       inset 0 3px 8px rgba(0,0,0,.35),
       0 0 4px 0 rgba(188,144,218,.5),
       0 0 10px 2px rgba(188,144,218,.3);
   }
-  .sec-play-card.tier-4:active .face {
+  .sec-play-card.tier-4:active .face,
+  .sec-play-card.tier-4.is-active .face {
     box-shadow:
       inset 0 3px 8px rgba(0,0,0,.35),
       0 0 4px 0 rgba(212,187,227,.45),
       0 0 10px 2px rgba(212,187,227,.25);
   }
-  .sec-play-card.tier-5:active .face {
+  .sec-play-card.tier-5:active .face,
+  .sec-play-card.tier-5.is-active .face {
     box-shadow:
       inset 0 3px 8px rgba(0,0,0,.35),
       0 0 4px 0 rgba(200,180,220,.4),
@@ -3404,8 +3410,10 @@ function publishPlayQueue() {
     try { playChannel.postMessage({ type: "queue", queue: playQueue }); } catch (e) {}
   }
 }
+var boardActiveKey = null;
 function clearPlayQueue() {
   playQueue = [];
+  boardActiveKey = null;
   publishPlayQueue();
   if (typeof renderPlayBoard === "function") renderPlayBoard();
   if (typeof syncAllPlaySelections === "function") syncAllPlaySelections();
@@ -3423,7 +3431,7 @@ function pullPlayQueue() {
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
   /* v= param forces the named popup to load current JS (Shift+C clear, etc.) */
-  var url = base + "?playboard=1&v=9";
+  var url = base + "?playboard=1&v=11";
   var w = window.open(url, "lickPlayBoard");
   if (!w) {
     alert("Pop-up blocked — allow pop-ups so Playboard can open in another window.");
@@ -3431,7 +3439,7 @@ function openPlayWindow() {
   }
   try {
     /* If an old Playboard tab is reused, navigate it to the fresh URL */
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=9") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=11") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -3466,7 +3474,7 @@ function initPlayboardPage() {
     + '<div class="sec-play-meta" id="secPlayMeta">Board — song[.class] + NP Enter · 0 / Shift+C clear · Esc close</div>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or Numpad 0)">Clear</button>'
     + '</div>'
-    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click Song Map sections or Lick Library cards to add riffs here.</div></div>'
+    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to press it in · click again to remove · song[.class]+Enter to add.</div></div>'
     + '</aside></div></div>';
   pullPlayQueue();
   trimPlayQueueToFit();
@@ -3476,12 +3484,18 @@ function initPlayboardPage() {
     var playCard = e.target.closest(".sec-play-card");
     if (!playCard) return;
     var key = playCard.getAttribute("data-key");
-    var idx = findPlayIndex(key);
-    if (idx >= 0) {
-      playQueue.splice(idx, 1);
+    if (!key) return;
+    /* First click activates (pressed); click active again to remove */
+    if (boardActiveKey === key) {
+      var idx = findPlayIndex(key);
+      if (idx >= 0) playQueue.splice(idx, 1);
+      boardActiveKey = null;
       publishPlayQueue();
       renderPlayBoard();
+      return;
     }
+    boardActiveKey = key;
+    renderPlayBoard();
   };
   var clearBtn = document.getElementById("secPlayClear");
   if (clearBtn) clearBtn.onclick = function(e){
@@ -4420,6 +4434,7 @@ function boardLickDisplayId(id) {
   return String(id || "").replace(/^(IM|WP|PC|HOD|RS|FOB|EF|P)-/, "");
 }
 function renderPlayBoard() {
+  if (boardActiveKey && findPlayIndex(boardActiveKey) < 0) boardActiveKey = null;
   var board = document.getElementById("secPlayBoard");
   var meta = document.getElementById("secPlayMeta");
   if (!board) return;
@@ -4442,7 +4457,7 @@ function renderPlayBoard() {
     var tier = slotBase(normalizeSlot(item.tier, 2));
     var fullId = item.code || item.lick || "";
     var shortId = boardLickDisplayId(fullId);
-    return '<div class="sec-play-card tier-'+tier+'" data-key="'+item.key+'" data-lick="'+fullId+'">'
+    return '<div class="sec-play-card tier-'+tier+(item.key === boardActiveKey ? " is-active" : "")+'" data-key="'+item.key+'" data-lick="'+fullId+'">'
       + '<div class="face">'
       + '<div class="ref">'+shortId+'</div>'
       + '<img src="'+item.src+'" alt="'+fullId+'">'
@@ -5942,11 +5957,17 @@ document.getElementById("sectionsSheet").onclick = function(e){
   var playCard = e.target.closest(".sec-play-card");
   if (playCard && sectionsMode === "play") {
     var key = playCard.getAttribute("data-key");
-    var idx = findPlayIndex(key);
-    if (idx >= 0) {
-      playQueue.splice(idx, 1);
+    if (!key) return;
+    if (boardActiveKey === key) {
+      var idx = findPlayIndex(key);
+      if (idx >= 0) playQueue.splice(idx, 1);
+      boardActiveKey = null;
       publishPlayQueue();
+      renderPlayBoard();
       syncPlayChipClasses();
+    } else {
+      boardActiveKey = key;
+      renderPlayBoard();
     }
     return;
   }
