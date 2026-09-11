@@ -1509,16 +1509,12 @@
     object-fit: cover;
     border-radius: 8px;
   }
-  /* LL riff-mode tiers: T1 plain; T2–T4 hue-rotate + screen over bold field color
-     (screen replaces near-black with the face-cover background; mid/highlights keep hue spin); T5 invert */
-  .phrase.flipped.tier-1 img.cover { filter: none; mix-blend-mode: normal; }
-  .phrase.flipped.tier-2 .face-cover { background: #7a00d6; }
-  .phrase.flipped.tier-2 img.cover { filter: hue-rotate(-18deg) saturate(1.45); mix-blend-mode: screen; }
-  .phrase.flipped.tier-3 .face-cover { background: #0058f0; }
-  .phrase.flipped.tier-3 img.cover { filter: hue-rotate(200deg) saturate(1.35); mix-blend-mode: screen; }
-  .phrase.flipped.tier-4 .face-cover { background: #d49800; }
-  .phrase.flipped.tier-4 img.cover { filter: hue-rotate(95deg) saturate(1.4); mix-blend-mode: screen; }
-  .phrase.flipped.tier-5 img.cover { filter: invert(1); mix-blend-mode: normal; }
+  /* LL riff-mode tiers: T1 plain, T2–T4 hue-rotate (keeps color relationships), T5 invert */
+  .phrase.flipped.tier-1 img.cover { filter: none; }
+  .phrase.flipped.tier-2 img.cover { filter: hue-rotate(-18deg) saturate(1.45); } /* purple / violet punch */
+  .phrase.flipped.tier-3 img.cover { filter: hue-rotate(200deg) saturate(1.35); } /* blue */
+  .phrase.flipped.tier-4 img.cover { filter: hue-rotate(95deg) saturate(1.4); } /* gold */
+  .phrase.flipped.tier-5 img.cover { filter: invert(1); }
   .phrase.flipped .ref {
     z-index: 2;
   }
@@ -3523,7 +3519,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=29";
+  var url = base + "?playboard=1&v=30";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
