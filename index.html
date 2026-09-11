@@ -506,8 +506,15 @@
     align-content: flex-start;
     align-items: flex-start;
     gap: 8px;
-    overflow: hidden;
+    overflow: auto; /* scroll when licks exceed the fold */
+    overscroll-behavior: contain;
   }
+  .sec-play-board::-webkit-scrollbar { width: 10px; height: 10px; }
+  .sec-play-board::-webkit-scrollbar-thumb {
+    background: #3a3f4d;
+    border-radius: 8px;
+  }
+  .sec-play-board::-webkit-scrollbar-track { background: transparent; }
   .sec-play-card {
     position: relative;
     flex: 0 0 auto;
@@ -3431,7 +3438,7 @@ function pullPlayQueue() {
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
   /* v= param forces the named popup to load current JS (Shift+C clear, etc.) */
-  var url = base + "?playboard=1&v=11";
+  var url = base + "?playboard=1&v=12";
   var w = window.open(url, "lickPlayBoard");
   if (!w) {
     alert("Pop-up blocked — allow pop-ups so Playboard can open in another window.");
@@ -3439,7 +3446,7 @@ function openPlayWindow() {
   }
   try {
     /* If an old Playboard tab is reused, navigate it to the fresh URL */
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=11") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=12") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -4395,24 +4402,9 @@ function playCapacity() {
 function trimPlayQueueToFit() {
   return 0;
 }
-/** Cycle out oldest riffs until the newest set fits at native sizes. */
+/** Board scrolls instead of culling — keep every queued lick. */
 function trimPlayQueueAfterPaint() {
-  if (typeof isPlayboardPage === "function" && !isPlayboardPage()) return 0;
-  var board = document.getElementById("secPlayBoard");
-  if (!board || !playBoardReady()) return 0;
-  var removed = 0;
-  function overflows() {
-    return board.scrollHeight > board.clientHeight + 4
-      || board.scrollWidth > board.clientWidth + 4;
-  }
-  while (playQueue.length > 1 && overflows()) {
-    playQueue.shift();
-    removed++;
-    var first = board.querySelector(".sec-play-card");
-    if (first) first.remove();
-    else break;
-  }
-  return removed;
+  return 0;
 }
 function syncPlayChipClasses() {
   var visible = visiblePlayKeys();
