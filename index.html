@@ -1213,6 +1213,23 @@
     z-index: 0;
     border-radius: inherit;
   }
+  .cover-board.song-cols.ll-b .song-col-head .song-col-num {
+    position: absolute;
+    z-index: 3;
+    top: 4px;
+    left: 5px;
+    margin: 0;
+    padding: 2px 5px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    font-size: clamp(8px, calc(var(--card) * 0.16), 13px);
+    font-weight: 700;
+    letter-spacing: .02em;
+    line-height: 1.1;
+    pointer-events: none;
+  }
   .cover-board.song-cols.ll-b .song-col-head .song-col-title {
     position: relative;
     z-index: 2;
@@ -5294,9 +5311,15 @@ function rebuildColumnsB() {
     var plate = document.createElement("span");
     plate.className = "song-col-plate";
     plate.setAttribute("aria-hidden", "true");
+    if (song.track) {
+      var num = document.createElement("span");
+      num.className = "song-col-num";
+      num.textContent = String(song.track);
+      head.appendChild(num);
+    }
     var title = document.createElement("span");
     title.className = "song-col-title";
-    title.textContent = (song.track ? song.track + " " : "") + song.label;
+    title.textContent = song.label;
     head.appendChild(plate);
     head.appendChild(title);
     var body = document.createElement("div");
