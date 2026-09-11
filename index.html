@@ -1167,7 +1167,7 @@
   .cover-board.song-cols.ll-b {
     flex-direction: column;
     flex-wrap: nowrap;
-    gap: var(--ll-row-gap, 10px);
+    gap: var(--ll-row-gap, 1px);
     align-items: stretch;
     width: 100%;
     overflow: visible; /* don’t clip card glow */
@@ -1264,7 +1264,7 @@
     min-width: 0;
     align-items: center;
     overflow: visible; /* glow on all 4 corners */
-    padding: 6px 6px 6px 0;
+    padding: 1px 6px 1px 0; /* 1px above/below chips */
     box-sizing: border-box;
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped {
@@ -5218,7 +5218,7 @@ function enqueueLibraryByFilter(pred) {
 }
 function sizeLlBCard(board, maxNonPc, nRows) {
   var gap = 10;
-  var rowGap = 10;
+  var rowGap = 1; /* 1px above/below song chip rows */
   var top = 0;
   try { top = board.getBoundingClientRect().top; } catch (e) { top = 0; }
   if (!top) {
