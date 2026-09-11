@@ -3510,7 +3510,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=21";
+  var url = base + "?playboard=1&v=22";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -3539,7 +3539,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=21") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=22") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -4781,7 +4781,7 @@ function togglePlayPhrase(el) {
       song: librarySongLabel(),
       lick: name,
       tier: 2,
-      src: el.getAttribute("data-file") || lickSrc(name)
+      src: lickSrc(name)
     });
     trimPlayQueueToFit();
     publishPlayQueue();
@@ -5768,7 +5768,8 @@ function showSeries(letter) {
   tabWrap.innerHTML = items.map(function(it){
     var id = it.lick || it.id;
     var label = it.label || id;
-    var src = id ? (folder + id + ".png") : "";
+    /* lickSrc resolves CATALOG folder or section-crops/ for riff section tabs */
+    var src = id ? lickSrc(id) : "";
     var on = (flipped.indexOf(id) >= 0 || flipped.indexOf(label) >= 0) ? " flipped" : "";
     var kind = lickKind(id || label).toLowerCase();
     var song = songClass(id || ("WP-"+label));
