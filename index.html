@@ -3339,6 +3339,16 @@ function publishPlayQueue() {
     try { playChannel.postMessage({ type: "queue", queue: playQueue }); } catch (e) {}
   }
 }
+function clearPlayQueue() {
+  playQueue = [];
+  publishPlayQueue();
+  if (typeof renderPlayBoard === "function") renderPlayBoard();
+  if (typeof syncAllPlaySelections === "function") syncAllPlaySelections();
+  else {
+    if (typeof syncPlayChipClasses === "function") syncPlayChipClasses();
+    if (typeof syncPlayLibraryClasses === "function") syncPlayLibraryClasses();
+  }
+}
 function pullPlayQueue() {
   try {
     var raw = localStorage.getItem(PLAY_QUEUE_KEY);
@@ -3401,20 +3411,25 @@ function initPlayboardPage() {
     if (trimPlayQueueToFit()) publishPlayQueue();
     renderPlayBoard();
   });
-  document.addEventListener("keydown", function(e){
+  function onPlayboardKey(e){
     var tag = (e.target && e.target.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA") return;
     var k = (e.key || "").toLowerCase();
-    if (e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && k === "c") {
+    var isShiftC = e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && (k === "c" || e.code === "KeyC");
+    if (isShiftC) {
       e.preventDefault();
-      if (!playQueue.length) return;
-      playQueue = [];
-      publishPlayQueue();
-      renderPlayBoard();
+      e.stopPropagation();
+      clearPlayQueue();
       return;
     }
-    if (e.key === "Escape" || isNumpadKey(e, "0")) window.close();
-  });
+    if (e.key === "Escape" || (typeof isNumpadKey === "function" && isNumpadKey(e, "0"))) window.close();
+  }
+  document.addEventListener("keydown", onPlayboardKey, true);
+  window.addEventListener("keydown", onPlayboardKey, true);
+  try {
+    document.body.tabIndex = -1;
+    document.body.focus();
+  } catch (err) {}
 }
 var SEC_TYPE_ORDER = ["I","V","B","S","L","O","C","PC","F"];
 function collectSecTypes() {
@@ -4260,8 +4275,8 @@ function renderPlayBoard() {
   var visible = playQueue.slice();
   if (meta) {
     meta.innerHTML = playQueue.length
-      ? ("<strong>"+playQueue.length+"</strong> on Playboard")
-      : "Playboard — click sections on the map to add · click a card to remove";
+      ? ("<strong>"+playQueue.length+"</strong> on Playboard · Shift+C clear all")
+      : "Playboard — click a card to remove · Shift+C clear all";
   }
   if (!visible.length) {
     board.innerHTML = '<div class="sec-play-empty" id="secPlayEmpty">Click linked sections on the map to fill the Playboard.</div>';
@@ -5871,6 +5886,14 @@ document.addEventListener("keydown", function(e){
     }
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
+  /* Playspace: Shift+C clears all queued licks (popup Playboard or Song Map Play pane) */
+  if (e.shiftKey && ((e.key || "").toLowerCase() === "c" || e.code === "KeyC")) {
+    if (document.body.classList.contains("playboard-mode") || document.body.classList.contains("sections-play")) {
+      e.preventDefault();
+      clearPlayQueue();
+      return;
+    }
+  }
   var lb = document.getElementById("lb");
   if (lb && !lb.classList.contains("hidden")) {
     if (e.key === "Escape" || isNumpadKey(e, "0")) lb.className = "lightbox hidden";
