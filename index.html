@@ -3510,16 +3510,21 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  /* v= param forces the named popup to load current JS (Shift+C clear, etc.) */
-  var url = base + "?playboard=1&v=16";
-  var w = window.open(url, "lickPlayBoard");
+  /* v= param forces the named popup to load current JS */
+  var url = base + "?playboard=1&v=17";
+  /* Feature string forces a real popup window (not a browser tab) */
+  var ww = Math.min(1200, Math.max(800, (window.screen && screen.availWidth ? Math.floor(screen.availWidth * 0.62) : 1100)));
+  var wh = Math.min(900, Math.max(600, (window.screen && screen.availHeight ? Math.floor(screen.availHeight * 0.78) : 800)));
+  var left = (window.screen && screen.availLeft != null) ? Math.floor(screen.availLeft + (screen.availWidth - ww) / 2) : Math.floor((screen.width - ww) / 2);
+  var top = (window.screen && screen.availTop != null) ? Math.floor(screen.availTop + (screen.availHeight - wh) / 2) : Math.floor((screen.height - wh) / 2);
+  var features = "popup=yes,width="+ww+",height="+wh+",left="+left+",top="+top+",menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes";
+  var w = window.open(url, "lickPlayBoard", features);
   if (!w) {
-    alert("Pop-up blocked — allow pop-ups so Playboard can open in another window.");
+    alert("Pop-up blocked — allow pop-ups so the Board can open in another window.");
     return null;
   }
   try {
-    /* If an old Playboard tab is reused, navigate it to the fresh URL */
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=16") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=17") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
