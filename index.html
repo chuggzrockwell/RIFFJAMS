@@ -3423,8 +3423,8 @@ function initPlayboardPage() {
   document.body.innerHTML = '<div class="wrap"><div id="playboardRoot">'
     + '<aside class="sec-play-pane" id="secPlayPane">'
     + '<div class="sec-play-toolbar">'
-    + '<div class="sec-play-meta" id="secPlayMeta">Playboard — click a card to remove · Shift+C clear all</div>'
-    + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C)">Clear</button>'
+    + '<div class="sec-play-meta" id="secPlayMeta">Board — click a card to remove · Shift+C / Numpad 0 clear · Esc close</div>'
+    + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or Numpad 0)">Clear</button>'
     + '</div>'
     + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click Song Map sections or Lick Library cards to add riffs here.</div></div>'
     + '</aside></div></div>';
@@ -3463,7 +3463,15 @@ function initPlayboardPage() {
       clearPlayQueue();
       return;
     }
-    if (e.type === "keydown" && (e.key === "Escape" || (typeof isNumpadKey === "function" && isNumpadKey(e, "0")))) window.close();
+    if (e.type !== "keydown") return;
+    /* Numpad 0 clears the board; Escape closes the window */
+    if (typeof isNumpadKey === "function" && isNumpadKey(e, "0")) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      clearPlayQueue();
+      return;
+    }
+    if (e.key === "Escape") window.close();
   }
   document.addEventListener("keydown", onPlayboardKey, true);
   document.addEventListener("keyup", onPlayboardKey, true);
@@ -4318,8 +4326,8 @@ function renderPlayBoard() {
   var visible = playQueue.slice();
   if (meta) {
     meta.innerHTML = playQueue.length
-      ? ("<strong>"+playQueue.length+"</strong> on Playboard · Shift+C clear all")
-      : "Playboard — click a card to remove · Shift+C clear all";
+      ? ("<strong>"+playQueue.length+"</strong> on Board · Shift+C / Numpad 0 clear")
+      : "Board — click a card to remove · Shift+C / Numpad 0 clear · Esc close";
   }
   if (!visible.length) {
     board.innerHTML = '<div class="sec-play-empty" id="secPlayEmpty">Click linked sections on the map to fill the Playboard.</div>';
