@@ -3383,7 +3383,7 @@ function pullPlayQueue() {
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
   /* v= param forces the named popup to load current JS (Shift+C clear, etc.) */
-  var url = base + "?playboard=1&v=4";
+  var url = base + "?playboard=1&v=5";
   var w = window.open(url, "lickPlayBoard");
   if (!w) {
     alert("Pop-up blocked — allow pop-ups so Playboard can open in another window.");
@@ -3391,7 +3391,7 @@ function openPlayWindow() {
   }
   try {
     /* If an old Playboard tab is reused, navigate it to the fresh URL */
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=4") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=5") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -3423,7 +3423,7 @@ function initPlayboardPage() {
   document.body.innerHTML = '<div class="wrap"><div id="playboardRoot">'
     + '<aside class="sec-play-pane" id="secPlayPane">'
     + '<div class="sec-play-toolbar">'
-    + '<div class="sec-play-meta" id="secPlayMeta">Board — click a card to remove · Shift+C / Numpad 0 clear · Esc close</div>'
+    + '<div class="sec-play-meta" id="secPlayMeta">Board — Numpad 1–8 queue song · 0 / Shift+C clear · Esc close</div>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or Numpad 0)">Clear</button>'
     + '</div>'
     + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click Song Map sections or Lick Library cards to add riffs here.</div></div>'
@@ -3469,6 +3469,17 @@ function initPlayboardPage() {
       e.preventDefault();
       e.stopImmediatePropagation();
       clearPlayQueue();
+      return;
+    }
+    /* Numpad 1–8: queue all licks for that Paranoid album track */
+    var trackDigit = null;
+    for (var ti = 1; ti <= 8; ti++) {
+      if (typeof isNumpadKey === "function" && isNumpadKey(e, String(ti))) { trackDigit = String(ti); break; }
+    }
+    if (trackDigit) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      queueParanoidTrackForBoard(trackDigit);
       return;
     }
     if (e.key === "Escape") window.close();
@@ -4326,8 +4337,8 @@ function renderPlayBoard() {
   var visible = playQueue.slice();
   if (meta) {
     meta.innerHTML = playQueue.length
-      ? ("<strong>"+playQueue.length+"</strong> on Board · Shift+C / Numpad 0 clear")
-      : "Board — click a card to remove · Shift+C / Numpad 0 clear · Esc close";
+      ? ("<strong>"+playQueue.length+"</strong> on Board · 1–8 queue · 0 clear")
+      : "Board — Numpad 1–8 queue song · 0 / Shift+C clear · Esc close";
   }
   if (!visible.length) {
     board.innerHTML = '<div class="sec-play-empty" id="secPlayEmpty">Click linked sections on the map to fill the Playboard.</div>';
@@ -5324,10 +5335,60 @@ var PARANOID_TRACK_PREFIX = {
   "7": "RS-",
   "8": "FOB-"
 };
+var PARANOID_TRACK_NAME = {
+  "1": "War Pigs",
+  "2": "Paranoid",
+  "3": "Planet Caravan",
+  "4": "Iron Man",
+  "5": "Electric Funeral",
+  "6": "Hand of Doom",
+  "7": "Rat Salad",
+  "8": "Fairies Wear Boots"
+};
 function revealParanoidTrack(digit) {
   var prefix = PARANOID_TRACK_PREFIX[String(digit)];
   if (!prefix) return;
   revealSong(prefix);
+}
+/** Board: numpad 1–8 queues all Paranoid-album licks for that track. */
+function queueParanoidTrackForBoard(digit) {
+  var d = String(digit);
+  var prefix = PARANOID_TRACK_PREFIX[d];
+  if (!prefix) return;
+  var songName = PARANOID_TRACK_NAME[d] || "Paranoid";
+  var ids = [];
+  (CATALOG || []).forEach(function(x){
+    if (!x || x[1] !== "B") return;
+    var id = x[0];
+    if (typeof lickMatchesPrefix === "function" ? lickMatchesPrefix(id, prefix) : (id.indexOf(prefix) === 0)) {
+      ids.push(id);
+    }
+  });
+  if (!ids.length) return;
+  var keys = ids.map(function(id){ return "lib|B|" + id; });
+  var allIn = keys.every(function(key){ return findPlayIndex(key) >= 0; });
+  if (allIn) {
+    keys.forEach(function(key){
+      var i = findPlayIndex(key);
+      if (i >= 0) playQueue.splice(i, 1);
+    });
+  } else {
+    ids.forEach(function(id){
+      var key = "lib|B|" + id;
+      if (findPlayIndex(key) >= 0) return;
+      playQueue.push({
+        key: key,
+        code: id,
+        song: songName,
+        lick: id,
+        tier: 2,
+        src: lickSrc(id)
+      });
+    });
+  }
+  publishPlayQueue();
+  if (typeof renderPlayBoard === "function") renderPlayBoard();
+  if (typeof syncAllPlaySelections === "function") syncAllPlaySelections();
 }
 function revealSong(prefix) {
   if (enqueueLibraryByFilter(function(n){ return lickMatchesPrefix(n, prefix); })) return;
