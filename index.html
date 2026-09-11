@@ -1509,6 +1509,31 @@
     object-fit: cover;
     border-radius: 8px;
   }
+  /* LL riff-mode: tier brightness — T1 full, then ~20–25% steps down */
+  .phrase.flipped.tier-1 img.cover { filter: brightness(1); }
+  .phrase.flipped.tier-2 img.cover { filter: brightness(0.78); }
+  .phrase.flipped.tier-3 img.cover { filter: brightness(0.58); }
+  .phrase.flipped.tier-4 img.cover { filter: brightness(0.40); }
+  .phrase.flipped.tier-5 img.cover { filter: brightness(0.25); }
+  .phrase.flipped.tier-2 .face-cover::after,
+  .phrase.flipped.tier-3 .face-cover::after,
+  .phrase.flipped.tier-4 .face-cover::after,
+  .phrase.flipped.tier-5 .face-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .phrase.flipped.tier-2 .face-cover::after { background: rgba(0,0,0,.10); }
+  .phrase.flipped.tier-3 .face-cover::after { background: rgba(0,0,0,.18); }
+  .phrase.flipped.tier-4 .face-cover::after { background: rgba(0,0,0,.28); }
+  .phrase.flipped.tier-5 .face-cover::after { background: rgba(0,0,0,.38); }
+  .phrase.flipped .face-cover { overflow: hidden; }
+  .phrase.flipped .ref {
+    z-index: 2;
+  }
   .phrase.flipped .ref {
     display: flex; align-items: center; justify-content: center;
     position: absolute; left: 0; right: 0; top: auto; bottom: 0;
@@ -3510,7 +3535,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=22";
+  var url = base + "?playboard=1&v=23";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5687,7 +5712,7 @@ function llChipItemsForMode(mode) {
     "War Pigs": "WP-", "Paranoid": "P-", "Planet Caravan": "PC-", "Iron Man": "IM-",
     "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-"
   };
-  function pushItem(label, lick, songName) {
+  function pushItem(label, lick, songName, tier) {
     var lab = String(label || "").trim();
     var id = (lick || "").trim();
     if (!lab && !id) return;
@@ -5699,7 +5724,9 @@ function llChipItemsForMode(mode) {
     var key = lab + "|" + id + "|" + (songName || "");
     if (seen[key]) return;
     seen[key] = true;
-    out.push({ id: id, label: lab, lick: (lick || "").trim() || id, song: songName || "" });
+    var tNum = parseInt(tier, 10);
+    if (!(tNum >= 1 && tNum <= 5)) tNum = 3;
+    out.push({ id: id, label: lab, lick: (lick || "").trim() || id, song: songName || "", tier: tNum });
   }
   if (mode === "solo") {
     if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
@@ -5710,7 +5737,7 @@ function llChipItemsForMode(mode) {
           if (!pair || !pair[0]) return;
           var lab = pair[0];
           var lick = (pair[2] || pair[0] || "").trim();
-          pushItem(lab, lick, s.song);
+          pushItem(lab, lick, s.song, pair[1]);
         });
       });
     });
@@ -5724,7 +5751,7 @@ function llChipItemsForMode(mode) {
         if (!pair || !pair[0]) return;
         var code = pair[0];
         var lick = (pair[2] || "").trim();
-        pushItem(code, lick, s.song);
+        pushItem(code, lick, s.song, pair[1]);
       });
     });
   });
@@ -5773,15 +5800,17 @@ function showSeries(letter) {
     var on = (flipped.indexOf(id) >= 0 || flipped.indexOf(label) >= 0) ? " flipped" : "";
     var kind = lickKind(id || label).toLowerCase();
     var song = songClass(id || ("WP-"+label));
+    var tier = (it.tier >= 1 && it.tier <= 5) ? it.tier : 3;
+    var tierCls = (letter === "B" && llMode === "riff") ? (" tier-"+tier) : "";
     if (cover) {
-      return '<div class="phrase '+kind+' '+song+on+' no-anim" draggable="true" data-name="'+id+'" data-label="'+label+'" data-file="'+src+'">'
+      return '<div class="phrase '+kind+' '+song+on+tierCls+' no-anim" draggable="true" data-name="'+id+'" data-label="'+label+'" data-tier="'+tier+'" data-file="'+src+'">'
         + '<div class="card-inner">'
         + '<div class="face face-tab"><img class="tab" src="'+src+'" alt="'+label+'"></div>'
         + '<div class="face face-cover"><img class="cover" src="'+cover+'" alt=""></div>'
         + '<span class="ref">'+label+'</span>'
         + '</div></div>';
     }
-    return '<div class="phrase '+kind+' '+song+'" draggable="true" data-name="'+id+'" data-label="'+label+'" data-file="'+src+'"><img class="tab" src="'+src+'" alt="'+label+'"></div>';
+    return '<div class="phrase '+kind+' '+song+tierCls+'" draggable="true" data-name="'+id+'" data-label="'+label+'" data-tier="'+tier+'" data-file="'+src+'"><img class="tab" src="'+src+'" alt="'+label+'"></div>';
   }).join("");
   [].forEach.call(document.querySelectorAll(".phrase"), placePhrase);
   requestAnimationFrame(function(){
