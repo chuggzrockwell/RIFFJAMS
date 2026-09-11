@@ -1509,12 +1509,12 @@
     object-fit: cover;
     border-radius: 8px;
   }
-  /* LL riff-mode: duotone by tier — dark mass → bold color, fully bright */
-  .phrase.flipped.tier-1 img.cover { filter: url(#ll-duotone-1); }
+  /* LL riff-mode tiers: T1 unaltered, T2 purple, T3 blue, T4 gold, T5 full invert */
+  .phrase.flipped.tier-1 img.cover { filter: none; }
   .phrase.flipped.tier-2 img.cover { filter: url(#ll-duotone-2); }
   .phrase.flipped.tier-3 img.cover { filter: url(#ll-duotone-3); }
   .phrase.flipped.tier-4 img.cover { filter: url(#ll-duotone-4); }
-  .phrase.flipped.tier-5 img.cover { filter: url(#ll-duotone-5); }
+  .phrase.flipped.tier-5 img.cover { filter: invert(1); }
   .phrase.flipped .ref {
     z-index: 2;
   }
@@ -2352,20 +2352,14 @@
 <!-- LL riff-mode tier duotone filters -->
 <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
   <defs>
-    <filter id="ll-duotone-1" color-interpolation-filters="sRGB" x="0%" y="0%" width="100%" height="100%">
-      <feColorMatrix type="matrix" values="0.18675 0.62825 0.06342 0 0.07059 0.18759 0.63106 0.06371 0 0.03137 0.18926 0.63667 0.06427 0 0.10980 0 0 0 1 0"/>
-    </filter>
     <filter id="ll-duotone-2" color-interpolation-filters="sRGB" x="0%" y="0%" width="100%" height="100%">
       <feColorMatrix type="matrix" values="0.13673 0.45997 0.04643 0 0.35686 0.21260 0.71520 0.07220 0 0.00000 0.07253 0.24401 0.02463 0 0.65882 0 0 0 1 0"/>
     </filter>
     <filter id="ll-duotone-3" color-interpolation-filters="sRGB" x="0%" y="0%" width="100%" height="100%">
-      <feColorMatrix type="matrix" values="0.06586 0.22157 0.02237 0 0.69020 0.21260 0.71520 0.07220 0 0.00000 0.19259 0.64789 0.06540 0 0.09412 0 0 0 1 0"/>
+      <feColorMatrix type="matrix" values="0.19342 0.65069 0.06569 0 0.00000 0.14674 0.49363 0.04983 0 0.25098 0.04585 0.15426 0.01557 0 0.78431 0 0 0 1 0"/>
     </filter>
     <filter id="ll-duotone-4" color-interpolation-filters="sRGB" x="0%" y="0%" width="100%" height="100%">
       <feColorMatrix type="matrix" values="0.04919 0.16548 0.01671 0 0.76863 0.09254 0.31132 0.03143 0 0.53725 0.19176 0.64508 0.06512 0 0.00000 0 0 0 1 0"/>
-    </filter>
-    <filter id="ll-duotone-5" color-interpolation-filters="sRGB" x="0%" y="0%" width="100%" height="100%">
-      <feColorMatrix type="matrix" values="-0.18509 -0.62264 -0.06286 0 0.90980 -0.19843 -0.66752 -0.06739 0 0.95686 -0.19593 -0.65911 -0.06654 0 1.00000 0 0 0 1 0"/>
     </filter>
   </defs>
 </svg>
@@ -3539,7 +3533,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=26";
+  var url = base + "?playboard=1&v=27";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
