@@ -1509,12 +1509,28 @@
     object-fit: cover;
     border-radius: 8px;
   }
-  /* LL riff-mode tiers: T1 plain; T2–T4 invert+hue-rotate (invert-style contrast); T5 invert */
+  /* LL riff-mode tiers: T1 plain; T5 invert;
+     T2–T4 = invert (keep luminance contrast) + color-blend tint (hue without light-on-light wash) */
   .phrase.flipped.tier-1 img.cover { filter: none; }
-  .phrase.flipped.tier-2 img.cover { filter: invert(1) hue-rotate(280deg) saturate(1.25); } /* purple */
-  .phrase.flipped.tier-3 img.cover { filter: invert(1) hue-rotate(180deg) saturate(1.25); } /* blue */
-  .phrase.flipped.tier-4 img.cover { filter: invert(1) hue-rotate(55deg) saturate(1.3); } /* gold */
+  .phrase.flipped.tier-2 img.cover,
+  .phrase.flipped.tier-3 img.cover,
+  .phrase.flipped.tier-4 img.cover,
   .phrase.flipped.tier-5 img.cover { filter: invert(1); }
+  .phrase.flipped.tier-2 .face-cover::after,
+  .phrase.flipped.tier-3 .face-cover::after,
+  .phrase.flipped.tier-4 .face-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    mix-blend-mode: color;
+    z-index: 1;
+  }
+  .phrase.flipped.tier-2 .face-cover::after { background: #9b2dff; } /* purple */
+  .phrase.flipped.tier-3 .face-cover::after { background: #2a6bff; } /* blue */
+  .phrase.flipped.tier-4 .face-cover::after { background: #e0a000; } /* gold */
+  .phrase.flipped .face-cover { overflow: hidden; }
   .phrase.flipped .ref {
     z-index: 2;
   }
@@ -3519,7 +3535,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=31";
+  var url = base + "?playboard=1&v=32";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
