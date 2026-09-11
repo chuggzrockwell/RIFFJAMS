@@ -519,7 +519,7 @@
     overflow: visible;
     display: flex;
     flex-direction: column;
-    padding: 16px 8px 14px;
+    padding: 1px 8px; /* 1px above/below glow */
     box-sizing: border-box;
     cursor: pointer;
   }
@@ -3383,7 +3383,7 @@ function pullPlayQueue() {
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
   /* v= param forces the named popup to load current JS (Shift+C clear, etc.) */
-  var url = base + "?playboard=1&v=5";
+  var url = base + "?playboard=1&v=7";
   var w = window.open(url, "lickPlayBoard");
   if (!w) {
     alert("Pop-up blocked — allow pop-ups so Playboard can open in another window.");
@@ -3391,7 +3391,7 @@ function openPlayWindow() {
   }
   try {
     /* If an old Playboard tab is reused, navigate it to the fresh URL */
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=5") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=7") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -3423,7 +3423,7 @@ function initPlayboardPage() {
   document.body.innerHTML = '<div class="wrap"><div id="playboardRoot">'
     + '<aside class="sec-play-pane" id="secPlayPane">'
     + '<div class="sec-play-toolbar">'
-    + '<div class="sec-play-meta" id="secPlayMeta">Board — Numpad 1–8 queue song · 0 / Shift+C clear · Esc close</div>'
+    + '<div class="sec-play-meta" id="secPlayMeta">Board — song[.class] + NP Enter · 0 / Shift+C clear · Esc close</div>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or Numpad 0)">Clear</button>'
     + '</div>'
     + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click Song Map sections or Lick Library cards to add riffs here.</div></div>'
@@ -3460,29 +3460,74 @@ function initPlayboardPage() {
     if (isShiftC) {
       e.preventDefault();
       e.stopImmediatePropagation();
+      boardEntryBuf = "";
       clearPlayQueue();
       return;
     }
     if (e.type !== "keydown") return;
-    /* Numpad 0 clears the board; Escape closes the window */
+    /* Numpad 0 clears entry buffer + board; Escape clears buffer or closes */
     if (typeof isNumpadKey === "function" && isNumpadKey(e, "0")) {
       e.preventDefault();
       e.stopImmediatePropagation();
+      boardEntryBuf = "";
       clearPlayQueue();
       return;
     }
-    /* Numpad 1–8: queue all licks for that Paranoid album track */
-    var trackDigit = null;
-    for (var ti = 1; ti <= 8; ti++) {
-      if (typeof isNumpadKey === "function" && isNumpadKey(e, String(ti))) { trackDigit = String(ti); break; }
-    }
-    if (trackDigit) {
+    if (e.key === "Escape") {
       e.preventDefault();
       e.stopImmediatePropagation();
-      queueParanoidTrackForBoard(trackDigit);
+      if (boardEntryBuf) { boardEntryBuf = ""; updateBoardEntryMeta(); return; }
+      window.close();
       return;
     }
-    if (e.key === "Escape") window.close();
+    if (e.key === "Backspace") {
+      if (!boardEntryBuf) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      boardEntryBuf = boardEntryBuf.slice(0, -1);
+      updateBoardEntryMeta();
+      return;
+    }
+    /* NP Enter (or Enter): commit song[.class] and display matching licks */
+    var isNpEnter = e.code === "NumpadEnter" || (e.key === "Enter" && e.location === 3);
+    var isEnter = e.key === "Enter" || e.code === "Enter" || isNpEnter;
+    if (isEnter) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      commitBoardEntry();
+      return;
+    }
+    /* Decimal point for song.class (NumpadDecimal / . / ,) */
+    var isDot = e.code === "NumpadDecimal" || e.key === "." || e.key === "," || e.code === "Period";
+    if (isDot) {
+      if (!/^[1-8]$/.test(boardEntryBuf)) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      boardEntryBuf += ".";
+      updateBoardEntryMeta();
+      return;
+    }
+    /* Digits: build buffer — do not display until Enter */
+    var digit = null;
+    for (var ti = 0; ti <= 9; ti++) {
+      if (typeof isNumpadKey === "function" && isNumpadKey(e, String(ti))) { digit = String(ti); break; }
+    }
+    if (!digit && e.location === 3 && /^[0-9]$/.test(String(e.key))) digit = String(e.key);
+    if (!digit) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (!boardEntryBuf) {
+      if (digit >= "1" && digit <= "8") boardEntryBuf = digit;
+    } else if (/^[1-8]$/.test(boardEntryBuf)) {
+      /* second digit without decimal replaces song pick */
+      if (digit >= "1" && digit <= "8") boardEntryBuf = digit;
+    } else if (/^[1-8]\.$/.test(boardEntryBuf)) {
+      if (digit >= "1" && digit <= "5") boardEntryBuf += digit;
+    } else if (/^[1-8]\.[1-5]$/.test(boardEntryBuf)) {
+      /* complete — new song digit starts fresh */
+      if (digit >= "1" && digit <= "8") boardEntryBuf = digit;
+    }
+    updateBoardEntryMeta();
   }
   document.addEventListener("keydown", onPlayboardKey, true);
   document.addEventListener("keyup", onPlayboardKey, true);
@@ -4336,9 +4381,13 @@ function renderPlayBoard() {
   if (!board) return;
   var visible = playQueue.slice();
   if (meta) {
-    meta.innerHTML = playQueue.length
-      ? ("<strong>"+playQueue.length+"</strong> on Board · 1–8 queue · 0 clear")
-      : "Board — Numpad 1–8 queue song · 0 / Shift+C clear · Esc close";
+    if (typeof boardEntryBuf !== "undefined" && boardEntryBuf) {
+      meta.innerHTML = "Entry <strong>" + boardEntryBuf + "</strong> · " + boardEntryLabel(boardEntryBuf) + " · NP Enter to show";
+    } else {
+      meta.innerHTML = playQueue.length
+        ? ("<strong>"+playQueue.length+"</strong> on Board · song[.class] + Enter · 0 clear")
+        : "Board — song[.class] + NP Enter · 0 / Shift+C clear · Esc close";
+    }
   }
   if (!visible.length) {
     board.innerHTML = '<div class="sec-play-empty" id="secPlayEmpty">Click linked sections on the map to fill the Playboard.</div>';
@@ -5350,19 +5399,45 @@ function revealParanoidTrack(digit) {
   if (!prefix) return;
   revealSong(prefix);
 }
-/** Board: numpad 1–8 queues all Paranoid-album licks for that track. */
-function queueParanoidTrackForBoard(digit) {
+/** Board entry buffer: type song[.class] on numpad, Enter to display. */
+var boardEntryBuf = "";
+var BOARD_CLASS_BY_DIGIT = { "1": "A", "2": "B", "3": "C", "4": "D", "5": "E" };
+function boardEntryLabel(buf) {
+  if (!buf) return "";
+  var parts = String(buf).split(".");
+  var song = PARANOID_TRACK_NAME[parts[0]] || ("#" + parts[0]);
+  if (parts.length === 1 || parts[1] === "") return song + " (all classes)";
+  var cls = BOARD_CLASS_BY_DIGIT[parts[1]] || ("?" + parts[1]);
+  return song + " class " + cls;
+}
+function updateBoardEntryMeta() {
+  var meta = document.getElementById("secPlayMeta");
+  if (!meta) return;
+  if (boardEntryBuf) {
+    meta.innerHTML = "Entry <strong>" + boardEntryBuf + "</strong> · " + boardEntryLabel(boardEntryBuf) + " · NP Enter to show";
+    return;
+  }
+  meta.innerHTML = playQueue.length
+    ? ("<strong>"+playQueue.length+"</strong> on Board · song[.class] + Enter · 0 clear")
+    : "Board — song[.class] + NP Enter · 0 / Shift+C clear · Esc close";
+}
+/**
+ * Board: queue Paranoid track licks. digit 1–8; optional classKind A–E.
+ * Toggle: if every matching lick is already queued, remove them; else add missing.
+ */
+function queueParanoidTrackForBoard(digit, classKind) {
   var d = String(digit);
   var prefix = PARANOID_TRACK_PREFIX[d];
   if (!prefix) return;
   var songName = PARANOID_TRACK_NAME[d] || "Paranoid";
+  var wantKind = classKind ? String(classKind).toUpperCase() : null;
   var ids = [];
   (CATALOG || []).forEach(function(x){
     if (!x || x[1] !== "B") return;
     var id = x[0];
-    if (typeof lickMatchesPrefix === "function" ? lickMatchesPrefix(id, prefix) : (id.indexOf(prefix) === 0)) {
-      ids.push(id);
-    }
+    if (!(typeof lickMatchesPrefix === "function" ? lickMatchesPrefix(id, prefix) : (id.indexOf(prefix) === 0))) return;
+    if (wantKind && lickKind(id) !== wantKind) return;
+    ids.push(id);
   });
   if (!ids.length) return;
   var keys = ids.map(function(id){ return "lib|B|" + id; });
@@ -5389,6 +5464,19 @@ function queueParanoidTrackForBoard(digit) {
   publishPlayQueue();
   if (typeof renderPlayBoard === "function") renderPlayBoard();
   if (typeof syncAllPlaySelections === "function") syncAllPlaySelections();
+}
+function commitBoardEntry() {
+  var buf = String(boardEntryBuf || "").trim();
+  boardEntryBuf = "";
+  if (!buf) return;
+  var m = buf.match(/^([1-8])(?:\.([1-5]))?$/);
+  if (!m) {
+    updateBoardEntryMeta();
+    return;
+  }
+  var kind = m[2] ? BOARD_CLASS_BY_DIGIT[m[2]] : null;
+  queueParanoidTrackForBoard(m[1], kind);
+  updateBoardEntryMeta();
 }
 function revealSong(prefix) {
   if (enqueueLibraryByFilter(function(n){ return lickMatchesPrefix(n, prefix); })) return;
