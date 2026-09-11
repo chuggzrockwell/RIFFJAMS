@@ -472,6 +472,31 @@
     color: rgba(255,255,255,.65);
     letter-spacing: .02em;
   }
+  .sec-play-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 8px;
+    flex: 0 0 auto;
+  }
+  .sec-play-toolbar .sec-play-meta { margin: 0; flex: 1 1 auto; }
+  .sec-play-clear {
+    appearance: none;
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #3a3f4d;
+    background: #1a1d26;
+    color: #e8e6e1;
+    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-size: 0.75rem;
+    letter-spacing: .04em;
+    cursor: pointer;
+    user-select: none;
+  }
+  .sec-play-clear:hover { filter: brightness(1.15); border-color: #7a8090; }
   .sec-play-meta strong { color: #fff; font-weight: 800; }
   .sec-play-board {
     flex: 1 1 auto;
@@ -3357,11 +3382,19 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var w = window.open(base + "?playboard=1", "lickPlayBoard");
+  /* v= param forces the named popup to load current JS (Shift+C clear, etc.) */
+  var url = base + "?playboard=1&v=3";
+  var w = window.open(url, "lickPlayBoard");
   if (!w) {
     alert("Pop-up blocked — allow pop-ups so Playboard can open in another window.");
     return null;
   }
+  try {
+    /* If an old Playboard tab is reused, navigate it to the fresh URL */
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=3") < 0) {
+      w.location.href = url;
+    }
+  } catch (e) {}
   try { w.focus(); } catch (e) {}
   return w;
 }
@@ -3389,7 +3422,10 @@ function initPlayboardPage() {
   document.body.className = "playboard-mode";
   document.body.innerHTML = '<div class="wrap"><div id="playboardRoot">'
     + '<aside class="sec-play-pane" id="secPlayPane">'
+    + '<div class="sec-play-toolbar">'
     + '<div class="sec-play-meta" id="secPlayMeta">Playboard — click a card to remove · Shift+C clear all</div>'
+    + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C)">Clear</button>'
+    + '</div>'
     + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click Song Map sections or Lick Library cards to add riffs here.</div></div>'
     + '</aside></div></div>';
   pullPlayQueue();
@@ -3407,6 +3443,11 @@ function initPlayboardPage() {
       renderPlayBoard();
     }
   };
+  var clearBtn = document.getElementById("secPlayClear");
+  if (clearBtn) clearBtn.onclick = function(e){
+    e.preventDefault();
+    clearPlayQueue();
+  };
   window.addEventListener("resize", function(){
     if (trimPlayQueueToFit()) publishPlayQueue();
     renderPlayBoard();
@@ -3418,14 +3459,16 @@ function initPlayboardPage() {
     var isShiftC = e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && (k === "c" || e.code === "KeyC");
     if (isShiftC) {
       e.preventDefault();
-      e.stopPropagation();
+      e.stopImmediatePropagation();
       clearPlayQueue();
       return;
     }
-    if (e.key === "Escape" || (typeof isNumpadKey === "function" && isNumpadKey(e, "0"))) window.close();
+    if (e.type === "keydown" && (e.key === "Escape" || (typeof isNumpadKey === "function" && isNumpadKey(e, "0")))) window.close();
   }
   document.addEventListener("keydown", onPlayboardKey, true);
+  document.addEventListener("keyup", onPlayboardKey, true);
   window.addEventListener("keydown", onPlayboardKey, true);
+  window.addEventListener("keyup", onPlayboardKey, true);
   try {
     document.body.tabIndex = -1;
     document.body.focus();
