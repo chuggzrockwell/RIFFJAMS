@@ -1510,14 +1510,13 @@
     border-radius: 8px;
   }
   /* LL riff-mode tiers: T1 plain; T5 invert;
-     T2–T4 = invert (keep luminance contrast) + color-blend tint (hue without light-on-light wash) */
+     T2/T4 = invert + color-blend tint; T3 = pre-remapped cover (hex chart), no CSS filter */
   .phrase.flipped.tier-1 img.cover { filter: none; }
+  .phrase.flipped.tier-3 img.cover { filter: none; }
   .phrase.flipped.tier-2 img.cover,
-  .phrase.flipped.tier-3 img.cover,
   .phrase.flipped.tier-4 img.cover,
   .phrase.flipped.tier-5 img.cover { filter: invert(1); }
   .phrase.flipped.tier-2 .face-cover::after,
-  .phrase.flipped.tier-3 .face-cover::after,
   .phrase.flipped.tier-4 .face-cover::after {
     content: "";
     position: absolute;
@@ -1528,7 +1527,6 @@
     z-index: 1;
   }
   .phrase.flipped.tier-2 .face-cover::after { background: #9b2dff; } /* purple */
-  .phrase.flipped.tier-3 .face-cover::after { background: #2a6bff; } /* blue */
   .phrase.flipped.tier-4 .face-cover::after { background: #e0a000; } /* gold */
   .phrase.flipped .face-cover { overflow: hidden; }
   .phrase.flipped .ref {
@@ -3535,7 +3533,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=32";
+  var url = base + "?playboard=1&v=33";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5043,6 +5041,7 @@ var CATALOG = [
 ];
 var FOLDER = { A: "a-crops/", B: "b-crops/", B2: "b-crops/", C: "svg/", D: "svg/" };
 var COVER = { A: "covers/sbs.png", B: "covers/paranoid.png", B2: "covers/paranoid.png" };
+var COVER_TIER3 = { B: "covers/paranoid-t3.png", B2: "covers/paranoid-t3.png" };
 var currentLetter = "";
 SOLO_MAP = loadSoloMap();
 try { if (!localStorage.getItem(SOLO_MAP_KEY)) localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP)); } catch (e) {}
@@ -5802,11 +5801,15 @@ function showSeries(letter) {
     var song = songClass(id || ("WP-"+label));
     var tier = (it.tier >= 1 && it.tier <= 5) ? it.tier : 3;
     var tierCls = (letter === "B" && llMode === "riff") ? (" tier-"+tier) : "";
+    var coverSrc = cover;
+    if (letter === "B" && llMode === "riff" && tier === 3 && COVER_TIER3[letter]) {
+      coverSrc = COVER_TIER3[letter];
+    }
     if (cover) {
       return '<div class="phrase '+kind+' '+song+on+tierCls+' no-anim" draggable="true" data-name="'+id+'" data-label="'+label+'" data-tier="'+tier+'" data-file="'+src+'">'
         + '<div class="card-inner">'
         + '<div class="face face-tab"><img class="tab" src="'+src+'" alt="'+label+'"></div>'
-        + '<div class="face face-cover"><img class="cover" src="'+cover+'" alt=""></div>'
+        + '<div class="face face-cover"><img class="cover" src="'+coverSrc+'" alt=""></div>'
         + '<span class="ref">'+label+'</span>'
         + '</div></div>';
     }
