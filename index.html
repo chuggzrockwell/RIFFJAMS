@@ -3379,7 +3379,7 @@ function initPlayboardPage() {
   document.body.className = "playboard-mode";
   document.body.innerHTML = '<div class="wrap"><div id="playboardRoot">'
     + '<aside class="sec-play-pane" id="secPlayPane">'
-    + '<div class="sec-play-meta" id="secPlayMeta">Playboard — click a card to remove</div>'
+    + '<div class="sec-play-meta" id="secPlayMeta">Playboard — click a card to remove · Shift+C clear all</div>'
     + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click Song Map sections or Lick Library cards to add riffs here.</div></div>'
     + '</aside></div></div>';
   pullPlayQueue();
@@ -3402,6 +3402,17 @@ function initPlayboardPage() {
     renderPlayBoard();
   });
   document.addEventListener("keydown", function(e){
+    var tag = (e.target && e.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    var k = (e.key || "").toLowerCase();
+    if (e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && k === "c") {
+      e.preventDefault();
+      if (!playQueue.length) return;
+      playQueue = [];
+      publishPlayQueue();
+      renderPlayBoard();
+      return;
+    }
     if (e.key === "Escape" || isNumpadKey(e, "0")) window.close();
   });
 }
