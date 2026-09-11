@@ -1070,29 +1070,53 @@
     padding: 6px 2px;
   }
 
-  /* Original Paranoid (letter B / LL-p): 8 album song columns, dynamic card size */
+  /* Original Paranoid (letter B / LL-p): 8 album song ROWS, dynamic card size */
   .cover-board.song-cols.ll-b {
+    flex-direction: column;
     flex-wrap: nowrap;
-    gap: var(--ll-col-gap, 10px);
-    align-items: flex-start;
+    gap: var(--ll-row-gap, 6px);
+    align-items: stretch;
     width: 100%;
-    overflow-x: auto;
+    overflow: hidden;
   }
   .cover-board.song-cols.ll-b .song-col {
-    --card: var(--ll-card, 100px);
-    --gap: var(--ll-gap, 6px);
-    width: calc(2 * var(--card) + var(--gap));
+    --card: var(--ll-card, 72px);
+    --gap: var(--ll-gap, 4px);
+    --label-w: var(--ll-label-w, 132px);
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap);
+    width: 100%;
+    max-width: 100%;
   }
   .cover-board.song-cols.ll-b .song-col-head {
-    min-height: calc(var(--card) * 0.42);
-    font-size: clamp(0.55rem, calc(var(--card) * 0.14), 1.05rem);
-    padding: 6px 4px;
+    flex: 0 0 var(--label-w);
+    width: var(--label-w);
+    min-width: var(--label-w);
+    max-width: var(--label-w);
+    min-height: var(--card);
+    height: var(--card);
+    font-size: clamp(0.5rem, calc(var(--card) * 0.18), 0.95rem);
+    padding: 4px 6px;
+    box-sizing: border-box;
   }
   .cover-board.song-cols.ll-b .song-col-head.long {
-    font-size: clamp(0.45rem, calc(var(--card) * 0.11), 0.72rem);
-    padding: 6px 2px;
+    font-size: clamp(0.42rem, calc(var(--card) * 0.14), 0.72rem);
+    padding: 4px 4px;
+  }
+  .cover-board.song-cols.ll-b .song-col-body {
+    display: flex;
+    flex-wrap: nowrap;
+    grid-template-columns: none;
+    gap: var(--gap);
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: center;
+    overflow: hidden;
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped {
+    flex: 0 0 var(--card);
     width: var(--card);
     height: var(--card);
     border-radius: 8px;
@@ -1106,6 +1130,7 @@
   }
   .cover-board.song-cols.ll-b .song-col-more {
     box-sizing: border-box;
+    flex: 0 0 var(--card);
     width: var(--card);
     height: var(--card);
     margin: 0;
@@ -1129,7 +1154,7 @@
     display: none !important;
   }
   .cover-board.song-cols.ll-b .song-col.is-empty .song-col-body {
-    min-height: calc(var(--card) * 0.5);
+    min-height: var(--card);
   }
   .phrase {
     box-sizing: border-box; padding: 0; cursor: grab;
@@ -4843,38 +4868,38 @@ function enqueueLibraryByFilter(pred) {
   syncPlayLibraryClasses();
   return true;
 }
-function sizeLlBCard(board, maxCount, nCols) {
-  var gap = 6;
-  var colGap = 10;
-  var headH = 40;
+function sizeLlBCard(board, maxNonPc, nRows) {
+  var gap = 4;
+  var rowGap = 6;
+  var labelW = 132;
   var top = 0;
   try { top = board.getBoundingClientRect().top; } catch (e) { top = 0; }
   if (!top) {
     var bar = document.querySelector("#series > .bar");
     top = bar ? (bar.getBoundingClientRect().bottom + 8) : 72;
   }
-  var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 4);
+  var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 8);
   var availH = Math.max(180, window.innerHeight - top - 12);
-  var rows = Math.max(1, Math.ceil(maxCount / 2));
-  var cardW = (availW - (nCols - 1) * colGap - nCols * gap) / (2 * nCols);
-  var cardH = (availH - headH - Math.max(0, rows - 1) * gap) / rows;
-  var card = Math.floor(Math.min(cardW, cardH, 100));
-  if (!isFinite(card) || card < 40) card = 40;
+  /* 8 song rows must fit vertically */
+  var cardByH = (availH - Math.max(0, nRows - 1) * rowGap) / nRows;
+  /* widest non-PC row must fit horizontally: label + cards */
+  var cardByW = (availW - labelW - gap - Math.max(0, maxNonPc - 1) * gap) / Math.max(1, maxNonPc);
+  var card = Math.floor(Math.min(cardByH, cardByW, 100));
+  if (!isFinite(card) || card < 36) card = 36;
+  if (card > 88) card = 88;
   board.style.setProperty("--ll-card", card + "px");
   board.style.setProperty("--ll-gap", gap + "px");
-  board.style.setProperty("--ll-col-gap", colGap + "px");
+  board.style.setProperty("--ll-row-gap", rowGap + "px");
+  board.style.setProperty("--ll-label-w", labelW + "px");
   return card;
 }
 function pcCollapsedVisibleCount(board, cardPx) {
-  var gap = 6;
-  var headH = 40;
-  var top = 0;
-  try { top = board.getBoundingClientRect().top; } catch (e) { top = 0; }
-  if (!top) top = 72;
-  var availH = Math.max(180, window.innerHeight - top - 12);
-  var rows = Math.max(1, Math.floor((availH - headH + gap) / (cardPx + gap)));
-  var slots = rows * 2;
-  // leave about one card-width before the edge for the + control
+  var gap = 4;
+  var labelW = 132;
+  var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 8);
+  var bodyW = availW - labelW - gap;
+  var slots = Math.max(1, Math.floor((bodyW + gap) / (cardPx + gap)));
+  /* leave about one card-width for the + control */
   return Math.max(1, slots - 1);
 }
 function rebuildColumnsB() {
@@ -4901,7 +4926,7 @@ function rebuildColumnsB() {
     board.className = "cover-board hidden";
     return;
   }
-  board.className = "cover-board song-cols ll-b";
+  board.className = "cover-board song-cols ll-b"; /* song ROWS */
   var maxOther = 1;
   songs.forEach(function(song){
     if (song.isPc) return;
