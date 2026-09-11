@@ -3383,7 +3383,7 @@ function pullPlayQueue() {
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
   /* v= param forces the named popup to load current JS (Shift+C clear, etc.) */
-  var url = base + "?playboard=1&v=7";
+  var url = base + "?playboard=1&v=8";
   var w = window.open(url, "lickPlayBoard");
   if (!w) {
     alert("Pop-up blocked — allow pop-ups so Playboard can open in another window.");
@@ -3391,7 +3391,7 @@ function openPlayWindow() {
   }
   try {
     /* If an old Playboard tab is reused, navigate it to the fresh URL */
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=7") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=8") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -4375,6 +4375,10 @@ function visiblePlayKeys() {
   playQueue.forEach(function(item){ map[item.key] = true; });
   return map;
 }
+/** Display label for Board LCs: drop song prefix (WP-/IM-/…); full id stays in data. */
+function boardLickDisplayId(id) {
+  return String(id || "").replace(/^(IM|WP|PC|HOD|RS|FOB|EF|P)-/, "");
+}
 function renderPlayBoard() {
   var board = document.getElementById("secPlayBoard");
   var meta = document.getElementById("secPlayMeta");
@@ -4396,12 +4400,14 @@ function renderPlayBoard() {
   }
   board.innerHTML = visible.map(function(item){
     var tier = slotBase(normalizeSlot(item.tier, 2));
-    return '<div class="sec-play-card tier-'+tier+'" data-key="'+item.key+'">'
+    var fullId = item.code || item.lick || "";
+    var shortId = boardLickDisplayId(fullId);
+    return '<div class="sec-play-card tier-'+tier+'" data-key="'+item.key+'" data-lick="'+fullId+'">'
       + '<div class="face">'
-      + '<div class="ref">'+item.code+'</div>'
-      + '<img src="'+item.src+'" alt="'+item.lick+'">'
+      + '<div class="ref">'+shortId+'</div>'
+      + '<img src="'+item.src+'" alt="'+fullId+'">'
       + '</div>'
-      + '<div class="cap">'+item.song+' · '+item.lick+'</div>'
+      + '<div class="cap">'+item.song+' · '+shortId+'</div>'
       + '</div>';
   }).join("");
   syncPlayChipClasses();
