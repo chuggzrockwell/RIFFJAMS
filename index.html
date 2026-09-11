@@ -174,6 +174,21 @@
   .sec-mode-btn.on {
     background: #111; color: #fff; border-color: #111;
   }
+  .map-mode-dd, .board-mode-dd { position: relative; flex: 0 0 auto; display: inline-flex; align-items: center; }
+  .map-mode-dd > select, .board-mode-dd > select {
+    appearance: none; -webkit-appearance: none; margin: 0;
+    padding: 5px 28px 5px 12px; border-radius: 999px;
+    border: 1px solid #3a3f4d; background: #1a1d26;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23c2c2be' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+    color: #e8e6e1; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+  }
+  body.sections-mode .map-mode-dd > select {
+    border-color: #2c3040; background-color: #12141a; color: #e8e6e1;
+  }
+  #series .board-mode-dd > select {
+    border-radius: 999px; padding: 5px 28px 5px 12px;
+  }
   #secHighlightTip {
     position: fixed;
     z-index: 9999;
@@ -1604,19 +1619,20 @@
   body.sections-mode .sec-save-status { color: rgba(232,230,225,.45); }
   body.sections-mode .sec-head-label { color: rgba(232,230,225,.4); }
   body.sections-mode .row-num {
-    background: transparent;
+    /* Number plate — top-left of each song, separate from title nameplate */
+    background: #333 !important;
     border: 0;
-    border-radius: 0;
-    color: #fff;
-    height: calc(var(--chip-h) - 4px);
-    min-height: calc(var(--chip-h) - 4px);
-    max-height: calc(var(--chip-h) - 4px);
-    width: var(--row-g);
-    min-width: var(--row-g);
-    max-width: var(--row-g);
-    flex: 0 0 var(--row-g);
+    border-radius: 8px;
+    color: #fff !important;
+    height: calc(var(--chip-h) - 6px);
+    min-height: calc(var(--chip-h) - 6px);
+    max-height: calc(var(--chip-h) - 6px);
+    width: calc(var(--chip-h) - 6px);
+    min-width: calc(var(--chip-h) - 6px);
+    max-width: calc(var(--chip-h) - 6px);
+    flex: 0 0 calc(var(--chip-h) - 6px);
     align-self: center;
-    margin-right: 0;
+    margin-right: 6px;
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
     font-size: 0.7rem;
     font-weight: 600;
@@ -1787,7 +1803,7 @@
 
   /* Song lists + Excel-style grid; covers hug max chip column (Acrobat = 10) */
   .sections-wrap {
-    --row-g: 28px;
+    --row-g: 34px;
     --name-w: 200px;
     --chip-w: 48px;
     --chip-h: 28px;
@@ -2325,13 +2341,18 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · 4 Solo · 5 Peek · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · Mode dropdown / 4 Solo · 5 Peek · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
       <button type="button" class="sec-mode-btn" data-sec-mode="edit">Edit</button>
       <button type="button" class="sec-mode-btn" data-sec-mode="play">Play</button>
-      <button type="button" class="sec-mode-btn" id="secSoloModeBtn" aria-pressed="false">Solo</button>
+      <label class="map-mode-dd" title="Riff = section chips · Solo = lick chips">
+        <select id="mapModeSelect" aria-label="Mode">
+          <option value="riff">Riff mode</option>
+          <option value="solo">Solo mode</option>
+        </select>
+      </label>
       <button type="button" class="sec-mode-btn" id="secPeekBtn" aria-pressed="false" title="Hover chips to peek tabs">Peek</button>
       <span class="sec-edit-tools" id="secEditTools" hidden>
         <button type="button" class="sec-tool-btn" id="secUndoBtn" title="Undo (Ctrl+Z)">Undo</button>
@@ -2426,6 +2447,12 @@
       <button type="button" class="btn-randomize" id="btnRandomize" title="Shuffle revealed tabs (Z)">Randomize</button>
       <button type="button" class="btn-randomize" id="btnReorder" title="Sort revealed tabs and cover cards by lick ID (O)">Reorder</button>
       <button type="button" class="btn-randomize" id="btnClear" title="Hide all revealed tabs (Shift+C)">Clear</button>
+      <label class="board-mode-dd" title="Riff / Solo chip set">
+        <select id="llBoardMode" aria-label="Mode">
+          <option value="riff">Riff mode</option>
+          <option value="solo">Solo mode</option>
+        </select>
+      </label>
       <span class="keys">Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Esc/0</span>
     </div>
     <div class="sheet" id="licks">
@@ -2498,6 +2525,45 @@ Shape: { albums: [{ name, songs: [{ song, licks: [[lickId,tier,lickId], ...] }] 
 */
 var SOLO_MAP_KEY = "lick-solo-map-v4";
 var soloMode = false;
+var LL_MODE_KEY = "riffjams-ll-mode";
+var llMode = "riff"; /* riff = section chips; solo = lick chips */
+try {
+  var _llm = localStorage.getItem(LL_MODE_KEY);
+  if (_llm === "solo" || _llm === "riff") llMode = _llm;
+} catch (eLm) {}
+soloMode = (llMode === "solo");
+function syncModeSelects() {
+  ["mapModeSelect", "llBoardMode", "boardModeSelect"].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.value = llMode;
+  });
+}
+function bindModeSelect(el) {
+  if (!el || el._modeBound) return;
+  el._modeBound = true;
+  el.value = llMode;
+  el.addEventListener("change", function(){ setPracticeMode(el.value); });
+}
+function setPracticeMode(mode, opts) {
+  opts = opts || {};
+  llMode = (mode === "solo") ? "solo" : "riff";
+  try { localStorage.setItem(LL_MODE_KEY, llMode); } catch (eSet) {}
+  soloMode = (llMode === "solo");
+  syncModeSelects();
+  closeChipEditor();
+  updateSoloUi();
+  updateEditSaveUi();
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden")) showSections(true);
+  /* LL: rebuild current series so the correct chips show */
+  if (document.body.classList.contains("sheet-mode") && currentLetter) {
+    showSeries(currentLetter);
+  }
+  if (playChannel && !opts.silent) {
+    try { playChannel.postMessage({ type: "ll-mode", mode: llMode }); } catch (eCh) {}
+  }
+}
+
 var SOLO_MAP = null;
 
 function blankSoloMapFromAlbums(albums) {
@@ -2653,24 +2719,12 @@ function totalSoloChips(map) {
   return n;
 }
 function updateSoloUi() {
-  var btn = document.getElementById("secSoloModeBtn");
-  if (btn) {
-    btn.classList.toggle("on", !!soloMode);
-    btn.setAttribute("aria-pressed", soloMode ? "true" : "false");
-  }
   document.body.classList.toggle("sections-solo", !!soloMode);
   if (!soloMode) document.body.classList.remove("solo-cols-collapsed");
+  syncModeSelects();
 }
 function setSoloMode(on) {
-  soloMode = !!on;
-  closeChipEditor();
-  updateSoloUi();
-  updateEditSaveUi();
-  if (document.getElementById("sections") && !document.getElementById("sections").classList.contains("hidden")) {
-    showSections(true);
-  } else {
-    updateEditSaveUi();
-  }
+  setPracticeMode(on ? "solo" : "riff");
 }
 function cloneAlbums(src) {
   return JSON.parse(JSON.stringify(src));
@@ -3272,6 +3326,8 @@ function toggleSoloColsCollapsed() {
 }
 
 function showSections(keepScroll) {
+  bindModeSelect(document.getElementById("mapModeSelect"));
+  syncModeSelects();
   smBuildPlaylist();
   smUpdateMeta();
   var sx = window.scrollX || window.pageXOffset || 0;
@@ -3438,7 +3494,7 @@ function pullPlayQueue() {
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
   /* v= param forces the named popup to load current JS (Shift+C clear, etc.) */
-  var url = base + "?playboard=1&v=12";
+  var url = base + "?playboard=1&v=14";
   var w = window.open(url, "lickPlayBoard");
   if (!w) {
     alert("Pop-up blocked — allow pop-ups so Playboard can open in another window.");
@@ -3446,7 +3502,7 @@ function openPlayWindow() {
   }
   try {
     /* If an old Playboard tab is reused, navigate it to the fresh URL */
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=12") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=14") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -3456,6 +3512,7 @@ function openPlayWindow() {
 function bindPlaySync() {
   if (playChannel) {
     playChannel.onmessage = function(ev){
+    if (ev.data && ev.data.type === "ll-mode") { setPracticeMode(ev.data.mode, { silent: true }); return; }
       if (!ev || !ev.data || ev.data.type !== "queue") return;
       playQueue = ev.data.queue || [];
       if (isPlayboardPage()) {
@@ -3479,13 +3536,20 @@ function initPlayboardPage() {
     + '<aside class="sec-play-pane" id="secPlayPane">'
     + '<div class="sec-play-toolbar">'
     + '<div class="sec-play-meta" id="secPlayMeta">Board — song[.class] + NP Enter · 0 / Shift+C clear · Esc close</div>'
-    + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or Numpad 0)">Clear</button>'
+    + '<label class="board-mode-dd" title="Riff / Solo">'
+    + '<select id="boardModeSelect" aria-label="Mode">'
+    + '<option value="riff">Riff mode</option>'
+    + '<option value="solo">Solo mode</option>'
+    + '</select></label>'
+    + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or 0 then Enter)">Clear</button>''
     + '</div>'
     + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to press it in · click again to remove · song[.class]+Enter to add.</div></div>'
     + '</aside></div></div>';
   pullPlayQueue();
   trimPlayQueueToFit();
   bindPlaySync();
+  bindModeSelect(document.getElementById("boardModeSelect"));
+  syncModeSelects();
   renderPlayBoard();
   document.getElementById("secPlayBoard").onclick = function(e){
     var playCard = e.target.closest(".sec-play-card");
@@ -3526,14 +3590,7 @@ function initPlayboardPage() {
       return;
     }
     if (e.type !== "keydown") return;
-    /* Numpad 0 clears entry buffer + board; Escape clears buffer or closes */
-    if (typeof isNumpadKey === "function" && isNumpadKey(e, "0")) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      boardEntryBuf = "";
-      clearPlayQueue();
-      return;
-    }
+    /* Escape clears buffer or closes — clear board with 0+Enter / Shift+C / Clear */
     if (e.key === "Escape") {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -3558,17 +3615,16 @@ function initPlayboardPage() {
       commitBoardEntry();
       return;
     }
-    /* Decimal point for song.class (NumpadDecimal / . / ,) */
+    /* Decimal: song.class or mode 0.1 / 0.2 */
     var isDot = e.code === "NumpadDecimal" || e.key === "." || e.key === "," || e.code === "Period";
     if (isDot) {
-      if (!/^[1-8]$/.test(boardEntryBuf)) return;
+      if (!/^[0-8]$/.test(boardEntryBuf)) return;
       e.preventDefault();
       e.stopImmediatePropagation();
       boardEntryBuf += ".";
       updateBoardEntryMeta();
       return;
     }
-    /* Digits: build buffer — do not display until Enter */
     var digit = null;
     for (var ti = 0; ti <= 9; ti++) {
       if (typeof isNumpadKey === "function" && isNumpadKey(e, String(ti))) { digit = String(ti); break; }
@@ -3578,15 +3634,18 @@ function initPlayboardPage() {
     e.preventDefault();
     e.stopImmediatePropagation();
     if (!boardEntryBuf) {
-      if (digit >= "1" && digit <= "8") boardEntryBuf = digit;
+      if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
+    } else if (boardEntryBuf === "0") {
+      /* wait for decimal (mode codes) */
     } else if (/^[1-8]$/.test(boardEntryBuf)) {
-      /* second digit without decimal replaces song pick */
       if (digit >= "1" && digit <= "8") boardEntryBuf = digit;
+      else if (digit === "0") boardEntryBuf = "0";
+    } else if (boardEntryBuf === "0.") {
+      if (digit === "1" || digit === "2") boardEntryBuf += digit;
     } else if (/^[1-8]\.$/.test(boardEntryBuf)) {
       if (digit >= "1" && digit <= "5") boardEntryBuf += digit;
-    } else if (/^[1-8]\.[1-5]$/.test(boardEntryBuf)) {
-      /* complete — new song digit starts fresh */
-      if (digit >= "1" && digit <= "8") boardEntryBuf = digit;
+    } else if (/^0\.[12]$/.test(boardEntryBuf) || /^[1-8]\.[1-5]$/.test(boardEntryBuf)) {
+      if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
     }
     updateBoardEntryMeta();
   }
@@ -4667,9 +4726,10 @@ function togglePlayPhrase(el) {
       syncPlayLibraryClasses();
       return;
     }
+    var labelB = (el.getAttribute("data-label") || name).trim();
     playQueue.push({
       key: keyB,
-      code: name,
+      code: labelB,
       song: librarySongLabel(),
       lick: name,
       tier: 2,
@@ -5457,6 +5517,10 @@ var boardEntryBuf = "";
 var BOARD_CLASS_BY_DIGIT = { "1": "A", "2": "B", "3": "C", "4": "D", "5": "E" };
 function boardEntryLabel(buf) {
   if (!buf) return "";
+  if (buf === "0") return "Clear board";
+  if (buf === "0.") return "Mode…";
+  if (buf === "0.1") return "Riff mode";
+  if (buf === "0.2") return "Solo mode";
   var parts = String(buf).split(".");
   var song = PARANOID_TRACK_NAME[parts[0]] || ("#" + parts[0]);
   if (parts.length === 1 || parts[1] === "") return song + " (all classes)";
@@ -5522,11 +5586,11 @@ function commitBoardEntry() {
   var buf = String(boardEntryBuf || "").trim();
   boardEntryBuf = "";
   if (!buf) return;
+  if (buf === "0") { clearPlayQueue(); updateBoardEntryMeta(); return; }
+  if (buf === "0.1") { setPracticeMode("riff"); updateBoardEntryMeta(); return; }
+  if (buf === "0.2") { setPracticeMode("solo"); updateBoardEntryMeta(); return; }
   var m = buf.match(/^([1-8])(?:\.([1-5]))?$/);
-  if (!m) {
-    updateBoardEntryMeta();
-    return;
-  }
+  if (!m) { updateBoardEntryMeta(); return; }
   var kind = m[2] ? BOARD_CLASS_BY_DIGIT[m[2]] : null;
   queueParanoidTrackForBoard(m[1], kind);
   updateBoardEntryMeta();
@@ -5560,6 +5624,59 @@ function revealGroup(group) {
     return lickGroup(el.getAttribute("data-name")) === group;
   }));
 }
+
+/** LL chip lists from current Song Map linking — riff=sections, solo=SOLO_MAP licks. */
+function llChipItemsForMode(mode) {
+  var out = [];
+  var seen = {};
+  var songPrefix = {
+    "War Pigs": "WP-", "Paranoid": "P-", "Planet Caravan": "PC-", "Iron Man": "IM-",
+    "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-"
+  };
+  function pushItem(label, lick, songName) {
+    var lab = String(label || "").trim();
+    var id = (lick || "").trim();
+    if (!lab && !id) return;
+    if (!id) {
+      var pref = songPrefix[songName] || "";
+      id = pref ? (pref + lab) : lab; /* synthetic id for song-row grouping */
+    }
+    if (!lab) lab = id;
+    var key = lab + "|" + id + "|" + (songName || "");
+    if (seen[key]) return;
+    seen[key] = true;
+    out.push({ id: id, label: lab, lick: (lick || "").trim() || id, song: songName || "" });
+  }
+  if (mode === "solo") {
+    if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
+    (SOLO_MAP && SOLO_MAP.albums || []).forEach(function(a){
+      if (!a || a.name !== "Paranoid") return;
+      (a.songs || []).forEach(function(s){
+        (s.licks || []).forEach(function(pair){
+          if (!pair || !pair[0]) return;
+          var lab = pair[0];
+          var lick = (pair[2] || pair[0] || "").trim();
+          pushItem(lab, lick, s.song);
+        });
+      });
+    });
+    return out;
+  }
+  /* riff mode: section chips from ALBUMS Paranoid — observe current linking */
+  (ALBUMS || ALBUMS_DEFAULT || []).forEach(function(a){
+    if (!a || a.name !== "Paranoid") return;
+    (a.songs || []).forEach(function(s){
+      (s.sections || []).forEach(function(pair){
+        if (!pair || !pair[0]) return;
+        var code = pair[0];
+        var lick = (pair[2] || "").trim();
+        pushItem(code, lick, s.song);
+      });
+    });
+  });
+  return out;
+}
+
 function showSeries(letter) {
   currentLetter = letter;
   pcColExpanded = false;
@@ -5570,6 +5687,8 @@ function showSeries(letter) {
   document.getElementById("home").className = "hidden";
   document.getElementById("sections").className = "hidden";
   document.getElementById("series").className = "";
+  bindModeSelect(document.getElementById("llBoardMode"));
+  syncModeSelects();
   var keysEl = document.querySelector("#series .keys");
   if (keysEl) {
     keysEl.textContent = (letter === "B")
@@ -5577,27 +5696,37 @@ function showSeries(letter) {
       : "Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Esc/0";
   }
   var catalogLetter = (letter === "B2") ? "B" : letter;
-  var items = applySavedOrder(CATALOG.filter(function(x){ return x[1] === catalogLetter; }), letter);
   var folder = FOLDER[letter] || FOLDER[catalogLetter] || "svg/";
-  document.getElementById("count").textContent = items.length + " licks";
   var cover = COVER[letter] || COVER[catalogLetter] || "";
   var flipped = flippedSet(letter);
   var tabWrap = document.getElementById("tabWrap");
   document.getElementById("coverBoard").innerHTML = "";
-  tabWrap.innerHTML = items.map(function(x){
-    var src = folder + x[0] + ".png";
-    var on = flipped.indexOf(x[0]) >= 0 ? " flipped" : "";
-    var kind = lickKind(x[0]).toLowerCase();
-    var song = songClass(x[0]);
+  /* LL modes (B): riff = section chips; solo = lick chips — same LL visuals, current linking */
+  var items = [];
+  if (letter === "B") {
+    items = llChipItemsForMode(llMode);
+  } else {
+    items = applySavedOrder(CATALOG.filter(function(x){ return x[1] === catalogLetter; }), letter).map(function(x){
+      return { id: x[0], label: x[0], lick: x[0] };
+    });
+  }
+  document.getElementById("count").textContent = items.length + (llMode === "solo" && letter === "B" ? " solo chips" : letter === "B" ? " riff chips" : " licks");
+  tabWrap.innerHTML = items.map(function(it){
+    var id = it.lick || it.id;
+    var label = it.label || id;
+    var src = id ? (folder + id + ".png") : "";
+    var on = (flipped.indexOf(id) >= 0 || flipped.indexOf(label) >= 0) ? " flipped" : "";
+    var kind = lickKind(id || label).toLowerCase();
+    var song = songClass(id || ("WP-"+label));
     if (cover) {
-      return '<div class="phrase '+kind+' '+song+on+' no-anim" draggable="true" data-name="'+x[0]+'" data-file="'+src+'">'
+      return '<div class="phrase '+kind+' '+song+on+' no-anim" draggable="true" data-name="'+id+'" data-label="'+label+'" data-file="'+src+'">'
         + '<div class="card-inner">'
-        + '<div class="face face-tab"><img class="tab" src="'+src+'" alt="'+x[0]+'"></div>'
+        + '<div class="face face-tab"><img class="tab" src="'+src+'" alt="'+label+'"></div>'
         + '<div class="face face-cover"><img class="cover" src="'+cover+'" alt=""></div>'
-        + '<span class="ref">'+x[0]+'</span>'
+        + '<span class="ref">'+label+'</span>'
         + '</div></div>';
     }
-    return '<div class="phrase '+kind+' '+song+'" draggable="true" data-name="'+x[0]+'" data-file="'+src+'"><img class="tab" src="'+src+'" alt="'+x[0]+'"></div>';
+    return '<div class="phrase '+kind+' '+song+'" draggable="true" data-name="'+id+'" data-label="'+label+'" data-file="'+src+'"><img class="tab" src="'+src+'" alt="'+label+'"></div>';
   }).join("");
   [].forEach.call(document.querySelectorAll(".phrase"), placePhrase);
   requestAnimationFrame(function(){
@@ -5694,10 +5823,7 @@ document.addEventListener("click", function(e){
 document.getElementById("secModes").onclick = function(e){
   if (e.target.closest("#secUndoBtn")) { if (soloMode) undoSoloMap(); else undoAlbums(); return; }
   if (e.target.closest("#secSaveBtn")) { if (soloMode) saveSoloMapNow(); else saveAlbumsNow(); return; }
-  if (e.target.closest("#secSoloModeBtn")) {
-    setSoloMode(!soloMode);
-    return;
-  }
+  /* Mode dropdown handles riff/solo; numpad 4 still toggles via setSoloMode */
   if (e.target.closest("#secPeekBtn")) {
     setHighlightMode(!highlightMode);
     return;
