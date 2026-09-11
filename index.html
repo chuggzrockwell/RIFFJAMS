@@ -1129,20 +1129,22 @@
     width: 100%;
     height: 100%;
     margin: 0;
-    padding: 4px 5px;
+    padding: 0 3px;
     box-sizing: border-box;
     text-align: center;
+    /* Match lick-card ID badges (.phrase.flipped .ref) */
     font-family: "Paranoid Title", "Black Ops One", cursive;
     font-weight: 400;
-    font-size: clamp(0.42rem, calc(var(--card) * 0.16), 0.78rem);
-    letter-spacing: .02em;
-    line-height: 1.1;
+    font-size: clamp(7px, calc(var(--card) * 0.14), 14px);
+    letter-spacing: .04em;
+    line-height: 1;
     color: #fff;
-    text-shadow: 0 1px 2px rgba(0,0,0,.85);
+    text-shadow: none;
+    white-space: normal;
   }
   .cover-board.song-cols.ll-b .song-col-head.long .song-col-title {
-    font-size: clamp(0.36rem, calc(var(--card) * 0.13), 0.62rem);
-    letter-spacing: .01em;
+    font-size: clamp(6px, calc(var(--card) * 0.12), 12px);
+    letter-spacing: .04em;
   }
   /* Semi-translucent name plate under the title */
   .cover-board.song-cols.ll-b .song-col-head .song-col-plate {
