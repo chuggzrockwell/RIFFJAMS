@@ -3510,37 +3510,21 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=20";
+  var url = base + "?playboard=1&v=21";
+  /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
   var availW = (window.screen && screen.availWidth) ? screen.availWidth : (screen.width || 1920);
   var availH = (window.screen && screen.availHeight) ? screen.availHeight : (screen.height || 1080);
-  /* Side-by-side: Board left ~33%, LL (this window) right ~67% */
-  var boardW = Math.max(420, Math.floor(availW * 0.33));
-  var llW = Math.max(640, availW - boardW);
-  boardW = availW - llW;
-  var boardLeft = availL;
-  var llLeft = availL + boardW;
-  var top = availT;
-  var h = availH;
-  function placePair(w) {
-    try {
-      if (w) {
-        if (typeof w.moveTo === "function") w.moveTo(boardLeft, top);
-        if (typeof w.resizeTo === "function") w.resizeTo(boardW, h);
-      }
-    } catch (e) {}
-    try {
-      if (typeof window.moveTo === "function") window.moveTo(llLeft, top);
-      if (typeof window.resizeTo === "function") window.resizeTo(llW, h);
-    } catch (e2) {}
-    try { if (w) w.focus(); } catch (e3) {}
-  }
+  var ww = Math.min(1200, Math.max(800, Math.floor(availW * 0.62)));
+  var wh = Math.min(900, Math.max(600, Math.floor(availH * 0.78)));
+  var left = Math.floor(availL + (availW - ww) / 2);
+  var top = Math.floor(availT + (availH - wh) / 2);
   var features = [
     "popup=yes",
-    "width="+boardW,
-    "height="+h,
-    "left="+boardLeft,
+    "width="+ww,
+    "height="+wh,
+    "left="+left,
     "top="+top,
     "menubar=no",
     "toolbar=no",
@@ -3555,14 +3539,15 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=20") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=21") < 0) {
       w.location.href = url;
     }
-  } catch (e4) {}
-  placePair(w);
-  setTimeout(function(){ placePair(w); }, 50);
-  setTimeout(function(){ placePair(w); }, 250);
-  setTimeout(function(){ placePair(w); }, 600);
+  } catch (e) {}
+  try {
+    if (typeof w.moveTo === "function") w.moveTo(left, top);
+    if (typeof w.resizeTo === "function") w.resizeTo(ww, wh);
+  } catch (e2) {}
+  try { w.focus(); } catch (e3) {}
   return w;
 }
 
