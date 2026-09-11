@@ -3494,7 +3494,7 @@ function pullPlayQueue() {
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
   /* v= param forces the named popup to load current JS (Shift+C clear, etc.) */
-  var url = base + "?playboard=1&v=15";
+  var url = base + "?playboard=1&v=16";
   var w = window.open(url, "lickPlayBoard");
   if (!w) {
     alert("Pop-up blocked — allow pop-ups so Playboard can open in another window.");
@@ -3502,7 +3502,7 @@ function openPlayWindow() {
   }
   try {
     /* If an old Playboard tab is reused, navigate it to the fresh URL */
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=15") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=16") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -3615,10 +3615,17 @@ function initPlayboardPage() {
       commitBoardEntry();
       return;
     }
-    /* Decimal: song.class or mode 0.1 / 0.2 */
+    /* Decimal: start mode (.1 / .2) or song.class (1.3 …) */
     var isDot = e.code === "NumpadDecimal" || e.key === "." || e.key === "," || e.code === "Period";
     if (isDot) {
-      if (!/^[0-8]$/.test(boardEntryBuf)) return;
+      if (boardEntryBuf === "") {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        boardEntryBuf = ".";
+        updateBoardEntryMeta();
+        return;
+      }
+      if (!/^[1-8]$/.test(boardEntryBuf)) return;
       e.preventDefault();
       e.stopImmediatePropagation();
       boardEntryBuf += ".";
@@ -3635,17 +3642,16 @@ function initPlayboardPage() {
     e.stopImmediatePropagation();
     if (!boardEntryBuf) {
       if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
-    } else if (boardEntryBuf === "0") {
-      /* wait for decimal (mode codes) */
+    } else if (boardEntryBuf === ".") {
+      if (digit === "1" || digit === "2") boardEntryBuf += digit;
     } else if (/^[1-8]$/.test(boardEntryBuf)) {
       if (digit >= "1" && digit <= "8") boardEntryBuf = digit;
       else if (digit === "0") boardEntryBuf = "0";
-    } else if (boardEntryBuf === "0.") {
-      if (digit === "1" || digit === "2") boardEntryBuf += digit;
     } else if (/^[1-8]\.$/.test(boardEntryBuf)) {
       if (digit >= "1" && digit <= "5") boardEntryBuf += digit;
-    } else if (/^0\.[12]$/.test(boardEntryBuf) || /^[1-8]\.[1-5]$/.test(boardEntryBuf)) {
+    } else if (/^\.[12]$/.test(boardEntryBuf) || /^[1-8]\.[1-5]$/.test(boardEntryBuf)) {
       if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
+      else if (digit === "1" || digit === "2") boardEntryBuf = "." + digit;
     }
     updateBoardEntryMeta();
   }
@@ -5518,9 +5524,9 @@ var BOARD_CLASS_BY_DIGIT = { "1": "A", "2": "B", "3": "C", "4": "D", "5": "E" };
 function boardEntryLabel(buf) {
   if (!buf) return "";
   if (buf === "0") return "Clear board";
-  if (buf === "0.") return "Mode…";
-  if (buf === "0.1") return "Riff mode";
-  if (buf === "0.2") return "Solo mode";
+  if (buf === ".") return "Mode…";
+  if (buf === ".1") return "Riff mode";
+  if (buf === ".2") return "Solo mode";
   var parts = String(buf).split(".");
   var song = PARANOID_TRACK_NAME[parts[0]] || ("#" + parts[0]);
   if (parts.length === 1 || parts[1] === "") return song + " (all classes)";
@@ -5587,8 +5593,8 @@ function commitBoardEntry() {
   boardEntryBuf = "";
   if (!buf) return;
   if (buf === "0") { clearPlayQueue(); updateBoardEntryMeta(); return; }
-  if (buf === "0.1") { setPracticeMode("riff"); updateBoardEntryMeta(); return; }
-  if (buf === "0.2") { setPracticeMode("solo"); updateBoardEntryMeta(); return; }
+  if (buf === ".1") { setPracticeMode("riff"); updateBoardEntryMeta(); return; }
+  if (buf === ".2") { setPracticeMode("solo"); updateBoardEntryMeta(); return; }
   var m = buf.match(/^([1-8])(?:\.([1-5]))?$/);
   if (!m) { updateBoardEntryMeta(); return; }
   var kind = m[2] ? BOARD_CLASS_BY_DIGIT[m[2]] : null;
@@ -6222,15 +6228,15 @@ function isNumpadKey(e, digit) {
   return false;
 }
 function goHomeKey(e) {
-  /* Numpad 0 is for mode codes (0.1 / 0.2) — not Back/Home */
+  /* Numpad 0 is not Back/Home — mode codes are .1 / .2 + Enter */
   return e.key === "Escape" || e.key === "Backspace" || e.key === "escape" || e.key === "backspace";
 }
 var modeEntryBuf = "";
 function commitModeEntry() {
   var buf = String(modeEntryBuf || "").trim();
   modeEntryBuf = "";
-  if (buf === "0.1") { setPracticeMode("riff"); return true; }
-  if (buf === "0.2") { setPracticeMode("solo"); return true; }
+  if (buf === ".1") { setPracticeMode("riff"); return true; }
+  if (buf === ".2") { setPracticeMode("solo"); return true; }
   if (buf === "0") {
     if (document.body.classList.contains("sections-mode")) { clearSecFilters(); return true; }
     if (document.body.classList.contains("playboard-mode")) { clearPlayQueue(); return true; }
@@ -6261,9 +6267,9 @@ function handleModeEntryKey(e) {
   }
   var isDot = e.code === "NumpadDecimal" || e.key === "." || e.key === "," || e.code === "Period";
   if (isDot) {
-    if (modeEntryBuf !== "0") return false;
+    if (modeEntryBuf) return false;
     e.preventDefault();
-    modeEntryBuf = "0.";
+    modeEntryBuf = ".";
     return true;
   }
   var digit = null;
@@ -6272,16 +6278,14 @@ function handleModeEntryKey(e) {
   }
   if (!digit) return false;
   if (!modeEntryBuf) {
-    if (digit !== "0") return false;
-    e.preventDefault();
-    modeEntryBuf = "0";
-    return true;
+    if (digit === "0") {
+      e.preventDefault();
+      modeEntryBuf = "0"; /* 0+Enter clears SM filters */
+      return true;
+    }
+    return false;
   }
-  if (modeEntryBuf === "0") {
-    e.preventDefault();
-    return true; /* wait for . */
-  }
-  if (modeEntryBuf === "0.") {
+  if (modeEntryBuf === ".") {
     if (digit === "1" || digit === "2") {
       e.preventDefault();
       modeEntryBuf += digit;
@@ -6290,12 +6294,16 @@ function handleModeEntryKey(e) {
     e.preventDefault();
     return true;
   }
-  if (modeEntryBuf === "0.1" || modeEntryBuf === "0.2") {
+  if (modeEntryBuf === ".1" || modeEntryBuf === ".2") {
     if (digit === "0") {
       e.preventDefault();
       modeEntryBuf = "0";
       return true;
     }
+  }
+  if (modeEntryBuf === "0") {
+    e.preventDefault();
+    return true;
   }
   return false;
 }
@@ -6412,7 +6420,7 @@ document.addEventListener("keydown", function(e){
       // Chip edit popup already handled above; Esc does nothing else on Song Map
       return;
     }
-    /* Numpad 0 reserved for mode entry (0.1 / 0.2); 0+Enter clears filters via commitModeEntry */
+    /* Mode is .1 / .2 + Enter; 0+Enter clears filters via commitModeEntry */
     if (k === "backspace") {
       e.preventDefault();
       showHome();
