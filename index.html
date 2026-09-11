@@ -3494,7 +3494,7 @@ function pullPlayQueue() {
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
   /* v= param forces the named popup to load current JS (Shift+C clear, etc.) */
-  var url = base + "?playboard=1&v=14";
+  var url = base + "?playboard=1&v=15";
   var w = window.open(url, "lickPlayBoard");
   if (!w) {
     alert("Pop-up blocked — allow pop-ups so Playboard can open in another window.");
@@ -3502,7 +3502,7 @@ function openPlayWindow() {
   }
   try {
     /* If an old Playboard tab is reused, navigate it to the fresh URL */
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=14") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=15") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -6222,7 +6222,82 @@ function isNumpadKey(e, digit) {
   return false;
 }
 function goHomeKey(e) {
-  return isNumpadKey(e, "0") || e.key === "Escape" || e.key === "Backspace" || e.key === "escape" || e.key === "backspace";
+  /* Numpad 0 is for mode codes (0.1 / 0.2) — not Back/Home */
+  return e.key === "Escape" || e.key === "Backspace" || e.key === "escape" || e.key === "backspace";
+}
+var modeEntryBuf = "";
+function commitModeEntry() {
+  var buf = String(modeEntryBuf || "").trim();
+  modeEntryBuf = "";
+  if (buf === "0.1") { setPracticeMode("riff"); return true; }
+  if (buf === "0.2") { setPracticeMode("solo"); return true; }
+  if (buf === "0") {
+    if (document.body.classList.contains("sections-mode")) { clearSecFilters(); return true; }
+    if (document.body.classList.contains("playboard-mode")) { clearPlayQueue(); return true; }
+    return true;
+  }
+  return false;
+}
+function handleModeEntryKey(e) {
+  if (e.type !== "keydown") return false;
+  var tag = (e.target && e.target.tagName) || "";
+  if (tag === "INPUT" || tag === "TEXTAREA") return false;
+  if (document.body.classList.contains("playboard-mode")) return false; /* Board has its own buffer */
+  var isEnter = e.key === "Enter" || e.code === "Enter" || e.code === "NumpadEnter";
+  if (isEnter && modeEntryBuf) {
+    e.preventDefault();
+    commitModeEntry();
+    return true;
+  }
+  if (e.key === "Backspace" && modeEntryBuf) {
+    e.preventDefault();
+    modeEntryBuf = modeEntryBuf.slice(0, -1);
+    return true;
+  }
+  if (e.key === "Escape" && modeEntryBuf) {
+    e.preventDefault();
+    modeEntryBuf = "";
+    return true;
+  }
+  var isDot = e.code === "NumpadDecimal" || e.key === "." || e.key === "," || e.code === "Period";
+  if (isDot) {
+    if (modeEntryBuf !== "0") return false;
+    e.preventDefault();
+    modeEntryBuf = "0.";
+    return true;
+  }
+  var digit = null;
+  for (var ti = 0; ti <= 9; ti++) {
+    if (typeof isNumpadKey === "function" && isNumpadKey(e, String(ti))) { digit = String(ti); break; }
+  }
+  if (!digit) return false;
+  if (!modeEntryBuf) {
+    if (digit !== "0") return false;
+    e.preventDefault();
+    modeEntryBuf = "0";
+    return true;
+  }
+  if (modeEntryBuf === "0") {
+    e.preventDefault();
+    return true; /* wait for . */
+  }
+  if (modeEntryBuf === "0.") {
+    if (digit === "1" || digit === "2") {
+      e.preventDefault();
+      modeEntryBuf += digit;
+      return true;
+    }
+    e.preventDefault();
+    return true;
+  }
+  if (modeEntryBuf === "0.1" || modeEntryBuf === "0.2") {
+    if (digit === "0") {
+      e.preventDefault();
+      modeEntryBuf = "0";
+      return true;
+    }
+  }
+  return false;
 }
 document.addEventListener("keydown", function(e){
   if ((e.metaKey || e.ctrlKey) && !e.altKey && document.body.classList.contains("sections-mode") && sectionsMode === "edit") {
@@ -6271,6 +6346,7 @@ document.addEventListener("keydown", function(e){
     }
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (handleModeEntryKey(e)) return;
   /* Playspace: Shift+C clears all queued licks (popup Playboard or Song Map Play pane) */
   if (e.shiftKey && ((e.key || "").toLowerCase() === "c" || e.code === "KeyC")) {
     if (document.body.classList.contains("playboard-mode") || document.body.classList.contains("sections-play")) {
@@ -6281,7 +6357,7 @@ document.addEventListener("keydown", function(e){
   }
   var lb = document.getElementById("lb");
   if (lb && !lb.classList.contains("hidden")) {
-    if (e.key === "Escape" || isNumpadKey(e, "0")) lb.className = "lightbox hidden";
+    if (e.key === "Escape") lb.className = "lightbox hidden";
     return;
   }
   var k = e.key.toLowerCase();
@@ -6336,10 +6412,7 @@ document.addEventListener("keydown", function(e){
       // Chip edit popup already handled above; Esc does nothing else on Song Map
       return;
     }
-    if (isNumpadKey(e, "0")) {
-      clearSecFilters();
-      return;
-    }
+    /* Numpad 0 reserved for mode entry (0.1 / 0.2); 0+Enter clears filters via commitModeEntry */
     if (k === "backspace") {
       e.preventDefault();
       showHome();
