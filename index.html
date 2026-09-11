@@ -1069,6 +1069,68 @@
     letter-spacing: .01em;
     padding: 6px 2px;
   }
+
+  /* Original Paranoid (letter B / LL-p): 8 album song columns, dynamic card size */
+  .cover-board.song-cols.ll-b {
+    flex-wrap: nowrap;
+    gap: var(--ll-col-gap, 10px);
+    align-items: flex-start;
+    width: 100%;
+    overflow-x: auto;
+  }
+  .cover-board.song-cols.ll-b .song-col {
+    --card: var(--ll-card, 100px);
+    --gap: var(--ll-gap, 6px);
+    width: calc(2 * var(--card) + var(--gap));
+  }
+  .cover-board.song-cols.ll-b .song-col-head {
+    min-height: calc(var(--card) * 0.42);
+    font-size: clamp(0.55rem, calc(var(--card) * 0.14), 1.05rem);
+    padding: 6px 4px;
+  }
+  .cover-board.song-cols.ll-b .song-col-head.long {
+    font-size: clamp(0.45rem, calc(var(--card) * 0.11), 0.72rem);
+    padding: 6px 2px;
+  }
+  .cover-board.song-cols.ll-b .song-col-body .phrase.flipped {
+    width: var(--card);
+    height: var(--card);
+    border-radius: 8px;
+  }
+  .cover-board.song-cols.ll-b .song-col-body .phrase.flipped img.cover {
+    border-radius: 8px;
+  }
+  .cover-board.song-cols.ll-b .song-col-body .phrase.flipped .ref {
+    height: calc(var(--card) * 0.28);
+    font-size: clamp(7px, calc(var(--card) * 0.14), 14px);
+  }
+  .cover-board.song-cols.ll-b .song-col-more {
+    box-sizing: border-box;
+    width: var(--card);
+    height: var(--card);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: #050607;
+    color: #fff;
+    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-size: calc(var(--card) * 0.48);
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 1px #22262f, 0 8px 20px rgba(0,0,0,.45);
+  }
+  .cover-board.song-cols.ll-b .song-col-more:hover { filter: brightness(1.18); }
+  .cover-board.song-cols.ll-b .phrase.pc-collapsed-hide {
+    display: none !important;
+  }
+  .cover-board.song-cols.ll-b .song-col.is-empty .song-col-body {
+    min-height: calc(var(--card) * 0.5);
+  }
   .phrase {
     box-sizing: border-box; padding: 0; cursor: grab;
     border: 0; background: transparent; position: relative;
@@ -4287,7 +4349,32 @@ function togglePlayPhrase(el) {
   if (!el) return;
   var name = (el.getAttribute("data-name") || "").trim();
   if (!name) return;
-  // COVER libraries: click toggles the SAME flip as A/B/C/D keys (no separate preview section)
+  // Original Paranoid (B / LL-p): stay cover-art grid; click → Playboard
+  if (currentLetter === "B") {
+    clearLibraryPreview();
+    var keyB = libraryPlayKey(el);
+    var idxB = findPlayIndex(keyB);
+    if (idxB >= 0) {
+      playQueue.splice(idxB, 1);
+      publishPlayQueue();
+      syncPlayLibraryClasses();
+      return;
+    }
+    playQueue.push({
+      key: keyB,
+      code: name,
+      song: librarySongLabel(),
+      lick: name,
+      tier: 2,
+      src: el.getAttribute("data-file") || lickSrc(name)
+    });
+    trimPlayQueueToFit();
+    publishPlayQueue();
+    openPlayWindow();
+    syncPlayLibraryClasses();
+    return;
+  }
+  // Other COVER libraries (A, B2): click toggles the SAME flip as A/B/C/D keys
   if (COVER[currentLetter]) {
     clearLibraryPreview();
     el.classList.toggle("flipped");
@@ -4715,11 +4802,178 @@ function collectFlipped(kind) {
   });
   return out;
 }
+var pcColExpanded = false;
+function lickMatchesPrefix(name, prefix) {
+  if (!name || !prefix) return false;
+  // P- must not swallow Planet Caravan (PC-)
+  if (prefix === "P-") return name.indexOf("P-") === 0 && name.indexOf("PC-") !== 0;
+  return name.indexOf(prefix) === 0;
+}
+function enqueueLibraryByFilter(pred) {
+  if (currentLetter !== "B") return false;
+  var els = [].filter.call(document.querySelectorAll("#coverBoard .phrase, #tabWrap .phrase"), function(el){
+    if (el.classList.contains("filtered-out")) return false;
+    return pred(el.getAttribute("data-name") || "");
+  });
+  if (!els.length) return true;
+  var allIn = els.every(function(el){ return findPlayIndex(libraryPlayKey(el)) >= 0; });
+  if (allIn) {
+    els.forEach(function(el){
+      var i = findPlayIndex(libraryPlayKey(el));
+      if (i >= 0) playQueue.splice(i, 1);
+    });
+  } else {
+    els.forEach(function(el){
+      var key = libraryPlayKey(el);
+      if (findPlayIndex(key) >= 0) return;
+      var name = el.getAttribute("data-name") || "";
+      playQueue.push({
+        key: key,
+        code: name,
+        song: librarySongLabel(),
+        lick: name,
+        tier: 2,
+        src: el.getAttribute("data-file") || lickSrc(name)
+      });
+    });
+    openPlayWindow();
+  }
+  trimPlayQueueToFit();
+  publishPlayQueue();
+  syncPlayLibraryClasses();
+  return true;
+}
+function sizeLlBCard(board, maxCount, nCols) {
+  var gap = 6;
+  var colGap = 10;
+  var headH = 40;
+  var top = 0;
+  try { top = board.getBoundingClientRect().top; } catch (e) { top = 0; }
+  if (!top) {
+    var bar = document.querySelector("#series > .bar");
+    top = bar ? (bar.getBoundingClientRect().bottom + 8) : 72;
+  }
+  var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 4);
+  var availH = Math.max(180, window.innerHeight - top - 12);
+  var rows = Math.max(1, Math.ceil(maxCount / 2));
+  var cardW = (availW - (nCols - 1) * colGap - nCols * gap) / (2 * nCols);
+  var cardH = (availH - headH - Math.max(0, rows - 1) * gap) / rows;
+  var card = Math.floor(Math.min(cardW, cardH, 100));
+  if (!isFinite(card) || card < 40) card = 40;
+  board.style.setProperty("--ll-card", card + "px");
+  board.style.setProperty("--ll-gap", gap + "px");
+  board.style.setProperty("--ll-col-gap", colGap + "px");
+  return card;
+}
+function pcCollapsedVisibleCount(board, cardPx) {
+  var gap = 6;
+  var headH = 40;
+  var top = 0;
+  try { top = board.getBoundingClientRect().top; } catch (e) { top = 0; }
+  if (!top) top = 72;
+  var availH = Math.max(180, window.innerHeight - top - 12);
+  var rows = Math.max(1, Math.floor((availH - headH + gap) / (cardPx + gap)));
+  var slots = rows * 2;
+  // leave about one card-width before the edge for the + control
+  return Math.max(1, slots - 1);
+}
+function rebuildColumnsB() {
+  var board = document.getElementById("coverBoard");
+  var songs = [
+    { re: /^WP-/, label: "War Pigs", track: 1 },
+    { re: /^P-(?!C)/, label: "Paranoid", track: 2 },
+    { re: /^PC-/, label: "Planet Caravan", track: 3, isPc: true },
+    { re: /^IM-/, label: "Iron Man", track: 4 },
+    { re: /^EF-/, label: "Electric Funeral", track: 5, allowEmpty: true },
+    { re: /^HOD-/, label: "Hand of Doom", track: 6 },
+    { re: /^RS-/, label: "Rat Salad", track: 7 },
+    { re: /^FOB-/, label: "Fairies Wear Boots", track: 8 }
+  ];
+  var all = [];
+  [].forEach.call(document.querySelectorAll(".phrase"), function(el){
+    el.classList.add("flipped");
+    if (!el.classList.contains("filtered-out")) all.push(el);
+  });
+  var hold = document.createDocumentFragment();
+  all.forEach(function(el){ hold.appendChild(el); });
+  board.innerHTML = "";
+  if (!all.length) {
+    board.className = "cover-board hidden";
+    return;
+  }
+  board.className = "cover-board song-cols ll-b";
+  var maxOther = 1;
+  songs.forEach(function(song){
+    if (song.isPc) return;
+    var n = all.filter(function(el){ return song.re.test(el.getAttribute("data-name") || ""); }).length;
+    if (n > maxOther) maxOther = n;
+  });
+  var cardPx = sizeLlBCard(board, maxOther, songs.length);
+  songs.forEach(function(song){
+    var items = all.filter(function(el){
+      return song.re.test(el.getAttribute("data-name") || "");
+    });
+    var col = document.createElement("div");
+    col.className = "song-col" + (!items.length ? " is-empty" : "");
+    var head = document.createElement("div");
+    head.className = "song-col-head" + (song.label === "Fairies Wear Boots" || song.label === "Planet Caravan" || song.label === "Electric Funeral" ? " long" : "");
+    head.textContent = (song.track ? song.track + " " : "") + song.label;
+    var body = document.createElement("div");
+    body.className = "song-col-body";
+    var moreBtn = null;
+    var collapseAfter = -1;
+    if (song.isPc && items.length) {
+      var vis = pcCollapsedVisibleCount(board, cardPx);
+      if (items.length > vis) {
+        moreBtn = document.createElement("button");
+        moreBtn.type = "button";
+        moreBtn.className = "song-col-more";
+        moreBtn.textContent = "+";
+        if (!pcColExpanded) {
+          collapseAfter = vis;
+          moreBtn.title = "Show more Planet Caravan licks";
+          moreBtn.setAttribute("aria-label", "Show more Planet Caravan licks");
+          moreBtn.addEventListener("click", function(ev){
+            ev.preventDefault();
+            ev.stopPropagation();
+            pcColExpanded = true;
+            rebuildColumnsB();
+          });
+        } else {
+          moreBtn.title = "Collapse Planet Caravan licks";
+          moreBtn.setAttribute("aria-label", "Collapse Planet Caravan licks");
+          moreBtn.addEventListener("click", function(ev){
+            ev.preventDefault();
+            ev.stopPropagation();
+            pcColExpanded = false;
+            rebuildColumnsB();
+          });
+        }
+      }
+    }
+    items.forEach(function(el, idx){
+      if (song.isPc) el.classList.toggle("pc-collapsed-hide", collapseAfter >= 0 && idx >= collapseAfter);
+      else el.classList.remove("pc-collapsed-hide");
+      body.appendChild(el);
+    });
+    if (moreBtn) {
+      if (collapseAfter >= 0 && body.children[collapseAfter]) {
+        body.insertBefore(moreBtn, body.children[collapseAfter]);
+      } else {
+        body.appendChild(moreBtn);
+      }
+    }
+    col.appendChild(head);
+    col.appendChild(body);
+    board.appendChild(col);
+  });
+  syncPlayLibraryClasses();
+}
 function rebuildColumnsB2() {
   var board = document.getElementById("coverBoard");
   var songs = [
     { re: /^WP-/, label: "War Pigs", track: 1 },
-    { re: /^P-/, label: "Paranoid", track: 2 },
+    { re: /^P-(?!C)/, label: "Paranoid", track: 2 },
     { re: /^PC-/, label: "Planet Caravan", track: 3 },
     { re: /^IM-/, label: "Iron Man", track: 4 },
     { re: /^HOD-/, label: "Hand of Doom", track: 6 },
@@ -4759,6 +5013,10 @@ function rebuildColumnsB2() {
   });
 }
 function rebuildColumns() {
+  if (currentLetter === "B") {
+    rebuildColumnsB();
+    return;
+  }
   if (currentLetter === "B2") {
     rebuildColumnsB2();
     return;
@@ -4807,6 +5065,11 @@ function rebuildColumns() {
 }
 function placePhrase(el) {
   var tabWrap = document.getElementById("tabWrap");
+  if (currentLetter === "B") {
+    el.classList.add("flipped");
+    rebuildColumns();
+    return;
+  }
   if (!el.classList.contains("flipped")) tabWrap.appendChild(el);
   rebuildColumns();
 }
@@ -4839,6 +5102,7 @@ function toggleEls(els) {
   afterLibraryRelayout();
 }
 function revealKind(kind) {
+  if (enqueueLibraryByFilter(function(n){ return lickKind(n) === kind; })) return;
   // Drop leftover filter state from the short-lived A-filter experiment
   document.querySelectorAll(".phrase.filtered-out").forEach(function(el){
     el.classList.remove("filtered-out");
@@ -4853,7 +5117,7 @@ var PARANOID_TRACK_PREFIX = {
   "2": "P-",
   "3": "PC-",
   "4": "IM-",
-  "5": "",
+  "5": "EF-",
   "6": "HOD-",
   "7": "RS-",
   "8": "FOB-"
@@ -4864,13 +5128,14 @@ function revealParanoidTrack(digit) {
   revealSong(prefix);
 }
 function revealSong(prefix) {
+  if (enqueueLibraryByFilter(function(n){ return lickMatchesPrefix(n, prefix); })) return;
   // I/P/W/H/R: toggle song licks (IM-/P-/WP-/HOD-/RS-). Same flip rule as A/B/C/D.
   document.querySelectorAll(".phrase.filtered-out").forEach(function(el){
     el.classList.remove("filtered-out");
   });
   toggleEls([].filter.call(document.querySelectorAll(".phrase"), function(el){
     var n = el.getAttribute("data-name") || "";
-    return n.indexOf(prefix) === 0;
+    return lickMatchesPrefix(n, prefix);
   }));
 }
 function showKind(kind) {
@@ -4886,12 +5151,14 @@ function showKind(kind) {
   afterLibraryRelayout();
 }
 function revealGroup(group) {
+  if (enqueueLibraryByFilter(function(n){ return lickGroup(n) === group; })) return;
   toggleEls([].filter.call(document.querySelectorAll(".phrase"), function(el){
     return lickGroup(el.getAttribute("data-name")) === group;
   }));
 }
 function showSeries(letter) {
   currentLetter = letter;
+  pcColExpanded = false;
   document.body.className = "sheet-mode stage";
   var badgeLabel = (letter === "B") ? "Paranoid" : (letter === "B2") ? "Paranoid 2" : letter;
   document.getElementById("badge").textContent = badgeLabel;
@@ -4899,6 +5166,12 @@ function showSeries(letter) {
   document.getElementById("home").className = "hidden";
   document.getElementById("sections").className = "hidden";
   document.getElementById("series").className = "";
+  var keysEl = document.querySelector("#series .keys");
+  if (keysEl) {
+    keysEl.textContent = (letter === "B")
+      ? "Click → Playboard · 1–8 songs · A–E class · I/P/W/H/R/F · Esc/0"
+      : "Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Esc/0";
+  }
   var catalogLetter = (letter === "B2") ? "B" : letter;
   var items = applySavedOrder(CATALOG.filter(function(x){ return x[1] === catalogLetter; }), letter);
   var folder = FOLDER[letter] || FOLDER[catalogLetter] || "svg/";
