@@ -1310,10 +1310,8 @@
       0 8px 22px rgba(0,0,0,.65);
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped .ref {
-    height: auto;
-    font-size: clamp(8px, calc(var(--card) * 0.18), 16px);
-    left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
+    height: calc(var(--card) * 0.28);
+    font-size: clamp(7px, calc(var(--card) * 0.14), 14px);
   }
   .cover-board.song-cols.ll-b .song-col-more {
     box-sizing: border-box;
@@ -1383,14 +1381,11 @@
     pointer-events: none;
     z-index: 2;
   }
-  /* face-up (tab showing): ID centered on chip */
+  /* face-up (tab showing): ID top-left */
   .phrase:not(.flipped) .ref {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
     position: absolute;
-    left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
+    top: 8px; left: 10px;
     margin: 0;
     padding: 4px 10px;
     border-radius: 6px;
@@ -1499,19 +1494,16 @@
   }
   .phrase.flipped .ref {
     display: flex; align-items: center; justify-content: center;
-    position: absolute;
-    left: 50%; top: 50%; right: auto; bottom: auto;
-    transform: translate(-50%, -50%);
-    width: auto; max-width: 90%;
-    height: auto; min-height: 1.2em;
-    padding: 4px 8px;
-    background: rgba(0,0,0,.55); color: #fff;
-    border-radius: 6px;
+    position: absolute; left: 0; right: 0; top: auto; bottom: 0;
+    height: 32px; padding: 0 3px;
+    background: rgba(0,0,0,.42); color: #fff;
+    border-radius: 0 0 8px 8px;
     font-family: "Paranoid Title", "Black Ops One", cursive;
     font-size: 14px; line-height: 1; letter-spacing: .04em;
     font-weight: 400;
     white-space: nowrap; overflow: hidden;
     pointer-events: none;
+    max-width: none;
   }
   .phrase.a.flipped .ref,
   .phrase.b.flipped .ref,
@@ -1531,10 +1523,9 @@
   }
   .cover-board.shrunk .phrase.flipped .face { border-radius: 4px; }
   .cover-board.shrunk .phrase.flipped .ref {
-    height: auto; padding: 2px 4px; font-size: 10px;
-    border-radius: 4px;
-    left: 50%; top: 50%; right: auto; bottom: auto;
-    transform: translate(-50%, -50%);
+    height: 22px; padding: 0 2px; font-size: 10px;
+    border-radius: 0 0 4px 4px;
+    top: auto; left: 0; right: 0; bottom: 0;
   }
   .cover-board.shrunk .phrase.a.flipped .ref { font-size: 11px; }
   .cover-board.shrunk .phrase.b.flipped .ref { font-size: 9px; }
