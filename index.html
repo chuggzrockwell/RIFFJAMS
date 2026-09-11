@@ -1509,28 +1509,12 @@
     object-fit: cover;
     border-radius: 8px;
   }
-  /* LL riff-mode: tier brightness — T1 full, then ~20–25% steps down */
-  .phrase.flipped.tier-1 img.cover { filter: brightness(1); }
-  .phrase.flipped.tier-2 img.cover { filter: brightness(0.78); }
-  .phrase.flipped.tier-3 img.cover { filter: brightness(0.58); }
-  .phrase.flipped.tier-4 img.cover { filter: brightness(0.40); }
-  .phrase.flipped.tier-5 img.cover { filter: brightness(0.25); }
-  .phrase.flipped.tier-2 .face-cover::after,
-  .phrase.flipped.tier-3 .face-cover::after,
-  .phrase.flipped.tier-4 .face-cover::after,
-  .phrase.flipped.tier-5 .face-cover::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .phrase.flipped.tier-2 .face-cover::after { background: rgba(0,0,0,.10); }
-  .phrase.flipped.tier-3 .face-cover::after { background: rgba(0,0,0,.18); }
-  .phrase.flipped.tier-4 .face-cover::after { background: rgba(0,0,0,.28); }
-  .phrase.flipped.tier-5 .face-cover::after { background: rgba(0,0,0,.38); }
-  .phrase.flipped .face-cover { overflow: hidden; }
+  /* LL riff-mode: graded invert — T1 normal, T5 full invert (same as song labels) */
+  .phrase.flipped.tier-1 img.cover { filter: invert(0); }
+  .phrase.flipped.tier-2 img.cover { filter: invert(0.25); }
+  .phrase.flipped.tier-3 img.cover { filter: invert(0.50); }
+  .phrase.flipped.tier-4 img.cover { filter: invert(0.75); }
+  .phrase.flipped.tier-5 img.cover { filter: invert(1); }
   .phrase.flipped .ref {
     z-index: 2;
   }
@@ -3535,7 +3519,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=23";
+  var url = base + "?playboard=1&v=25";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
