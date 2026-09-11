@@ -1074,20 +1074,23 @@
   .cover-board.song-cols.ll-b {
     flex-direction: column;
     flex-wrap: nowrap;
-    gap: var(--ll-row-gap, 6px);
+    gap: var(--ll-row-gap, 10px);
     align-items: stretch;
     width: 100%;
-    overflow: hidden;
+    overflow: visible; /* don’t clip card glow */
+    padding: 8px 4px 10px;
+    box-sizing: border-box;
   }
   .cover-board.song-cols.ll-b .song-col {
     --card: var(--ll-card, 72px);
-    --gap: var(--ll-gap, 4px);
+    --gap: var(--ll-gap, 10px);
     --label-w: var(--ll-label-w, 132px);
     flex-direction: row;
     align-items: center;
     gap: var(--gap);
     width: 100%;
     max-width: 100%;
+    overflow: visible;
   }
   .cover-board.song-cols.ll-b .song-col-head {
     flex: 0 0 var(--label-w);
@@ -1113,16 +1116,51 @@
     flex: 1 1 auto;
     min-width: 0;
     align-items: center;
-    overflow: hidden;
+    overflow: visible; /* glow on all 4 corners */
+    padding: 6px 6px 6px 0;
+    box-sizing: border-box;
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped {
     flex: 0 0 var(--card);
     width: var(--card);
     height: var(--card);
     border-radius: 8px;
+    /* keep glow outside the card; clip only the cover art */
+    overflow: visible;
   }
+  .cover-board.song-cols.ll-b .song-col-body .phrase.flipped .face-cover,
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped img.cover {
     border-radius: 8px;
+    overflow: hidden;
+  }
+  .cover-board.song-cols.ll-b .song-col-body .phrase.a.flipped {
+    box-shadow:
+      0 0 8px 2px rgba(163,73,164,.55),
+      0 0 22px 6px rgba(163,73,164,.28),
+      0 8px 22px rgba(0,0,0,.65);
+  }
+  .cover-board.song-cols.ll-b .song-col-body .phrase.b.flipped {
+    box-shadow:
+      0 0 8px 2px rgba(237,28,36,.55),
+      0 0 22px 6px rgba(237,28,36,.28),
+      0 8px 22px rgba(0,0,0,.65);
+  }
+  .cover-board.song-cols.ll-b .song-col-body .phrase.e.flipped {
+    box-shadow:
+      0 0 8px 2px rgba(255,140,40,.55),
+      0 0 22px 6px rgba(255,140,40,.28),
+      0 8px 22px rgba(0,0,0,.65);
+  }
+  .cover-board.song-cols.ll-b .song-col-body .phrase.d.flipped {
+    box-shadow:
+      0 0 8px 2px rgba(46,180,90,.55),
+      0 0 22px 6px rgba(46,180,90,.28),
+      0 8px 22px rgba(0,0,0,.65);
+  }
+  .cover-board.song-cols.ll-b .song-col-body .phrase.flipped:not(.a):not(.b):not(.d):not(.e) {
+    box-shadow:
+      0 0 10px 2px rgba(255,255,255,.08),
+      0 8px 22px rgba(0,0,0,.65);
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped .ref {
     height: calc(var(--card) * 0.28);
@@ -4869,8 +4907,8 @@ function enqueueLibraryByFilter(pred) {
   return true;
 }
 function sizeLlBCard(board, maxNonPc, nRows) {
-  var gap = 4;
-  var rowGap = 6;
+  var gap = 10;
+  var rowGap = 10;
   var labelW = 132;
   var top = 0;
   try { top = board.getBoundingClientRect().top; } catch (e) { top = 0; }
@@ -4894,7 +4932,7 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   return card;
 }
 function pcCollapsedVisibleCount(board, cardPx) {
-  var gap = 4;
+  var gap = 10;
   var labelW = 132;
   var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 8);
   var bodyW = availW - labelW - gap;
