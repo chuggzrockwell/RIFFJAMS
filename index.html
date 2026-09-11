@@ -1084,7 +1084,7 @@
   .cover-board.song-cols.ll-b .song-col {
     --card: var(--ll-card, 72px);
     --gap: var(--ll-gap, 10px);
-    --label-w: var(--ll-label-w, 132px);
+    --label-w: var(--card);
     flex-direction: row;
     align-items: center;
     gap: var(--gap);
@@ -1092,20 +1092,72 @@
     max-width: 100%;
     overflow: visible;
   }
+  /* Song label = same-size inverted album art with title overlay + translucent plate */
   .cover-board.song-cols.ll-b .song-col-head {
-    flex: 0 0 var(--label-w);
-    width: var(--label-w);
-    min-width: var(--label-w);
-    max-width: var(--label-w);
+    --label-w: var(--card);
+    position: relative;
+    flex: 0 0 var(--card);
+    width: var(--card);
+    min-width: var(--card);
+    max-width: var(--card);
     min-height: var(--card);
     height: var(--card);
-    font-size: clamp(0.5rem, calc(var(--card) * 0.18), 0.95rem);
-    padding: 4px 6px;
+    padding: 0;
     box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #000;
+    color: #fff;
+    isolation: isolate;
+    box-shadow: 0 0 0 1px #22262f, 0 8px 20px rgba(0,0,0,.45);
   }
-  .cover-board.song-cols.ll-b .song-col-head.long {
-    font-size: clamp(0.42rem, calc(var(--card) * 0.14), 0.72rem);
-    padding: 4px 4px;
+  .cover-board.song-cols.ll-b .song-col-head::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #000 url("covers/paranoid.png") center / cover no-repeat;
+    filter: invert(1);
+    z-index: 0;
+    border-radius: inherit;
+  }
+  .cover-board.song-cols.ll-b .song-col-head .song-col-title {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 4px 5px;
+    box-sizing: border-box;
+    text-align: center;
+    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-weight: 400;
+    font-size: clamp(0.42rem, calc(var(--card) * 0.16), 0.78rem);
+    letter-spacing: .02em;
+    line-height: 1.1;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,.85);
+  }
+  .cover-board.song-cols.ll-b .song-col-head.long .song-col-title {
+    font-size: clamp(0.36rem, calc(var(--card) * 0.13), 0.62rem);
+    letter-spacing: .01em;
+  }
+  /* Semi-translucent name plate under the title */
+  .cover-board.song-cols.ll-b .song-col-head .song-col-plate {
+    position: absolute;
+    z-index: 1;
+    left: 6%;
+    right: 6%;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 42%;
+    min-height: 1.1em;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.48);
+    box-shadow: 0 1px 4px rgba(0,0,0,.35);
+    pointer-events: none;
   }
   .cover-board.song-cols.ll-b .song-col-body {
     display: flex;
@@ -4909,7 +4961,6 @@ function enqueueLibraryByFilter(pred) {
 function sizeLlBCard(board, maxNonPc, nRows) {
   var gap = 10;
   var rowGap = 10;
-  var labelW = 132;
   var top = 0;
   try { top = board.getBoundingClientRect().top; } catch (e) { top = 0; }
   if (!top) {
@@ -4918,22 +4969,22 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   }
   var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 8);
   var availH = Math.max(180, window.innerHeight - top - 12);
-  /* 8 song rows must fit vertically */
+  /* 8 song rows must fit vertically; label is square album art = card size */
   var cardByH = (availH - Math.max(0, nRows - 1) * rowGap) / nRows;
-  /* widest non-PC row must fit horizontally: label + cards */
-  var cardByW = (availW - labelW - gap - Math.max(0, maxNonPc - 1) * gap) / Math.max(1, maxNonPc);
+  /* label(card) + gap + maxNonPc cards */
+  var cardByW = (availW - gap - Math.max(0, maxNonPc) * gap) / Math.max(1, maxNonPc + 1);
   var card = Math.floor(Math.min(cardByH, cardByW, 100));
   if (!isFinite(card) || card < 36) card = 36;
   if (card > 88) card = 88;
   board.style.setProperty("--ll-card", card + "px");
   board.style.setProperty("--ll-gap", gap + "px");
   board.style.setProperty("--ll-row-gap", rowGap + "px");
-  board.style.setProperty("--ll-label-w", labelW + "px");
+  board.style.setProperty("--ll-label-w", card + "px");
   return card;
 }
 function pcCollapsedVisibleCount(board, cardPx) {
   var gap = 10;
-  var labelW = 132;
+  var labelW = cardPx;
   var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 8);
   var bodyW = availW - labelW - gap;
   var slots = Math.max(1, Math.floor((bodyW + gap) / (cardPx + gap)));
@@ -4979,8 +5030,17 @@ function rebuildColumnsB() {
     var col = document.createElement("div");
     col.className = "song-col" + (!items.length ? " is-empty" : "");
     var head = document.createElement("div");
-    head.className = "song-col-head" + (song.label === "Fairies Wear Boots" || song.label === "Planet Caravan" || song.label === "Electric Funeral" ? " long" : "");
-    head.textContent = (song.track ? song.track + " " : "") + song.label;
+    var longLabel = (song.label === "Fairies Wear Boots" || song.label === "Planet Caravan" || song.label === "Electric Funeral");
+    head.className = "song-col-head" + (longLabel ? " long" : "");
+    head.setAttribute("title", song.label);
+    var plate = document.createElement("span");
+    plate.className = "song-col-plate";
+    plate.setAttribute("aria-hidden", "true");
+    var title = document.createElement("span");
+    title.className = "song-col-title";
+    title.textContent = (song.track ? song.track + " " : "") + song.label;
+    head.appendChild(plate);
+    head.appendChild(title);
     var body = document.createElement("div");
     body.className = "song-col-body";
     var moreBtn = null;
