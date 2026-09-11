@@ -3511,12 +3511,24 @@ function pullPlayQueue() {
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
   /* v= param forces the named popup to load current JS */
-  var url = base + "?playboard=1&v=17";
-  /* Feature string forces a real popup window (not a browser tab) */
-  var ww = Math.min(1200, Math.max(800, (window.screen && screen.availWidth ? Math.floor(screen.availWidth * 0.62) : 1100)));
-  var wh = Math.min(900, Math.max(600, (window.screen && screen.availHeight ? Math.floor(screen.availHeight * 0.78) : 800)));
-  var left = (window.screen && screen.availLeft != null) ? Math.floor(screen.availLeft + (screen.availWidth - ww) / 2) : Math.floor((screen.width - ww) / 2);
-  var top = (window.screen && screen.availTop != null) ? Math.floor(screen.availTop + (screen.availHeight - wh) / 2) : Math.floor((screen.height - wh) / 2);
+  var url = base + "?playboard=1&v=18";
+  /* Place Board to the LEFT of the LL / opener window (side-by-side) */
+  var openerLeft = (typeof window.screenX === "number") ? window.screenX : (window.screenLeft || 0);
+  var openerTop = (typeof window.screenY === "number") ? window.screenY : (window.screenTop || 0);
+  var openerW = window.outerWidth || 1200;
+  var openerH = window.outerHeight || 800;
+  var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
+  var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
+  var availW = (window.screen && screen.availWidth) ? screen.availWidth : (screen.width || 1920);
+  var availH = (window.screen && screen.availHeight) ? screen.availHeight : (screen.height || 1080);
+  /* ~left third relative to opener — matches Board | LL layout */
+  var ww = Math.max(420, Math.min(700, Math.floor(openerW * 0.45)));
+  var wh = Math.max(480, Math.min(availH, openerH));
+  var left = Math.floor(openerLeft - ww);
+  if (left < availL) left = availL;
+  var top = Math.floor(openerTop);
+  if (top < availT) top = availT;
+  if (top + wh > availT + availH) wh = Math.max(480, availT + availH - top);
   var features = "popup=yes,width="+ww+",height="+wh+",left="+left+",top="+top+",menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes";
   var w = window.open(url, "lickPlayBoard", features);
   if (!w) {
@@ -3524,11 +3536,15 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=17") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=18") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
-  try { w.focus(); } catch (e) {}
+  try {
+    if (typeof w.moveTo === "function") w.moveTo(left, top);
+    if (typeof w.resizeTo === "function") w.resizeTo(ww, wh);
+  } catch (e2) {}
+  try { w.focus(); } catch (e3) {}
   return w;
 }
 function bindPlaySync() {
