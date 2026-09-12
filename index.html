@@ -33,6 +33,10 @@
     color: #e8e6e1;
   }
   .wrap { width: 100%; padding: 10px 8px 28px; box-sizing: border-box; }
+  body.sheet-mode .wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   h1 { margin: 0 0 10px 6px; font-size: 0.95rem; letter-spacing: .08em; text-transform: uppercase; color: #c2c2be; font-weight: 600; }
   .grid {
     display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1211,9 +1215,11 @@
     flex-direction: column;
     flex-wrap: nowrap;
     gap: var(--ll-row-gap, 1px);
-    align-items: stretch;
+    align-items: flex-start;
     width: 100%;
-    overflow: visible; /* don’t clip card glow */
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
     padding: 8px 4px 10px;
     box-sizing: border-box;
   }
@@ -1225,8 +1231,9 @@
     flex-direction: row;
     align-items: center;
     gap: var(--gap);
-    width: 100%;
-    max-width: 100%;
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
     min-height: 18px;
     height: 18px;
     margin: 0 0 2px;
@@ -1275,8 +1282,9 @@
     flex-direction: row;
     align-items: center;
     gap: var(--gap);
-    width: 100%;
-    max-width: 100%;
+    width: max-content;
+    min-width: 100%;
+    max-width: none;
     overflow: visible;
   }
   /* Song label = same-size standard album art with title overlay + translucent plate */
@@ -1372,9 +1380,9 @@
     flex-wrap: nowrap;
     grid-template-columns: none;
     gap: var(--gap);
-    width: auto;
-    flex: 1 1 auto;
-    min-width: 0;
+    width: max-content;
+    flex: 0 0 auto;
+    min-width: auto;
     align-items: center;
     overflow: visible; /* glow on all 4 corners */
     padding: 8px 10px 8px 4px; /* room for T1 outline 4px + offset 3px */
@@ -3724,7 +3732,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=59";
+  var url = base + "?playboard=1&v=60";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5539,9 +5547,24 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   var cardByH = (availH - Math.max(0, nRows - 1) * rowGap) / nRows;
   /* label(card) + gap + maxNonPc cards */
   var cardByW = (availW - gap - Math.max(0, maxNonPc) * gap) / Math.max(1, maxNonPc + 1);
-  var card = Math.floor(Math.min(cardByH, cardByW, 100));
-  if (!isFinite(card) || card < 36) card = 36;
-  if (card > 88) card = 88;
+  var portraitMobile = false;
+  try {
+    portraitMobile = window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches
+      || (window.innerWidth <= 900 && window.innerHeight >= window.innerWidth);
+  } catch (ePm) {
+    portraitMobile = window.innerWidth <= 900 && window.innerHeight >= window.innerWidth;
+  }
+  var card;
+  if (portraitMobile) {
+    /* Keep chip faces readable; song rows extend past the screen and scroll horizontally */
+    card = Math.floor(Math.min(cardByH, 72));
+    if (!isFinite(card) || card < 56) card = 56;
+    if (card > 72) card = 72;
+  } else {
+    card = Math.floor(Math.min(cardByH, cardByW, 100));
+    if (!isFinite(card) || card < 36) card = 36;
+    if (card > 88) card = 88;
+  }
   board.style.setProperty("--ll-card", card + "px");
   board.style.setProperty("--ll-gap", gap + "px");
   board.style.setProperty("--ll-row-gap", rowGap + "px");
