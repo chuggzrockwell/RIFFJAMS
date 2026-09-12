@@ -3914,7 +3914,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=96";
+  var url = base + "?playboard=1&v=97";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5834,10 +5834,9 @@ function llSongRowsForLibrary() {
   var sources = ALBUMS || ALBUMS_DEFAULT || [];
   llSelectedAlbums().forEach(function(albumName){
     var album = null;
-    var track = 0;
     sources.forEach(function(a){ if (a && a.name === albumName) album = a; });
     if (!album) return;
-    (album.songs || []).forEach(function(s){
+    (album.songs || []).forEach(function(s, si){
       var hasChips = (s.sections || []).some(function(p){ return isChipPair(p); });
       if (llMode === "solo") {
         var soloAlbum = null;
@@ -5847,11 +5846,10 @@ function llSongRowsForLibrary() {
         hasChips = !!(ss && (ss.licks || []).some(function(p){ return isChipPair(p); }));
       }
       if (!hasChips) return; /* skip empty Fluff / Who Are You? / Electric Funeral with no chips, etc. */
-      track += 1;
       rows.push({
         label: s.song,
         album: albumName,
-        track: track,
+        track: si + 1, /* real album track # even when earlier empty songs are hidden */
         isPc: s.song === "Planet Caravan",
         allowEmpty: false
       });
