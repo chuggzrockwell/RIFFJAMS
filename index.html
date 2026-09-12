@@ -1323,8 +1323,14 @@
       0 8px 22px rgba(0,0,0,.65);
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped .ref {
-    height: calc(var(--card) * 0.28);
-    font-size: clamp(7px, calc(var(--card) * 0.14), 14px);
+    inset: 0;
+    top: 0; right: 0; bottom: 0; left: 0;
+    height: auto;
+    width: auto;
+    border-radius: 8px;
+    background: transparent;
+    font-size: clamp(16px, calc(var(--card) * 0.36), 28px);
+    text-shadow: 0 1px 3px rgba(0,0,0,.95), 0 0 10px rgba(0,0,0,.7);
   }
   .cover-board.song-cols.ll-b .song-col-more {
     box-sizing: border-box;
@@ -1521,19 +1527,20 @@
   .phrase.flipped .face-cover { overflow: hidden; }
   .phrase.flipped .ref {
     z-index: 2;
-  }
-  .phrase.flipped .ref {
     display: flex; align-items: center; justify-content: center;
-    position: absolute; left: 0; right: 0; top: auto; bottom: 0;
-    height: 32px; padding: 0 3px;
-    background: rgba(0,0,0,.42); color: #fff;
-    border-radius: 0 0 8px 8px;
+    position: absolute;
+    inset: 0;
+    top: 0; right: 0; bottom: 0; left: 0;
+    height: auto; width: auto; padding: 0 4px;
+    background: transparent; color: #fff;
+    border-radius: 8px;
     font-family: "Paranoid Title", "Black Ops One", cursive;
-    font-size: 14px; line-height: 1; letter-spacing: .04em;
+    font-size: 22px; line-height: 1; letter-spacing: .04em;
     font-weight: 400;
     white-space: nowrap; overflow: hidden;
     pointer-events: none;
     max-width: none;
+    text-shadow: 0 1px 3px rgba(0,0,0,.95), 0 0 10px rgba(0,0,0,.7);
   }
   .phrase.a.flipped .ref,
   .phrase.b.flipped .ref,
@@ -1541,9 +1548,9 @@
   .phrase.d.flipped .ref,
   .phrase.e.flipped .ref {
     font-family: "Paranoid Title", "Black Ops One", cursive;
-    font-size: 14px;
+    font-size: 22px;
     color: #fff;
-    background: rgba(0,0,0,.42);
+    background: transparent;
   }
   .cover-board.shrunk .phrase.flipped {
     width: 75px; height: 75px;
@@ -1553,14 +1560,13 @@
   }
   .cover-board.shrunk .phrase.flipped .face { border-radius: 4px; }
   .cover-board.shrunk .phrase.flipped .ref {
-    height: 22px; padding: 0 2px; font-size: 10px;
-    border-radius: 0 0 4px 4px;
-    top: auto; left: 0; right: 0; bottom: 0;
+    inset: 0; height: auto; padding: 0 2px; font-size: 16px;
+    border-radius: 4px; background: transparent;
   }
-  .cover-board.shrunk .phrase.a.flipped .ref { font-size: 11px; }
-  .cover-board.shrunk .phrase.b.flipped .ref { font-size: 9px; }
-  .cover-board.shrunk .phrase.d.flipped .ref { font-size: 9px; }
-  .cover-board.shrunk .phrase.e.flipped .ref { font-size: 9px; }
+  .cover-board.shrunk .phrase.a.flipped .ref,
+  .cover-board.shrunk .phrase.b.flipped .ref,
+  .cover-board.shrunk .phrase.d.flipped .ref,
+  .cover-board.shrunk .phrase.e.flipped .ref { font-size: 16px; }
   .cover-board.shrunk .col-head {
     width: 75px; height: 75px; flex-basis: 75px;
     font-size: 1.6rem; border-radius: 4px;
@@ -2313,9 +2319,10 @@
     .cover-board { gap: 4px; }
     .group { gap: 4px; }
     .phrase.flipped { width: 48px; height: 48px; }
-    .phrase.flipped .ref { font-size: 7px !important; height: 14px; padding: 0 1px; }
-    .phrase.a.flipped .ref { font-size: 8px !important; }
-    .phrase.b.flipped .ref, .phrase.d.flipped .ref { font-size: 6px !important; }
+    .phrase.flipped .ref { font-size: 14px !important; height: auto; padding: 0 2px; inset: 0; background: transparent !important; }
+    .phrase.a.flipped .ref,
+    .phrase.b.flipped .ref,
+    .phrase.d.flipped .ref { font-size: 14px !important; }
     .cover-board.shrunk .phrase.flipped { width: 40px; height: 40px; }
     .cover-board.shrunk .phrase.flipped .ref { font-size: 6px !important; height: 12px; }
     .col-head { width: 48px; height: 48px; flex-basis: 48px; font-size: 1rem; border-radius: 4px; }
@@ -3523,7 +3530,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=51";
+  var url = base + "?playboard=1&v=52";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
