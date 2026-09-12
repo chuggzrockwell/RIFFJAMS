@@ -1509,12 +1509,12 @@
     object-fit: cover;
     border-radius: 8px;
   }
-  /* LL tiers: standard art; brightness steps — T2 +25%, T3 +50%, T4/T5 +75% */
-  .phrase.flipped.tier-1 img.cover { filter: none; }
-  .phrase.flipped.tier-2 img.cover { filter: brightness(1.25); }
-  .phrase.flipped.tier-3 img.cover { filter: brightness(1.5); }
+  /* LL tiers: all use standard album art (no per-tier cover/filter) */
+  .phrase.flipped.tier-1 img.cover,
+  .phrase.flipped.tier-2 img.cover,
+  .phrase.flipped.tier-3 img.cover,
   .phrase.flipped.tier-4 img.cover,
-  .phrase.flipped.tier-5 img.cover { filter: brightness(1.75); }
+  .phrase.flipped.tier-5 img.cover { filter: none; }
   .phrase.flipped .face-cover { overflow: hidden; }
   .phrase.flipped .ref {
     z-index: 2;
@@ -3520,7 +3520,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=36";
+  var url = base + "?playboard=1&v=37";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
