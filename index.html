@@ -241,7 +241,9 @@
     position: sticky;
     bottom: 0;
     z-index: 50;
-    margin: 16px 0 0;
+    width: min(420px, calc(100% - 24px));
+    max-width: 420px;
+    margin: 16px auto 0;
     padding: 14px 16px 12px;
     background: #000;
     border: 1px solid #222;
@@ -328,7 +330,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    max-width: 520px;
+    max-width: 100%;
     margin: 0 auto;
   }
   .sm-player-time {
