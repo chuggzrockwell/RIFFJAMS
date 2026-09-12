@@ -3788,7 +3788,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=69";
+  var url = base + "?playboard=1&v=70";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -4253,8 +4253,10 @@ function clearSecFilters() {
   secPosDFilter = false;
   secExcludeTypes = {};
   secAlbumFilter = {};
+  document.querySelectorAll(".filter-dd.open").forEach(function(el){ el.classList.remove("open"); });
   buildSecFilters();
   applySecFilters();
+  if (sectionsMode === "play" && typeof renderPlayBoard === "function") renderPlayBoard();
 }
 
 
@@ -6287,6 +6289,7 @@ function clearLlFilters() {
   llPosDFilter = false;
   llExcludeTypes = {};
   llAlbumFilter = {};
+  document.querySelectorAll("#llFilters .filter-dd.open").forEach(function(el){ el.classList.remove("open"); });
   applyLlFilters();
 }
 function clearLlTierFilters() { clearLlFilters(); }
@@ -6443,8 +6446,10 @@ document.getElementById("llFilters").onclick = function(e){
     return;
   }
   if (e.target.id === "llFilterClear" || e.target.closest("#llFilterClear")) {
-    clearLlFilters();
+    e.preventDefault();
     e.stopPropagation();
+    clearLlFilters();
+    return;
   }
 };
 
@@ -6504,7 +6509,13 @@ document.getElementById("secFilters").onclick = function(e){
     e.stopPropagation();
     return;
   }
-  if (e.target.id === "secFilterClear" || e.target.closest("#secFilterClear")) clearSecFilters();
+  if (e.target.id === "secFilterClear" || e.target.closest("#secFilterClear")) {
+    e.preventDefault();
+    e.stopPropagation();
+    clearSecFilters();
+    if (sectionsMode === "play") renderPlayBoard();
+    return;
+  }
 };
 document.addEventListener("click", function(e){
   if (e.target.closest(".filter-dd")) return;
@@ -7056,11 +7067,23 @@ document.addEventListener("keydown", function(e){
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (handleModeEntryKey(e)) return;
-  /* Playspace: Shift+C clears all queued licks (popup Playboard or Song Map Play pane) */
+  /* Shift+C: clear Board queue / Song Map filters / LL filters */
   if (e.shiftKey && ((e.key || "").toLowerCase() === "c" || e.code === "KeyC")) {
-    if (document.body.classList.contains("playboard-mode") || document.body.classList.contains("sections-play")) {
+    if (document.body.classList.contains("playboard-mode")) {
       e.preventDefault();
       clearPlayQueue();
+      return;
+    }
+    if (document.body.classList.contains("sections-mode")) {
+      e.preventDefault();
+      if (document.body.classList.contains("sections-play")) clearPlayQueue();
+      clearSecFilters();
+      return;
+    }
+    if (document.body.classList.contains("sheet-mode")) {
+      e.preventDefault();
+      if (typeof clearLlFilters === "function") clearLlFilters();
+      if (typeof clearRevealedLicks === "function") clearRevealedLicks();
       return;
     }
   }
@@ -7141,7 +7164,6 @@ document.addEventListener("keydown", function(e){
   }
   if (k === "z") { randomizeCoverBoard(); return; }
   if (k === "o") { reorderRevealedTabs(); return; }
-  if (e.shiftKey && k === "c") { clearRevealedLicks(); return; }
   if (!e.shiftKey && (k === "a" || k === "b" || k === "c" || k === "d" || k === "e")) {
     revealKind(k.toUpperCase());
     return;
