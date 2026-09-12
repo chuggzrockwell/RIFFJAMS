@@ -1506,24 +1506,11 @@
     border-radius: 8px;
   }
 
-  /* T1: permanent bright neon box (former selected-chip look); art unchanged */
+  /* T1: same outline the selected chip used to have; art + class glow unchanged */
   .phrase.flipped.tier-1,
-  .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-1,
-  .cover-board.song-cols.ll-b .song-col-body .phrase.a.flipped.tier-1,
-  .cover-board.song-cols.ll-b .song-col-body .phrase.b.flipped.tier-1,
-  .cover-board.song-cols.ll-b .song-col-body .phrase.d.flipped.tier-1,
-  .cover-board.song-cols.ll-b .song-col-body .phrase.e.flipped.tier-1,
-  .phrase.a.flipped.tier-1,
-  .phrase.b.flipped.tier-1,
-  .phrase.d.flipped.tier-1,
-  .phrase.e.flipped.tier-1 {
+  .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-1 {
     outline: 2px solid #ed1c24;
     outline-offset: 2px;
-    box-shadow:
-      0 0 0 1px #ed1c24,
-      0 0 10px 3px rgba(237,28,36,.9),
-      0 0 24px 8px rgba(237,28,36,.45),
-      0 8px 22px rgba(0,0,0,.65);
   }
   /* LL tiers: T1+T2 standard art; T3–T5 shared wash art; no invert */
   .phrase.flipped.tier-1 img.cover,
@@ -3536,7 +3523,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=48";
+  var url = base + "?playboard=1&v=49";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
