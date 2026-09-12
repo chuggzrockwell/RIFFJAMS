@@ -3857,7 +3857,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=82";
+  var url = base + "?playboard=1&v=83";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5406,7 +5406,7 @@ function llCoverForAlbumTier(album, tier) {
   tier = parseInt(tier, 10);
   if (!(tier >= 1 && tier <= 2)) tier = 3;
   if (album === "Sabbath Bloody Sabbath") {
-    return (tier >= 3) ? "covers/sbs-tier3.png?v=1" : "covers/sbs.png";
+    return (tier >= 3) ? "covers/sbs-tier3.png?v=2" : "covers/sbs.png?v=2";
   }
   /* Paranoid default */
   if (COVER_BY_TIER[tier]) return COVER_BY_TIER[tier];
