@@ -3894,7 +3894,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=89";
+  var url = base + "?playboard=1&v=90";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5335,7 +5335,7 @@ function saveChipEditor() {
     });
   }
   closeChipEditor();
-  showSections();
+  showSections(true);
 }
 function deleteChipEditor() {
   if (!chipEditState || chipEditState.isNew) return;
@@ -5353,7 +5353,7 @@ function deleteChipEditor() {
     saveAlbums();
   }
   closeChipEditor();
-  showSections();
+  showSections(true);
 }
 function cloneSectionPair(pair) {
   return isChipPair(pair) ? pair.slice() : null;
