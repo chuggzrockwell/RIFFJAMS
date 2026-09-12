@@ -1299,36 +1299,31 @@
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.a.flipped {
     box-shadow:
-      0 0 6px 2px rgba(163,73,164,.95),
-      0 0 18px 6px rgba(163,73,164,.7),
-      0 0 36px 12px rgba(163,73,164,.4),
+      0 0 8px 2px rgba(163,73,164,.55),
+      0 0 22px 6px rgba(163,73,164,.28),
       0 8px 22px rgba(0,0,0,.65);
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.b.flipped {
     box-shadow:
-      0 0 6px 2px rgba(237,28,36,.95),
-      0 0 18px 6px rgba(237,28,36,.7),
-      0 0 36px 12px rgba(237,28,36,.4),
+      0 0 8px 2px rgba(237,28,36,.55),
+      0 0 22px 6px rgba(237,28,36,.28),
       0 8px 22px rgba(0,0,0,.65);
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.e.flipped {
     box-shadow:
-      0 0 6px 2px rgba(255,140,40,.95),
-      0 0 18px 6px rgba(255,140,40,.7),
-      0 0 36px 12px rgba(255,140,40,.4),
+      0 0 8px 2px rgba(255,140,40,.55),
+      0 0 22px 6px rgba(255,140,40,.28),
       0 8px 22px rgba(0,0,0,.65);
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.d.flipped {
     box-shadow:
-      0 0 6px 2px rgba(46,180,90,.95),
-      0 0 18px 6px rgba(46,180,90,.7),
-      0 0 36px 12px rgba(46,180,90,.4),
+      0 0 8px 2px rgba(46,180,90,.55),
+      0 0 22px 6px rgba(46,180,90,.28),
       0 8px 22px rgba(0,0,0,.65);
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped:not(.a):not(.b):not(.d):not(.e) {
     box-shadow:
-      0 0 8px 2px rgba(255,255,255,.35),
-      0 0 22px 8px rgba(255,255,255,.18),
+      0 0 10px 2px rgba(255,255,255,.08),
       0 8px 22px rgba(0,0,0,.65);
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped .ref {
@@ -1471,36 +1466,31 @@
     background: transparent;
     overflow: hidden;
     box-shadow:
-      0 0 8px 2px rgba(255,255,255,.35),
-      0 0 22px 8px rgba(255,255,255,.18),
+      0 0 10px 2px rgba(255,255,255,.08),
       0 8px 22px rgba(0,0,0,.65);
   }
   .phrase.a.flipped {
     box-shadow:
-      0 0 6px 2px rgba(163,73,164,.95),
-      0 0 18px 6px rgba(163,73,164,.7),
-      0 0 36px 12px rgba(163,73,164,.4),
+      0 0 8px 2px rgba(163,73,164,.55),
+      0 0 22px 6px rgba(163,73,164,.28),
       0 8px 22px rgba(0,0,0,.65);
   }
   .phrase.b.flipped {
     box-shadow:
-      0 0 6px 2px rgba(237,28,36,.95),
-      0 0 18px 6px rgba(237,28,36,.7),
-      0 0 36px 12px rgba(237,28,36,.4),
+      0 0 8px 2px rgba(237,28,36,.55),
+      0 0 22px 6px rgba(237,28,36,.28),
       0 8px 22px rgba(0,0,0,.65);
   }
   .phrase.e.flipped {
     box-shadow:
-      0 0 6px 2px rgba(255,140,40,.95),
-      0 0 18px 6px rgba(255,140,40,.7),
-      0 0 36px 12px rgba(255,140,40,.4),
+      0 0 8px 2px rgba(255,140,40,.55),
+      0 0 22px 6px rgba(255,140,40,.28),
       0 8px 22px rgba(0,0,0,.65);
   }
   .phrase.d.flipped {
     box-shadow:
-      0 0 6px 2px rgba(46,180,90,.95),
-      0 0 18px 6px rgba(46,180,90,.7),
-      0 0 36px 12px rgba(46,180,90,.4),
+      0 0 8px 2px rgba(46,180,90,.55),
+      0 0 22px 6px rgba(46,180,90,.28),
       0 8px 22px rgba(0,0,0,.65);
   }
   .phrase.flipped .card-inner {
@@ -3530,7 +3520,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=44";
+  var url = base + "?playboard=1&v=45";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
