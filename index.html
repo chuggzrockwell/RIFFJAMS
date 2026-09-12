@@ -117,6 +117,10 @@
   /* LL: no Paranoid badge / chip count in the top bar */
   body.sheet-mode #badge,
   body.sheet-mode #count { display: none !important; }
+  /* Hide shortcut hint strip in top nav (LL + Song Map) */
+  body.sheet-mode #series > .bar .keys,
+  body.sections-mode #sections > .bar .keys,
+  #sectionsKeys { display: none !important; }
   .btn-randomize {
     background: transparent; color: inherit; border: 1px solid #4a4e5a;
     border-radius: 999px; padding: 5px 12px; cursor: pointer;
@@ -3776,7 +3780,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=65";
+  var url = base + "?playboard=1&v=66";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
