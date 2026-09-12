@@ -553,12 +553,12 @@
   .sec-play-toolbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 12px;
     margin: 0 0 8px;
     flex: 0 0 auto;
   }
-  .sec-play-toolbar .sec-play-meta { margin: 0; flex: 1 1 auto; }
+  .sec-play-toolbar .sec-play-meta { display: none !important; }
   .sec-play-clear {
     appearance: none;
     flex: 0 0 auto;
@@ -2692,8 +2692,6 @@
       <button type="button" class="back" id="back">Back</button>
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
-      <button type="button" class="btn-randomize" id="btnRandomize" title="Shuffle revealed tabs (Z)">Randomize</button>
-      <button type="button" class="btn-randomize" id="btnReorder" title="Sort revealed tabs and cover cards by lick ID (O)">Reorder</button>
       <button type="button" class="btn-randomize" id="btnClear" title="Hide all revealed tabs (Shift+C)">Clear</button>
       <label class="board-mode-dd" title="Riff / Solo chip set">
         <select id="llBoardMode" aria-label="Mode">
@@ -3780,7 +3778,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=66";
+  var url = base + "?playboard=1&v=67";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -3847,7 +3845,6 @@ function initPlayboardPage() {
   document.body.innerHTML = '<div class="wrap"><div id="playboardRoot">'
     + '<aside class="sec-play-pane" id="secPlayPane">'
     + '<div class="sec-play-toolbar">'
-    + '<div class="sec-play-meta" id="secPlayMeta">Board — song[.class] + NP Enter · Z randomize · 0 / Shift+C clear · Esc close</div>'
     + '<label class="board-mode-dd" title="Riff / Solo">'
     + '<select id="boardModeSelect" aria-label="Mode">'
     + '<option value="riff">Riff mode</option>'
@@ -6226,8 +6223,10 @@ document.getElementById("btnC").onclick = function(){ showSeries("C"); };
 document.getElementById("btnD").onclick = function(){ showSeries("D"); };
 document.getElementById("btnHP").onclick = showSections;
 document.getElementById("back").onclick = showHome;
-document.getElementById("btnRandomize").onclick = function(){ randomizeCoverBoard(); };
-document.getElementById("btnReorder").onclick = function(){ reorderRevealedTabs(); };
+var _btnRand = document.getElementById("btnRandomize");
+if (_btnRand) _btnRand.onclick = function(){ randomizeCoverBoard(); };
+var _btnReord = document.getElementById("btnReorder");
+if (_btnReord) _btnReord.onclick = function(){ reorderRevealedTabs(); };
 document.getElementById("btnClear").onclick = function(){ clearRevealedLicks(); };
 document.getElementById("backSections").onclick = showHome;
 
