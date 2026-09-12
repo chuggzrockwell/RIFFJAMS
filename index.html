@@ -2457,6 +2457,94 @@
     }
     .tile small { font-size: 0.65rem; margin-bottom: 2px; }
   }
+
+  /* Mobile landscape: player becomes a vertical dock on the right */
+  @media (orientation: landscape) and (max-height: 560px) {
+    body.sections-mode .wrap,
+    body.sheet-mode .wrap {
+      padding-right: 118px;
+      box-sizing: border-box;
+    }
+    body.sections-mode .sm-player,
+    body.sheet-mode .sm-player {
+      position: fixed;
+      right: 6px;
+      left: auto;
+      top: 50%;
+      bottom: auto;
+      transform: translateY(-50%);
+      width: 104px;
+      max-width: 104px;
+      max-height: calc(100vh - 12px);
+      margin: 0;
+      padding: 10px 8px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      z-index: 60;
+    }
+    .sm-player-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
+    }
+    .sm-player-art {
+      order: -1;
+      width: 56px;
+      height: 56px;
+      flex: 0 0 auto;
+    }
+    .sm-player-meta {
+      white-space: normal;
+      text-align: center;
+      font-size: 0.58rem;
+      line-height: 1.25;
+      margin: 0 0 4px;
+      max-width: 100%;
+    }
+    .sm-player-controls {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 0 6px;
+    }
+    .sm-player-btn.play {
+      width: 36px;
+      height: 36px;
+    }
+    .sm-player-btn.repeat.on::after {
+      left: auto;
+      right: -8px;
+      bottom: 50%;
+      margin-left: 0;
+      margin-bottom: -2px;
+    }
+    .sm-player-progress {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      gap: 4px;
+      margin: 0;
+    }
+    .sm-player-time,
+    .sm-player-time.end {
+      text-align: center;
+      min-width: 0;
+      font-size: 0.58rem;
+    }
+    .sm-player-scrub {
+      width: 100%;
+      flex: 0 0 auto;
+    }
+  }
 </style>
 </head>
 <body class="home-mode">
@@ -3636,7 +3724,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=58";
+  var url = base + "?playboard=1&v=59";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
