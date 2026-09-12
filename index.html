@@ -3824,7 +3824,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=76";
+  var url = base + "?playboard=1&v=77";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5693,24 +5693,27 @@ function sizeLlBCard(board, maxNonPc, nRows) {
     hBudget = Math.max(160, shortSide - barGuess - 12 - rulerH - playerH);
   }
   /*
-   * Auto chip-height modes by albums selected (or present):
-   *  1 album  → standard 88px
-   *  2 albums → mid: tallest size that still fits 17 song rows
-   *  3+ albums → compact 36px
+   * Auto chip height from VISIBLE song rows (not album count):
+   *  ≤8 songs  → standard 88px
+   *  ≤17 songs → mid (~fit 17 rows on screen)
+   *  ≥18 songs → compact 36px
    */
-  var albumN = llScaleAlbumCount();
+  nRows = Math.max(1, parseInt(nRows, 10) || 1);
   var mode = "standard";
   var card;
-  if (albumN >= 3) {
+  if (nRows >= 18) {
     mode = "compact";
     card = 36;
-  } else if (albumN >= 2) {
+  } else if (nRows >= 9) {
     mode = "mid";
     card = Math.floor((hBudget - 16 * rowGap) / 17);
   } else {
     mode = "standard";
     card = 88;
   }
+  /* Also never exceed what actually fits these rows (keeps 3-song filters at 88) */
+  var fitRows = Math.floor((hBudget - Math.max(0, nRows - 1) * rowGap) / nRows);
+  if (isFinite(fitRows) && fitRows > 0) card = Math.min(card, fitRows);
   if (mode !== "compact") {
     var byW = Math.floor(cardByW);
     if (isFinite(byW) && byW > 0) card = Math.min(card, byW);
@@ -5724,7 +5727,6 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   board.setAttribute("data-ll-scale", mode);
   board.classList.toggle("ll-scale-mid", mode === "mid");
   board.classList.toggle("ll-scale-compact", mode === "compact");
-  /* Compact/mid with many rows: allow vertical scroll inside the board */
   if (mode === "compact" || mode === "mid") {
     board.style.maxHeight = Math.floor(hBudget + rulerH + 12) + "px";
     board.style.overflowY = "auto";
@@ -5808,17 +5810,26 @@ function rebuildColumnsB() {
   }
   board.className = "cover-board song-cols ll-b"; /* song ROWS */
   var maxOther = 1;
+  var visibleSongs = [];
   songs.forEach(function(song){
-    if (song.isPc) return;
-    var n = all.filter(function(el){ return (el.getAttribute("data-song") || "") === song.label; }).length;
-    if (n > maxOther) maxOther = n;
+    var n = all.filter(function(el){
+      return (el.getAttribute("data-song") || "") === song.label
+        && (el.getAttribute("data-album") || "") === (song.album || "");
+    }).length;
+    if (!n && !song.allowEmpty) return;
+    visibleSongs.push(song);
+    if (!song.isPc && n > maxOther) maxOther = n;
   });
-  var cardPx = sizeLlBCard(board, maxOther, songs.length);
+  var cardPx = sizeLlBCard(board, maxOther, visibleSongs.length || 1);
   var firstRowCount = 0;
-  if (songs.length) {
-    firstRowCount = all.filter(function(el){ return (el.getAttribute("data-song") || "") === songs[0].label; }).length;
+  if (visibleSongs.length) {
+    firstRowCount = all.filter(function(el){
+      return (el.getAttribute("data-song") || "") === visibleSongs[0].label
+        && (el.getAttribute("data-album") || "") === (visibleSongs[0].album || "");
+    }).length;
   }
   var colCount = Math.max(firstRowCount, 1);
+  songs = visibleSongs;
   var ruler = document.createElement("div");
   ruler.className = "ll-col-ruler";
   ruler.setAttribute("aria-hidden", "true");
