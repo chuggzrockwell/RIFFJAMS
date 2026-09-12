@@ -3475,7 +3475,6 @@ function secType(code) {
   var m = String(code).match(/^[A-Z]+/);
   return m ? m[0] : "";
 }
-var SONG_SLOTS = 10;
 function isChipPair(pair) {
   return !!(pair && pair[0]);
 }
@@ -3592,20 +3591,59 @@ function countSongChips(song) {
   (song.sections || []).forEach(function(pair){ if (isChipPair(pair)) n++; });
   return n;
 }
-/** Pack existing chips into a fixed 10-column slot grid (null = empty square). */
-function ensureSongSlots(song) {
+var SONG_SLOTS = 10; /* minimum columns; grid grows when you drag past the end */
+function songArraySlots(arr) {
+  var n = 0;
+  (arr || []).forEach(function(pair, i){ if (isChipPair(pair) && i + 1 > n) n = i + 1; });
+  if ((arr || []).length > n) n = arr.length;
+  return n;
+}
+function mapSlotCount(albums) {
+  var n = SONG_SLOTS;
+  (albums || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      var sn = songArraySlots(s && s.sections);
+      if (sn > n) n = sn;
+    });
+  });
+  return n;
+}
+function soloMapSlotCount(map) {
+  var n = SONG_SLOTS;
+  ((map && map.albums) || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      var sn = songArraySlots(s && s.licks);
+      if (sn > n) n = sn;
+    });
+  });
+  return n;
+}
+/** Pack chips into a sparse slot grid (null = empty). Pads to minSlots; never truncates longer rows. */
+function ensureSongSlots(song, minSlots) {
   if (!song) return;
-  var slots = (typeof SONG_SLOTS === "number" && SONG_SLOTS > 0) ? SONG_SLOTS : 10;
+  var min = (typeof minSlots === "number" && minSlots > 0) ? minSlots : SONG_SLOTS;
   var src = song.sections || [];
+  var need = Math.max(min, songArraySlots(src), src.length);
   var out = [];
   var i;
-  for (i = 0; i < slots; i++) out[i] = isChipPair(src[i]) ? src[i] : null;
+  for (i = 0; i < need; i++) out[i] = isChipPair(src[i]) ? src[i] : null;
   song.sections = out;
 }
-function ensureAllSongSlots(albums) {
+function ensureAllSongSlots(albums, minSlots) {
+  var need = Math.max(minSlots || 0, mapSlotCount(albums));
   (albums || []).forEach(function(a){
-    (a.songs || []).forEach(ensureSongSlots);
+    (a.songs || []).forEach(function(s){ ensureSongSlots(s, need); });
   });
+}
+function growSongSlotsTo(song, indexInclusive) {
+  if (!song) return;
+  var need = Math.max(SONG_SLOTS, (indexInclusive | 0) + 1);
+  if (soloMode) {
+    ensureSoloSlots(song);
+    while ((song.licks || []).length < need) song.licks.push(null);
+  } else {
+    ensureSongSlots(song, need);
+  }
 }
 
 function totalAlbumChips(albums) {
@@ -3709,17 +3747,10 @@ function showSections(keepScroll) {
   var n = 0;
   var rowN = 0;
   var sourceAlbums = soloMode ? ((SOLO_MAP && SOLO_MAP.albums) || []) : ALBUMS;
-  var maxCols = 10;
-  if (soloMode) {
-    sourceAlbums.forEach(function(album){
-      (album.songs || []).forEach(function(s){
-        var len = 0;
-        (s.licks || []).forEach(function(lp){ if (isChipPair(lp)) len++; });
-        if (len > maxCols) maxCols = len;
-      });
-    });
-    if (maxCols < 10) maxCols = 10;
-  }
+  var contentCols = soloMode ? soloMapSlotCount(SOLO_MAP) : mapSlotCount(ALBUMS);
+  if (contentCols < SONG_SLOTS) contentCols = SONG_SLOTS;
+  /* Edit: one empty column past the end so dragging right creates a new numbered column (display only until drop) */
+  var maxCols = (sectionsMode === "edit") ? (contentCols + 1) : contentCols;
   var groupStart = SOLO_COL_GROUP_START; // 1-based
   var hasSoloGroup = soloMode && maxCols >= groupStart;
   var displayCols = (hasSoloGroup && soloColsCollapsed) ? (groupStart - 1) : maxCols;
@@ -3751,9 +3782,10 @@ function showSections(keepScroll) {
       var chipArr = [];
       var ci;
       if (soloMode) {
+        ensureSoloSlots(s);
         var licks = (s.licks || []);
         for (ci = 0; ci < maxCols; ci++) {
-          var lp = licks[ci];
+          var lp = (ci < licks.length) ? licks[ci] : null;
           if (!isChipPair(lp)) {
             var gEmpty = (hasSoloGroup && (ci + 1) >= groupStart) ? " col-group-member" : "";
             chipArr.push('<button type="button" class="sec-chip empty'+gEmpty+'" data-solo="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty solo slot"></button>');
@@ -3766,10 +3798,10 @@ function showSections(keepScroll) {
           }
         }
       } else {
-        ensureSongSlots(s);
+        ensureSongSlots(s, contentCols);
         n += countSongChips(s);
         for (ci = 0; ci < maxCols; ci++) {
-          var pair = s.sections[ci];
+          var pair = (s.sections && ci < s.sections.length) ? s.sections[ci] : null;
           if (!isChipPair(pair)) {
             chipArr.push('<button type="button" class="sec-chip empty" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Add section"></button>');
           } else {
@@ -3857,7 +3889,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=85";
+  var url = base + "?playboard=1&v=87";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5270,16 +5302,18 @@ function saveChipEditor() {
   var entry = makeChipEntry(code, tier, lick, posList);
   if (soloMode) {
     pushSoloHistory();
-    ensureSoloSlots(song);
+    ((SOLO_MAP && SOLO_MAP.albums) || []).forEach(function(a){
+      (a.songs || []).forEach(function(s){ growSongSlotsTo(s, ci); });
+    });
+    song = getEditSong(ai, si);
+    if (!song) return;
     song.licks[ci] = entry;
     saveSoloMap();
   } else {
     pushAlbumHistory();
-    ensureSongSlots(song);
-    if (chipEditState.isNew && countSongChips(song) >= SONG_SLOTS) {
-      alert("This song already has 10 chips.");
-      return;
-    }
+    ensureAllSongSlots(ALBUMS, ci + 1);
+    song = getEditSong(ai, si);
+    if (!song) return;
     song.sections[ci] = entry;
     saveAlbums();
   }
@@ -5363,10 +5397,9 @@ function pasteSongSectionAt(ai, si, ci) {
     song.licks[ci] = sectionClipboard.slice();
     saveSoloMap();
   } else {
-    ensureSongSlots(song);
-    if (ci < 0 || ci >= SONG_SLOTS) return false;
+    growSongSlotsTo(song, ci);
+    if (ci < 0 || ci >= (song.sections || []).length) return false;
     var dest = song.sections[ci];
-    if (!isChipPair(dest) && countSongChips(song) >= SONG_SLOTS) return false;
     pushAlbumHistory();
     song.sections[ci] = sectionClipboard.slice();
     saveAlbums();
@@ -6860,16 +6893,19 @@ function moveSongMapChip(fromAi, fromSi, fromCi, toAi, toSi, toCi, copy) {
   var toSong = getEditSong(toAi, toSi);
   if (!fromSong || !toSong) return false;
   if (soloMode) {
-    ensureSoloSlots(fromSong);
-    ensureSoloSlots(toSong);
+    if (fromCi < 0 || toCi < 0) return false;
+    growSongSlotsTo(fromSong, fromCi);
+    /* New column: pad every song so grid lines/empties exist in that column */
+    ((SOLO_MAP && SOLO_MAP.albums) || []).forEach(function(a){
+      (a.songs || []).forEach(function(s){ growSongSlotsTo(s, toCi); });
+    });
     var fromArr = fromSong.licks;
     var toArr = toSong.licks;
-    if (fromCi < 0 || fromCi >= fromArr.length || toCi < 0 || toCi >= toArr.length) return false;
+    if (fromCi >= fromArr.length || toCi >= toArr.length) return false;
     if (fromAi === toAi && fromSi === toSi && fromCi === toCi) return false;
     var itemS = fromArr[fromCi];
     if (!isChipPair(itemS)) return false;
     var destS = toArr[toCi];
-    if (!(fromAi === toAi && fromSi === toSi) && !isChipPair(destS) && countSoloSongChips(toSong) >= toArr.length) return false;
     pushSoloHistory();
     if (copy) {
       toArr[toCi] = itemS.slice();
@@ -6891,14 +6927,16 @@ function moveSongMapChip(fromAi, fromSi, fromCi, toAi, toSi, toCi, copy) {
     saveSoloMap();
     return true;
   }
-  ensureSongSlots(fromSong);
-  ensureSongSlots(toSong);
-  if (fromCi < 0 || fromCi >= SONG_SLOTS || toCi < 0 || toCi >= SONG_SLOTS) return false;
+  if (fromCi < 0 || toCi < 0) return false;
+  growSongSlotsTo(fromSong, fromCi);
+  ensureAllSongSlots(ALBUMS, toCi + 1);
+  growSongSlotsTo(fromSong, fromCi);
+  growSongSlotsTo(toSong, toCi);
+  if (fromCi >= (fromSong.sections || []).length || toCi >= (toSong.sections || []).length) return false;
   if (fromAi === toAi && fromSi === toSi && fromCi === toCi) return false;
   var item = fromSong.sections[fromCi];
   if (!isChipPair(item)) return false;
   var dest = toSong.sections[toCi];
-  if (!(fromAi === toAi && fromSi === toSi) && !isChipPair(dest) && countSongChips(toSong) >= SONG_SLOTS) return false;
   pushAlbumHistory();
   if (copy) {
     toSong.sections[toCi] = item.slice();
@@ -7091,8 +7129,19 @@ document.getElementById("sectionsSheet").onclick = function(e){
         if (pasteSongSectionAt(ai, si, ci)) return;
       }
       if (soloMode) {
-        if (ci >= song.licks.length) return;
-      } else if (countSongChips(song) >= SONG_SLOTS) return;
+        if (ci >= (song.licks || []).length) {
+          ((SOLO_MAP && SOLO_MAP.albums) || []).forEach(function(a){
+            (a.songs || []).forEach(function(s){ growSongSlotsTo(s, ci); });
+          });
+          song = getEditSong(ai, si);
+        }
+      } else {
+        ensureSongSlots(song, mapSlotCount(ALBUMS));
+        if (ci >= (song.sections || []).length) {
+          ensureAllSongSlots(ALBUMS, ci + 1);
+          song = getEditSong(ai, si);
+        }
+      }
       var newPos = soloMode ? [1] : defaultPositionsForAlbum(ALBUMS[ai]);
       openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "", positions: newPos });
       return;
