@@ -1220,7 +1220,7 @@
   /* Column numbers above War Pigs chip row */
   .cover-board.song-cols.ll-b .ll-col-ruler {
     --card: var(--ll-card, 72px);
-    --gap: var(--ll-gap, 12px);
+    --gap: var(--ll-gap, 20px);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -1270,7 +1270,7 @@
   }
   .cover-board.song-cols.ll-b .song-col {
     --card: var(--ll-card, 72px);
-    --gap: var(--ll-gap, 12px);
+    --gap: var(--ll-gap, 20px);
     --label-w: var(--card);
     flex-direction: row;
     align-items: center;
@@ -1377,7 +1377,7 @@
     min-width: 0;
     align-items: center;
     overflow: visible; /* glow on all 4 corners */
-    padding: 5px 6px 5px 0; /* room for T1 outline (2px+2px) + 1px */
+    padding: 8px 10px 8px 4px; /* room for T1 outline 4px + offset 3px */
     box-sizing: border-box;
   }
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped {
@@ -1612,11 +1612,11 @@
     border-radius: 8px;
   }
 
-  /* T1: same outline the selected chip used to have; art + class glow unchanged */
+  /* T1 neon: thicker ring; gap must clear outline+offset on both chips */
   .phrase.flipped.tier-1,
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-1 {
-    outline: 2px solid #ed1c24;
-    outline-offset: 2px;
+    outline: 4px solid #ed1c24;
+    outline-offset: 3px;
   }
   /* LL tiers: T1+T2 standard art; T3–T5 shared wash art; no invert */
   .phrase.flipped.tier-1 img.cover,
@@ -3636,7 +3636,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=57";
+  var url = base + "?playboard=1&v=58";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5434,8 +5434,8 @@ function enqueueLibraryByFilter(pred) {
   return true;
 }
 function sizeLlBCard(board, maxNonPc, nRows) {
-  /* Chip gap: T1 neon is outline 2px + offset 2px per side; 12px → ~4px clear between two T1s (was 10) */
-  var gap = 12;
+  /* Chip gap: T1 neon outline 4px + offset 3px per side → need ≥14px; 20px → ~6px clear */
+  var gap = 20;
   var rowGap = 1; /* 1px above/below song chip rows */
   var rulerH = 20; /* column numbers above War Pigs */
   var playerH = 118; /* sticky Song Map-style player under LL */
@@ -5461,7 +5461,7 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   return card;
 }
 function pcCollapsedVisibleCount(board, cardPx) {
-  var gap = 12;
+  var gap = 20;
   var labelW = cardPx;
   var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 8);
   var bodyW = availW - labelW - gap;
