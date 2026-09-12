@@ -3581,7 +3581,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=53";
+  var url = base + "?playboard=1&v=54";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -3648,12 +3648,13 @@ function initPlayboardPage() {
   document.body.innerHTML = '<div class="wrap"><div id="playboardRoot">'
     + '<aside class="sec-play-pane" id="secPlayPane">'
     + '<div class="sec-play-toolbar">'
-    + '<div class="sec-play-meta" id="secPlayMeta">Board — song[.class] + NP Enter · 0 / Shift+C clear · Esc close</div>'
+    + '<div class="sec-play-meta" id="secPlayMeta">Board — song[.class] + NP Enter · Z randomize · 0 / Shift+C clear · Esc close</div>'
     + '<label class="board-mode-dd" title="Riff / Solo">'
     + '<select id="boardModeSelect" aria-label="Mode">'
     + '<option value="riff">Riff mode</option>'
     + '<option value="solo">Solo mode</option>'
     + '</select></label>'
+    + '<button type="button" class="sec-play-clear" id="secPlayRandomize" title="Shuffle Board order (Z)">Randomize</button>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or 0 then Enter)">Clear</button>'
     + '</div>'
     + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to press it in · click again to remove · song[.class]+Enter to add.</div></div>'
@@ -3681,6 +3682,11 @@ function initPlayboardPage() {
     boardActiveKey = key;
     renderPlayBoard();
   };
+  var randBtn = document.getElementById("secPlayRandomize");
+  if (randBtn) randBtn.onclick = function(e){
+    e.preventDefault();
+    randomizePlayBoard();
+  };
   var clearBtn = document.getElementById("secPlayClear");
   if (clearBtn) clearBtn.onclick = function(e){
     e.preventDefault();
@@ -3703,6 +3709,12 @@ function initPlayboardPage() {
       return;
     }
     if (e.type !== "keydown") return;
+    if (!e.altKey && !e.ctrlKey && !e.metaKey && (k === "z" || e.code === "KeyZ")) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      randomizePlayBoard();
+      return;
+    }
     /* Escape clears buffer or closes — clear board with 0+Enter / Shift+C / Clear */
     if (e.key === "Escape") {
       e.preventDefault();
@@ -4614,8 +4626,8 @@ function renderPlayBoard() {
       meta.innerHTML = "Entry <strong>" + boardEntryBuf + "</strong> · " + boardEntryLabel(boardEntryBuf) + " · NP Enter to show";
     } else {
       meta.innerHTML = playQueue.length
-        ? ("<strong>"+playQueue.length+"</strong> on Board · song[.class] + Enter · 0 clear")
-        : "Board — song[.class] + NP Enter · 0 / Shift+C clear · Esc close";
+        ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · song[.class] + Enter · 0 clear")
+        : "Board — song[.class] + NP Enter · Z randomize · 0 / Shift+C clear · Esc close";
     }
   }
   if (!visible.length) {
@@ -5131,15 +5143,45 @@ function revealedTabCards() {
     return el.classList && el.classList.contains("phrase") && !el.classList.contains("flipped") && !el.classList.contains("filtered-out");
   });
 }
-/** Shuffle revealed tabs (Jacob: flipped = tab = CSS without .flipped). */
+/** Shuffle revealed tabs (Jacob: flipped = tab = CSS without .flipped).
+ *  Also shuffles cover chips inside LL song rows (Paranoid B), matching Reorder. */
 function randomizeCoverBoard() {
   var tabWrap = document.getElementById("tabWrap");
-  if (!tabWrap) return;
-  var cards = revealedTabCards();
-  if (cards.length < 2) return;
-  shuffleInPlace(cards);
-  cards.forEach(function(el){ tabWrap.appendChild(el); });
+  if (tabWrap) {
+    var cards = revealedTabCards();
+    if (cards.length >= 2) {
+      shuffleInPlace(cards);
+      cards.forEach(function(el){ tabWrap.appendChild(el); });
+    }
+  }
+  var board = document.getElementById("coverBoard");
+  if (board && !board.classList.contains("hidden")) {
+    var parents = [].slice.call(board.querySelectorAll(".song-col-body"));
+    if (!parents.length) parents = [].slice.call(board.querySelectorAll(".group"));
+    if (!parents.length) parents = [board];
+    parents.forEach(function(parent){
+      var covers = [].filter.call(parent.children, function(el){
+        return el.classList && el.classList.contains("phrase")
+          && !el.classList.contains("filtered-out")
+          && !el.classList.contains("pc-collapsed-hide");
+      });
+      if (covers.length < 2) return;
+      shuffleInPlace(covers);
+      covers.forEach(function(el){ parent.appendChild(el); });
+      /* keep + expander after visible chips when PC collapsed */
+      var more = parent.querySelector(".song-col-more");
+      if (more) parent.appendChild(more);
+    });
+  }
   saveOrder();
+}
+/** Shuffle Board (playQueue) card order. */
+function randomizePlayBoard() {
+  if (!playQueue || playQueue.length < 2) return;
+  shuffleInPlace(playQueue);
+  boardActiveKey = null;
+  publishPlayQueue();
+  if (typeof renderPlayBoard === "function") renderPlayBoard();
 }
 function sortPhraseCards(cards) {
   cards.sort(function(a, b){
@@ -5687,8 +5729,8 @@ function updateBoardEntryMeta() {
     return;
   }
   meta.innerHTML = playQueue.length
-    ? ("<strong>"+playQueue.length+"</strong> on Board · song[.class] + Enter · 0 clear")
-    : "Board — song[.class] + NP Enter · 0 / Shift+C clear · Esc close";
+    ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · song[.class] + Enter · 0 clear")
+    : "Board — song[.class] + NP Enter · Z randomize · 0 / Shift+C clear · Esc close";
 }
 /**
  * Board: queue Paranoid track licks. digit 1–8; optional classKind A–E.
