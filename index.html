@@ -3788,7 +3788,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=70";
+  var url = base + "?playboard=1&v=71";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -4254,6 +4254,9 @@ function clearSecFilters() {
   secExcludeTypes = {};
   secAlbumFilter = {};
   document.querySelectorAll(".filter-dd.open").forEach(function(el){ el.classList.remove("open"); });
+  document.querySelectorAll("#sectionsSheet .filtered-out").forEach(function(el){
+    el.classList.remove("filtered-out");
+  });
   buildSecFilters();
   applySecFilters();
   if (sectionsMode === "play" && typeof renderPlayBoard === "function") renderPlayBoard();
@@ -5638,6 +5641,7 @@ function pcCollapsedVisibleCount(board, cardPx) {
 }
 function rebuildColumnsB() {
   var board = document.getElementById("coverBoard");
+  var tabWrap = document.getElementById("tabWrap");
   var songs = [
     { re: /^WP-/, label: "War Pigs", track: 1 },
     { re: /^P-(?!C)/, label: "Paranoid", track: 2 },
@@ -5648,14 +5652,23 @@ function rebuildColumnsB() {
     { re: /^RS-/, label: "Rat Salad", track: 7 },
     { re: /^FOB-/, label: "Fairies Wear Boots", track: 8 }
   ];
-  var all = [];
-  [].forEach.call(document.querySelectorAll(".phrase"), function(el){
+  /* Detach ALL phrases first — board.innerHTML="" used to destroy filtered-out chips */
+  var phrases = [].slice.call(document.querySelectorAll("#series .phrase"));
+  var park = document.createDocumentFragment();
+  phrases.forEach(function(el){
     el.classList.add("flipped");
-    if (!el.classList.contains("filtered-out")) all.push(el);
+    park.appendChild(el);
   });
-  var hold = document.createDocumentFragment();
-  all.forEach(function(el){ hold.appendChild(el); });
   board.innerHTML = "";
+  var all = [];
+  phrases.forEach(function(el){
+    if (el.classList.contains("filtered-out")) {
+      if (tabWrap) tabWrap.appendChild(el);
+      else park.appendChild(el);
+    } else {
+      all.push(el);
+    }
+  });
   if (!all.length) {
     board.className = "cover-board hidden";
     return;
@@ -5773,13 +5786,21 @@ function rebuildColumnsB2() {
     { re: /^FOB-/, label: "Fairies Wear Boots", track: 8 }
   ];
   // Preserve document / saved order among flipped (album-art) cards
-  var allFlipped = [];
-  [].forEach.call(document.querySelectorAll(".phrase"), function(el){
-    if (el.classList.contains("flipped") && !el.classList.contains("filtered-out")) allFlipped.push(el);
-  });
-  var hold = document.createDocumentFragment();
-  allFlipped.forEach(function(el){ hold.appendChild(el); });
+  var tabWrap = document.getElementById("tabWrap");
+  var phrases = [].slice.call(document.querySelectorAll("#series .phrase"));
+  var park = document.createDocumentFragment();
+  phrases.forEach(function(el){ park.appendChild(el); });
   board.innerHTML = "";
+  var allFlipped = [];
+  phrases.forEach(function(el){
+    if (el.classList.contains("filtered-out")) {
+      if (tabWrap) tabWrap.appendChild(el);
+    } else if (el.classList.contains("flipped")) {
+      allFlipped.push(el);
+    } else if (tabWrap) {
+      tabWrap.appendChild(el);
+    }
+  });
   if (!allFlipped.length) {
     board.className = "cover-board hidden";
     return;
@@ -6290,6 +6311,11 @@ function clearLlFilters() {
   llExcludeTypes = {};
   llAlbumFilter = {};
   document.querySelectorAll("#llFilters .filter-dd.open").forEach(function(el){ el.classList.remove("open"); });
+  /* Remount so chips destroyed by older filter rebuilds come back */
+  if (currentLetter === "B" && typeof showSeries === "function") {
+    showSeries("B");
+    return;
+  }
   applyLlFilters();
 }
 function clearLlTierFilters() { clearLlFilters(); }
