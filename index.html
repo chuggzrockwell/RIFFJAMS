@@ -117,6 +117,47 @@
   }
   .btn-randomize:hover { filter: brightness(1.15); border-color: #7a8090; }
   body.sheet-mode .btn-randomize { color: #e8e6e1; }
+  .ll-filters {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+  }
+  .ll-filters[hidden] { display: none !important; }
+  body.sheet-mode .filter-dd-toggle {
+    background: #fff;
+    color: #222;
+    border-color: #d0d0d0;
+  }
+  body.sheet-mode .filter-dd-toggle.has-sel {
+    background: #fff;
+    border-color: #a365d1;
+    color: #111;
+  }
+  body.sheet-mode .filter-dd-toggle .filter-dd-caret {
+    border-top-color: #333;
+  }
+  body.sheet-mode .filter-dd-toggle.has-sel .filter-dd-caret {
+    border-top-color: #7030a0;
+  }
+  body.sheet-mode .filter-dd-menu {
+    background: #161920;
+    border-color: #2c3040;
+    box-shadow: 0 12px 32px rgba(0,0,0,.55);
+  }
+  body.sheet-mode .filter-dd-item { color: #e8e6e1; }
+  body.sheet-mode .filter-dd-item:hover { background: rgba(255,255,255,.06); }
+  body.sheet-mode .filter-dd-item input {
+    border-color: rgba(255,255,255,.35);
+    background: #0e1016;
+  }
+  body.sheet-mode .filter-dd-item input:checked {
+    border-color: #a365d1;
+    background: #7030a0;
+    box-shadow: inset 0 0 0 3px #161920;
+  }
+  body.sheet-mode .sec-filter-clear { color: rgba(232,230,225,.55); }
+  body.sheet-mode .sec-filter-clear:hover { color: #c9a0e8; }
   .keys { margin-left: auto; opacity: .5; font-size: 0.78rem; letter-spacing: .04em; }
   .phrase.filtered-out { display: none !important; }
 
@@ -2518,6 +2559,10 @@
           <option value="solo">Solo mode</option>
         </select>
       </label>
+      <div class="ll-filters" id="llFilters" aria-label="Filter lick library" hidden>
+        <div class="sec-filter-group" id="llTierFilters"></div>
+        <button type="button" class="sec-filter-clear" id="llFilterClear" title="Clear tier filter">Clear</button>
+      </div>
       <span class="keys">Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Esc/0</span>
     </div>
     <div class="sheet" id="licks">
@@ -2624,6 +2669,7 @@ var SOLO_MAP_KEY = "lick-solo-map-v4";
 var soloMode = false;
 var LL_MODE_KEY = "riffjams-ll-mode";
 var llMode = "riff"; /* riff = section chips; solo = lick chips */
+var llTierFilter = {}; /* LL-p only: multi-select T1–T5 */
 try {
   var _llm = localStorage.getItem(LL_MODE_KEY);
   if (_llm === "solo" || _llm === "riff") llMode = _llm;
@@ -3590,7 +3636,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=56";
+  var url = base + "?playboard=1&v=57";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5689,6 +5735,7 @@ function revealKind(kind) {
   toggleEls([].filter.call(document.querySelectorAll(".phrase"), function(el){
     return lickKind(el.getAttribute("data-name")) === kind;
   }));
+  if (typeof applyLlTierFilters === "function") applyLlTierFilters();
 }
 // Song Map Paranoid track order → lick prefix (1–8). Empty prefix = no library licks yet.
 var PARANOID_TRACK_PREFIX = {
@@ -5809,6 +5856,7 @@ function revealSong(prefix) {
     var n = el.getAttribute("data-name") || "";
     return lickMatchesPrefix(n, prefix);
   }));
+  if (typeof applyLlTierFilters === "function") applyLlTierFilters();
 }
 function showKind(kind) {
   document.querySelectorAll(".phrase.filtered-out").forEach(function(el){
@@ -5883,6 +5931,58 @@ function llChipItemsForMode(mode) {
   return out;
 }
 
+
+function buildLlFilters() {
+  var host = document.getElementById("llTierFilters");
+  var wrap = document.getElementById("llFilters");
+  if (!host || !wrap) return;
+  var show = (currentLetter === "B");
+  wrap.hidden = !show;
+  if (!show) return;
+  var openId = null;
+  var openEl = wrap.querySelector(".filter-dd.open");
+  if (openEl) openId = openEl.id;
+  var tierKeys = [1,2,3,4,5].filter(function(n){ return llTierFilter[n]; }).map(function(n){ return "T"+n; });
+  var tierItems = [1,2,3,4,5].map(function(n){
+    var checked = llTierFilter[n] ? " checked" : "";
+    return '<label class="filter-dd-item"><input type="checkbox" data-ll-filter-tier="'+n+'"'+checked+'><span>T'+n+'</span></label>';
+  }).join("");
+  host.innerHTML = buildFilterDd("llTierDd", "All tiers", tierItems, tierKeys);
+  if (openId) {
+    var reopen = document.getElementById(openId);
+    if (reopen) reopen.classList.add("open");
+  }
+}
+function llTierFiltersActive() {
+  return Object.keys(llTierFilter).some(function(k){ return llTierFilter[k]; });
+}
+function applyLlTierFilters(opts) {
+  opts = opts || {};
+  var active = (currentLetter === "B") && llTierFiltersActive();
+  [].forEach.call(document.querySelectorAll("#series .phrase"), function(el){
+    if (!active) {
+      el.classList.remove("filtered-out");
+      return;
+    }
+    var t = parseInt(el.getAttribute("data-tier"), 10);
+    if (!(t >= 1 && t <= 5)) t = 3;
+    el.classList.toggle("filtered-out", !llTierFilter[t]);
+  });
+  if (!opts.skipRebuild && currentLetter === "B" && typeof rebuildColumns === "function") {
+    rebuildColumns();
+  }
+  buildLlFilters();
+  var countEl = document.getElementById("count");
+  if (countEl && currentLetter === "B") {
+    var n = document.querySelectorAll("#series .phrase:not(.filtered-out)").length;
+    countEl.textContent = n + (llMode === "solo" ? " solo chips" : " riff chips");
+  }
+}
+function clearLlTierFilters() {
+  llTierFilter = {};
+  applyLlTierFilters();
+}
+
 function showSeries(letter) {
   currentLetter = letter;
   pcColExpanded = false;
@@ -5898,7 +5998,7 @@ function showSeries(letter) {
   var keysEl = document.querySelector("#series .keys");
   if (keysEl) {
     keysEl.textContent = (letter === "B")
-      ? "Click chip → Board · song label plays · # = playalong · Space · Shift+←/→ · Ctrl+←/→ · Z/O · Esc/0"
+      ? "Click chip → Board · Tier filter · song label plays · Space · Shift+←/→ · Ctrl+←/→ · Z/O · Esc/0"
       : "Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Esc/0";
   }
   var catalogLetter = (letter === "B2") ? "B" : letter;
@@ -5948,6 +6048,8 @@ function showSeries(letter) {
   window.scrollTo(0,0);
   clearLibraryPreview();
   pullPlayQueue();
+  buildLlFilters();
+  applyLlTierFilters({ skipRebuild: false });
   // Don't re-apply yellow/red queue outlines in the library strip — preview uses .playing instead
 }
 
@@ -5970,6 +6072,39 @@ document.getElementById("btnRandomize").onclick = function(){ randomizeCoverBoar
 document.getElementById("btnReorder").onclick = function(){ reorderRevealedTabs(); };
 document.getElementById("btnClear").onclick = function(){ clearRevealedLicks(); };
 document.getElementById("backSections").onclick = showHome;
+
+document.getElementById("llFilters").onclick = function(e){
+  var toggle = e.target.closest("[data-filter-dd-toggle]");
+  if (toggle) {
+    var id = toggle.getAttribute("data-filter-dd-toggle");
+    var dd = document.getElementById(id);
+    document.querySelectorAll(".filter-dd.open").forEach(function(el){
+      if (el !== dd) el.classList.remove("open");
+    });
+    if (dd) dd.classList.toggle("open");
+    e.stopPropagation();
+    return;
+  }
+  var inp = e.target.closest(".filter-dd-item input");
+  if (inp) {
+    var r = inp.getAttribute("data-ll-filter-tier");
+    if (r) {
+      var n = parseInt(r, 10);
+      if (n >= 1 && n <= 5) {
+        if (inp.checked) llTierFilter[n] = true;
+        else delete llTierFilter[n];
+        applyLlTierFilters();
+      }
+    }
+    e.stopPropagation();
+    return;
+  }
+  if (e.target.id === "llFilterClear" || e.target.closest("#llFilterClear")) {
+    clearLlTierFilters();
+    e.stopPropagation();
+  }
+};
+
 document.getElementById("secFilters").onclick = function(e){
   var toggle = e.target.closest("[data-filter-dd-toggle]");
   if (toggle) {
