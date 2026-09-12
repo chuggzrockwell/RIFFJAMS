@@ -1675,6 +1675,11 @@
     outline: 4px solid #ed1c24;
     outline-offset: 3px;
   }
+  /* SBS T1 neon → blue */
+  .phrase.flipped.tier-1[data-album="Sabbath Bloody Sabbath"],
+  .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-1[data-album="Sabbath Bloody Sabbath"] {
+    outline-color: #1e90ff;
+  }
   /* LL tiers: T1+T2 standard art; T3–T5 shared wash art; no invert */
   .phrase.flipped.tier-1 img.cover,
   .phrase.flipped.tier-2 img.cover,
@@ -3889,7 +3894,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=88";
+  var url = base + "?playboard=1&v=89";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
