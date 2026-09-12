@@ -1172,7 +1172,7 @@
   }
   .cover-board.song-cols.ll-b .song-col {
     --card: var(--ll-card, 72px);
-    --gap: var(--ll-gap, 9px);
+    --gap: var(--ll-gap, 12px);
     --label-w: var(--card);
     flex-direction: row;
     align-items: center;
@@ -3523,7 +3523,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=50";
+  var url = base + "?playboard=1&v=51";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5279,8 +5279,8 @@ function enqueueLibraryByFilter(pred) {
   return true;
 }
 function sizeLlBCard(board, maxNonPc, nRows) {
-  /* Chip gap: T1 neon is outline 2px + offset 2px per side → need 9px for 1px clear between two T1s */
-  var gap = 9;
+  /* Chip gap: T1 neon is outline 2px + offset 2px per side; 12px → ~4px clear between two T1s (was 10) */
+  var gap = 12;
   var rowGap = 1; /* 1px above/below song chip rows */
   var top = 0;
   try { top = board.getBoundingClientRect().top; } catch (e) { top = 0; }
@@ -5304,7 +5304,7 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   return card;
 }
 function pcCollapsedVisibleCount(board, cardPx) {
-  var gap = 9;
+  var gap = 12;
   var labelW = cardPx;
   var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 8);
   var bodyW = availW - labelW - gap;
