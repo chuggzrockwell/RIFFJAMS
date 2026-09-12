@@ -3590,7 +3590,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=55";
+  var url = base + "?playboard=1&v=56";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -4653,7 +4653,7 @@ function renderPlayBoard() {
       + '<div class="ref">'+shortId+'</div>'
       + '<img src="'+item.src+'" alt="'+fullId+'">'
       + '</div>'
-      + '<div class="cap">'+item.song+' · '+shortId+'</div>'
+      + '<div class="cap">'+item.song+'</div>'
       + '</div>';
   }).join("");
   syncPlayChipClasses();
