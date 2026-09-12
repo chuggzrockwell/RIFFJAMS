@@ -3817,7 +3817,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=74";
+  var url = base + "?playboard=1&v=75";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5637,9 +5637,11 @@ function enqueueLibraryByFilter(pred) {
   return true;
 }
 function llScaleAlbumCount() {
-  /* Albums selected in the Album filter, else albums present in the current LL chip set */
-  var selected = Object.keys(llAlbumFilter || {}).filter(function(k){ return llAlbumFilter[k]; });
-  if (selected.length) return selected.length;
+  /* Prefer Album-filter selection; else albums present in the LL chip set */
+  if (typeof llSelectedAlbums === "function") {
+    var picked = Object.keys(llAlbumFilter || {}).filter(function(k){ return llAlbumFilter[k]; });
+    if (picked.length) return llSelectedAlbums().length;
+  }
   var seen = {};
   try {
     (llChipItemsForMode(llMode) || []).forEach(function(it){
@@ -5728,11 +5730,19 @@ function pcCollapsedVisibleCount(board, cardPx) {
   /* leave about one card-width for the + control */
   return Math.max(1, slots - 1);
 }
+function llSelectedAlbums() {
+  /* Album filter: one (or more) checked → only those; none checked → all LL albums */
+  var selected = Object.keys(llAlbumFilter || {}).filter(function(k){ return llAlbumFilter[k]; });
+  if (selected.length) {
+    return selected.filter(function(name){ return llAlbumAllowed(name); });
+  }
+  return (LL_LIBRARY_ALBUMS || []).slice();
+}
 function llSongRowsForLibrary() {
   var rows = [];
   var track = 0;
   var sources = ALBUMS || ALBUMS_DEFAULT || [];
-  (LL_LIBRARY_ALBUMS || []).forEach(function(albumName){
+  llSelectedAlbums().forEach(function(albumName){
     var album = null;
     sources.forEach(function(a){ if (a && a.name === albumName) album = a; });
     if (!album) return;
@@ -5814,11 +5824,10 @@ function rebuildColumnsB() {
   board.appendChild(ruler);
   songs.forEach(function(song){
     var items = all.filter(function(el){
-      return (el.getAttribute("data-song") || "") === song.label;
+      return (el.getAttribute("data-song") || "") === song.label
+        && (el.getAttribute("data-album") || "") === (song.album || "");
     });
-    if (!items.length && !song.allowEmpty) {
-      /* still show empty EF; skip other empties already filtered in llSongRowsForLibrary */
-    }
+    if (!items.length && !song.allowEmpty) return; /* hide song titles with no visible chips */
     var col = document.createElement("div");
     col.className = "song-col" + (!items.length ? " is-empty" : "");
     if (song.album) col.setAttribute("data-album", song.album);
