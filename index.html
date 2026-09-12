@@ -3824,7 +3824,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=79";
+  var url = base + "?playboard=1&v=80";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6737,6 +6737,12 @@ document.getElementById("secModes").onclick = function(e){
 };
 document.getElementById("chipEditSave").onclick = saveChipEditor;
 document.getElementById("chipEditCancel").onclick = closeChipEditor;
+document.addEventListener("pointerdown", function(e){
+  var ed = document.getElementById("chipEditor");
+  if (!ed || !ed.classList.contains("open")) return;
+  if (ed.contains(e.target)) return;
+  closeChipEditor();
+}, true);
 document.getElementById("chipEditDelete").onclick = deleteChipEditor;
 document.getElementById("chipEditCopy").onclick = function(){
   if (copyFromChipEditor()) {
