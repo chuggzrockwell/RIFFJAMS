@@ -1509,7 +1509,7 @@
     object-fit: cover;
     border-radius: 8px;
   }
-  /* LL tiers: provided brightness-ladder covers (T1 dark → T3–T5 bright); no CSS filter */
+  /* LL tiers: T1 unaltered art; T2/T3 provided; T4+T5 shared tier4,5 art; no CSS filter */
   .phrase.flipped.tier-1 img.cover,
   .phrase.flipped.tier-2 img.cover,
   .phrase.flipped.tier-3 img.cover,
@@ -3520,7 +3520,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=38";
+  var url = base + "?playboard=1&v=39";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5029,11 +5029,11 @@ var CATALOG = [
 var FOLDER = { A: "a-crops/", B: "b-crops/", B2: "b-crops/", C: "svg/", D: "svg/" };
 var COVER = { A: "covers/sbs.png", B: "covers/paranoid.png", B2: "covers/paranoid.png" };
 var COVER_BY_TIER = {
-  1: "covers/paranoid-tier1.png",
+  1: "covers/paranoid.png", /* unaltered */
   2: "covers/paranoid-tier2.png",
   3: "covers/paranoid-tier3.png",
-  4: "covers/paranoid-tier3.png",
-  5: "covers/paranoid-tier3.png"
+  4: "covers/paranoid-tier45.png", /* labeled tier4,5 */
+  5: "covers/paranoid-tier45.png"
 };
 var currentLetter = "";
 SOLO_MAP = loadSoloMap();
