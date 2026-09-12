@@ -1239,6 +1239,39 @@
   .cover-board.song-cols.ll-b.ll-scale-mid {
     overflow-y: auto;
   }
+  /* Multi-album: panels sit side-by-side (album 2 starts in the next chip column) */
+  .cover-board.song-cols.ll-b.ll-multi {
+    overflow-x: auto;
+  }
+  .cover-board.song-cols.ll-b .ll-albums-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: var(--ll-gap, 20px);
+    width: max-content;
+    min-width: 100%;
+    box-sizing: border-box;
+  }
+  .cover-board.song-cols.ll-b .ll-album-panel {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: var(--ll-row-gap, 1px);
+    width: max-content;
+    flex: 0 0 auto;
+  }
+  .cover-board.song-cols.ll-b.ll-multi .song-col-body {
+    padding-right: 0; /* flush album2 art against album1 last chip (gap from albums-row) */
+  }
+  .cover-board.song-cols.ll-b.ll-multi .ll-col-ruler-nums {
+    padding-right: 0;
+  }
+  .cover-board.song-cols.ll-b.ll-multi .song-col,
+  .cover-board.song-cols.ll-b.ll-multi .ll-col-ruler {
+    min-width: 0;
+  }
   /* Column numbers above War Pigs chip row */
   .cover-board.song-cols.ll-b .ll-col-ruler {
     --card: var(--ll-card, 72px);
@@ -3824,7 +3857,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=80";
+  var url = base + "?playboard=1&v=81";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5755,10 +5788,10 @@ function llSelectedAlbums() {
 }
 function llSongRowsForLibrary() {
   var rows = [];
-  var track = 0;
   var sources = ALBUMS || ALBUMS_DEFAULT || [];
   llSelectedAlbums().forEach(function(albumName){
     var album = null;
+    var track = 0;
     sources.forEach(function(a){ if (a && a.name === albumName) album = a; });
     if (!album) return;
     (album.songs || []).forEach(function(s){
@@ -5782,6 +5815,101 @@ function llSongRowsForLibrary() {
     });
   });
   return rows;
+}
+function llAlbumCoverUrl(albumName) {
+  if (albumName === "Sabbath Bloody Sabbath") return "covers/sbs.png";
+  if (albumName === "Master of Reality") return "covers/mor.png";
+  return "covers/paranoid.png";
+}
+function llBuildColRuler(colCount) {
+  var ruler = document.createElement("div");
+  ruler.className = "ll-col-ruler";
+  ruler.setAttribute("aria-hidden", "true");
+  var spacer = document.createElement("div");
+  spacer.className = "ll-col-ruler-spacer";
+  ruler.appendChild(spacer);
+  var nums = document.createElement("div");
+  nums.className = "ll-col-ruler-nums";
+  for (var ci = 1; ci <= colCount; ci++) {
+    var cn = document.createElement("span");
+    cn.className = "ll-col-num";
+    cn.textContent = String(ci);
+    nums.appendChild(cn);
+  }
+  ruler.appendChild(nums);
+  return ruler;
+}
+function llAppendSongRow(boardOrPanel, song, items, cardPx) {
+  var col = document.createElement("div");
+  col.className = "song-col" + (!items.length ? " is-empty" : "");
+  if (song.album) col.setAttribute("data-album", song.album);
+  var head = document.createElement("div");
+  var longLabel = (song.label.length > 16 || song.label === "Fairies Wear Boots" || song.label === "Planet Caravan" || song.label === "Electric Funeral" || song.label === "Sabbath Bloody Sabbath" || song.label === "Killing Yourself to Live" || song.label === "A National Acrobat");
+  head.className = "song-col-head" + (longLabel ? " long" : "");
+  head.setAttribute("title", song.label);
+  head.style.setProperty("--song-cover", 'url("'+llAlbumCoverUrl(song.album)+'")');
+  var plate = document.createElement("span");
+  plate.className = "song-col-plate";
+  plate.setAttribute("aria-hidden", "true");
+  if (song.track) {
+    var num = document.createElement("span");
+    num.className = "song-col-num";
+    num.textContent = String(song.track);
+    head.appendChild(num);
+  }
+  var title = document.createElement("span");
+  title.className = "song-col-title";
+  title.textContent = song.label;
+  head.appendChild(plate);
+  head.appendChild(title);
+  var body = document.createElement("div");
+  body.className = "song-col-body";
+  var moreBtn = null;
+  var collapseAfter = -1;
+  if (song.isPc && items.length) {
+    var vis = pcCollapsedVisibleCount(boardOrPanel.closest ? (boardOrPanel.closest(".cover-board") || boardOrPanel) : boardOrPanel, cardPx);
+    if (items.length > vis) {
+      moreBtn = document.createElement("button");
+      moreBtn.type = "button";
+      moreBtn.className = "song-col-more";
+      moreBtn.textContent = "+";
+      if (!pcColExpanded) {
+        collapseAfter = vis;
+        moreBtn.title = "Show more Planet Caravan licks";
+        moreBtn.setAttribute("aria-label", "Show more Planet Caravan licks");
+        moreBtn.addEventListener("click", function(ev){
+          ev.preventDefault();
+          ev.stopPropagation();
+          pcColExpanded = true;
+          rebuildColumnsB();
+        });
+      } else {
+        moreBtn.title = "Collapse Planet Caravan licks";
+        moreBtn.setAttribute("aria-label", "Collapse Planet Caravan licks");
+        moreBtn.addEventListener("click", function(ev){
+          ev.preventDefault();
+          ev.stopPropagation();
+          pcColExpanded = false;
+          rebuildColumnsB();
+        });
+      }
+    }
+  }
+  items.forEach(function(el, idx){
+    if (song.isPc) el.classList.toggle("pc-collapsed-hide", collapseAfter >= 0 && idx >= collapseAfter);
+    else el.classList.remove("pc-collapsed-hide");
+    body.appendChild(el);
+  });
+  if (moreBtn) {
+    if (collapseAfter >= 0 && body.children[collapseAfter]) {
+      body.insertBefore(moreBtn, body.children[collapseAfter]);
+    } else {
+      body.appendChild(moreBtn);
+    }
+  }
+  col.appendChild(head);
+  col.appendChild(body);
+  boardOrPanel.appendChild(col);
 }
 function rebuildColumnsB() {
   var board = document.getElementById("coverBoard");
@@ -5808,122 +5936,70 @@ function rebuildColumnsB() {
     board.className = "cover-board hidden";
     return;
   }
-  board.className = "cover-board song-cols ll-b"; /* song ROWS */
-  var maxOther = 1;
-  var visibleSongs = [];
-  songs.forEach(function(song){
-    var n = all.filter(function(el){
-      return (el.getAttribute("data-song") || "") === song.label
-        && (el.getAttribute("data-album") || "") === (song.album || "");
-    }).length;
-    if (!n && !song.allowEmpty) return;
-    visibleSongs.push(song);
-    if (!song.isPc && n > maxOther) maxOther = n;
-  });
-  var cardPx = sizeLlBCard(board, maxOther, visibleSongs.length || 1);
-  var firstRowCount = 0;
-  if (visibleSongs.length) {
-    firstRowCount = all.filter(function(el){
-      return (el.getAttribute("data-song") || "") === visibleSongs[0].label
-        && (el.getAttribute("data-album") || "") === (visibleSongs[0].album || "");
-    }).length;
-  }
-  var colCount = Math.max(firstRowCount, 1);
-  songs = visibleSongs;
-  var ruler = document.createElement("div");
-  ruler.className = "ll-col-ruler";
-  ruler.setAttribute("aria-hidden", "true");
-  var spacer = document.createElement("div");
-  spacer.className = "ll-col-ruler-spacer";
-  ruler.appendChild(spacer);
-  var nums = document.createElement("div");
-  nums.className = "ll-col-ruler-nums";
-  for (var ci = 1; ci <= colCount; ci++) {
-    var cn = document.createElement("span");
-    cn.className = "ll-col-num";
-    cn.textContent = String(ci);
-    nums.appendChild(cn);
-  }
-  ruler.appendChild(nums);
-  board.appendChild(ruler);
+  var albumsOrder = [];
+  var byAlbum = {};
   songs.forEach(function(song){
     var items = all.filter(function(el){
       return (el.getAttribute("data-song") || "") === song.label
         && (el.getAttribute("data-album") || "") === (song.album || "");
     });
-    if (!items.length && !song.allowEmpty) return; /* hide song titles with no visible chips */
-    var col = document.createElement("div");
-    col.className = "song-col" + (!items.length ? " is-empty" : "");
-    if (song.album) col.setAttribute("data-album", song.album);
-    var head = document.createElement("div");
-    var longLabel = (song.label.length > 16 || song.label === "Fairies Wear Boots" || song.label === "Planet Caravan" || song.label === "Electric Funeral" || song.label === "Sabbath Bloody Sabbath" || song.label === "Killing Yourself to Live" || song.label === "A National Acrobat");
-    head.className = "song-col-head" + (longLabel ? " long" : "");
-    head.setAttribute("title", song.label);
-    var coverUrl = (song.album === "Sabbath Bloody Sabbath") ? "covers/sbs.png" : "covers/paranoid.png";
-    head.style.setProperty("--song-cover", 'url("'+coverUrl+'")');
-    var plate = document.createElement("span");
-    plate.className = "song-col-plate";
-    plate.setAttribute("aria-hidden", "true");
-    if (song.track) {
-      var num = document.createElement("span");
-      num.className = "song-col-num";
-      num.textContent = String(song.track);
-      head.appendChild(num);
+    if (!items.length && !song.allowEmpty) return;
+    if (!byAlbum[song.album]) {
+      byAlbum[song.album] = { songs: [], maxChips: 0 };
+      albumsOrder.push(song.album);
     }
-    var title = document.createElement("span");
-    title.className = "song-col-title";
-    title.textContent = song.label;
-    head.appendChild(plate);
-    head.appendChild(title);
-    var body = document.createElement("div");
-    body.className = "song-col-body";
-    var moreBtn = null;
-    var collapseAfter = -1;
-    if (song.isPc && items.length) {
-      var vis = pcCollapsedVisibleCount(board, cardPx);
-      if (items.length > vis) {
-        moreBtn = document.createElement("button");
-        moreBtn.type = "button";
-        moreBtn.className = "song-col-more";
-        moreBtn.textContent = "+";
-        if (!pcColExpanded) {
-          collapseAfter = vis;
-          moreBtn.title = "Show more Planet Caravan licks";
-          moreBtn.setAttribute("aria-label", "Show more Planet Caravan licks");
-          moreBtn.addEventListener("click", function(ev){
-            ev.preventDefault();
-            ev.stopPropagation();
-            pcColExpanded = true;
-            rebuildColumnsB();
-          });
-        } else {
-          moreBtn.title = "Collapse Planet Caravan licks";
-          moreBtn.setAttribute("aria-label", "Collapse Planet Caravan licks");
-          moreBtn.addEventListener("click", function(ev){
-            ev.preventDefault();
-            ev.stopPropagation();
-            pcColExpanded = false;
-            rebuildColumnsB();
-          });
-        }
-      }
+    byAlbum[song.album].songs.push({ song: song, items: items });
+    if (!song.isPc && items.length > byAlbum[song.album].maxChips) {
+      byAlbum[song.album].maxChips = items.length;
     }
-    items.forEach(function(el, idx){
-      if (song.isPc) el.classList.toggle("pc-collapsed-hide", collapseAfter >= 0 && idx >= collapseAfter);
-      else el.classList.remove("pc-collapsed-hide");
-      body.appendChild(el);
-    });
-    if (moreBtn) {
-      if (collapseAfter >= 0 && body.children[collapseAfter]) {
-        body.insertBefore(moreBtn, body.children[collapseAfter]);
-      } else {
-        body.appendChild(moreBtn);
-      }
-    }
-    col.appendChild(head);
-    col.appendChild(body);
-    board.appendChild(col);
   });
+  if (!albumsOrder.length) {
+    board.className = "cover-board hidden";
+    return;
+  }
+  var multi = albumsOrder.length >= 2;
+  board.className = "cover-board song-cols ll-b" + (multi ? " ll-multi" : "");
+  var maxRows = 1;
+  var maxOther = 1;
+  albumsOrder.forEach(function(name){
+    var pack = byAlbum[name];
+    if (pack.songs.length > maxRows) maxRows = pack.songs.length;
+    pack.songs.forEach(function(entry){
+      if (entry.items.length > pack.maxChips) pack.maxChips = entry.items.length;
+    });
+    if (pack.maxChips > maxOther) maxOther = pack.maxChips;
+  });
+  /* Multi: keep chip size from the taller album's row count; horizontal scroll for side-by-side width */
+  var rowCountForSize = multi ? maxRows : (function(){
+    var n = 0;
+    albumsOrder.forEach(function(name){ n += byAlbum[name].songs.length; });
+    return n || 1;
+  })();
+  var cardPx = sizeLlBCard(board, maxOther, rowCountForSize);
+
+  function fillPanel(panel, albumName) {
+    var pack = byAlbum[albumName];
+    var colCount = Math.max(pack.maxChips, 1);
+    panel.appendChild(llBuildColRuler(colCount));
+    pack.songs.forEach(function(entry){
+      llAppendSongRow(panel, entry.song, entry.items, cardPx);
+    });
+  }
+
+  if (multi) {
+    var row = document.createElement("div");
+    row.className = "ll-albums-row";
+    albumsOrder.forEach(function(albumName){
+      var panel = document.createElement("div");
+      panel.className = "ll-album-panel";
+      panel.setAttribute("data-album", albumName);
+      fillPanel(panel, albumName);
+      row.appendChild(panel);
+    });
+    board.appendChild(row);
+  } else {
+    fillPanel(board, albumsOrder[0]);
+  }
   syncPlayLibraryClasses();
 }
 function rebuildColumnsB2() {
