@@ -283,12 +283,14 @@
   }
   .sm-player {
     display: none;
-    position: sticky;
-    bottom: 0;
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    left: auto;
     z-index: 50;
-    width: min(420px, calc(100% - 24px));
+    width: min(420px, calc(100% - 32px));
     max-width: 420px;
-    margin: 16px auto 0;
+    margin: 0;
     padding: 14px 16px 12px;
     background: #000;
     border: 1px solid #222;
@@ -3766,7 +3768,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=63";
+  var url = base + "?playboard=1&v=64";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
