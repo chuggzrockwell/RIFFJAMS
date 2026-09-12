@@ -3530,7 +3530,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=42";
+  var url = base + "?playboard=1&v=43";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5040,7 +5040,7 @@ var FOLDER = { A: "a-crops/", B: "b-crops/", B2: "b-crops/", C: "svg/", D: "svg/
 var COVER = { A: "covers/sbs.png", B: "covers/paranoid.png", B2: "covers/paranoid.png" };
 var COVER_BY_TIER = {
   1: "covers/paranoid.png", /* unaltered */
-  2: "covers/paranoid-tier2.png",
+  2: "covers/paranoid-tier2.png?v=43",
   3: "covers/paranoid-tier3.png",
   4: "covers/paranoid.png", /* invert via CSS */
   5: "covers/paranoid.png"
