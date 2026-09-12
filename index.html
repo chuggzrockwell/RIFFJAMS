@@ -3732,7 +3732,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=60";
+  var url = base + "?playboard=1&v=61";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5547,19 +5547,18 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   var cardByH = (availH - Math.max(0, nRows - 1) * rowGap) / nRows;
   /* label(card) + gap + maxNonPc cards */
   var cardByW = (availW - gap - Math.max(0, maxNonPc) * gap) / Math.max(1, maxNonPc + 1);
-  var portraitMobile = false;
-  try {
-    portraitMobile = window.matchMedia("(orientation: portrait) and (max-width: 900px)").matches
-      || (window.innerWidth <= 900 && window.innerHeight >= window.innerWidth);
-  } catch (ePm) {
-    portraitMobile = window.innerWidth <= 900 && window.innerHeight >= window.innerWidth;
-  }
+  var shortSide = Math.min(window.innerWidth, window.innerHeight);
+  var longSide = Math.max(window.innerWidth, window.innerHeight);
+  var mobile = shortSide <= 560 || longSide <= 900;
   var card;
-  if (portraitMobile) {
-    /* Keep chip faces readable; song rows extend past the screen and scroll horizontally */
-    card = Math.floor(Math.min(cardByH, 72));
-    if (!isFinite(card) || card < 56) card = 56;
-    if (card > 72) card = 72;
+  if (mobile) {
+    /* Portrait + landscape share the same size: budget from the short side (landscape height) */
+    var barGuess = top > 0 ? Math.min(top, 96) : 56;
+    var availHMobile = Math.max(160, shortSide - barGuess - 12 - rulerH - playerH);
+    var cardByHMobile = (availHMobile - Math.max(0, nRows - 1) * rowGap) / nRows;
+    card = Math.floor(Math.min(cardByHMobile, 88));
+    if (!isFinite(card) || card < 36) card = 36;
+    if (card > 88) card = 88;
   } else {
     card = Math.floor(Math.min(cardByH, cardByW, 100));
     if (!isFinite(card) || card < 36) card = 36;
