@@ -2950,6 +2950,8 @@ function loadSoloMap() {
 }
 function saveSoloMap() {
   try { localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP)); } catch (e) {}
+  soloDirty = false;
+  updateEditSaveUi();
 }
 var soloHistory = [];
 var soloDirty = false;
@@ -2964,10 +2966,8 @@ function pushSoloHistory() {
 function undoSoloMap() {
   if (!soloHistory.length) return;
   SOLO_MAP = soloHistory.pop();
-  soloDirty = true;
   closeChipEditor();
   saveSoloMap();
-  updateEditSaveUi();
   showSections(true);
   setSaveStatus("Undid");
 }
@@ -3368,6 +3368,8 @@ function loadAlbums() {
 }
 function saveAlbums() {
   try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (e) {}
+  albumsDirty = false;
+  updateEditSaveUi();
 }
 var albumHistory = [];
 var albumsDirty = false;
@@ -3383,10 +3385,8 @@ function pushAlbumHistory() {
 function undoAlbums() {
   if (!albumHistory.length) return;
   ALBUMS = albumHistory.pop();
-  albumsDirty = true;
   closeChipEditor();
   saveAlbums();
-  updateEditSaveUi();
   showSections(true);
   setSaveStatus("Undid");
 }
@@ -3824,7 +3824,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=78";
+  var url = base + "?playboard=1&v=79";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
