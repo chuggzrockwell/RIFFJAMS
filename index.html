@@ -1690,6 +1690,11 @@
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-1[data-album="Sabbath Bloody Sabbath"] {
     outline-color: #1e90ff;
   }
+  /* MoR T1 neon → green */
+  .phrase.flipped.tier-1[data-album="Master of Reality"],
+  .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-1[data-album="Master of Reality"] {
+    outline-color: #22c55e;
+  }
   /* LL tiers: T1+T2 standard art; T3–T5 shared wash art; no invert */
   .phrase.flipped.tier-1 img.cover,
   .phrase.flipped.tier-2 img.cover,
@@ -2756,6 +2761,7 @@
         <div class="sec-filter-group" id="llTierFilters"></div>
         <div class="sec-filter-group" id="llPosFilters"></div>
         <button type="button" class="sec-filter-clear" id="llFilterClear" title="Clear filters">Clear</button>
+        <button type="button" class="sec-filter-clear" id="llScaleBtn" title="Toggle chip size (88px / 36px)" aria-pressed="false">Scale down</button>
       </div>
       <span class="keys">Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Esc/0</span>
     </div>
@@ -2869,6 +2875,10 @@ var llTierFilter = {}; /* LL-p only: multi-select T1–T5 */
 var llTypeFilter = {};
 var llExcludeTypes = {};
 var llAlbumFilter = {};
+var LL_SCALE_KEY = "riffjams-ll-scale-compact";
+var llScaleCompact = false;
+try { llScaleCompact = localStorage.getItem(LL_SCALE_KEY) === "1"; } catch (e) {}
+
 var llPosFilter = {};
 var llPosOFilter = false;
 var llPosPFilter = false;
@@ -3904,7 +3914,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=94";
+  var url = base + "?playboard=1&v=96";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5777,31 +5787,12 @@ function sizeLlBCard(board, maxNonPc, nRows) {
     hBudget = Math.max(160, shortSide - barGuess - 12 - rulerH - playerH);
   }
   /*
-   * Auto chip height from VISIBLE song rows (not album count):
-   *  ≤8 songs  → standard 88px
-   *  ≤17 songs → mid (~fit 17 rows on screen)
-   *  ≥18 songs → compact 36px
+   * Chip height: default 88px. "Scale down" forces compact 36px (same as old 3-album compact).
+   * Board scrolls when content is taller than the viewport.
    */
   nRows = Math.max(1, parseInt(nRows, 10) || 1);
-  var mode = "standard";
-  var card;
-  if (nRows >= 18) {
-    mode = "compact";
-    card = 36;
-  } else if (nRows >= 9) {
-    mode = "mid";
-    card = Math.floor((hBudget - 16 * rowGap) / 17);
-  } else {
-    mode = "standard";
-    card = 88;
-  }
-  /* Also never exceed what actually fits these rows (keeps 3-song filters at 88) */
-  var fitRows = Math.floor((hBudget - Math.max(0, nRows - 1) * rowGap) / nRows);
-  if (isFinite(fitRows) && fitRows > 0) card = Math.min(card, fitRows);
-  if (mode !== "compact") {
-    var byW = Math.floor(cardByW);
-    if (isFinite(byW) && byW > 0) card = Math.min(card, byW);
-  }
+  var mode = llScaleCompact ? "compact" : "standard";
+  var card = llScaleCompact ? 36 : 88;
   if (!isFinite(card) || card < 36) card = 36;
   if (card > 88) card = 88;
   board.style.setProperty("--ll-card", card + "px");
@@ -5809,9 +5800,10 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   board.style.setProperty("--ll-row-gap", rowGap + "px");
   board.style.setProperty("--ll-label-w", card + "px");
   board.setAttribute("data-ll-scale", mode);
-  board.classList.toggle("ll-scale-mid", mode === "mid");
+  board.classList.toggle("ll-scale-mid", false);
   board.classList.toggle("ll-scale-compact", mode === "compact");
-  if (mode === "compact" || mode === "mid") {
+  var needScroll = (nRows * (card + rowGap)) > hBudget;
+  if (mode === "compact" || needScroll) {
     board.style.maxHeight = Math.floor(hBudget + rulerH + 12) + "px";
     board.style.overflowY = "auto";
   } else {
@@ -6191,6 +6183,23 @@ function relayout() {
   rebuildColumns();
   saveFlipped();
 }
+
+function syncLlScaleBtn() {
+  var btn = document.getElementById("llScaleBtn");
+  if (!btn) return;
+  btn.setAttribute("aria-pressed", llScaleCompact ? "true" : "false");
+  btn.textContent = llScaleCompact ? "Scale up" : "Scale down";
+  btn.title = llScaleCompact ? "Restore 88px chips" : "Shrink chips to 36px";
+}
+function setLlScaleCompact(on) {
+  llScaleCompact = !!on;
+  try { localStorage.setItem(LL_SCALE_KEY, llScaleCompact ? "1" : "0"); } catch (e) {}
+  syncLlScaleBtn();
+  if (typeof rebuildColumnsB === "function" && document.getElementById("coverBoard")) {
+    rebuildColumnsB();
+    if (typeof afterLibraryRelayout === "function") afterLibraryRelayout();
+  }
+}
 function afterLibraryRelayout() {
   // Tabs stay full size; album-art shrink is handled in rebuildColumns (cover-board.shrunk)
   compactLibraryStrip(false);
@@ -6463,6 +6472,7 @@ function collectLlTypes() {
   return ordered;
 }
 function buildLlFilters() {
+  syncLlScaleBtn();
   var albumHost = document.getElementById("llAlbumFilters");
   var typeHost = document.getElementById("llTypeFilters");
   var exclHost = document.getElementById("llExcludeFilters");
@@ -6787,6 +6797,12 @@ document.getElementById("llFilters").onclick = function(e){
     e.preventDefault();
     e.stopPropagation();
     clearLlFilters();
+    return;
+  }
+  if (e.target.id === "llScaleBtn" || e.target.closest("#llScaleBtn")) {
+    e.preventDefault();
+    e.stopPropagation();
+    setLlScaleCompact(!llScaleCompact);
     return;
   }
 };
