@@ -1726,10 +1726,10 @@
     outline: 4px solid #ed1c24;
     outline-offset: 3px;
   }
-  /* SBS T1 neon → blue */
+  /* SBS T1 neon → yellow */
   .phrase.flipped.tier-1[data-album="Sabbath Bloody Sabbath"],
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-1[data-album="Sabbath Bloody Sabbath"] {
-    outline-color: #1e90ff;
+    outline-color: #ffd400;
   }
   /* MoR T1 neon → green */
   .phrase.flipped.tier-1[data-album="Master of Reality"],
@@ -3955,7 +3955,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=99";
+  var url = base + "?playboard=1&v=100";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
