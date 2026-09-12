@@ -2660,8 +2660,6 @@
       <button type="button" class="tier-pick t1" data-tier="1">1</button>
       <button type="button" class="tier-pick t2" data-tier="2">2</button>
       <button type="button" class="tier-pick t3" data-tier="3">3</button>
-      <button type="button" class="tier-pick t4" data-tier="4">4</button>
-      <button type="button" class="tier-pick t5" data-tier="5">5</button>
     </div>
     <label>Position <span style="font-weight:500;opacity:.65">(multi, none ok)</span></label>
     <div class="tier-row" id="chipEditPos">
@@ -2758,30 +2756,30 @@
 
 var ALBUMS_DEFAULT = [
   { name: "Paranoid", cover: "covers/paranoid.png", font: "font-paranoid", songs: [
-    { song: "War Pigs", sections: [["I1",2,"WP-I1",3],["V1",5,"WP-V1"],["V2",2,"WP-V2"],["V3",2,"WP-V3"],["V4",2,"WP-V4"],["S1",1,"WP-S1"],["O1",2,"WP-O1"],["O2",1,"WP-O2"],["S2",1,"WP-S2"]] },
-    { song: "Paranoid", sections: [["I1",2,"P-I1"],["V1",4,"P-V1"],["V2",4,"P-V2"],["S1",1]] },
-    { song: "Planet Caravan", sections: [["V",5],["S1",1]] },
+    { song: "War Pigs", sections: [["I1",2,"WP-I1",3],["V1",3,"WP-V1"],["V2",2,"WP-V2"],["V3",2,"WP-V3"],["V4",2,"WP-V4"],["S1",1,"WP-S1"],["O1",2,"WP-O1"],["O2",1,"WP-O2"],["S2",1,"WP-S2"]] },
+    { song: "Paranoid", sections: [["I1",2,"P-I1"],["V1",3,"P-V1"],["V2",3,"P-V2"],["S1",1]] },
+    { song: "Planet Caravan", sections: [["V",3],["S1",1]] },
     { song: "Iron Man", sections: [["V1",1,"IM-V1"],["V2",2,"IM-V2"],["V3",2,"IM-V3"],["V4",2,"IM-V4"],["S1",1,"IM-S1"],["S2",1,"IM-S2"],["O1",1,"IM-O1"]] },
-    { song: "Electric Funeral", sections: [["I1",4],["V1",4],["B1",5],["B2",5],["B3",5],["B4",5]] },
-    { song: "Hand of Doom", sections: [["V1",5],["V2",5],["B1",2],["B2",2],["S1",1,"HOD-S1"]] },
-    { song: "Rat Salad", sections: [["I1",4,"RS-I1"],["V2",4],["S1",1]] },
-    { song: "Fairies Wear Boots", sections: [["I1",2,"FOB-I1"],["I2",2,"FOB-I2"],["I3",2,"FOB-I3"],["I4",2,"FOB-I4"],["S1",1,"FOB-S1"],["V1",4,"FOB-V1"],["B1",4,"FOB-B1"],["L1",2,"FOB-L1"],["S2",1,"FOB-S2"],["F1",5]] },
+    { song: "Electric Funeral", sections: [["I1",3],["V1",3],["B1",3],["B2",3],["B3",3],["B4",3]] },
+    { song: "Hand of Doom", sections: [["V1",3],["V2",3],["B1",2],["B2",2],["S1",1,"HOD-S1"]] },
+    { song: "Rat Salad", sections: [["I1",3,"RS-I1"],["V2",3],["S1",1]] },
+    { song: "Fairies Wear Boots", sections: [["I1",2,"FOB-I1"],["I2",2,"FOB-I2"],["I3",2,"FOB-I3"],["I4",2,"FOB-I4"],["S1",1,"FOB-S1"],["V1",3,"FOB-V1"],["B1",3,"FOB-B1"],["L1",2,"FOB-L1"],["S2",1,"FOB-S2"],["F1",3]] },
   ]},
   { name: "Sabbath Bloody Sabbath", cover: "covers/sbs.png", font: "font-sbs", songs: [
-    { song: "Sabbath Bloody Sabbath", sections: [["V1",1],["PC1",2],["PC2",2],["S1",1],["B1",4],["B2",2],["B3",2],["B4",2],["S2",2]] },
-    { song: "A National Acrobat", sections: [["I1",1],["V1",5],["B1",1],["S1",1],["B2",4],["B3",5],["B4",4],["B5",4],["B6",5],["S3",5]] },
+    { song: "Sabbath Bloody Sabbath", sections: [["V1",1],["PC1",2],["PC2",2],["S1",1],["B1",3],["B2",2],["B3",2],["B4",2],["S2",2]] },
+    { song: "A National Acrobat", sections: [["I1",1],["V1",3],["B1",1],["S1",1],["B2",3],["B3",3],["B4",3],["B5",3],["B6",3],["S3",3]] },
     { song: "Fluff", sections: [] },
-    { song: "Sabbra Cadabra", sections: [["I1",1],["L1",1],["L2",1],["V1",2],["B1",4],["B2",4],["B3",4]] },
+    { song: "Sabbra Cadabra", sections: [["I1",1],["L1",1],["L2",1],["V1",2],["B1",3],["B2",3],["B3",3]] },
     { song: "Killing Yourself to Live", sections: [["I1",2],["V1",2],["C1",2],["S1",1],["B1",2],["B2",2],["S2",1],["B3",2],["B4",2]] },
     { song: "Who Are You?", sections: [] },
     { song: "Looking for Today", sections: [["V1",2],["PC1",2],["C1",1],["S1",1]] },
-    { song: "Spiral Architect", sections: [["I1",1],["L1",2],["I2",5],["V1",5],["C1",5]] },
+    { song: "Spiral Architect", sections: [["I1",1],["L1",2],["I2",3],["V1",3],["C1",3]] },
   ]},
   { name: "Master of Reality", cover: "covers/mor.png", font: "font-mor", songs: [
     { song: "Sweet Leaf", sections: [] },
-    { song: "After Forever", sections: [["I1",1],["V1",4],["B1",4],["B2",2],["S1",1]] },
+    { song: "After Forever", sections: [["I1",1],["V1",3],["B1",3],["B2",2],["S1",1]] },
     { song: "Embryo", sections: [["V1",2]] },
-    { song: "Children of the Grave", sections: [["I1",4],["I2",5],["V1",4],["V2",5],["B1",2],["S1",1],["L1",5]] },
+    { song: "Children of the Grave", sections: [["I1",3],["I2",3],["V1",3],["V2",3],["B1",2],["S1",1],["L1",3]] },
     { song: "Orchid", sections: [] },
     { song: "Lord of This World", sections: [] },
     { song: "Solitude", sections: [] },
@@ -3064,6 +3062,7 @@ function loadAlbums() {
     var albums = (!raw) ? cloneAlbums(ALBUMS_DEFAULT) : JSON.parse(raw);
     if (!albums || !albums.length) albums = cloneAlbums(ALBUMS_DEFAULT);
     renameJackTheStripperInAlbums(albums);
+    collapseAlbumTiers(albums);
     albums.forEach(function(a){
       (a.songs||[]).forEach(function(s){
         if (s.song === "Into the Void") {
@@ -3083,7 +3082,7 @@ function loadAlbums() {
           }
         }
         if (s.song === "War Pigs") {
-          var links = { "I1": ["I1",2,"WP-I1",3], "V1": ["V1",5,"WP-V1"], "V2": ["V2",2,"WP-V2"], "V3": ["V3",2,"WP-V3"], "V4": ["V4",2,"WP-V4"], "S1": ["S1",1,"WP-S1"] , "O1": ["O1",2,"WP-O1"] , "O2": ["O2",1,"WP-O2"] , "S2": ["S2",1,"WP-S2"] };
+          var links = { "I1": ["I1",2,"WP-I1",3], "V1": ["V1",3,"WP-V1"], "V2": ["V2",2,"WP-V2"], "V3": ["V3",2,"WP-V3"], "V4": ["V4",2,"WP-V4"], "S1": ["S1",1,"WP-S1"] , "O1": ["O1",2,"WP-O1"] , "O2": ["O2",1,"WP-O2"] , "S2": ["S2",1,"WP-S2"] };
           if (!s.sections) s.sections = [];
           Object.keys(links).forEach(function(code){
             var want = links[code];
@@ -3147,10 +3146,10 @@ function loadAlbums() {
             pV1[1] = 4;
             pV1[2] = "P-V1";
           } else if (!s.sections.length) {
-            s.sections.push(["V1",4,"P-V1"]);
+            s.sections.push(["V1",3,"P-V1"]);
           } else {
             var hasV1 = s.sections.some(function(pair){ return isChipPair(pair) && pair[0] === "V1"; });
-            if (!hasV1) s.sections.push(["V1",4,"P-V1"]);
+            if (!hasV1) s.sections.push(["V1",3,"P-V1"]);
           }
           var pV2 = null;
           s.sections.forEach(function(pair){ if (isChipPair(pair) && pair[0] === "V2") pV2 = pair; });
@@ -3162,7 +3161,7 @@ function loadAlbums() {
             if (!hasV2) {
               var v1idx = -1;
               s.sections.forEach(function(pair, idx){ if (isChipPair(pair) && pair[0] === "V1") v1idx = idx; });
-              var rowV2 = ["V2",4,"P-V2"];
+              var rowV2 = ["V2",3,"P-V2"];
               if (v1idx >= 0) s.sections.splice(v1idx + 1, 0, rowV2);
               else s.sections.push(rowV2);
             }
@@ -3196,7 +3195,7 @@ function loadAlbums() {
             rsI1[1] = 4;
             rsI1[2] = "RS-I1";
           } else if (!s.sections.some(function(p){ return isChipPair(p) && p[0] === "I1"; })) {
-            s.sections.unshift(["I1",4,"RS-I1"]);
+            s.sections.unshift(["I1",3,"RS-I1"]);
           }
         }
         if (s.song === "Jack the Stripper") s.song = "Fairies Wear Boots";
@@ -3297,7 +3296,7 @@ function loadAlbums() {
             if (!hasV1) {
               var s1idx = -1;
               s.sections.forEach(function(p, idx){ if (isChipPair(p) && p[0] === "S1") s1idx = idx; });
-              var rowV1 = ["V1",4,"FOB-V1"];
+              var rowV1 = ["V1",3,"FOB-V1"];
               if (s1idx >= 0) s.sections.splice(s1idx + 1, 0, rowV1);
               else s.sections.push(rowV1);
             }
@@ -3312,7 +3311,7 @@ function loadAlbums() {
             if (!hasB1) {
               var v1idx = -1;
               s.sections.forEach(function(p, idx){ if (isChipPair(p) && p[0] === "V1") v1idx = idx; });
-              var rowB1 = ["B1",4,"FOB-B1"];
+              var rowB1 = ["B1",3,"FOB-B1"];
               if (v1idx >= 0) s.sections.splice(v1idx + 1, 0, rowB1);
               else s.sections.push(rowB1);
             }
@@ -3470,7 +3469,26 @@ function slotCss(prefix, v) {
   return prefix + "-" + String(normalizeSlot(v, 1)).toLowerCase();
 }
 function chipTier(pair) {
-  return slotBase(normalizeSlot(pair && pair[1], 3));
+  var t = slotBase(normalizeSlot(pair && pair[1], 3));
+  /* Jacob: former T3/T4/T5 all count as T3; T1/T2 unchanged */
+  if (t >= 3) return 3;
+  if (t === 1 || t === 2) return t;
+  return 3;
+}
+function collapseAlbumTiers(albums) {
+  (albums || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      (s.sections || []).forEach(function(pair){
+        if (!isChipPair(pair)) return;
+        pair[1] = chipTier(pair);
+      });
+      (s.licks || []).forEach(function(pair){
+        if (!isChipPair(pair)) return;
+        pair[1] = chipTier(pair);
+      });
+    });
+  });
+  return albums;
 }
 function albumUsesPosDefault(albumOrName) {
   var name = typeof albumOrName === "string" ? albumOrName : (albumOrName && albumOrName.name);
@@ -3516,7 +3534,7 @@ function isDefaultPosList(list) {
   return p.length === 1 && p[0] === 1;
 }
 function makeChipEntry(code, tier, lick, positions) {
-  tier = slotBase(normalizeSlot(tier, 3));
+  tier = chipTier([code, tier]);
   // Preserve explicit empty array; don't coerce missing→[1] when caller passed []
   var posList = Array.isArray(positions) ? parsePosList(positions) : parsePosList(positions == null ? null : positions);
   lick = lick || "";
@@ -3592,6 +3610,7 @@ function repairAlbumsFromDefaults(albums) {
   return repaired;
 }
 var ALBUMS = loadAlbums();
+try { collapseAlbumTiers(ALBUMS); saveAlbums(); } catch (eTierAlbums) {}
 ensureAllSongSlots(ALBUMS);
 if (repairAlbumsFromDefaults(ALBUMS) > 0 || totalAlbumChips(ALBUMS) === 0) {
   if (totalAlbumChips(ALBUMS) === 0) {
@@ -3601,6 +3620,12 @@ if (repairAlbumsFromDefaults(ALBUMS) > 0 || totalAlbumChips(ALBUMS) === 0) {
   try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (e) {}
 }
 SOLO_MAP = loadSoloMap();
+try {
+  if (SOLO_MAP && SOLO_MAP.albums) {
+    collapseAlbumTiers(SOLO_MAP.albums);
+    localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP));
+  }
+} catch (eTierSolo) {}
 
 var SOLO_COL_GROUP_START = 12; // 1-based; collapse 12..end in Solo
 var SOLO_COLS_COLLAPSED_KEY = "lick-solo-cols-collapsed";
@@ -3788,7 +3813,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=71";
+  var url = base + "?playboard=1&v=72";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -4074,8 +4099,8 @@ function buildSecFilters() {
     exclHost.innerHTML = buildFilterDd("excludeDd", "No excludes", exclItems, exclKeys.map(function(k){ return "−"+k; }));
   }
 
-  var tierKeys = [1,2,3,4,5].filter(function(n){ return secTierFilter[n]; }).map(function(n){ return "T"+n; });
-  var tierItems = [1,2,3,4,5].map(function(n){
+  var tierKeys = [1,2,3].filter(function(n){ return secTierFilter[n]; }).map(function(n){ return "T"+n; });
+  var tierItems = [1,2,3].map(function(n){
     var checked = secTierFilter[n] ? " checked" : "";
     return '<label class="filter-dd-item"><input type="checkbox" data-filter-tier="'+n+'"'+checked+'><span>T'+n+'</span></label>';
   }).join("");
@@ -4207,8 +4232,14 @@ function sizeAlbumCovers() {
 }
 
 function toggleSecTierKey(n) {
+  n = parseInt(n, 10);
+  if (n >= 3) n = 3;
+  if (!(n >= 1 && n <= 3)) return;
   if (secTierFilter[n]) delete secTierFilter[n];
   else secTierFilter[n] = true;
+  /* drop legacy T4/T5 filter keys */
+  delete secTierFilter[4];
+  delete secTierFilter[5];
   buildSecFilters();
   applySecFilters();
   if (sectionsMode === "play") renderPlayBoard();
@@ -6208,8 +6239,8 @@ function buildLlFilters() {
     exclHost.innerHTML = buildFilterDd("llExcludeDd", "No excludes", exclItems, exclKeys.map(function(k){ return "−"+k; }));
   }
 
-  var tierKeys = [1,2,3,4,5].filter(function(n){ return llTierFilter[n]; }).map(function(n){ return "T"+n; });
-  var tierItems = [1,2,3,4,5].map(function(n){
+  var tierKeys = [1,2,3].filter(function(n){ return llTierFilter[n]; }).map(function(n){ return "T"+n; });
+  var tierItems = [1,2,3].map(function(n){
     var checked = llTierFilter[n] ? " checked" : "";
     return '<label class="filter-dd-item"><input type="checkbox" data-ll-filter-tier="'+n+'"'+checked+'><span>T'+n+'</span></label>';
   }).join("");
@@ -6362,7 +6393,7 @@ function showSeries(letter) {
     var on = (flipped.indexOf(id) >= 0 || flipped.indexOf(label) >= 0) ? " flipped" : "";
     var kind = lickKind(id || label).toLowerCase();
     var song = songClass(id || ("WP-"+label));
-    var tier = (it.tier >= 1 && it.tier <= 5) ? it.tier : 3;
+    var tier = (it.tier >= 1 && it.tier <= 2) ? it.tier : 3;
     var tierCls = (letter === "B") ? (" tier-"+tier) : "";
     var coverSrc = cover;
     if (letter === "B" && COVER_BY_TIER[tier]) {
@@ -6450,9 +6481,12 @@ document.getElementById("llFilters").onclick = function(e){
       else delete llExcludeTypes[xt];
     } else if (r) {
       var n = parseInt(r, 10);
-      if (n >= 1 && n <= 5) {
+      if (n >= 3) n = 3;
+      if (n >= 1 && n <= 3) {
         if (inp.checked) llTierFilter[n] = true;
         else delete llTierFilter[n];
+        delete llTierFilter[4];
+        delete llTierFilter[5];
       }
     } else if (po) {
       llPosOFilter = !!inp.checked;
@@ -6512,9 +6546,12 @@ document.getElementById("secFilters").onclick = function(e){
       else delete secExcludeTypes[xt];
     } else if (r) {
       var n = parseInt(r, 10);
-      if (n >= 1 && n <= 5) {
+      if (n >= 3) n = 3;
+      if (n >= 1 && n <= 3) {
         if (inp.checked) secTierFilter[n] = true;
         else delete secTierFilter[n];
+        delete secTierFilter[4];
+        delete secTierFilter[5];
       }
     } else if (po) {
       secPosOFilter = !!inp.checked;
@@ -7169,7 +7206,9 @@ document.addEventListener("keydown", function(e){
       return;
     }
     if (e.code.indexOf("Digit") === 0 && k >= "1" && k <= "5") {
-      toggleSecTierKey(parseInt(k, 10));
+      var tn = parseInt(k, 10);
+      if (tn >= 3) tn = 3; /* T3/T4/T5 → T3 */
+      toggleSecTierKey(tn);
       return;
     }
     if (k === "escape" || e.key === "Escape") {
