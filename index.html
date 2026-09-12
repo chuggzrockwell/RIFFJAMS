@@ -2357,6 +2357,34 @@
     body.sheet-mode #badge,
     body.sheet-mode #count { display: none !important; }
     .bar { flex-wrap: wrap; gap: 8px; }
+    /* Board / peek tabs: scale down to phone-readable size */
+    body.playboard-mode .sec-play-card {
+      max-width: calc(100vw - 20px);
+    }
+    body.playboard-mode .sec-play-card img {
+      max-width: calc(100vw - 28px);
+      max-height: min(58vh, 360px);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    body.playboard-mode .sec-play-card .ref {
+      font-size: 0.72rem;
+    }
+    #secHighlightTip img.peek-tab {
+      max-width: min(92vw, 420px);
+      max-height: min(55vh, 320px);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    .phrase:not(.flipped) img.tab {
+      max-width: calc(100vw - 24px);
+      max-height: min(50vh, 300px);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
     .sections-wrap {
       --row-g: 22px; --name-w: 140px; --chip-w: 30px; --chip-h: 20px; --chip-gap: 1px; --cover-rows: 6; --cover: calc(var(--chip-h) * var(--cover-rows));
       max-width: 100%; gap: 0;
@@ -2470,6 +2498,10 @@
 
   /* Mobile landscape: player becomes a vertical dock on the right */
   @media (orientation: landscape) and (max-height: 560px) {
+    body.playboard-mode .sec-play-card img {
+      max-width: min(48vw, 340px);
+      max-height: calc(100vh - 88px);
+    }
     body.sections-mode .wrap,
     body.sheet-mode .wrap {
       padding-right: 118px;
@@ -3734,7 +3766,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=62";
+  var url = base + "?playboard=1&v=63";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
