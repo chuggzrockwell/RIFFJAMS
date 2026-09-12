@@ -2803,7 +2803,7 @@ var ALBUMS_DEFAULT = [
     { song: "Rat Salad", sections: [["I1",3,"RS-I1"],["V2",3],["S1",1]] },
     { song: "Fairies Wear Boots", sections: [["I1",2,"FOB-I1"],["I2",2,"FOB-I2"],["I3",2,"FOB-I3"],["I4",2,"FOB-I4"],["S1",1,"FOB-S1"],["V1",3,"FOB-V1"],["B1",3,"FOB-B1"],["L1",2,"FOB-L1"],["S2",1,"FOB-S2"],["F1",3]] },
   ]},
-  { name: "Sabbath Bloody Sabbath", cover: "covers/sbs.png", font: "font-sbs", songs: [
+  { name: "Sabbath Bloody Sabbath", cover: "covers/sbs.png?v=2", font: "font-sbs", songs: [
     { song: "Sabbath Bloody Sabbath", sections: [["V1",1],["PC1",2],["PC2",2],["S1",1],["B1",3],["B2",2],["B3",2],["B4",2],["S2",2]] },
     { song: "A National Acrobat", sections: [["I1",1],["V1",3],["B1",1],["S1",1],["B2",3],["B3",3],["B4",3],["B5",3],["B6",3],["S3",3]] },
     { song: "Fluff", sections: [] },
@@ -3857,7 +3857,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=83";
+  var url = base + "?playboard=1&v=84";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5392,7 +5392,7 @@ var CATALOG = [
   ["LFT-1C","C"],["LFT-1D","D"]
 ];
 var FOLDER = { A: "a-crops/", B: "b-crops/", B2: "b-crops/", C: "svg/", D: "svg/" };
-var COVER = { A: "covers/sbs.png", B: "covers/paranoid.png", B2: "covers/paranoid.png" };
+var COVER = { A: "covers/sbs.png?v=2", B: "covers/paranoid.png", B2: "covers/paranoid.png" };
 var COVER_BY_TIER = {
   1: "covers/paranoid.png", /* unaltered — same as T2 */
   2: "covers/paranoid.png",
@@ -5817,7 +5817,7 @@ function llSongRowsForLibrary() {
   return rows;
 }
 function llAlbumCoverUrl(albumName) {
-  if (albumName === "Sabbath Bloody Sabbath") return "covers/sbs.png";
+  if (albumName === "Sabbath Bloody Sabbath") return "covers/sbs.png?v=2";
   if (albumName === "Master of Reality") return "covers/mor.png";
   return "covers/paranoid.png";
 }
