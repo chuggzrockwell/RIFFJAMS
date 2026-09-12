@@ -3894,7 +3894,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=91";
+  var url = base + "?playboard=1&v=92";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5439,12 +5439,15 @@ var COVER_BY_TIER = {
   5: "covers/paranoid-tier2.png?v=45"
 };
 /* Albums included in Paranoid LL (letter B) multi-album grid */
-var LL_LIBRARY_ALBUMS = ["Paranoid", "Sabbath Bloody Sabbath"];
+var LL_LIBRARY_ALBUMS = ["Paranoid", "Sabbath Bloody Sabbath", "Master of Reality"];
 function llCoverForAlbumTier(album, tier) {
   tier = parseInt(tier, 10);
   if (!(tier >= 1 && tier <= 2)) tier = 3;
   if (album === "Sabbath Bloody Sabbath") {
     return (tier >= 3) ? "covers/sbs-tier3.png?v=5" : "covers/sbs-ll.png?v=5";
+  }
+  if (album === "Master of Reality") {
+    return (tier >= 3) ? "covers/mor-tier3.png?v=1" : "covers/mor-ll.png?v=1";
   }
   /* Paranoid default */
   if (COVER_BY_TIER[tier]) return COVER_BY_TIER[tier];
@@ -5856,7 +5859,7 @@ function llSongRowsForLibrary() {
 }
 function llAlbumCoverUrl(albumName) {
   if (albumName === "Sabbath Bloody Sabbath") return "covers/sbs-ll.png?v=5";
-  if (albumName === "Master of Reality") return "covers/mor.png";
+  if (albumName === "Master of Reality") return "covers/mor-ll.png?v=1";
   return "covers/paranoid.png";
 }
 function llBuildColRuler(colCount) {
@@ -5882,7 +5885,7 @@ function llAppendSongRow(boardOrPanel, song, items, cardPx) {
   col.className = "song-col" + (!items.length ? " is-empty" : "");
   if (song.album) col.setAttribute("data-album", song.album);
   var head = document.createElement("div");
-  var longLabel = (song.label.length > 16 || song.label === "Fairies Wear Boots" || song.label === "Planet Caravan" || song.label === "Electric Funeral" || song.label === "Sabbath Bloody Sabbath" || song.label === "Killing Yourself to Live" || song.label === "A National Acrobat");
+  var longLabel = (song.label.length > 16 || song.label === "Fairies Wear Boots" || song.label === "Planet Caravan" || song.label === "Electric Funeral" || song.label === "Sabbath Bloody Sabbath" || song.label === "Killing Yourself to Live" || song.label === "A National Acrobat" || song.label === "Children of the Grave" || song.label === "Lord of This World" || song.label === "After Forever");
   head.className = "song-col-head" + (longLabel ? " long" : "");
   head.setAttribute("title", song.label);
   head.style.setProperty("--song-cover", 'url("'+llAlbumCoverUrl(song.album)+'")');
@@ -6343,7 +6346,9 @@ function llChipItemsForMode(mode) {
     "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-",
     "Sabbath Bloody Sabbath": "SBS-", "A National Acrobat": "ANA-", "Fluff": "FLU-",
     "Sabbra Cadabra": "SAC-", "Killing Yourself to Live": "KYTL-", "Who Are You?": "WAY-",
-    "Looking for Today": "LFT-", "Spiral Architect": "SAR-"
+    "Looking for Today": "LFT-", "Spiral Architect": "SAR-",
+    "Sweet Leaf": "SL-", "After Forever": "AF-", "Embryo": "EMB-", "Children of the Grave": "COTG-",
+    "Orchid": "ORC-", "Lord of This World": "LOTW-", "Solitude": "SOL-", "Into the Void": "ITV-"
   };
   function pushItem(label, lick, songName, tier, albumName, typ, posAttr) {
     var lab = String(label || "").trim();
@@ -6600,7 +6605,7 @@ function showSeries(letter) {
   currentLetter = letter;
   pcColExpanded = false;
   document.body.className = "sheet-mode stage";
-  var badgeLabel = (letter === "B") ? "Paranoid + SBS" : (letter === "B2") ? "Paranoid 2" : letter;
+  var badgeLabel = (letter === "B") ? "Paranoid + SBS + MoR" : (letter === "B2") ? "Paranoid 2" : letter;
   document.getElementById("badge").textContent = badgeLabel;
   document.getElementById("badge").className = "badge " + letter.toLowerCase();
   document.getElementById("home").className = "hidden";
