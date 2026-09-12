@@ -1185,7 +1185,7 @@
     max-width: 100%;
     overflow: visible;
   }
-  /* Song label = same-size inverted album art with title overlay + translucent plate */
+  /* Song label = same-size standard album art with title overlay + translucent plate */
   .cover-board.song-cols.ll-b .song-col-head {
     --label-w: var(--card);
     position: relative;
@@ -1209,7 +1209,7 @@
     position: absolute;
     inset: 0;
     background: #000 url("covers/paranoid.png") center / cover no-repeat;
-    filter: invert(1);
+    filter: none;
     z-index: 0;
     border-radius: inherit;
   }
@@ -3530,7 +3530,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=41";
+  var url = base + "?playboard=1&v=42";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
