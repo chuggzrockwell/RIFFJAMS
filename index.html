@@ -252,7 +252,11 @@
     align-items: center;
     gap: 14px;
   }
-  body.sections-mode .sm-player { display: flex; }
+  body.sections-mode .sm-player,
+  body.sheet-mode .sm-player { display: flex; }
+  body.sheet-mode #series {
+    padding-bottom: 8px;
+  }
   .sm-player-main {
     flex: 1 1 auto;
     min-width: 0;
@@ -1250,6 +1254,7 @@
     color: #fff;
     isolation: isolate;
     box-shadow: 0 0 0 1px #22262f, 0 8px 20px rgba(0,0,0,.45);
+    cursor: pointer;
   }
   .cover-board.song-cols.ll-b .song-col-head::before {
     content: "";
@@ -1275,7 +1280,8 @@
     font-weight: 700;
     letter-spacing: .02em;
     line-height: 1.1;
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
   }
   .cover-board.song-cols.ll-b .song-col-head .song-col-title {
     position: relative;
@@ -2457,37 +2463,6 @@
       <button type="button" class="sec-filter-clear" id="secFilterClear">Clear</button>
     </div>
     <div class="sheet stage" id="sectionsSheet"></div>
-    <div id="ytPlayerHost" aria-hidden="true"></div>
-    <div class="sm-player" id="smPlayer" aria-label="Song player">
-      <div class="sm-player-main">
-        <div class="sm-player-meta" id="smPlayerMeta">Pick a song on the map</div>
-        <div class="sm-player-controls">
-          <button type="button" class="sm-player-btn" id="smShuffle" title="Shuffle" aria-pressed="false">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
-          </button>
-          <button type="button" class="sm-player-btn" id="smPrev" title="Previous">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h2v12H6V6zm3.5 6 8.5 6V6l-8.5 6z"/></svg>
-          </button>
-          <button type="button" class="sm-player-btn play" id="smPlay" title="Play">
-            <svg id="smPlayIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg>
-          </button>
-          <button type="button" class="sm-player-btn" id="smNext" title="Next">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-          </button>
-          <button type="button" class="sm-player-btn repeat on" id="smRepeat" title="Repeat playlist" aria-pressed="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
-          </button>
-        </div>
-        <div class="sm-player-progress">
-          <span class="sm-player-time" id="smTimeCur">0:00</span>
-          <div class="sm-player-scrub" id="smScrub" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
-            <div class="sm-player-scrub-fill" id="smScrubFill"></div>
-          </div>
-          <span class="sm-player-time end" id="smTimeDur">0:00</span>
-        </div>
-      </div>
-      <img class="sm-player-art" id="smPlayerArt" alt="" width="72" height="72" decoding="async">
-    </div>
   </section>
   <div id="secHighlightTip" aria-hidden="true"></div>
   <div id="chipEditor" class="chip-editor" aria-hidden="true">
@@ -2553,6 +2528,38 @@
       </div>
     </div>
   </section>
+  <div id="ytPlayerHost" aria-hidden="true"></div>
+  <div class="sm-player" id="smPlayer" aria-label="Song player">
+    <div class="sm-player-main">
+      <div class="sm-player-meta" id="smPlayerMeta">Pick a song · Space play/pause</div>
+      <div class="sm-player-controls">
+        <button type="button" class="sm-player-btn" id="smShuffle" title="Shuffle" aria-pressed="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+        </button>
+        <button type="button" class="sm-player-btn" id="smPrev" title="Previous">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 6h2v12H6V6zm3.5 6 8.5 6V6l-8.5 6z"/></svg>
+        </button>
+        <button type="button" class="sm-player-btn play" id="smPlay" title="Play">
+          <svg id="smPlayIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg>
+        </button>
+        <button type="button" class="sm-player-btn" id="smNext" title="Next">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+        <button type="button" class="sm-player-btn repeat on" id="smRepeat" title="Repeat playlist" aria-pressed="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+        </button>
+      </div>
+      <div class="sm-player-progress">
+        <span class="sm-player-time" id="smTimeCur">0:00</span>
+        <div class="sm-player-scrub" id="smScrub" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+          <div class="sm-player-scrub-fill" id="smScrubFill"></div>
+        </div>
+        <span class="sm-player-time end" id="smTimeDur">0:00</span>
+      </div>
+    </div>
+    <img class="sm-player-art" id="smPlayerArt" alt="" width="72" height="72" decoding="async">
+  </div>
+
 </div>
 <div id="lb" class="lightbox hidden"></div>
 <script>
@@ -3581,7 +3588,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=54";
+  var url = base + "?playboard=1&v=55";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5383,6 +5390,7 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   var gap = 12;
   var rowGap = 1; /* 1px above/below song chip rows */
   var rulerH = 20; /* column numbers above War Pigs */
+  var playerH = 118; /* sticky Song Map-style player under LL */
   var top = 0;
   try { top = board.getBoundingClientRect().top; } catch (e) { top = 0; }
   if (!top) {
@@ -5390,7 +5398,7 @@ function sizeLlBCard(board, maxNonPc, nRows) {
     top = bar ? (bar.getBoundingClientRect().bottom + 8) : 72;
   }
   var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 8);
-  var availH = Math.max(180, window.innerHeight - top - 12 - rulerH);
+  var availH = Math.max(180, window.innerHeight - top - 12 - rulerH - playerH);
   /* 8 song rows must fit vertically; label is square album art = card size */
   var cardByH = (availH - Math.max(0, nRows - 1) * rowGap) / nRows;
   /* label(card) + gap + maxNonPc cards */
@@ -5888,7 +5896,7 @@ function showSeries(letter) {
   var keysEl = document.querySelector("#series .keys");
   if (keysEl) {
     keysEl.textContent = (letter === "B")
-      ? "Click → Playboard · 1–8 songs · A–E class · I/P/W/H/R/F · Esc/0"
+      ? "Click chip → Board · song label plays · # = playalong · Space · Shift+←/→ · Ctrl+←/→ · Z/O · Esc/0"
       : "Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Esc/0";
   }
   var catalogLetter = (letter === "B2") ? "B" : letter;
@@ -6340,6 +6348,18 @@ window.addEventListener("resize", function(){
   if (currentLetter && COVER[currentLetter]) rebuildColumns();
 });
 document.getElementById("coverBoard").onclick = function(e){
+  /* LL-B: song label art/title → album track; song # badge → playalong */
+  var songHead = e.target.closest(".song-col-head");
+  if (songHead) {
+    e.preventDefault();
+    e.stopPropagation();
+    var titleEl = songHead.querySelector(".song-col-title");
+    var title = titleEl ? (titleEl.textContent || "").trim() : (songHead.getAttribute("title") || "").trim();
+    if (title && typeof smPlaySongName === "function") {
+      smPlaySongName(title, true, !!e.target.closest(".song-col-num"));
+    }
+    return;
+  }
   var head = e.target.closest(".col-head");
   if (!head) return;
   e.stopPropagation();
@@ -6526,27 +6546,31 @@ document.addEventListener("keydown", function(e){
       }
     }
   }
-  if ((e.ctrlKey || e.metaKey) && !e.altKey && document.body.classList.contains("sections-mode")) {
+  if ((e.ctrlKey || e.metaKey) && !e.altKey) {
     var tagPos = (e.target && e.target.tagName) || "";
     if (tagPos !== "INPUT" && tagPos !== "TEXTAREA") {
-      var posDigit = null;
-      if (e.code && e.code.indexOf("Digit") === 0) posDigit = e.code.slice(5);
-      else if (e.key >= "1" && e.key <= "5") posDigit = e.key;
-      if (posDigit >= "1" && posDigit <= "5") {
-        e.preventDefault();
-        toggleSecPosKey(parseInt(posDigit, 10));
-        return;
+      if (document.body.classList.contains("sections-mode")) {
+        var posDigit = null;
+        if (e.code && e.code.indexOf("Digit") === 0) posDigit = e.code.slice(5);
+        else if (e.key >= "1" && e.key <= "5") posDigit = e.key;
+        if (posDigit >= "1" && posDigit <= "5") {
+          e.preventDefault();
+          toggleSecPosKey(parseInt(posDigit, 10));
+          return;
+        }
       }
-      /* Player: Ctrl/Cmd + arrows */
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
-        smPlayIndex(smIndex + 1, true);
-        return;
-      }
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        smCtrlLeftArrow();
-        return;
+      /* Player: Ctrl/Cmd + arrows (Song Map + LL) */
+      if (document.body.classList.contains("sections-mode") || document.body.classList.contains("sheet-mode")) {
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          smPlayIndex(smIndex + 1, true);
+          return;
+        }
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          smCtrlLeftArrow();
+          return;
+        }
       }
     }
   }
@@ -6580,19 +6604,25 @@ document.addEventListener("keydown", function(e){
     if (k === "escape") { e.preventDefault(); closeChipEditor(); return; }
     return;
   }
+  /* Player transport: Song Map + LL */
+  if (document.body.classList.contains("sections-mode") || document.body.classList.contains("sheet-mode")) {
+    var tagPlayer = (e.target && e.target.tagName) || "";
+    if (tagPlayer !== "INPUT" && tagPlayer !== "TEXTAREA") {
+      if (e.code === "Space" || e.key === " ") {
+        e.preventDefault();
+        smTogglePlay();
+        return;
+      }
+      if (e.shiftKey && !e.altKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+        e.preventDefault();
+        smSeekBy(e.key === "ArrowLeft" ? -5 : 5);
+        return;
+      }
+    }
+  }
   if (document.body.classList.contains("sections-mode")) {
     var tag = (e.target && e.target.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA") return;
-    if (e.code === "Space" || e.key === " ") {
-      e.preventDefault();
-      smTogglePlay();
-      return;
-    }
-    if (e.shiftKey && !e.altKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
-      e.preventDefault();
-      smSeekBy(e.key === "ArrowLeft" ? -5 : 5);
-      return;
-    }
     if (isNumpadKey(e, "1")) { setSectionsMode("view"); return; }
     if (isNumpadKey(e, "2")) { setSectionsMode("edit"); return; }
     if (isNumpadKey(e, "3")) { setSectionsMode("play"); return; }
