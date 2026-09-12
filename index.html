@@ -1327,7 +1327,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: #000 url("covers/paranoid.png") center / cover no-repeat;
+    background: #000 var(--song-cover, url("covers/paranoid.png")) center / cover no-repeat;
     filter: none;
     z-index: 0;
     border-radius: inherit;
@@ -3817,7 +3817,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=73";
+  var url = base + "?playboard=1&v=74";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5354,6 +5354,18 @@ var COVER_BY_TIER = {
   4: "covers/paranoid-tier2.png?v=45",
   5: "covers/paranoid-tier2.png?v=45"
 };
+/* Albums included in Paranoid LL (letter B) multi-album grid */
+var LL_LIBRARY_ALBUMS = ["Paranoid", "Sabbath Bloody Sabbath"];
+function llCoverForAlbumTier(album, tier) {
+  tier = parseInt(tier, 10);
+  if (!(tier >= 1 && tier <= 2)) tier = 3;
+  if (album === "Sabbath Bloody Sabbath") {
+    return (tier >= 3) ? "covers/sbs-tier3.png?v=1" : "covers/sbs.png";
+  }
+  /* Paranoid default */
+  if (COVER_BY_TIER[tier]) return COVER_BY_TIER[tier];
+  return "covers/paranoid.png";
+}
 var currentLetter = "";
 SOLO_MAP = loadSoloMap();
 try { if (!localStorage.getItem(SOLO_MAP_KEY)) localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP)); } catch (e) {}
@@ -5716,19 +5728,40 @@ function pcCollapsedVisibleCount(board, cardPx) {
   /* leave about one card-width for the + control */
   return Math.max(1, slots - 1);
 }
+function llSongRowsForLibrary() {
+  var rows = [];
+  var track = 0;
+  var sources = ALBUMS || ALBUMS_DEFAULT || [];
+  (LL_LIBRARY_ALBUMS || []).forEach(function(albumName){
+    var album = null;
+    sources.forEach(function(a){ if (a && a.name === albumName) album = a; });
+    if (!album) return;
+    (album.songs || []).forEach(function(s){
+      var hasChips = (s.sections || []).some(function(p){ return isChipPair(p); });
+      if (llMode === "solo") {
+        var soloAlbum = null;
+        ((SOLO_MAP && SOLO_MAP.albums) || []).forEach(function(a){ if (a && a.name === albumName) soloAlbum = a; });
+        var ss = null;
+        if (soloAlbum) (soloAlbum.songs || []).forEach(function(x){ if (x.song === s.song) ss = x; });
+        hasChips = !!(ss && (ss.licks || []).some(function(p){ return isChipPair(p); }));
+      }
+      if (!hasChips && s.song !== "Electric Funeral") return; /* skip empty Fluff / Who Are You? etc. */
+      track += 1;
+      rows.push({
+        label: s.song,
+        album: albumName,
+        track: track,
+        isPc: s.song === "Planet Caravan",
+        allowEmpty: s.song === "Electric Funeral"
+      });
+    });
+  });
+  return rows;
+}
 function rebuildColumnsB() {
   var board = document.getElementById("coverBoard");
   var tabWrap = document.getElementById("tabWrap");
-  var songs = [
-    { re: /^WP-/, label: "War Pigs", track: 1 },
-    { re: /^P-(?!C)/, label: "Paranoid", track: 2 },
-    { re: /^PC-/, label: "Planet Caravan", track: 3, isPc: true },
-    { re: /^IM-/, label: "Iron Man", track: 4 },
-    { re: /^EF-/, label: "Electric Funeral", track: 5, allowEmpty: true },
-    { re: /^HOD-/, label: "Hand of Doom", track: 6 },
-    { re: /^RS-/, label: "Rat Salad", track: 7 },
-    { re: /^FOB-/, label: "Fairies Wear Boots", track: 8 }
-  ];
+  var songs = llSongRowsForLibrary();
   /* Detach ALL phrases first — board.innerHTML="" used to destroy filtered-out chips */
   var phrases = [].slice.call(document.querySelectorAll("#series .phrase"));
   var park = document.createDocumentFragment();
@@ -5754,12 +5787,15 @@ function rebuildColumnsB() {
   var maxOther = 1;
   songs.forEach(function(song){
     if (song.isPc) return;
-    var n = all.filter(function(el){ return song.re.test(el.getAttribute("data-name") || ""); }).length;
+    var n = all.filter(function(el){ return (el.getAttribute("data-song") || "") === song.label; }).length;
     if (n > maxOther) maxOther = n;
   });
   var cardPx = sizeLlBCard(board, maxOther, songs.length);
-  var wpCount = all.filter(function(el){ return /^WP-/.test(el.getAttribute("data-name") || ""); }).length;
-  var colCount = Math.max(wpCount, 1);
+  var firstRowCount = 0;
+  if (songs.length) {
+    firstRowCount = all.filter(function(el){ return (el.getAttribute("data-song") || "") === songs[0].label; }).length;
+  }
+  var colCount = Math.max(firstRowCount, 1);
   var ruler = document.createElement("div");
   ruler.className = "ll-col-ruler";
   ruler.setAttribute("aria-hidden", "true");
@@ -5778,14 +5814,20 @@ function rebuildColumnsB() {
   board.appendChild(ruler);
   songs.forEach(function(song){
     var items = all.filter(function(el){
-      return song.re.test(el.getAttribute("data-name") || "");
+      return (el.getAttribute("data-song") || "") === song.label;
     });
+    if (!items.length && !song.allowEmpty) {
+      /* still show empty EF; skip other empties already filtered in llSongRowsForLibrary */
+    }
     var col = document.createElement("div");
     col.className = "song-col" + (!items.length ? " is-empty" : "");
+    if (song.album) col.setAttribute("data-album", song.album);
     var head = document.createElement("div");
-    var longLabel = (song.label === "Fairies Wear Boots" || song.label === "Planet Caravan" || song.label === "Electric Funeral");
+    var longLabel = (song.label.length > 16 || song.label === "Fairies Wear Boots" || song.label === "Planet Caravan" || song.label === "Electric Funeral" || song.label === "Sabbath Bloody Sabbath" || song.label === "Killing Yourself to Live" || song.label === "A National Acrobat");
     head.className = "song-col-head" + (longLabel ? " long" : "");
     head.setAttribute("title", song.label);
+    var coverUrl = (song.album === "Sabbath Bloody Sabbath") ? "covers/sbs.png" : "covers/paranoid.png";
+    head.style.setProperty("--song-cover", 'url("'+coverUrl+'")');
     var plate = document.createElement("span");
     plate.className = "song-col-plate";
     plate.setAttribute("aria-hidden", "true");
@@ -6143,12 +6185,18 @@ function revealGroup(group) {
 }
 
 /** LL chip lists from current Song Map linking — riff=sections, solo=SOLO_MAP licks. */
+function llAlbumAllowed(name) {
+  return (LL_LIBRARY_ALBUMS || []).indexOf(name) >= 0;
+}
 function llChipItemsForMode(mode) {
   var out = [];
   var seen = {};
   var songPrefix = {
     "War Pigs": "WP-", "Paranoid": "P-", "Planet Caravan": "PC-", "Iron Man": "IM-",
-    "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-"
+    "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-",
+    "Sabbath Bloody Sabbath": "SBS-", "A National Acrobat": "ANA-", "Fluff": "FLU-",
+    "Sabbra Cadabra": "SAC-", "Killing Yourself to Live": "KYTL-", "Who Are You?": "WAY-",
+    "Looking for Today": "LFT-", "Spiral Architect": "SAR-"
   };
   function pushItem(label, lick, songName, tier, albumName, typ, posAttr) {
     var lab = String(label || "").trim();
@@ -6159,11 +6207,10 @@ function llChipItemsForMode(mode) {
       id = pref ? (pref + lab) : lab; /* synthetic id for song-row grouping */
     }
     if (!lab) lab = id;
-    var key = lab + "|" + id + "|" + (songName || "");
+    var key = lab + "|" + id + "|" + (songName || "") + "|" + (albumName || "");
     if (seen[key]) return;
     seen[key] = true;
-    var tNum = parseInt(tier, 10);
-    if (!(tNum >= 1 && tNum <= 5)) tNum = 3;
+    var tNum = chipTier([lab, tier]);
     out.push({
       id: id,
       label: lab,
@@ -6178,7 +6225,7 @@ function llChipItemsForMode(mode) {
   if (mode === "solo") {
     if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
     (SOLO_MAP && SOLO_MAP.albums || []).forEach(function(a){
-      if (!a || a.name !== "Paranoid") return;
+      if (!a || !llAlbumAllowed(a.name)) return;
       (a.songs || []).forEach(function(s){
         (s.licks || []).forEach(function(pair){
           if (!isChipPair(pair)) return;
@@ -6191,9 +6238,9 @@ function llChipItemsForMode(mode) {
     });
     return out;
   }
-  /* riff mode: section chips from ALBUMS Paranoid — observe current linking */
+  /* riff mode: section chips from allowed LL albums — observe current linking */
   (ALBUMS || ALBUMS_DEFAULT || []).forEach(function(a){
-    if (!a || a.name !== "Paranoid") return;
+    if (!a || !llAlbumAllowed(a.name)) return;
     (a.songs || []).forEach(function(s){
       (s.sections || []).forEach(function(pair){
         if (!isChipPair(pair)) return;
@@ -6213,7 +6260,7 @@ function collectLlTypes() {
   if (llMode === "solo") {
     if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
     (SOLO_MAP && SOLO_MAP.albums || []).forEach(function(a){
-      if (!a || a.name !== "Paranoid") return;
+      if (!a || !llAlbumAllowed(a.name)) return;
       (a.songs || []).forEach(function(s){
         (s.licks || []).forEach(function(pair){
           if (!isChipPair(pair)) return;
@@ -6223,7 +6270,7 @@ function collectLlTypes() {
     });
   } else {
     (ALBUMS || ALBUMS_DEFAULT || []).forEach(function(a){
-      if (!a || a.name !== "Paranoid") return;
+      if (!a || !llAlbumAllowed(a.name)) return;
       (a.songs || []).forEach(function(s){
         (s.sections || []).forEach(function(pair){
           if (!isChipPair(pair)) return;
@@ -6401,7 +6448,7 @@ function showSeries(letter) {
   currentLetter = letter;
   pcColExpanded = false;
   document.body.className = "sheet-mode stage";
-  var badgeLabel = (letter === "B") ? "Paranoid" : (letter === "B2") ? "Paranoid 2" : letter;
+  var badgeLabel = (letter === "B") ? "Paranoid + SBS" : (letter === "B2") ? "Paranoid 2" : letter;
   document.getElementById("badge").textContent = badgeLabel;
   document.getElementById("badge").className = "badge " + letter.toLowerCase();
   document.getElementById("home").className = "hidden";
@@ -6442,13 +6489,14 @@ function showSeries(letter) {
     var tier = (it.tier >= 1 && it.tier <= 2) ? it.tier : 3;
     var tierCls = (letter === "B") ? (" tier-"+tier) : "";
     var coverSrc = cover;
-    if (letter === "B" && COVER_BY_TIER[tier]) {
-      coverSrc = COVER_BY_TIER[tier];
+    if (letter === "B") {
+      coverSrc = llCoverForAlbumTier(it.album || "Paranoid", tier);
     }
     var albumAttr = (it.album || "").replace(/"/g, "&quot;");
+    var songAttr = (it.song || "").replace(/"/g, "&quot;");
     var typeAttr = (it.type || "").replace(/"/g, "&quot;");
     var posAttr = (it.position != null ? String(it.position) : "").replace(/"/g, "&quot;");
-    var meta = ' data-album="'+albumAttr+'" data-type="'+typeAttr+'" data-position="'+posAttr+'"';
+    var meta = ' data-album="'+albumAttr+'" data-song="'+songAttr+'" data-type="'+typeAttr+'" data-position="'+posAttr+'"';
     if (cover) {
       return '<div class="phrase '+kind+' '+song+on+tierCls+' no-anim" draggable="true" data-name="'+id+'" data-label="'+label+'" data-tier="'+tier+'" data-file="'+src+'"'+meta+'>'
         + '<div class="card-inner">'
