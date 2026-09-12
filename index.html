@@ -1361,7 +1361,7 @@
     position: absolute;
     inset: 0;
     background: #000 var(--song-cover, url("covers/paranoid.png")) center / cover no-repeat;
-    filter: none;
+    filter: invert(1); /* song-identifier art only in LL */
     z-index: 0;
     border-radius: inherit;
   }
@@ -3857,7 +3857,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=81";
+  var url = base + "?playboard=1&v=82";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
