@@ -3894,7 +3894,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=92";
+  var url = base + "?playboard=1&v=93";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5844,14 +5844,14 @@ function llSongRowsForLibrary() {
         if (soloAlbum) (soloAlbum.songs || []).forEach(function(x){ if (x.song === s.song) ss = x; });
         hasChips = !!(ss && (ss.licks || []).some(function(p){ return isChipPair(p); }));
       }
-      if (!hasChips && s.song !== "Electric Funeral") return; /* skip empty Fluff / Who Are You? etc. */
+      if (!hasChips) return; /* skip empty Fluff / Who Are You? / Electric Funeral with no chips, etc. */
       track += 1;
       rows.push({
         label: s.song,
         album: albumName,
         track: track,
         isPc: s.song === "Planet Caravan",
-        allowEmpty: s.song === "Electric Funeral"
+        allowEmpty: false
       });
     });
   });
