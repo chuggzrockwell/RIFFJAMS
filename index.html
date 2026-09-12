@@ -2699,8 +2699,12 @@
         </select>
       </label>
       <div class="ll-filters" id="llFilters" aria-label="Filter lick library" hidden>
+        <div class="sec-filter-group" id="llAlbumFilters"></div>
+        <div class="sec-filter-group" id="llTypeFilters"></div>
+        <div class="sec-filter-group" id="llExcludeFilters"></div>
         <div class="sec-filter-group" id="llTierFilters"></div>
-        <button type="button" class="sec-filter-clear" id="llFilterClear" title="Clear tier filter">Clear</button>
+        <div class="sec-filter-group" id="llPosFilters"></div>
+        <button type="button" class="sec-filter-clear" id="llFilterClear" title="Clear filters">Clear</button>
       </div>
       <span class="keys">Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Esc/0</span>
     </div>
@@ -2811,6 +2815,13 @@ var soloMode = false;
 var LL_MODE_KEY = "riffjams-ll-mode";
 var llMode = "riff"; /* riff = section chips; solo = lick chips */
 var llTierFilter = {}; /* LL-p only: multi-select T1–T5 */
+var llTypeFilter = {};
+var llExcludeTypes = {};
+var llAlbumFilter = {};
+var llPosFilter = {};
+var llPosOFilter = false;
+var llPosPFilter = false;
+var llPosDFilter = false;
 try {
   var _llm = localStorage.getItem(LL_MODE_KEY);
   if (_llm === "solo" || _llm === "riff") llMode = _llm;
@@ -3777,7 +3788,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=68";
+  var url = base + "?playboard=1&v=69";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6039,7 +6050,7 @@ function llChipItemsForMode(mode) {
     "War Pigs": "WP-", "Paranoid": "P-", "Planet Caravan": "PC-", "Iron Man": "IM-",
     "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-"
   };
-  function pushItem(label, lick, songName, tier) {
+  function pushItem(label, lick, songName, tier, albumName, typ, posAttr) {
     var lab = String(label || "").trim();
     var id = (lick || "").trim();
     if (!lab && !id) return;
@@ -6053,7 +6064,16 @@ function llChipItemsForMode(mode) {
     seen[key] = true;
     var tNum = parseInt(tier, 10);
     if (!(tNum >= 1 && tNum <= 5)) tNum = 3;
-    out.push({ id: id, label: lab, lick: (lick || "").trim() || id, song: songName || "", tier: tNum });
+    out.push({
+      id: id,
+      label: lab,
+      lick: (lick || "").trim() || id,
+      song: songName || "",
+      tier: tNum,
+      album: albumName || "",
+      type: typ || "",
+      position: posAttr || ""
+    });
   }
   if (mode === "solo") {
     if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
@@ -6061,10 +6081,11 @@ function llChipItemsForMode(mode) {
       if (!a || a.name !== "Paranoid") return;
       (a.songs || []).forEach(function(s){
         (s.licks || []).forEach(function(pair){
-          if (!pair || !pair[0]) return;
+          if (!isChipPair(pair)) return;
           var lab = pair[0];
           var lick = (pair[2] || pair[0] || "").trim();
-          pushItem(lab, lick, s.song, pair[1]);
+          var pos = posListAttr(chipPositions(pair));
+          pushItem(lab, lick, s.song, chipTier(pair), a.name, "S", pos);
         });
       });
     });
@@ -6075,10 +6096,11 @@ function llChipItemsForMode(mode) {
     if (!a || a.name !== "Paranoid") return;
     (a.songs || []).forEach(function(s){
       (s.sections || []).forEach(function(pair){
-        if (!pair || !pair[0]) return;
+        if (!isChipPair(pair)) return;
         var code = pair[0];
         var lick = (pair[2] || "").trim();
-        pushItem(code, lick, s.song, pair[1]);
+        var pos = posListAttr(chipPositions(pair));
+        pushItem(code, lick, s.song, chipTier(pair), a.name, secType(code), pos);
       });
     });
   });
@@ -6086,41 +6108,164 @@ function llChipItemsForMode(mode) {
 }
 
 
+function collectLlTypes() {
+  var seen = {};
+  if (llMode === "solo") {
+    if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
+    (SOLO_MAP && SOLO_MAP.albums || []).forEach(function(a){
+      if (!a || a.name !== "Paranoid") return;
+      (a.songs || []).forEach(function(s){
+        (s.licks || []).forEach(function(pair){
+          if (!isChipPair(pair)) return;
+          seen["S"] = true;
+        });
+      });
+    });
+  } else {
+    (ALBUMS || ALBUMS_DEFAULT || []).forEach(function(a){
+      if (!a || a.name !== "Paranoid") return;
+      (a.songs || []).forEach(function(s){
+        (s.sections || []).forEach(function(pair){
+          if (!isChipPair(pair)) return;
+          var tp = secType(pair[0]);
+          if (tp) seen[tp] = true;
+        });
+      });
+    });
+  }
+  var ordered = SEC_TYPE_ORDER.filter(function(t){ return seen[t]; });
+  Object.keys(seen).forEach(function(t){
+    if (t && ordered.indexOf(t) < 0) ordered.push(t);
+  });
+  return ordered;
+}
 function buildLlFilters() {
-  var host = document.getElementById("llTierFilters");
+  var albumHost = document.getElementById("llAlbumFilters");
+  var typeHost = document.getElementById("llTypeFilters");
+  var exclHost = document.getElementById("llExcludeFilters");
+  var tierHost = document.getElementById("llTierFilters");
+  var posHost = document.getElementById("llPosFilters");
   var wrap = document.getElementById("llFilters");
-  if (!host || !wrap) return;
+  if (!tierHost || !wrap) return;
   var show = (currentLetter === "B");
   wrap.hidden = !show;
   if (!show) return;
   var openId = null;
   var openEl = wrap.querySelector(".filter-dd.open");
   if (openEl) openId = openEl.id;
+  var types = collectLlTypes();
+
+  if (albumHost) {
+    var albums = (llMode === "solo" && SOLO_MAP && SOLO_MAP.albums) ? SOLO_MAP.albums : (ALBUMS || []);
+    var albumNames = albums.map(function(a){ return a && a.name; }).filter(Boolean);
+    var albumKeys = Object.keys(llAlbumFilter).filter(function(k){ return llAlbumFilter[k]; });
+    var albumItems = albumNames.map(function(name){
+      var checked = llAlbumFilter[name] ? " checked" : "";
+      var esc = String(name).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+      return '<label class="filter-dd-item"><input type="checkbox" data-ll-filter-album="'+esc+'"'+checked+'><span>'+esc+'</span></label>';
+    }).join("");
+    albumHost.innerHTML = buildFilterDd("llAlbumDd", "All albums", albumItems, albumKeys);
+  }
+
+  if (typeHost) {
+    var typeKeys = Object.keys(llTypeFilter).filter(function(k){ return llTypeFilter[k]; });
+    var typeItems = types.map(function(tp){
+      var checked = llTypeFilter[tp] ? " checked" : "";
+      return '<label class="filter-dd-item"><input type="checkbox" data-ll-filter-type="'+tp+'"'+checked+'><span>'+tp+'</span></label>';
+    }).join("");
+    typeHost.innerHTML = buildFilterDd("llTypeDd", "All types", typeItems, typeKeys);
+  }
+
+  if (exclHost) {
+    var exclKeys = Object.keys(llExcludeTypes).filter(function(k){ return llExcludeTypes[k]; });
+    var exclItems = types.map(function(tp){
+      var checked = llExcludeTypes[tp] ? " checked" : "";
+      return '<label class="filter-dd-item"><input type="checkbox" data-ll-exclude-type="'+tp+'"'+checked+'><span>'+tp+'</span></label>';
+    }).join("");
+    exclHost.innerHTML = buildFilterDd("llExcludeDd", "No excludes", exclItems, exclKeys.map(function(k){ return "−"+k; }));
+  }
+
   var tierKeys = [1,2,3,4,5].filter(function(n){ return llTierFilter[n]; }).map(function(n){ return "T"+n; });
   var tierItems = [1,2,3,4,5].map(function(n){
     var checked = llTierFilter[n] ? " checked" : "";
     return '<label class="filter-dd-item"><input type="checkbox" data-ll-filter-tier="'+n+'"'+checked+'><span>T'+n+'</span></label>';
   }).join("");
-  host.innerHTML = buildFilterDd("llTierDd", "All tiers", tierItems, tierKeys);
+  tierHost.innerHTML = buildFilterDd("llTierDd", "All tiers", tierItems, tierKeys);
+
+  if (posHost) {
+    var posKeys = [1,2,3,4,5].filter(function(n){ return llPosFilter[n]; }).map(String);
+    if (llPosOFilter) posKeys.push("O");
+    if (llPosPFilter) posKeys.push("P");
+    if (llPosDFilter) posKeys.push("D");
+    var posItems = [1,2,3,4,5].map(function(n){
+      var checked = llPosFilter[n] ? " checked" : "";
+      return '<label class="filter-dd-item"><input type="checkbox" data-ll-filter-pos="'+n+'"'+checked+'><span>'+n+'</span></label>';
+    }).join("")
+      + '<label class="filter-dd-item"><input type="checkbox" data-ll-filter-pos-o="1"'+(llPosOFilter?" checked":"")+'><span>O · Open</span></label>'
+      + '<label class="filter-dd-item"><input type="checkbox" data-ll-filter-pos-p="1"'+(llPosPFilter?" checked":"")+'><span>P · Pedal</span></label>'
+      + '<label class="filter-dd-item"><input type="checkbox" data-ll-filter-pos-d="1"'+(llPosDFilter?" checked":"")+'><span>D · Dorian</span></label>';
+    posHost.innerHTML = buildFilterDd("llPosDd", "Any position", posItems, posKeys);
+  }
+
   if (openId) {
     var reopen = document.getElementById(openId);
     if (reopen) reopen.classList.add("open");
   }
 }
-function llTierFiltersActive() {
-  return Object.keys(llTierFilter).some(function(k){ return llTierFilter[k]; });
+function llFiltersActive() {
+  var t = Object.keys(llTypeFilter).some(function(k){ return llTypeFilter[k]; });
+  var r = Object.keys(llTierFilter).some(function(k){ return llTierFilter[k]; });
+  var p = Object.keys(llPosFilter).some(function(k){ return llPosFilter[k]; }) || llPosOFilter || llPosPFilter || llPosDFilter;
+  var x = Object.keys(llExcludeTypes).some(function(k){ return llExcludeTypes[k]; });
+  var a = Object.keys(llAlbumFilter).some(function(k){ return llAlbumFilter[k]; });
+  return t || r || p || x || a;
 }
-function applyLlTierFilters(opts) {
+function llTierFiltersActive() { return llFiltersActive(); }
+function llChipMatchesPosFilter(pos) {
+  pos = normalizeSlot(pos, 1);
+  var posOn = Object.keys(llPosFilter).some(function(k){ return llPosFilter[k]; });
+  var oOn = !!llPosOFilter;
+  var pOn = !!llPosPFilter;
+  var dOn = !!llPosDFilter;
+  var typeOn = oOn || pOn || dOn;
+  var isO = slotIsO(pos);
+  var isP = slotIsP(pos);
+  var isD = slotIsD(pos);
+  var base = slotBase(pos);
+  var baseOn = !!(llPosFilter[base] || llPosFilter[String(base)]);
+  var typeMatch = (oOn && isO) || (pOn && isP) || (dOn && isD);
+  if (!posOn && !typeOn) return true;
+  if (!posOn && typeOn) return typeMatch;
+  if (posOn && typeOn) return typeMatch && baseOn;
+  return baseOn;
+}
+function llPhraseMatchesFilter(el) {
+  var typ = el.getAttribute("data-type") || "";
+  var tier = slotBase(normalizeSlot(el.getAttribute("data-tier"), 3));
+  var positions = parsePosList(el.getAttribute("data-position"));
+  var albumName = el.getAttribute("data-album") || "";
+  if (llExcludeTypes[typ]) return false;
+  var albumOn = Object.keys(llAlbumFilter).some(function(k){ return llAlbumFilter[k]; });
+  if (albumOn && !llAlbumFilter[albumName]) return false;
+  var typeOn = Object.keys(llTypeFilter).some(function(k){ return llTypeFilter[k]; });
+  var tierOn = Object.keys(llTierFilter).some(function(k){ return llTierFilter[k]; });
+  if (typeOn && !llTypeFilter[typ]) return false;
+  if (tierOn && !llTierFilter[tier]) return false;
+  var posFilterActive = Object.keys(llPosFilter).some(function(k){ return llPosFilter[k]; }) || llPosOFilter || llPosPFilter || llPosDFilter;
+  if (posFilterActive) {
+    if (!positions.some(function(pos){ return llChipMatchesPosFilter(pos); })) return false;
+  }
+  return true;
+}
+function applyLlFilters(opts) {
   opts = opts || {};
-  var active = (currentLetter === "B") && llTierFiltersActive();
+  var active = (currentLetter === "B") && llFiltersActive();
   [].forEach.call(document.querySelectorAll("#series .phrase"), function(el){
     if (!active) {
       el.classList.remove("filtered-out");
       return;
     }
-    var t = parseInt(el.getAttribute("data-tier"), 10);
-    if (!(t >= 1 && t <= 5)) t = 3;
-    el.classList.toggle("filtered-out", !llTierFilter[t]);
+    el.classList.toggle("filtered-out", !llPhraseMatchesFilter(el));
   });
   if (!opts.skipRebuild && currentLetter === "B" && typeof rebuildColumns === "function") {
     rebuildColumns();
@@ -6132,10 +6277,19 @@ function applyLlTierFilters(opts) {
     countEl.textContent = n + (llMode === "solo" ? " solo chips" : " riff chips");
   }
 }
-function clearLlTierFilters() {
+function applyLlTierFilters(opts) { applyLlFilters(opts); }
+function clearLlFilters() {
+  llTypeFilter = {};
   llTierFilter = {};
-  applyLlTierFilters();
+  llPosFilter = {};
+  llPosOFilter = false;
+  llPosPFilter = false;
+  llPosDFilter = false;
+  llExcludeTypes = {};
+  llAlbumFilter = {};
+  applyLlFilters();
 }
+function clearLlTierFilters() { clearLlFilters(); }
 
 function showSeries(letter) {
   currentLetter = letter;
@@ -6185,15 +6339,19 @@ function showSeries(letter) {
     if (letter === "B" && COVER_BY_TIER[tier]) {
       coverSrc = COVER_BY_TIER[tier];
     }
+    var albumAttr = (it.album || "").replace(/"/g, "&quot;");
+    var typeAttr = (it.type || "").replace(/"/g, "&quot;");
+    var posAttr = (it.position != null ? String(it.position) : "").replace(/"/g, "&quot;");
+    var meta = ' data-album="'+albumAttr+'" data-type="'+typeAttr+'" data-position="'+posAttr+'"';
     if (cover) {
-      return '<div class="phrase '+kind+' '+song+on+tierCls+' no-anim" draggable="true" data-name="'+id+'" data-label="'+label+'" data-tier="'+tier+'" data-file="'+src+'">'
+      return '<div class="phrase '+kind+' '+song+on+tierCls+' no-anim" draggable="true" data-name="'+id+'" data-label="'+label+'" data-tier="'+tier+'" data-file="'+src+'"'+meta+'>'
         + '<div class="card-inner">'
         + '<div class="face face-tab"><img class="tab" src="'+src+'" alt="'+label+'"></div>'
         + '<div class="face face-cover"><img class="cover" src="'+coverSrc+'" alt=""></div>'
         + '<span class="ref">'+label+'</span>'
         + '</div></div>';
     }
-    return '<div class="phrase '+kind+' '+song+tierCls+'" draggable="true" data-name="'+id+'" data-label="'+label+'" data-tier="'+tier+'" data-file="'+src+'"><img class="tab" src="'+src+'" alt="'+label+'"></div>';
+    return '<div class="phrase '+kind+' '+song+tierCls+'" draggable="true" data-name="'+id+'" data-label="'+label+'" data-tier="'+tier+'" data-file="'+src+'"'+meta+'><img class="tab" src="'+src+'" alt="'+label+'"></div>';
   }).join("");
   [].forEach.call(document.querySelectorAll(".phrase"), placePhrase);
   requestAnimationFrame(function(){
@@ -6244,20 +6402,48 @@ document.getElementById("llFilters").onclick = function(e){
   }
   var inp = e.target.closest(".filter-dd-item input");
   if (inp) {
+    var album = inp.getAttribute("data-ll-filter-album");
+    var t = inp.getAttribute("data-ll-filter-type");
+    var xt = inp.getAttribute("data-ll-exclude-type");
     var r = inp.getAttribute("data-ll-filter-tier");
-    if (r) {
+    var p = inp.getAttribute("data-ll-filter-pos");
+    var po = inp.getAttribute("data-ll-filter-pos-o");
+    var pp = inp.getAttribute("data-ll-filter-pos-p");
+    var pd = inp.getAttribute("data-ll-filter-pos-d");
+    if (album != null) {
+      if (inp.checked) llAlbumFilter[album] = true;
+      else delete llAlbumFilter[album];
+    } else if (t) {
+      if (inp.checked) llTypeFilter[t] = true;
+      else delete llTypeFilter[t];
+    } else if (xt) {
+      if (inp.checked) llExcludeTypes[xt] = true;
+      else delete llExcludeTypes[xt];
+    } else if (r) {
       var n = parseInt(r, 10);
       if (n >= 1 && n <= 5) {
         if (inp.checked) llTierFilter[n] = true;
         else delete llTierFilter[n];
-        applyLlTierFilters();
+      }
+    } else if (po) {
+      llPosOFilter = !!inp.checked;
+    } else if (pp) {
+      llPosPFilter = !!inp.checked;
+    } else if (pd) {
+      llPosDFilter = !!inp.checked;
+    } else if (p) {
+      var pn = parseInt(p, 10);
+      if (pn >= 1 && pn <= 5) {
+        if (inp.checked) llPosFilter[pn] = true;
+        else delete llPosFilter[pn];
       }
     }
+    applyLlFilters();
     e.stopPropagation();
     return;
   }
   if (e.target.id === "llFilterClear" || e.target.closest("#llFilterClear")) {
-    clearLlTierFilters();
+    clearLlFilters();
     e.stopPropagation();
   }
 };
