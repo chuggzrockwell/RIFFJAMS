@@ -114,6 +114,9 @@
   .badge.a { background: #3ec8ff; } .badge.b { background: #3ee45e; }
   .badge.b2 { background: #9bffb0; } .badge.c { background: #ffe44a; } .badge.d { background: #ff3d4e; }
   .count { opacity: .65; font-size: 0.9rem; }
+  /* LL: no Paranoid badge / chip count in the top bar */
+  body.sheet-mode #badge,
+  body.sheet-mode #count { display: none !important; }
   .btn-randomize {
     background: transparent; color: inherit; border: 1px solid #4a4e5a;
     border-radius: 999px; padding: 5px 12px; cursor: pointer;
@@ -287,7 +290,8 @@
     right: 16px;
     bottom: 16px;
     left: auto;
-    z-index: 50;
+    top: auto;
+    z-index: 200;
     width: min(420px, calc(100% - 32px));
     max-width: 420px;
     margin: 0;
@@ -300,6 +304,8 @@
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
     align-items: center;
     gap: 14px;
+    /* Stay pinned to the viewport while page content scrolls */
+    transform: none;
   }
   body.sections-mode .sm-player,
   body.sheet-mode .sm-player { display: flex; }
@@ -2707,6 +2713,10 @@
       </div>
     </div>
   </section>
+
+
+</div>
+
   <div id="ytPlayerHost" aria-hidden="true"></div>
   <div class="sm-player" id="smPlayer" aria-label="Song player">
     <div class="sm-player-main">
@@ -2738,8 +2748,6 @@
     </div>
     <img class="sm-player-art" id="smPlayerArt" alt="" width="72" height="72" decoding="async">
   </div>
-
-</div>
 <div id="lb" class="lightbox hidden"></div>
 <script>
 
@@ -3768,7 +3776,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=64";
+  var url = base + "?playboard=1&v=65";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
