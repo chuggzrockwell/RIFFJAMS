@@ -2354,6 +2354,8 @@
     .tile { padding: 16px 18px; border-radius: 12px; }
     .tile small { font-size: 0.75rem; }
     .keys { display: none; }
+    body.sheet-mode #badge,
+    body.sheet-mode #count { display: none !important; }
     .bar { flex-wrap: wrap; gap: 8px; }
     .sections-wrap {
       --row-g: 22px; --name-w: 140px; --chip-w: 30px; --chip-h: 20px; --chip-gap: 1px; --cover-rows: 6; --cover: calc(var(--chip-h) * var(--cover-rows));
@@ -3732,7 +3734,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=61";
+  var url = base + "?playboard=1&v=62";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
