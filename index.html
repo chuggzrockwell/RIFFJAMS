@@ -1172,7 +1172,9 @@
     gap: var(--ll-row-gap, 1px);
     align-items: stretch;
     width: 100%;
-    overflow: visible; /* don’t clip card glow */
+    max-height: calc(100vh - 210px); /* bar + player + padding */
+    overflow-x: visible;
+    overflow-y: auto; /* all albums → scroll */
     padding: 8px 4px 10px;
     box-sizing: border-box;
   }
@@ -1262,7 +1264,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: #000 url("covers/paranoid.png") center / cover no-repeat;
+    background: #000 var(--song-cover, url("covers/paranoid.png")) center / cover no-repeat;
     filter: none;
     z-index: 0;
     border-radius: inherit;
@@ -2422,11 +2424,11 @@
 <div class="wrap">
   <section id="home">
     <h1>RIFFJAMS</h1>
-    <p class="keys" style="margin:0 0 10px 4px">Numpad 1 Song Map · 2 SBS · 3 Paranoid · 0 home</p>
+    <p class="keys" style="margin:0 0 10px 4px">Numpad 1 Song Map · 2 SBS · 3 LL (all songs) · 0 home</p>
     <div class="grid">
       <button type="button" class="tile hp" id="btnHP"><small>Song Map</small>Sabbath</button>
       <button type="button" class="tile a" id="btnA"><small>Licks</small>A</button>
-      <button type="button" class="tile b" id="btnB"><small>Paranoid</small>B</button>
+      <button type="button" class="tile b" id="btnB"><small>All songs</small>LL</button>
       <button type="button" class="tile b2" id="btnB2"><small>Paranoid</small>B2</button>
       <button type="button" class="tile c" id="btnC"><small>Licks</small>C</button>
       <button type="button" class="tile d" id="btnD"><small>Licks</small>D</button>
@@ -3590,7 +3592,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=56";
+  var url = base + "?playboard=1&v=57";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -4720,7 +4722,7 @@ function libraryPlayKey(el) {
 }
 function librarySongLabel() {
   if (currentLetter === "A") return "SBS";
-  if (currentLetter === "B") return "Paranoid";
+  if (currentLetter === "B") return "LL";
   if (currentLetter === "B2") return "Paranoid 2";
   return currentLetter || "";
 }
@@ -4867,12 +4869,15 @@ function togglePlayPhrase(el) {
       return;
     }
     var labelB = (el.getAttribute("data-label") || name).trim();
+    var songB = (el.getAttribute("data-song") || "").trim() || librarySongLabel();
+    var tierB = parseInt(el.getAttribute("data-tier"), 10);
+    if (!(tierB >= 1 && tierB <= 5)) tierB = 2;
     playQueue.push({
       key: keyB,
       code: labelB,
-      song: librarySongLabel(),
+      song: songB,
       lick: name,
-      tier: 2,
+      tier: tierB,
       src: lickSrc(name)
     });
     trimPlayQueueToFit();
@@ -5371,12 +5376,15 @@ function enqueueLibraryByFilter(pred) {
       var key = libraryPlayKey(el);
       if (findPlayIndex(key) >= 0) return;
       var name = el.getAttribute("data-name") || "";
+      var songE = (el.getAttribute("data-song") || "").trim() || librarySongLabel();
+      var tierE = parseInt(el.getAttribute("data-tier"), 10);
+      if (!(tierE >= 1 && tierE <= 5)) tierE = 2;
       playQueue.push({
         key: key,
-        code: name,
-        song: librarySongLabel(),
+        code: (el.getAttribute("data-label") || name),
+        song: songE,
         lick: name,
-        tier: 2,
+        tier: tierE,
         src: el.getAttribute("data-file") || lickSrc(name)
       });
     });
@@ -5405,8 +5413,13 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   var cardByH = (availH - Math.max(0, nRows - 1) * rowGap) / nRows;
   /* label(card) + gap + maxNonPc cards */
   var cardByW = (availW - gap - Math.max(0, maxNonPc) * gap) / Math.max(1, maxNonPc + 1);
-  var card = Math.floor(Math.min(cardByH, cardByW, 100));
-  if (!isFinite(card) || card < 36) card = 36;
+  var card = Math.floor(Math.min(cardByH, cardByW, 88));
+  /* Many album rows: keep chips readable and let the board scroll */
+  if (!isFinite(card) || card < 48) {
+    card = Math.floor(Math.min(cardByW, 64));
+    if (!isFinite(card) || card < 44) card = 44;
+    if (card > 72) card = 72;
+  }
   if (card > 88) card = 88;
   board.style.setProperty("--ll-card", card + "px");
   board.style.setProperty("--ll-gap", gap + "px");
@@ -5425,16 +5438,7 @@ function pcCollapsedVisibleCount(board, cardPx) {
 }
 function rebuildColumnsB() {
   var board = document.getElementById("coverBoard");
-  var songs = [
-    { re: /^WP-/, label: "War Pigs", track: 1 },
-    { re: /^P-(?!C)/, label: "Paranoid", track: 2 },
-    { re: /^PC-/, label: "Planet Caravan", track: 3, isPc: true },
-    { re: /^IM-/, label: "Iron Man", track: 4 },
-    { re: /^EF-/, label: "Electric Funeral", track: 5, allowEmpty: true },
-    { re: /^HOD-/, label: "Hand of Doom", track: 6 },
-    { re: /^RS-/, label: "Rat Salad", track: 7 },
-    { re: /^FOB-/, label: "Fairies Wear Boots", track: 8 }
-  ];
+  var songs = llSongRows();
   var all = [];
   [].forEach.call(document.querySelectorAll(".phrase"), function(el){
     el.classList.add("flipped");
@@ -5443,7 +5447,7 @@ function rebuildColumnsB() {
   var hold = document.createDocumentFragment();
   all.forEach(function(el){ hold.appendChild(el); });
   board.innerHTML = "";
-  if (!all.length) {
+  if (!all.length && !songs.length) {
     board.className = "cover-board hidden";
     return;
   }
@@ -5451,12 +5455,13 @@ function rebuildColumnsB() {
   var maxOther = 1;
   songs.forEach(function(song){
     if (song.isPc) return;
-    var n = all.filter(function(el){ return song.re.test(el.getAttribute("data-name") || ""); }).length;
+    var n = all.filter(function(el){ return (el.getAttribute("data-song") || "") === song.label; }).length;
     if (n > maxOther) maxOther = n;
   });
-  var cardPx = sizeLlBCard(board, maxOther, songs.length);
-  var wpCount = all.filter(function(el){ return /^WP-/.test(el.getAttribute("data-name") || ""); }).length;
-  var colCount = Math.max(wpCount, 1);
+  var cardPx = sizeLlBCard(board, maxOther, Math.max(1, songs.length));
+  var firstSong = songs.length ? songs[0].label : "War Pigs";
+  var firstCount = all.filter(function(el){ return (el.getAttribute("data-song") || "") === firstSong; }).length;
+  var colCount = Math.max(firstCount, 1);
   var ruler = document.createElement("div");
   ruler.className = "ll-col-ruler";
   ruler.setAttribute("aria-hidden", "true");
@@ -5475,14 +5480,15 @@ function rebuildColumnsB() {
   board.appendChild(ruler);
   songs.forEach(function(song){
     var items = all.filter(function(el){
-      return song.re.test(el.getAttribute("data-name") || "");
+      return (el.getAttribute("data-song") || "") === song.label;
     });
     var col = document.createElement("div");
     col.className = "song-col" + (!items.length ? " is-empty" : "");
     var head = document.createElement("div");
-    var longLabel = (song.label === "Fairies Wear Boots" || song.label === "Planet Caravan" || song.label === "Electric Funeral");
+    var longLabel = (song.label || "").length > 12;
     head.className = "song-col-head" + (longLabel ? " long" : "");
     head.setAttribute("title", song.label);
+    if (song.cover) head.style.setProperty("--song-cover", 'url("' + song.cover + '")');
     var plate = document.createElement("span");
     plate.className = "song-col-plate";
     plate.setAttribute("aria-hidden", "true");
@@ -5829,21 +5835,64 @@ function revealGroup(group) {
   }));
 }
 
-/** LL chip lists from current Song Map linking — riff=sections, solo=SOLO_MAP licks. */
+/** Stable prefix for synthetic LL ids (grouping / uniqueness across albums). */
+function llSongPrefix(songName) {
+  var map = {
+    "War Pigs": "WP-", "Paranoid": "P-", "Planet Caravan": "PC-", "Iron Man": "IM-",
+    "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-",
+    "Sabbath Bloody Sabbath": "SBS-", "A National Acrobat": "ANA-", "Fluff": "FLU-",
+    "Sabbra Cadabra": "SC-", "Killing Yourself to Live": "KYTL-", "Who Are You?": "WAY-",
+    "Looking for Today": "LFT-", "Spiral Architect": "SA-",
+    "Sweet Leaf": "SL-", "After Forever": "AF-", "Embryo": "EMB-",
+    "Children of the Grave": "COTG-", "Orchid": "ORC-", "Lord of This World": "LOTW-",
+    "Solitude": "SOL-", "Into the Void": "ITV-",
+    "Wheels of Confusion": "WOC-", "Tomorrow's Dream": "TD-", "Changes": "CHG-",
+    "FX": "FX-", "Supernaut": "SUP-", "Snowblind": "SNB-", "Cornucopia": "COR-",
+    "Laguna Sunrise": "LS-", "St. Vitus Dance": "SVD-", "Under the Sun": "UTS-"
+  };
+  if (map[songName]) return map[songName];
+  var slug = String(songName || "").replace(/[^A-Za-z0-9]+/g, "").toUpperCase().slice(0, 8);
+  return (slug || "X") + "-";
+}
+function llAlbumCoverForSong(songName) {
+  var albums = ALBUMS || ALBUMS_DEFAULT || [];
+  for (var i = 0; i < albums.length; i++) {
+    var a = albums[i];
+    var songs = (a && a.songs) || [];
+    for (var j = 0; j < songs.length; j++) {
+      if (songs[j].song === songName) return a.cover || "";
+    }
+  }
+  return "";
+}
+/** All Song Map songs as LL rows (album order). */
+function llSongRows() {
+  var rows = [];
+  (ALBUMS || ALBUMS_DEFAULT || []).forEach(function(a){
+    if (!a) return;
+    (a.songs || []).forEach(function(s, si){
+      rows.push({
+        label: s.song,
+        album: a.name || "",
+        cover: a.cover || "",
+        track: si + 1,
+        isPc: s.song === "Planet Caravan",
+        allowEmpty: true
+      });
+    });
+  });
+  return rows;
+}
+/** LL chip lists from current Song Map linking — riff=sections, solo=SOLO_MAP licks (all albums). */
 function llChipItemsForMode(mode) {
   var out = [];
   var seen = {};
-  var songPrefix = {
-    "War Pigs": "WP-", "Paranoid": "P-", "Planet Caravan": "PC-", "Iron Man": "IM-",
-    "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-"
-  };
-  function pushItem(label, lick, songName, tier) {
+  function pushItem(label, lick, songName, tier, albumName, albumCover) {
     var lab = String(label || "").trim();
     var id = (lick || "").trim();
     if (!lab && !id) return;
     if (!id) {
-      var pref = songPrefix[songName] || "";
-      id = pref ? (pref + lab) : lab; /* synthetic id for song-row grouping */
+      id = llSongPrefix(songName) + lab; /* synthetic id — unique across albums */
     }
     if (!lab) lab = id;
     var key = lab + "|" + id + "|" + (songName || "");
@@ -5851,32 +5900,40 @@ function llChipItemsForMode(mode) {
     seen[key] = true;
     var tNum = parseInt(tier, 10);
     if (!(tNum >= 1 && tNum <= 5)) tNum = 3;
-    out.push({ id: id, label: lab, lick: (lick || "").trim() || id, song: songName || "", tier: tNum });
+    out.push({
+      id: id,
+      label: lab,
+      lick: (lick || "").trim() || id,
+      song: songName || "",
+      album: albumName || "",
+      cover: albumCover || "",
+      tier: tNum
+    });
   }
   if (mode === "solo") {
     if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
     (SOLO_MAP && SOLO_MAP.albums || []).forEach(function(a){
-      if (!a || a.name !== "Paranoid") return;
+      if (!a) return;
       (a.songs || []).forEach(function(s){
         (s.licks || []).forEach(function(pair){
           if (!pair || !pair[0]) return;
           var lab = pair[0];
           var lick = (pair[2] || pair[0] || "").trim();
-          pushItem(lab, lick, s.song, pair[1]);
+          pushItem(lab, lick, s.song, pair[1], a.name, a.cover);
         });
       });
     });
     return out;
   }
-  /* riff mode: section chips from ALBUMS Paranoid — observe current linking */
+  /* riff mode: section chips from every album — current Song Map linking */
   (ALBUMS || ALBUMS_DEFAULT || []).forEach(function(a){
-    if (!a || a.name !== "Paranoid") return;
+    if (!a) return;
     (a.songs || []).forEach(function(s){
       (s.sections || []).forEach(function(pair){
         if (!pair || !pair[0]) return;
         var code = pair[0];
         var lick = (pair[2] || "").trim();
-        pushItem(code, lick, s.song, pair[1]);
+        pushItem(code, lick, s.song, pair[1], a.name, a.cover);
       });
     });
   });
@@ -5887,7 +5944,7 @@ function showSeries(letter) {
   currentLetter = letter;
   pcColExpanded = false;
   document.body.className = "sheet-mode stage";
-  var badgeLabel = (letter === "B") ? "Paranoid" : (letter === "B2") ? "Paranoid 2" : letter;
+  var badgeLabel = (letter === "B") ? "LL" : (letter === "B2") ? "Paranoid 2" : letter;
   document.getElementById("badge").textContent = badgeLabel;
   document.getElementById("badge").className = "badge " + letter.toLowerCase();
   document.getElementById("home").className = "hidden";
@@ -5920,6 +5977,8 @@ function showSeries(letter) {
   tabWrap.innerHTML = items.map(function(it){
     var id = it.lick || it.id;
     var label = it.label || id;
+    var songName = it.song || "";
+    var esc = function(s){ return String(s || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); };
     /* lickSrc resolves CATALOG folder or section-crops/ for riff section tabs */
     var src = id ? lickSrc(id) : "";
     var on = (flipped.indexOf(id) >= 0 || flipped.indexOf(label) >= 0) ? " flipped" : "";
@@ -5928,18 +5987,20 @@ function showSeries(letter) {
     var tier = (it.tier >= 1 && it.tier <= 5) ? it.tier : 3;
     var tierCls = (letter === "B") ? (" tier-"+tier) : "";
     var coverSrc = cover;
-    if (letter === "B" && COVER_BY_TIER[tier]) {
-      coverSrc = COVER_BY_TIER[tier];
+    if (letter === "B") {
+      if ((it.album === "Paranoid" || !it.album) && COVER_BY_TIER[tier]) coverSrc = COVER_BY_TIER[tier];
+      else if (it.cover) coverSrc = it.cover;
+      else coverSrc = llAlbumCoverForSong(songName) || cover;
     }
-    if (cover) {
-      return '<div class="phrase '+kind+' '+song+on+tierCls+' no-anim" draggable="true" data-name="'+id+'" data-label="'+label+'" data-tier="'+tier+'" data-file="'+src+'">'
+    if (cover || letter === "B") {
+      return '<div class="phrase '+kind+' '+song+on+tierCls+' no-anim" draggable="true" data-name="'+esc(id)+'" data-label="'+esc(label)+'" data-song="'+esc(songName)+'" data-album="'+esc(it.album || "")+'" data-tier="'+tier+'" data-file="'+esc(src)+'">'
         + '<div class="card-inner">'
-        + '<div class="face face-tab"><img class="tab" src="'+src+'" alt="'+label+'"></div>'
+        + '<div class="face face-tab"><img class="tab" src="'+src+'" alt="'+esc(label)+'"></div>'
         + '<div class="face face-cover"><img class="cover" src="'+coverSrc+'" alt=""></div>'
-        + '<span class="ref">'+label+'</span>'
+        + '<span class="ref">'+esc(label)+'</span>'
         + '</div></div>';
     }
-    return '<div class="phrase '+kind+' '+song+tierCls+'" draggable="true" data-name="'+id+'" data-label="'+label+'" data-tier="'+tier+'" data-file="'+src+'"><img class="tab" src="'+src+'" alt="'+label+'"></div>';
+    return '<div class="phrase '+kind+' '+song+tierCls+'" draggable="true" data-name="'+esc(id)+'" data-label="'+esc(label)+'" data-song="'+esc(songName)+'" data-tier="'+tier+'" data-file="'+esc(src)+'"><img class="tab" src="'+src+'" alt="'+esc(label)+'"></div>';
   }).join("");
   [].forEach.call(document.querySelectorAll(".phrase"), placePhrase);
   requestAnimationFrame(function(){
