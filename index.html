@@ -1170,6 +1170,57 @@
     padding: 8px 4px 10px;
     box-sizing: border-box;
   }
+  /* Column numbers above War Pigs chip row */
+  .cover-board.song-cols.ll-b .ll-col-ruler {
+    --card: var(--ll-card, 72px);
+    --gap: var(--ll-gap, 12px);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap);
+    width: 100%;
+    max-width: 100%;
+    min-height: 18px;
+    height: 18px;
+    margin: 0 0 2px;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    pointer-events: none;
+  }
+  .cover-board.song-cols.ll-b .ll-col-ruler-spacer {
+    flex: 0 0 var(--card);
+    width: var(--card);
+    min-width: var(--card);
+    max-width: var(--card);
+    height: 18px;
+  }
+  .cover-board.song-cols.ll-b .ll-col-ruler-nums {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: var(--gap);
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 6px 0 0; /* match song-col-body horizontal padding (right) */
+    box-sizing: border-box;
+  }
+  .cover-board.song-cols.ll-b .ll-col-num {
+    flex: 0 0 var(--card);
+    width: var(--card);
+    min-width: var(--card);
+    max-width: var(--card);
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    font-size: 0.6rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255,255,255,.32);
+    line-height: 1;
+  }
   .cover-board.song-cols.ll-b .song-col {
     --card: var(--ll-card, 72px);
     --gap: var(--ll-gap, 12px);
@@ -3530,7 +3581,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=52";
+  var url = base + "?playboard=1&v=53";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5289,6 +5340,7 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   /* Chip gap: T1 neon is outline 2px + offset 2px per side; 12px → ~4px clear between two T1s (was 10) */
   var gap = 12;
   var rowGap = 1; /* 1px above/below song chip rows */
+  var rulerH = 20; /* column numbers above War Pigs */
   var top = 0;
   try { top = board.getBoundingClientRect().top; } catch (e) { top = 0; }
   if (!top) {
@@ -5296,7 +5348,7 @@ function sizeLlBCard(board, maxNonPc, nRows) {
     top = bar ? (bar.getBoundingClientRect().bottom + 8) : 72;
   }
   var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 8);
-  var availH = Math.max(180, window.innerHeight - top - 12);
+  var availH = Math.max(180, window.innerHeight - top - 12 - rulerH);
   /* 8 song rows must fit vertically; label is square album art = card size */
   var cardByH = (availH - Math.max(0, nRows - 1) * rowGap) / nRows;
   /* label(card) + gap + maxNonPc cards */
@@ -5351,6 +5403,24 @@ function rebuildColumnsB() {
     if (n > maxOther) maxOther = n;
   });
   var cardPx = sizeLlBCard(board, maxOther, songs.length);
+  var wpCount = all.filter(function(el){ return /^WP-/.test(el.getAttribute("data-name") || ""); }).length;
+  var colCount = Math.max(wpCount, 1);
+  var ruler = document.createElement("div");
+  ruler.className = "ll-col-ruler";
+  ruler.setAttribute("aria-hidden", "true");
+  var spacer = document.createElement("div");
+  spacer.className = "ll-col-ruler-spacer";
+  ruler.appendChild(spacer);
+  var nums = document.createElement("div");
+  nums.className = "ll-col-ruler-nums";
+  for (var ci = 1; ci <= colCount; ci++) {
+    var cn = document.createElement("span");
+    cn.className = "ll-col-num";
+    cn.textContent = String(ci);
+    nums.appendChild(cn);
+  }
+  ruler.appendChild(nums);
+  board.appendChild(ruler);
   songs.forEach(function(song){
     var items = all.filter(function(el){
       return song.re.test(el.getAttribute("data-name") || "");
