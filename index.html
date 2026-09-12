@@ -1538,7 +1538,14 @@
     border-radius: 8px;
     background: transparent;
     font-size: clamp(16px, calc(var(--card) * 0.36), 28px);
-    text-shadow: 0 1px 3px rgba(0,0,0,.95), 0 0 10px rgba(0,0,0,.7);
+    -webkit-text-stroke: 1.35px #000;
+    paint-order: stroke fill;
+    text-shadow:
+      -1px -1px 0 #000,
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000,
+       0 1px 3px rgba(0,0,0,.85);
   }
   .cover-board.song-cols.ll-b .song-col-more {
     box-sizing: border-box;
@@ -1758,7 +1765,15 @@
     white-space: nowrap; overflow: hidden;
     pointer-events: none;
     max-width: none;
-    text-shadow: 0 1px 3px rgba(0,0,0,.95), 0 0 10px rgba(0,0,0,.7);
+    /* Hard stroke around glyphs for readability on busy covers */
+    -webkit-text-stroke: 1.35px #000;
+    paint-order: stroke fill;
+    text-shadow:
+      -1px -1px 0 #000,
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000,
+       0 1px 3px rgba(0,0,0,.85);
   }
   .phrase.a.flipped .ref,
   .phrase.b.flipped .ref,
@@ -3955,7 +3970,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=100";
+  var url = base + "?playboard=1&v=101";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
