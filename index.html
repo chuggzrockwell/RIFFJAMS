@@ -2692,7 +2692,6 @@
       <button type="button" class="back" id="back">Back</button>
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
-      <button type="button" class="btn-randomize" id="btnClear" title="Hide all revealed tabs (Shift+C)">Clear</button>
       <label class="board-mode-dd" title="Riff / Solo chip set">
         <select id="llBoardMode" aria-label="Mode">
           <option value="riff">Riff mode</option>
@@ -3778,7 +3777,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=67";
+  var url = base + "?playboard=1&v=68";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6227,7 +6226,8 @@ var _btnRand = document.getElementById("btnRandomize");
 if (_btnRand) _btnRand.onclick = function(){ randomizeCoverBoard(); };
 var _btnReord = document.getElementById("btnReorder");
 if (_btnReord) _btnReord.onclick = function(){ reorderRevealedTabs(); };
-document.getElementById("btnClear").onclick = function(){ clearRevealedLicks(); };
+var _btnClear = document.getElementById("btnClear");
+if (_btnClear) _btnClear.onclick = function(){ clearRevealedLicks(); };
 document.getElementById("backSections").onclick = showHome;
 
 document.getElementById("llFilters").onclick = function(e){
