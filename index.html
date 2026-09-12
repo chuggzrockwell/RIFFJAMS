@@ -35,7 +35,33 @@
   .wrap { width: 100%; padding: 10px 8px 28px; box-sizing: border-box; }
   body.sheet-mode .wrap {
     overflow-x: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    padding: 10px 8px 8px; /* bottom buffer matches left (8px) */
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  }
+  body.sheet-mode #series {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+  }
+  body.sheet-mode #licks.sheet {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  body.sheet-mode #licks.sheet #coverBoard.cover-board.song-cols.ll-b {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
   }
   h1 { margin: 0 0 10px 6px; font-size: 0.95rem; letter-spacing: .08em; text-transform: uppercase; color: #c2c2be; font-weight: 600; }
   .grid {
@@ -327,7 +353,7 @@
   body.sections-mode .sm-player,
   body.sheet-mode .sm-player { display: flex; }
   body.sheet-mode #series {
-    padding-bottom: 8px;
+    padding-bottom: 0;
   }
   .sm-player-main {
     flex: 1 1 auto;
@@ -3929,7 +3955,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=98";
+  var url = base + "?playboard=1&v=99";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5782,7 +5808,16 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   var gap = 20;
   var rowGap = 1; /* 1px above/below song chip rows */
   var rulerH = 20; /* column numbers above War Pigs */
-  var playerH = 118; /* sticky Song Map-style player under LL */
+  var edge = 8; /* match wrap left padding — outline bottom buffer */
+  var sheet = document.getElementById("licks");
+  /* Grow the outlined sheet down to the viewport bottom (same buffer as left) */
+  if (sheet) {
+    var sheetTop = 0;
+    try { sheetTop = sheet.getBoundingClientRect().top; } catch (e) { sheetTop = 0; }
+    var sheetH = Math.max(180, Math.floor(window.innerHeight - sheetTop - edge));
+    sheet.style.height = sheetH + "px";
+    sheet.style.maxHeight = sheetH + "px";
+  }
   var top = 0;
   try { top = board.getBoundingClientRect().top; } catch (e) { top = 0; }
   if (!top) {
@@ -5790,8 +5825,8 @@ function sizeLlBCard(board, maxNonPc, nRows) {
     top = bar ? (bar.getBoundingClientRect().bottom + 8) : 72;
   }
   var availW = Math.max(320, (board.clientWidth || (board.parentElement && board.parentElement.clientWidth) || window.innerWidth) - 8);
-  var availH = Math.max(180, window.innerHeight - top - 12 - rulerH - playerH);
-  /* label(card) + gap + maxNonPc cards — still used so wide rows don't overflow */
+  /* Board fills the sheet interior down to the same edge buffer (player floats over) */
+  var availH = Math.max(180, window.innerHeight - top - edge);
   var cardByW = (availW - gap - Math.max(0, maxNonPc) * gap) / Math.max(1, maxNonPc + 1);
   var shortSide = Math.min(window.innerWidth, window.innerHeight);
   var longSide = Math.max(window.innerWidth, window.innerHeight);
@@ -5799,7 +5834,7 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   var hBudget = availH;
   if (mobile) {
     var barGuess = top > 0 ? Math.min(top, 96) : 56;
-    hBudget = Math.max(160, shortSide - barGuess - 12 - rulerH - playerH);
+    hBudget = Math.max(160, shortSide - barGuess - edge);
   }
   /*
    * Chip height: default 88px. "Scale down" forces compact 36px (same as old 3-album compact).
@@ -5817,8 +5852,8 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   board.setAttribute("data-ll-scale", mode);
   board.classList.toggle("ll-scale-mid", false);
   board.classList.toggle("ll-scale-compact", mode === "compact");
-  /* Pin board height to the chip viewport so the horizontal scrollbar sits at the bottom */
-  var boardH = Math.floor(hBudget + rulerH + 12);
+  /* Fill the sheet so the horizontal scrollbar sits on the bottom edge of the outline */
+  var boardH = Math.floor(hBudget);
   board.style.height = boardH + "px";
   board.style.maxHeight = boardH + "px";
   board.style.overflowX = "auto";
