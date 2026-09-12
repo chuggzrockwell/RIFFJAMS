@@ -167,8 +167,8 @@
     background: #7030a0;
     box-shadow: inset 0 0 0 3px #161920;
   }
-  body.sheet-mode .sec-filter-clear { color: rgba(232,230,225,.55); }
-  body.sheet-mode .sec-filter-clear:hover { color: #c9a0e8; }
+  body.sheet-mode .sec-filter-clear { background: #7030a0; color: #fff; }
+  body.sheet-mode .sec-filter-clear:hover { background: #8440b8; color: #fff; }
   .keys { margin-left: auto; opacity: .5; font-size: 0.78rem; letter-spacing: .04em; }
   .phrase.filtered-out { display: none !important; }
 
@@ -204,11 +204,24 @@
   .sec-filter-btn.tier.on.t5 { background: #f3edf7; border-color: #c9b3d9; color: #1a1020; }
   .sec-filter-clear {
     margin-left: auto;
-    border: 0; background: transparent;
-    color: rgba(0,0,0,.45); font-size: 0.72rem; font-weight: 600;
-    cursor: pointer; text-decoration: underline;
+    border: 0;
+    background: #7030a0;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 999px;
+    padding: 6px 14px;
+    line-height: 1.2;
   }
-  .sec-filter-clear:hover { color: #7030a0; }
+  .sec-filter-clear:hover { background: #8440b8; color: #fff; filter: brightness(1.05); }
+  #llScaleBtn {
+    margin-left: 8px;
+  }
+  #llScaleBtn[aria-pressed="true"] {
+    background: #a365d1;
+  }
 
   .sec-modes {
     display: flex; gap: 6px; align-items: center;
@@ -1230,10 +1243,11 @@
     align-items: flex-start;
     width: 100%;
     overflow-x: auto;
-    overflow-y: visible;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 8px 4px 10px;
     box-sizing: border-box;
+    /* height set in JS to fill down to the player so the h-scrollbar sits at the bottom */
   }
   .cover-board.song-cols.ll-b.ll-scale-compact,
   .cover-board.song-cols.ll-b.ll-scale-mid {
@@ -1242,6 +1256,7 @@
   /* Multi-album: two per row side-by-side; 3rd+ wraps underneath */
   .cover-board.song-cols.ll-b.ll-multi {
     overflow-x: auto;
+    overflow-y: auto;
   }
   .cover-board.song-cols.ll-b .ll-albums-stack {
     display: flex;
@@ -1775,8 +1790,8 @@
     background: rgba(255,255,255,.04);
     border: 1px solid rgba(255,255,255,.08);
   }
-  body.sections-mode .sec-filter-clear { color: rgba(232,230,225,.55); }
-  body.sections-mode .sec-filter-clear:hover { color: #c9a0e8; }
+  body.sections-mode .sec-filter-clear { background: #7030a0; color: #fff; }
+  body.sections-mode .sec-filter-clear:hover { background: #8440b8; color: #fff; }
   body.sections-mode .filter-dd-toggle {
     background: #fff;
     color: #222;
@@ -3914,7 +3929,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=97";
+  var url = base + "?playboard=1&v=98";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5802,14 +5817,12 @@ function sizeLlBCard(board, maxNonPc, nRows) {
   board.setAttribute("data-ll-scale", mode);
   board.classList.toggle("ll-scale-mid", false);
   board.classList.toggle("ll-scale-compact", mode === "compact");
-  var needScroll = (nRows * (card + rowGap)) > hBudget;
-  if (mode === "compact" || needScroll) {
-    board.style.maxHeight = Math.floor(hBudget + rulerH + 12) + "px";
-    board.style.overflowY = "auto";
-  } else {
-    board.style.maxHeight = "";
-    board.style.overflowY = "";
-  }
+  /* Pin board height to the chip viewport so the horizontal scrollbar sits at the bottom */
+  var boardH = Math.floor(hBudget + rulerH + 12);
+  board.style.height = boardH + "px";
+  board.style.maxHeight = boardH + "px";
+  board.style.overflowX = "auto";
+  board.style.overflowY = "auto";
   return card;
 }
 function pcCollapsedVisibleCount(board, cardPx) {
