@@ -1509,12 +1509,12 @@
     object-fit: cover;
     border-radius: 8px;
   }
-  /* LL tiers (riff + solo): T1 original; T2–T4 custom cover arts; T5 invert */
+  /* LL tiers: all use standard album art (no per-tier cover/filter) */
   .phrase.flipped.tier-1 img.cover,
   .phrase.flipped.tier-2 img.cover,
   .phrase.flipped.tier-3 img.cover,
-  .phrase.flipped.tier-4 img.cover { filter: none; }
-  .phrase.flipped.tier-5 img.cover { filter: invert(1); }
+  .phrase.flipped.tier-4 img.cover,
+  .phrase.flipped.tier-5 img.cover { filter: none; }
   .phrase.flipped .face-cover { overflow: hidden; }
   .phrase.flipped .ref {
     z-index: 2;
@@ -3520,7 +3520,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=34";
+  var url = base + "?playboard=1&v=35";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5028,11 +5028,6 @@ var CATALOG = [
 ];
 var FOLDER = { A: "a-crops/", B: "b-crops/", B2: "b-crops/", C: "svg/", D: "svg/" };
 var COVER = { A: "covers/sbs.png", B: "covers/paranoid.png", B2: "covers/paranoid.png" };
-var COVER_BY_TIER = {
-  2: "covers/paranoid-t2.png",
-  3: "covers/paranoid-t3.png",
-  4: "covers/paranoid-t4.png"
-};
 var currentLetter = "";
 SOLO_MAP = loadSoloMap();
 try { if (!localStorage.getItem(SOLO_MAP_KEY)) localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP)); } catch (e) {}
@@ -5792,15 +5787,11 @@ function showSeries(letter) {
     var song = songClass(id || ("WP-"+label));
     var tier = (it.tier >= 1 && it.tier <= 5) ? it.tier : 3;
     var tierCls = (letter === "B") ? (" tier-"+tier) : "";
-    var coverSrc = cover;
-    if (letter === "B" && COVER_BY_TIER[tier]) {
-      coverSrc = COVER_BY_TIER[tier];
-    }
     if (cover) {
       return '<div class="phrase '+kind+' '+song+on+tierCls+' no-anim" draggable="true" data-name="'+id+'" data-label="'+label+'" data-tier="'+tier+'" data-file="'+src+'">'
         + '<div class="card-inner">'
         + '<div class="face face-tab"><img class="tab" src="'+src+'" alt="'+label+'"></div>'
-        + '<div class="face face-cover"><img class="cover" src="'+coverSrc+'" alt=""></div>'
+        + '<div class="face face-cover"><img class="cover" src="'+cover+'" alt=""></div>'
         + '<span class="ref">'+label+'</span>'
         + '</div></div>';
     }
