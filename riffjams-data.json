@@ -1,9 +1,10 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-14T02:49:07.983Z",
+  "updatedAt": "2026-09-14T02:52:57.089Z",
   "assets": {
     "V1": "user-tabs/V1.png",
-    "PC1": "user-tabs/PC1.png"
+    "PC1": "user-tabs/PC1.png",
+    "PC2": "user-tabs/PC2.png"
   },
   "albums": [
     {
@@ -341,7 +342,7 @@
             [
               "PC2",
               3,
-              "",
+              "PC2",
               [
                 1,
                 5
