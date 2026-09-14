@@ -1070,7 +1070,10 @@
   }
   .chip-editor {
     position: fixed; z-index: 80;
-    min-width: 220px;
+    width: min(360px, calc(100vw - 32px));
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    box-sizing: border-box;
     background: #fff;
     border: 1px solid rgba(0,0,0,.12);
     border-radius: 12px;
@@ -1145,6 +1148,30 @@
   .chip-editor .btn-cancel { background: #eee; color: #333; }
   .chip-editor .btn-copy { background: #f3eef8; color: #7030a0; }
   .chip-editor .btn-del { background: transparent; color: #c0392b; margin-left: auto; }
+  .chip-attachment { margin: 2px 0 12px; }
+  .chip-paste-zone {
+    position: relative; min-height: 96px; display: flex; align-items: center; justify-content: center;
+    overflow: hidden; box-sizing: border-box; border: 2px dashed #c9b5d8; border-radius: 10px;
+    background: #faf7fc; color: #7030a0; cursor: pointer; margin-bottom: 8px;
+  }
+  .chip-paste-zone.dragging, .chip-paste-zone:focus { border-color: #7030a0; outline: none; background: #f3eafa; }
+  .chip-paste-zone span { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 18px; }
+  .chip-paste-zone strong { font-size: .88rem; }
+  .chip-paste-zone small { font-size: .7rem; color: #665a6e; }
+  .chip-paste-zone img { display: block; max-width: 100%; max-height: 180px; object-fit: contain; background: #fff; }
+  .chip-image-clear { position: absolute; top: 5px; right: 5px; width: 26px; height: 26px; border: 0; border-radius: 50%; background: #111; color: #fff; font-size: 18px; cursor: pointer; }
+  .chip-github-connect { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; font-size: .7rem; color: #8b2635; }
+  .chip-github-connect.connected { color: #237a3b; }
+  .chip-github-connect span { flex: 1; }
+  .chip-github-connect button, .chip-token-panel button { border: 0; border-radius: 6px; padding: 5px 8px; font-size: .68rem; font-weight: 700; cursor: pointer; }
+  .chip-token-panel { padding: 8px; border-radius: 8px; background: #f1f1f1; margin-bottom: 8px; }
+  .chip-token-panel input { width: 100%; box-sizing: border-box; margin: 0 0 6px; padding: 7px; border: 1px solid #bbb; border-radius: 6px; }
+  .chip-token-panel small { display: block; margin-top: 6px; color: #666; font-size: .65rem; line-height: 1.35; }
+  .chip-attach-save { width: 100%; border: 0; border-radius: 8px; padding: 9px 12px; background: #111; color: #fff; font-weight: 800; cursor: pointer; }
+  .chip-attach-save:disabled { opacity: .55; cursor: wait; }
+  .chip-attach-status { min-height: 16px; margin-top: 6px; font-size: .7rem; line-height: 1.35; color: #555; }
+  .chip-attach-status.success { color: #237a3b; }
+  .chip-attach-status.error { color: #b42332; }
   /* Filtered chips stay as empty cells so grid lines remain */
   .sec-chip.filtered-out {
     color: transparent !important;
@@ -4968,6 +4995,7 @@ function showHighlightTip(chip) {
 }
 function lickSrc(id) {
   if (!id) return "";
+  if (window.RIFFJAMS_ASSETS && window.RIFFJAMS_ASSETS[id]) return window.RIFFJAMS_ASSETS[id];
   for (var i = 0; i < CATALOG.length; i++) {
     if (CATALOG[i][0] === id) {
       var letter = CATALOG[i][1];
@@ -5348,9 +5376,11 @@ function openChipEditor(anchor, state) {
   ed.classList.add("open");
   ed.setAttribute("aria-hidden", "false");
   var r = anchor.getBoundingClientRect();
-  var left = Math.min(window.innerWidth - 240, Math.max(8, r.left));
+  var editorWidth = ed.offsetWidth || 360;
+  var editorHeight = ed.offsetHeight || 520;
+  var left = Math.min(window.innerWidth - editorWidth - 12, Math.max(12, r.left));
   var top = r.bottom + 8;
-  if (top + 260 > window.innerHeight) top = Math.max(8, r.top - 260);
+  if (top + editorHeight > window.innerHeight - 12) top = Math.max(12, window.innerHeight - editorHeight - 12);
   ed.style.left = left + "px";
   ed.style.top = top + "px";
   idInput.focus();
@@ -7635,5 +7665,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
+<script src="riffjams-admin.js"></script>
 </body>
 </html>
