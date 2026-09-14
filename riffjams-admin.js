@@ -279,7 +279,7 @@
   function injectEditor() {
     var editor = qs("chipEditor");
     var actions = editor && editor.querySelector(".editor-actions");
-    if (!editor || !actions || qs("chipPasteZone")) return;
+    if (!editor || !actions || qs("chipClipboardPaste")) return;
     var block = document.createElement("div");
     block.className = "chip-attachment";
     block.innerHTML =

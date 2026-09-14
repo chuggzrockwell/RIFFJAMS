@@ -5550,6 +5550,11 @@ function llCoverForAlbumTier(album, tier) {
   if (album === "Master of Reality") {
     return (tier >= 3) ? "covers/mor-tier3.png?v=1" : "covers/mor-ll.png?v=1";
   }
+  if (album !== "Paranoid") {
+    var matchedCover = "";
+    (ALBUMS || ALBUMS_DEFAULT || []).forEach(function(a){ if (a && a.name === album) matchedCover = a.cover || ""; });
+    if (matchedCover) return matchedCover;
+  }
   /* Paranoid default */
   if (COVER_BY_TIER[tier]) return COVER_BY_TIER[tier];
   return "covers/paranoid.png";
@@ -5915,7 +5920,11 @@ function llSelectedAlbums() {
   if (selected.length) {
     return selected.filter(function(name){ return llAlbumAllowed(name); });
   }
-  return (LL_LIBRARY_ALBUMS || []).slice();
+  var names = [];
+  function add(name) { if (name && names.indexOf(name) < 0 && llAlbumAllowed(name)) names.push(name); }
+  (ALBUMS || ALBUMS_DEFAULT || []).forEach(function(a){ add(a && a.name); });
+  ((SOLO_MAP && SOLO_MAP.albums) || []).forEach(function(a){ add(a && a.name); });
+  return names;
 }
 function llSongRowsForLibrary() {
   var rows = [];
@@ -5948,7 +5957,10 @@ function llSongRowsForLibrary() {
 function llAlbumCoverUrl(albumName) {
   if (albumName === "Sabbath Bloody Sabbath") return "covers/sbs-ll.png?v=5";
   if (albumName === "Master of Reality") return "covers/mor-ll.png?v=1";
-  return "covers/paranoid.png";
+  if (albumName === "Paranoid") return "covers/paranoid.png";
+  var cover = "";
+  (ALBUMS || ALBUMS_DEFAULT || []).forEach(function(a){ if (a && a.name === albumName) cover = a.cover || ""; });
+  return cover || "covers/paranoid.png";
 }
 function llBuildColRuler(colCount) {
   var ruler = document.createElement("div");
@@ -6454,8 +6466,19 @@ function revealGroup(group) {
 }
 
 /** LL chip lists from current Song Map linking — riff=sections, solo=SOLO_MAP licks. */
+function llAlbumHasAttachedTab(name) {
+  var assets = window.RIFFJAMS_ASSETS || {};
+  function albumHas(album, key) {
+    if (!album || album.name !== name) return false;
+    return (album.songs || []).some(function(song){
+      return (song[key] || []).some(function(pair){ return isChipPair(pair) && pair[2] && !!assets[pair[2]]; });
+    });
+  }
+  return (ALBUMS || []).some(function(a){ return albumHas(a, "sections"); }) ||
+    ((SOLO_MAP && SOLO_MAP.albums) || []).some(function(a){ return albumHas(a, "licks"); });
+}
 function llAlbumAllowed(name) {
-  return (LL_LIBRARY_ALBUMS || []).indexOf(name) >= 0;
+  return (LL_LIBRARY_ALBUMS || []).indexOf(name) >= 0 || llAlbumHasAttachedTab(name);
 }
 function llChipItemsForMode(mode) {
   var out = [];
