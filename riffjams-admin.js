@@ -265,11 +265,12 @@
     block.innerHTML =
       '<label>Tab screenshot</label>' +
       '<div class="chip-paste-zone" id="chipPasteZone" tabindex="0" role="button" aria-label="Paste or choose a tab screenshot">' +
-        '<span id="chipPasteEmpty"><strong>Paste screenshot</strong><small>Ctrl+V, drop, or click to choose</small></span>' +
+        '<span id="chipPasteEmpty"><strong>Click here, then press Ctrl+V</strong><small>You can also drop a screenshot here</small></span>' +
         '<img id="chipTabPreview" alt="Tab screenshot preview" hidden>' +
         '<button type="button" id="chipImageClear" class="chip-image-clear" aria-label="Remove screenshot" hidden>×</button>' +
       '</div>' +
       '<input id="chipImageFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>' +
+      '<button type="button" class="chip-file-pick" id="chipImageChoose">Choose image file</button>' +
       '<div class="chip-github-connect" id="chipGithubConnect">' +
         '<span id="chipGithubStatus">GitHub connection required</span>' +
         '<button type="button" id="chipGithubOpen">Connect</button>' +
@@ -285,7 +286,7 @@
     editor.insertBefore(block, actions);
 
     var zone = qs("chipPasteZone");
-    zone.onclick = function (event) { if (!event.target.closest("#chipImageClear")) qs("chipImageFile").click(); };
+    zone.onclick = function (event) { if (!event.target.closest("#chipImageClear")) zone.focus(); };
     zone.ondragover = function (event) { event.preventDefault(); zone.classList.add("dragging"); };
     zone.ondragleave = function () { zone.classList.remove("dragging"); };
     zone.ondrop = function (event) {
@@ -293,6 +294,7 @@
       if (event.dataTransfer.files[0]) acceptImage(event.dataTransfer.files[0]);
     };
     qs("chipImageFile").onchange = function () { if (this.files[0]) acceptImage(this.files[0]); this.value = ""; };
+    qs("chipImageChoose").onclick = function () { qs("chipImageFile").click(); };
     qs("chipImageClear").onclick = function (event) { event.stopPropagation(); clearPendingImage(); setMessage(""); };
     qs("chipAttachSave").onclick = attachAndSave;
     qs("chipGithubOpen").onclick = function () { qs("chipTokenPanel").hidden = !qs("chipTokenPanel").hidden; qs("chipGithubToken").focus(); };
