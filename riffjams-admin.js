@@ -124,8 +124,8 @@
     pendingPreviewUrl = "";
     var img = qs("chipTabPreview");
     if (img) { img.removeAttribute("src"); img.hidden = true; }
-    var empty = qs("chipPasteEmpty");
-    if (empty) empty.hidden = false;
+    var preview = qs("chipImagePreview");
+    if (preview) preview.hidden = true;
     var clear = qs("chipImageClear");
     if (clear) clear.hidden = true;
   }
@@ -139,13 +139,33 @@
       pendingPreviewUrl = URL.createObjectURL(png);
       var img = qs("chipTabPreview");
       if (img) { img.src = pendingPreviewUrl; img.hidden = false; }
-      var empty = qs("chipPasteEmpty");
-      if (empty) empty.hidden = true;
+      var preview = qs("chipImagePreview");
+      if (preview) preview.hidden = false;
       var clear = qs("chipImageClear");
       if (clear) clear.hidden = false;
       setMessage("Screenshot ready", "success");
     } catch (error) {
       setMessage(error.message || "Could not use that screenshot.", "error");
+    }
+  }
+
+  async function pasteClipboardImage() {
+    try {
+      if (!navigator.clipboard || !navigator.clipboard.read) {
+        throw new Error("Clipboard paste is not available in this browser.");
+      }
+      setMessage("Reading clipboard…");
+      var items = await navigator.clipboard.read();
+      for (var i = 0; i < items.length; i++) {
+        var imageType = items[i].types.find(function (type) { return type.indexOf("image/") === 0; });
+        if (imageType) {
+          await acceptImage(await items[i].getType(imageType));
+          return;
+        }
+      }
+      throw new Error("There is no screenshot on the clipboard.");
+    } catch (error) {
+      setMessage(error.message || "The screenshot could not be pasted.", "error");
     }
   }
 
@@ -264,13 +284,15 @@
     block.className = "chip-attachment";
     block.innerHTML =
       '<label>Tab screenshot</label>' +
-      '<div class="chip-paste-zone" id="chipPasteZone" tabindex="0" role="button" aria-label="Paste or choose a tab screenshot">' +
-        '<span id="chipPasteEmpty"><strong>Click here, then press Ctrl+V</strong><small>You can also drop a screenshot here</small></span>' +
+      '<div class="chip-paste-actions">' +
+        '<button type="button" class="chip-paste-button" id="chipClipboardPaste">Paste</button>' +
+        '<button type="button" class="chip-file-pick" id="chipImageChoose">Choose file</button>' +
+      '</div>' +
+      '<div class="chip-image-preview" id="chipImagePreview" hidden>' +
         '<img id="chipTabPreview" alt="Tab screenshot preview" hidden>' +
         '<button type="button" id="chipImageClear" class="chip-image-clear" aria-label="Remove screenshot" hidden>×</button>' +
       '</div>' +
       '<input id="chipImageFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>' +
-      '<button type="button" class="chip-file-pick" id="chipImageChoose">Choose image file</button>' +
       '<div class="chip-github-connect" id="chipGithubConnect">' +
         '<span id="chipGithubStatus">GitHub connection required</span>' +
         '<button type="button" id="chipGithubOpen">Connect</button>' +
@@ -285,14 +307,7 @@
       '<div class="chip-attach-status" id="chipAttachStatus" aria-live="polite"></div>';
     editor.insertBefore(block, actions);
 
-    var zone = qs("chipPasteZone");
-    zone.onclick = function (event) { if (!event.target.closest("#chipImageClear")) zone.focus(); };
-    zone.ondragover = function (event) { event.preventDefault(); zone.classList.add("dragging"); };
-    zone.ondragleave = function () { zone.classList.remove("dragging"); };
-    zone.ondrop = function (event) {
-      event.preventDefault(); zone.classList.remove("dragging");
-      if (event.dataTransfer.files[0]) acceptImage(event.dataTransfer.files[0]);
-    };
+    qs("chipClipboardPaste").onclick = pasteClipboardImage;
     qs("chipImageFile").onchange = function () { if (this.files[0]) acceptImage(this.files[0]); this.value = ""; };
     qs("chipImageChoose").onclick = function () { qs("chipImageFile").click(); };
     qs("chipImageClear").onclick = function (event) { event.stopPropagation(); clearPendingImage(); setMessage(""); };
