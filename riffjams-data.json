@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-14T19:41:07.960Z",
+  "updatedAt": "2026-09-14T19:42:22.578Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -12,7 +12,8 @@
     "S1": "user-tabs/S1.png",
     "I1": "user-tabs/I1.png",
     "B5": "user-tabs/B5.png",
-    "B6": "user-tabs/B6.png"
+    "B6": "user-tabs/B6.png",
+    "B7": "user-tabs/B7.png"
   },
   "albums": [
     {
@@ -72,6 +73,7 @@
               1,
               "WP-S2"
             ],
+            null,
             null
           ]
         },
@@ -103,6 +105,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -117,6 +120,7 @@
               "S1",
               1
             ],
+            null,
             null,
             null,
             null,
@@ -175,6 +179,7 @@
             ],
             null,
             null,
+            null,
             null
           ]
         },
@@ -205,6 +210,7 @@
               "B4",
               3
             ],
+            null,
             null,
             null,
             null,
@@ -239,6 +245,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -258,6 +265,7 @@
               "S1",
               1
             ],
+            null,
             null,
             null,
             null,
@@ -319,6 +327,7 @@
               2,
               "FOB-L1"
             ],
+            null,
             null
           ]
         }
@@ -395,6 +404,7 @@
               "",
               []
             ],
+            null,
             null
           ]
         },
@@ -456,6 +466,12 @@
               []
             ],
             [
+              "B7",
+              3,
+              "B7",
+              []
+            ],
+            [
               "S3",
               3,
               "",
@@ -466,6 +482,7 @@
         {
           "song": "Fluff",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -537,6 +554,7 @@
             ],
             null,
             null,
+            null,
             null
           ]
         },
@@ -602,12 +620,14 @@
               3,
               "",
               []
-            ]
+            ],
+            null
           ]
         },
         {
           "song": "Who Are You?",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -652,6 +672,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -688,6 +709,7 @@
               "",
               []
             ],
+            null,
             null,
             null,
             null,
@@ -739,6 +761,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -779,6 +802,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -791,6 +815,7 @@
               "",
               []
             ],
+            null,
             null,
             null,
             null,
@@ -844,12 +869,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "Orchid",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -917,12 +944,14 @@
             ],
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "Solitude",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -987,6 +1016,7 @@
               []
             ],
             null,
+            null,
             null
           ]
         }
@@ -1000,6 +1030,7 @@
         {
           "song": "Wheels of Confusion",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -1024,12 +1055,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "Changes",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -1054,12 +1087,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "Supernaut",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -1084,6 +1119,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -1099,12 +1135,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "Laguna Sunrise",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -1144,12 +1182,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "Under the Sun",
           "sections": [
+            null,
             null,
             null,
             null,
