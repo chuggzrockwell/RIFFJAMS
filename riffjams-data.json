@@ -1,10 +1,11 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-14T02:58:21.943Z",
+  "updatedAt": "2026-09-14T03:01:31.787Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
-    "PC2": "user-tabs/PC2.png"
+    "PC2": "user-tabs/PC2.png",
+    "B1": "user-tabs/B1.png"
   },
   "albums": [
     {
@@ -360,7 +361,7 @@
             [
               "B1",
               3,
-              "",
+              "B1",
               "5S"
             ],
             [
