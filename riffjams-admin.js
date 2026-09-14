@@ -188,21 +188,44 @@
     var nextSolo = clone(window.SOLO_MAP);
     var state = window.chipEditState;
     var entry = window.makeChipEntry(draft.code, draft.tier, draft.lick, draft.positions);
+    var previousEntry = null;
     if (window.soloMode) {
       var soloSong = nextSolo && nextSolo.albums && nextSolo.albums[state.ai] && nextSolo.albums[state.ai].songs[state.si];
       if (!soloSong) throw new Error("The selected song could not be found.");
       while ((soloSong.licks || (soloSong.licks = [])).length <= state.ci) soloSong.licks.push(null);
+      previousEntry = soloSong.licks[state.ci];
       soloSong.licks[state.ci] = entry;
     } else {
       var song = nextAlbums[state.ai] && nextAlbums[state.ai].songs[state.si];
       if (!song) throw new Error("The selected song could not be found.");
       while ((song.sections || (song.sections = [])).length <= state.ci) song.sections.push(null);
+      previousEntry = song.sections[state.ci];
       song.sections[state.ci] = entry;
     }
-    return { albums: nextAlbums, soloMap: nextSolo };
+    return {
+      albums: nextAlbums,
+      soloMap: nextSolo,
+      previousLick: previousEntry && previousEntry[2] ? String(previousEntry[2]).trim() : ""
+    };
   }
 
-  async function commitAttachment(imageBlob, imagePath, manifest, message) {
+  function tabIsStillLinked(albums, soloMap, lick) {
+    var found = false;
+    function scan(list, field) {
+      (list || []).forEach(function (album) {
+        (album.songs || []).forEach(function (song) {
+          (song[field] || []).forEach(function (pair) {
+            if (pair && String(pair[2] || "").trim() === lick) found = true;
+          });
+        });
+      });
+    }
+    scan(albums, "sections");
+    scan((soloMap && soloMap.albums) || [], "licks");
+    return found;
+  }
+
+  async function commitAttachment(imageBlob, imagePath, manifest, message, deletePaths) {
     var prefix = "/repos/" + REPO_OWNER + "/" + REPO_NAME;
     var ref = await github(prefix + "/git/ref/heads/" + REPO_BRANCH);
     var parentSha = ref.object.sha;
@@ -216,14 +239,18 @@
       method: "POST",
       body: JSON.stringify({ content: textToBase64(JSON.stringify(manifest, null, 2) + "\n"), encoding: "base64" })
     });
+    var treeEntries = [
+      { path: imagePath, mode: "100644", type: "blob", sha: imageGitBlob.sha },
+      { path: DATA_PATH, mode: "100644", type: "blob", sha: dataGitBlob.sha }
+    ];
+    (deletePaths || []).forEach(function (path) {
+      if (path && path !== imagePath) treeEntries.push({ path: path, mode: "100644", type: "blob", sha: null });
+    });
     var tree = await github(prefix + "/git/trees", {
       method: "POST",
       body: JSON.stringify({
         base_tree: parent.tree.sha,
-        tree: [
-          { path: imagePath, mode: "100644", type: "blob", sha: imageGitBlob.sha },
-          { path: DATA_PATH, mode: "100644", type: "blob", sha: dataGitBlob.sha }
-        ]
+        tree: treeEntries
       })
     });
     var commit = await github(prefix + "/git/commits", {
@@ -246,6 +273,12 @@
       var next = buildNextState(draft);
       var imagePath = IMAGE_DIR + "/" + draft.lick + ".png";
       var nextAssets = Object.assign({}, sharedData.assets || {}, window.RIFFJAMS_ASSETS || {});
+      var deletePaths = [];
+      if (next.previousLick && next.previousLick !== draft.lick && !tabIsStillLinked(next.albums, next.soloMap, next.previousLick)) {
+        var previousPath = nextAssets[next.previousLick] || "";
+        if (previousPath.indexOf(IMAGE_DIR + "/") === 0) deletePaths.push(previousPath);
+        delete nextAssets[next.previousLick];
+      }
       nextAssets[draft.lick] = imagePath;
       var manifest = {
         version: 1,
@@ -257,7 +290,7 @@
       button.disabled = true;
       button.textContent = "Attaching…";
       setMessage("Saving screenshot and chip to GitHub…");
-      await commitAttachment(pendingImage, imagePath, manifest, "Attach " + draft.lick + " tab");
+      await commitAttachment(pendingImage, imagePath, manifest, "Attach " + draft.lick + " tab", deletePaths);
       sharedData = manifest;
       window.RIFFJAMS_ASSETS = nextAssets;
       window.ALBUMS = next.albums;
