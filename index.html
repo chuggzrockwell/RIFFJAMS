@@ -2907,7 +2907,7 @@ var ALBUMS_DEFAULT = [
     { song: "A National Acrobat", sections: [["I1",1],["V1",3],["B1",1],["S1",1],["B2",3],["B3",3],["B4",3],["B5",3],["B6",3],["S3",3]] },
     { song: "Fluff", sections: [] },
     { song: "Sabbra Cadabra", sections: [["I1",1],["L1",1],["L2",1],["V1",2],["B1",3],["B2",3],["B3",3]] },
-    { song: "Killing Yourself to Live", sections: [["I1",2,"KYTL-I1"],["V1",2,"KYTL-V1"],["C1",2,"KYTL-C1"],["S1",1,"KYTL-S1"],["B1",2,"KYTL-B1"],["B2",2,"KYTL-B2"],["S2",1,"KYTL-S2"],["B3",2,"KYTL-B3"],["B4",2,"KYTL-B4"]] },
+    { song: "Killing Yourself to Live", sections: [["I1",2,"KYTL-I1"],["V1",2,"KYTL-V1"],["C1",2,"KYTL-C1"],["S1",1,"KYTL-S1"],["B1",2,"KYTL-B1"],["B2",2,"KYTL-B2"],["S2",1,"KYTL-S2"],["B3",2,"KYTL-B3"],["S3",1,"KYTL-S3"],["B4",2,"KYTL-B4"]] },
     { song: "Who Are You?", sections: [] },
     { song: "Looking for Today", sections: [["V1",2,"LFT-V1"],["PC1",2,"LFT-PC1"],["C1",1,"LFT-C1"],["S1",1,"LFT-S1"]] },
     { song: "Spiral Architect", sections: [["I1",1],["L1",2],["I2",3],["V1",3],["C1",3]] },
@@ -3224,7 +3224,7 @@ function loadAlbums() {
           }
         }
         if (s.song === "Killing Yourself to Live") {
-          var kytlWant = [["I1",2,"KYTL-I1"],["V1",2,"KYTL-V1"],["C1",2,"KYTL-C1"],["S1",1,"KYTL-S1"],["B1",2,"KYTL-B1"],["B2",2,"KYTL-B2"],["S2",1,"KYTL-S2"],["B3",2,"KYTL-B3"],["B4",2,"KYTL-B4"]];
+          var kytlWant = [["I1",2,"KYTL-I1"],["V1",2,"KYTL-V1"],["C1",2,"KYTL-C1"],["S1",1,"KYTL-S1"],["B1",2,"KYTL-B1"],["B2",2,"KYTL-B2"],["S2",1,"KYTL-S2"],["B3",2,"KYTL-B3"],["S3",1,"KYTL-S3"],["B4",2,"KYTL-B4"]];
           s.sections = kytlWant.map(function(x){ return x.slice(); });
         }
         if (s.song === "Looking for Today") {
@@ -4016,7 +4016,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=104";
+  var url = base + "?playboard=1&v=105";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
