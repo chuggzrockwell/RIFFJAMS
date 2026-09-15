@@ -1765,6 +1765,12 @@
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-1[data-album="Master of Reality"] {
     outline-color: #22c55e;
   }
+  /* Vol. 4 T1 neon → orange */
+  .phrase.flipped.tier-1[data-album="Vol. 4"],
+  .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-1[data-album="Vol. 4"] {
+    outline-color: #ff8c00;
+  }
+
   /* LL tiers: T1+T2 standard art; T3–T5 shared wash art; no invert */
   .phrase.flipped.tier-1 img.cover,
   .phrase.flipped.tier-2 img.cover,
@@ -2954,7 +2960,7 @@ var ALBUMS_DEFAULT = [
     { song: "Snowblind", sections: [["I1",2,"SNB-I1"],["V1",2,"SNB-V1"],["V2",2,"SNB-V2"],["B1",2,"SNB-B1"],["S1",1,"SNB-S1"],["B2",2,"SNB-B2"],["S2",1,"SNB-S2"]] },
     { song: "Cornucopia", sections: [] },
     { song: "Laguna Sunrise", sections: [] },
-    { song: "St. Vitus Dance", sections: [] },
+    { song: "St. Vitus Dance", sections: [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",2,"SVD-PC1"]] },
     { song: "Under the Sun", sections: [] },
   ]},
 ];
@@ -3718,7 +3724,7 @@ var SECTION_SONG_PREFIX = {
   "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-",
   "Sabbath Bloody Sabbath": "SBS-", "A National Acrobat": "ANA-", "Fluff": "FLU-",
   "Sabbra Cadabra": "SAC-", "Killing Yourself to Live": "KYTL-", "Who Are You?": "WAY-",
-  "Looking for Today": "LFT-", "Spiral Architect": "SAR-", "Snowblind": "SNB-",
+  "Looking for Today": "LFT-", "Spiral Architect": "SAR-", "Snowblind": "SNB-", "St. Vitus Dance": "SVD-",
   "Sweet Leaf": "SL-", "After Forever": "AF-", "Embryo": "EMB-", "Children of the Grave": "COTG-",
   "Orchid": "ORC-", "Lord of This World": "LOTW-", "Solitude": "SOL-", "Into the Void": "ITV-"
 };
@@ -3836,7 +3842,8 @@ function repairAlbumsFromDefaults(albums) {
         if (isChipPair(pair)) defN++;
       });
       var needsSnowblind = (s.song === "Snowblind" && defN > 0 && (chips === 0 || !(s.sections || []).some(function(p){ return p && p[2] && String(p[2]).indexOf("SNB-") === 0; })));
-      if ((chips === 0 && defN > 0) || needsSnowblind) {
+      var needsStVitus = (s.song === "St. Vitus Dance" && defN > 0 && (chips === 0 || !(s.sections || []).some(function(p){ return p && p[2] && String(p[2]).indexOf("SVD-") === 0; })));
+      if ((chips === 0 && defN > 0) || needsSnowblind || needsStVitus) {
         s.sections = JSON.parse(JSON.stringify(ds.sections));
         ensureSongSlots(s);
         repaired++;
@@ -4066,7 +4073,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=113";
+  var url = base + "?playboard=1&v=114";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5731,7 +5738,7 @@ var COVER_BY_TIER = {
   5: "covers/paranoid-tier2.png?v=45"
 };
 /* Albums included in Paranoid LL (letter B) multi-album grid */
-var LL_LIBRARY_ALBUMS = ["Paranoid", "Sabbath Bloody Sabbath", "Master of Reality"];
+var LL_LIBRARY_ALBUMS = ["Paranoid", "Sabbath Bloody Sabbath", "Master of Reality", "Vol. 4"];
 function llCoverForAlbumTier(album, tier) {
   tier = parseInt(tier, 10);
   if (!(tier >= 1 && tier <= 2)) tier = 3;
@@ -6148,6 +6155,7 @@ function llSongRowsForLibrary() {
 function llAlbumCoverUrl(albumName) {
   if (albumName === "Sabbath Bloody Sabbath") return "covers/sbs-ll.png?v=5";
   if (albumName === "Master of Reality") return "covers/mor-ll.png?v=1";
+  if (albumName === "Vol. 4") return "covers/vol4.png";
   if (albumName === "Paranoid") return "covers/paranoid.png";
   var cover = "";
   (ALBUMS || ALBUMS_DEFAULT || []).forEach(function(a){ if (a && a.name === albumName) cover = a.cover || ""; });
