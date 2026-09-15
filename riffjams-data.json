@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-15T15:16:42.179Z",
+  "updatedAt": "2026-09-15T15:22:47.727Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -17,7 +17,8 @@
     "S3": "user-tabs/S3.png",
     "L1": "user-tabs/L1.png",
     "L2": "user-tabs/L2.png",
-    "FOB-B1": "user-tabs/FOB-B1.png"
+    "FOB-B1": "user-tabs/FOB-B1.png",
+    "FOB-V1": "user-tabs/FOB-V1.png"
   },
   "albums": [
     {
@@ -300,15 +301,15 @@
               []
             ],
             [
-              "S1",
-              1,
-              "FOB-S1",
-              []
-            ],
-            [
               "I4",
               2,
               "FOB-I4",
+              []
+            ],
+            [
+              "S1",
+              1,
+              "FOB-S1",
               []
             ],
             [
@@ -316,6 +317,7 @@
               3,
               "FOB-V1"
             ],
+            null,
             [
               "B1",
               3,
@@ -331,7 +333,6 @@
               2,
               "FOB-L1"
             ],
-            null,
             null
           ]
         }
