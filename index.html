@@ -3264,6 +3264,10 @@ function loadAlbums() {
           var snbWant = [["I1",2,"SNB-I1"],["V1",2,"SNB-V1"],["V2",2,"SNB-V2"],["B1",2,"SNB-B1"],["S1",1,"SNB-S1"],["B2",2,"SNB-B2"],["S2",1,"SNB-S2"]];
           s.sections = snbWant.map(function(x){ return x.slice(); });
         }
+        if (s.song === "St. Vitus Dance") {
+          var svdWant = [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",2,"SVD-PC1"]];
+          s.sections = svdWant.map(function(x){ return x.slice(); });
+        }
         if (s.song === "War Pigs") {
           var links = { "I1": ["I1",2,"WP-I1",3], "V1": ["V1",3,"WP-V1"], "V2": ["V2",2,"WP-V2"], "V3": ["V3",2,"WP-V3"], "V4": ["V4",2,"WP-V4"], "S1": ["S1",1,"WP-S1"] , "O1": ["O1",2,"WP-O1"] , "O2": ["O2",1,"WP-O2"] , "S2": ["S2",1,"WP-S2"] };
           if (!s.sections) s.sections = [];
@@ -3524,6 +3528,30 @@ function loadAlbums() {
       if (!da || !da.name || have[da.name]) return;
       albums.push(JSON.parse(JSON.stringify(da)));
       have[da.name] = true;
+    });
+    // Merge missing default songs into existing albums (e.g. Vol. 4 added before Snowblind chips existed)
+    ALBUMS_DEFAULT.forEach(function(da){
+      if (!da || !da.name) return;
+      var live = null;
+      albums.forEach(function(a){ if (a && a.name === da.name) live = a; });
+      if (!live) return;
+      if (!live.songs) live.songs = [];
+      (da.songs || []).forEach(function(ds){
+        if (!ds || !ds.song) return;
+        var hit = null;
+        live.songs.forEach(function(s){ if (s && s.song === ds.song) hit = s; });
+        if (!hit) {
+          live.songs.push(JSON.parse(JSON.stringify(ds)));
+          return;
+        }
+        var liveChips = 0;
+        (hit.sections || []).forEach(function(p){ if (p && p[0]) liveChips++; });
+        var defChips = 0;
+        (ds.sections || []).forEach(function(p){ if (p && p[0]) defChips++; });
+        if (liveChips === 0 && defChips > 0) {
+          hit.sections = JSON.parse(JSON.stringify(ds.sections));
+        }
+      });
     });
     // Non-Paranoid albums: unset position → explicit none ([]). Paranoid keeps legacy default 1.
     albums.forEach(function(a){
@@ -3898,10 +3926,21 @@ function forceSnowblindSongMapChips(albums) {
     });
   });
 }
+function forceStVitusSongMapChips(albums) {
+  var want = [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",2,"SVD-PC1"]];
+  (albums || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      if (s && s.song === "St. Vitus Dance") {
+        s.sections = want.map(function(x){ return makeChipEntry(x[0], x[1], x[2], []); });
+      }
+    });
+  });
+}
 function showSections(keepScroll) {
   /* Snowblind is newly defined; force its current chip map before every riff render so stale saves cannot blank it. */
   if (!soloMode) {
     forceSnowblindSongMapChips(ALBUMS);
+    forceStVitusSongMapChips(ALBUMS);
     try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (eSnowblindSave) {}
   }
   bindModeSelect(document.getElementById("mapModeSelect"));
@@ -4073,7 +4112,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=114";
+  var url = base + "?playboard=1&v=115";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6961,6 +7000,9 @@ function showSeries(letter) {
   /* LL modes (B): riff = section chips; solo = lick chips — same LL visuals, current linking */
   var items = [];
   if (letter === "B") {
+    if (typeof forceSnowblindSongMapChips === "function") forceSnowblindSongMapChips(ALBUMS);
+    if (typeof forceStVitusSongMapChips === "function") forceStVitusSongMapChips(ALBUMS);
+    try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (eLlForce) {}
     items = llChipItemsForMode(llMode);
   } else {
     items = applySavedOrder(CATALOG.filter(function(x){ return x[1] === catalogLetter; }), letter).map(function(x){
