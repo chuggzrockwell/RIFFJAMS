@@ -3225,43 +3225,11 @@ function loadAlbums() {
         }
         if (s.song === "Killing Yourself to Live") {
           var kytlWant = [["I1",2,"KYTL-I1"],["V1",2,"KYTL-V1"],["C1",2,"KYTL-C1"],["S1",1,"KYTL-S1"],["B1",2,"KYTL-B1"],["B2",2,"KYTL-B2"],["S2",1,"KYTL-S2"],["B3",2,"KYTL-B3"],["B4",2,"KYTL-B4"]];
-          if (!s.sections) s.sections = [];
-          var kytlLinks = {};
-          kytlWant.forEach(function(x){ kytlLinks[x[0]] = x; });
-          var kytlChips = 0;
-          s.sections.forEach(function(p){ if (p && p[0]) kytlChips++; });
-          if (kytlChips === 0) {
-            s.sections = kytlWant.map(function(x){ return x.slice(); });
-          } else {
-            Object.keys(kytlLinks).forEach(function(code){
-              var want = kytlLinks[code];
-              var hit = null;
-              s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === code) hit = p; });
-              if (hit) {
-                if (hit[2] !== want[2]) { hit[1] = want[1]; hit[2] = want[2]; }
-              }
-            });
-          }
+          s.sections = kytlWant.map(function(x){ return x.slice(); });
         }
         if (s.song === "Looking for Today") {
           var lftWant = [["V1",2,"LFT-V1"],["PC1",2,"LFT-PC1"],["C1",1,"LFT-C1"],["S1",1,"LFT-S1"]];
-          if (!s.sections) s.sections = [];
-          var lftLinks = {};
-          lftWant.forEach(function(x){ lftLinks[x[0]] = x; });
-          var lftChips = 0;
-          s.sections.forEach(function(p){ if (p && p[0]) lftChips++; });
-          if (lftChips === 0) {
-            s.sections = lftWant.map(function(x){ return x.slice(); });
-          } else {
-            Object.keys(lftLinks).forEach(function(code){
-              var want = lftLinks[code];
-              var hit = null;
-              s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === code) hit = p; });
-              if (hit) {
-                if (hit[2] !== want[2]) { hit[1] = want[1]; hit[2] = want[2]; }
-              }
-            });
-          }
+          s.sections = lftWant.map(function(x){ return x.slice(); });
         }
         if (s.song === "War Pigs") {
           var links = { "I1": ["I1",2,"WP-I1",3], "V1": ["V1",3,"WP-V1"], "V2": ["V2",2,"WP-V2"], "V3": ["V3",2,"WP-V3"], "V4": ["V4",2,"WP-V4"], "S1": ["S1",1,"WP-S1"] , "O1": ["O1",2,"WP-O1"] , "O2": ["O2",1,"WP-O2"] , "S2": ["S2",1,"WP-S2"] };
@@ -3718,6 +3686,22 @@ function isDefaultPosList(list) {
   var p = parsePosList(list);
   return p.length === 1 && p[0] === 1;
 }
+var SECTION_SONG_PREFIX = {
+  "War Pigs": "WP-", "Paranoid": "P-", "Planet Caravan": "PC-", "Iron Man": "IM-",
+  "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-",
+  "Sabbath Bloody Sabbath": "SBS-", "A National Acrobat": "ANA-", "Fluff": "FLU-",
+  "Sabbra Cadabra": "SAC-", "Killing Yourself to Live": "KYTL-", "Who Are You?": "WAY-",
+  "Looking for Today": "LFT-", "Spiral Architect": "SAR-",
+  "Sweet Leaf": "SL-", "After Forever": "AF-", "Embryo": "EMB-", "Children of the Grave": "COTG-",
+  "Orchid": "ORC-", "Lord of This World": "LOTW-", "Solitude": "SOL-", "Into the Void": "ITV-"
+};
+function sectionLickId(songName, code, pairLick) {
+  var lick = String(pairLick || "").trim();
+  if (lick) return lick;
+  var pref = SECTION_SONG_PREFIX[songName] || "";
+  var c = String(code || "").trim();
+  return (pref && c) ? (pref + c) : "";
+}
 function makeChipEntry(code, tier, lick, positions) {
   tier = chipTier([code, tier]);
   // Preserve explicit empty array; don't coerce missing→[1] when caller passed []
@@ -3948,7 +3932,7 @@ function showSections(keepScroll) {
           if (!isChipPair(pair)) {
             chipArr.push('<button type="button" class="sec-chip empty" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Add section"></button>');
           } else {
-            var code = pair[0], tier = chipTier(pair), lick = pair[2] || "", pos = posListAttr(chipPositions(pair));
+            var code = pair[0], tier = chipTier(pair), lick = sectionLickId(s.song, code, pair[2]), pos = posListAttr(chipPositions(pair));
             var typ = secType(code);
             chipArr.push('<button type="button" class="sec-chip '+typ+' '+slotCss("tier", tier)+'" data-song="'+s.song+'" data-sec="'+code+'" data-type="'+typ+'" data-tier="'+tier+'" data-lick="'+lick+'" data-position="'+pos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+code+'</button>');
           }
@@ -4032,7 +4016,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=103";
+  var url = base + "?playboard=1&v=104";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6523,21 +6507,12 @@ function llAlbumAllowed(name) {
 function llChipItemsForMode(mode) {
   var out = [];
   var seen = {};
-  var songPrefix = {
-    "War Pigs": "WP-", "Paranoid": "P-", "Planet Caravan": "PC-", "Iron Man": "IM-",
-    "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-",
-    "Sabbath Bloody Sabbath": "SBS-", "A National Acrobat": "ANA-", "Fluff": "FLU-",
-    "Sabbra Cadabra": "SAC-", "Killing Yourself to Live": "KYTL-", "Who Are You?": "WAY-",
-    "Looking for Today": "LFT-", "Spiral Architect": "SAR-",
-    "Sweet Leaf": "SL-", "After Forever": "AF-", "Embryo": "EMB-", "Children of the Grave": "COTG-",
-    "Orchid": "ORC-", "Lord of This World": "LOTW-", "Solitude": "SOL-", "Into the Void": "ITV-"
-  };
   function pushItem(label, lick, songName, tier, albumName, typ, posAttr) {
     var lab = String(label || "").trim();
     var id = (lick || "").trim();
     if (!lab && !id) return;
     if (!id) {
-      var pref = songPrefix[songName] || "";
+      var pref = SECTION_SONG_PREFIX[songName] || "";
       id = pref ? (pref + lab) : lab; /* synthetic id for song-row grouping */
     }
     if (!lab) lab = id;
@@ -7353,7 +7328,7 @@ document.getElementById("sectionsSheet").onclick = function(e){
       ai: ai, si: si, ci: ci, isNew: false,
       code: chip.getAttribute("data-sec") || "",
       tier: normalizeSlot(chip.getAttribute("data-tier"), 3),
-      lick: chip.getAttribute("data-lick") || "",
+      lick: sectionLickId(chip.getAttribute("data-song") || "", chip.getAttribute("data-sec") || "", chip.getAttribute("data-lick") || ""),
       positions: editPos
     });
     return;
