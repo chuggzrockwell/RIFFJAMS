@@ -2841,7 +2841,7 @@
         <button type="button" class="sec-filter-clear" id="llFilterClear" title="Clear filters">Clear</button>
         <button type="button" class="sec-filter-clear" id="llScaleBtn" title="Toggle chip size (88px / 36px)" aria-pressed="false">Scale down</button>
       </div>
-      <span class="keys">Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Esc/0</span>
+      <span class="keys">Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Backspace home</span>
     </div>
     <div class="sheet" id="licks">
       <div class="cover-board hidden" id="coverBoard"></div>
@@ -4016,7 +4016,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=106";
+  var url = base + "?playboard=1&v=107";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6774,8 +6774,8 @@ function showSeries(letter) {
   var keysEl = document.querySelector("#series .keys");
   if (keysEl) {
     keysEl.textContent = (letter === "B")
-      ? "Click chip → Board · Tier filter · song label plays · Space · Shift+←/→ · Ctrl+←/→ · Z/O · Esc/0"
-      : "Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Esc/0";
+      ? "Click chip → Board · Tier filter · song label plays · Space · Shift+←/→ · Ctrl+←/→ · Z/O · Backspace home"
+      : "Click to flip · A/B/C/D/E class · Z/O · Shift+C clear · I/P/W/H/R · 1–8 · Backspace home";
   }
   var catalogLetter = (letter === "B2") ? "B" : letter;
   var folder = FOLDER[letter] || FOLDER[catalogLetter] || "svg/";
@@ -7442,7 +7442,8 @@ function isNumpadKey(e, digit) {
   return false;
 }
 function goHomeKey(e) {
-  /* Numpad 0 is not Back/Home — mode codes are .1 / .2 + Enter */
+  /* Numpad 0 is not Back/Home — mode codes are .1 / .2 + Enter.
+     Escape is home only outside LL; sheet-mode handles Esc separately (no-op). */
   return e.key === "Escape" || e.key === "Backspace" || e.key === "escape" || e.key === "backspace";
 }
 var modeEntryBuf = "";
@@ -7665,7 +7666,17 @@ document.addEventListener("keydown", function(e){
     }
     return;
   }
-  if (goHomeKey(e)) {
+  /* LL (sheet-mode): Backspace / Back button go home; Escape does not */
+  if (document.body.classList.contains("sheet-mode")) {
+    if (k === "escape" || e.key === "Escape") {
+      return;
+    }
+    if (k === "backspace") {
+      e.preventDefault();
+      showHome();
+      return;
+    }
+  } else if (goHomeKey(e)) {
     if (k === "backspace") e.preventDefault();
     showHome();
     return;
