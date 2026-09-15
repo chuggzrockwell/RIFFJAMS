@@ -2909,7 +2909,7 @@ var ALBUMS_DEFAULT = [
     { song: "Sabbra Cadabra", sections: [["I1",1],["L1",1],["L2",1],["V1",2],["B1",3],["B2",3],["B3",3]] },
     { song: "Killing Yourself to Live", sections: [["I1",2,"KYTL-I1"],["V1",2,"KYTL-V1"],["C1",2,"KYTL-C1"],["S1",1,"KYTL-S1"],["B1",2,"KYTL-B1"],["B2",2,"KYTL-B2"],["S2",1,"KYTL-S2"],["B3",2,"KYTL-B3"],["B4",2,"KYTL-B4"]] },
     { song: "Who Are You?", sections: [] },
-    { song: "Looking for Today", sections: [["V1",2],["PC1",2],["C1",1],["S1",1]] },
+    { song: "Looking for Today", sections: [["V1",2,"LFT-V1"],["PC1",2,"LFT-PC1"],["C1",1,"LFT-C1"],["S1",1,"LFT-S1"]] },
     { song: "Spiral Architect", sections: [["I1",1],["L1",2],["I2",3],["V1",3],["C1",3]] },
   ]},
   { name: "Master of Reality", cover: "covers/mor.png", font: "font-mor", songs: [
@@ -3235,6 +3235,26 @@ function loadAlbums() {
           } else {
             Object.keys(kytlLinks).forEach(function(code){
               var want = kytlLinks[code];
+              var hit = null;
+              s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === code) hit = p; });
+              if (hit) {
+                if (hit[2] !== want[2]) { hit[1] = want[1]; hit[2] = want[2]; }
+              }
+            });
+          }
+        }
+        if (s.song === "Looking for Today") {
+          var lftWant = [["V1",2,"LFT-V1"],["PC1",2,"LFT-PC1"],["C1",1,"LFT-C1"],["S1",1,"LFT-S1"]];
+          if (!s.sections) s.sections = [];
+          var lftLinks = {};
+          lftWant.forEach(function(x){ lftLinks[x[0]] = x; });
+          var lftChips = 0;
+          s.sections.forEach(function(p){ if (p && p[0]) lftChips++; });
+          if (lftChips === 0) {
+            s.sections = lftWant.map(function(x){ return x.slice(); });
+          } else {
+            Object.keys(lftLinks).forEach(function(code){
+              var want = lftLinks[code];
               var hit = null;
               s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === code) hit = p; });
               if (hit) {
@@ -4012,7 +4032,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=102";
+  var url = base + "?playboard=1&v=103";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
