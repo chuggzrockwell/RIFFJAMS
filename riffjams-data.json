@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-15T14:51:35.603Z",
+  "updatedAt": "2026-09-15T14:53:57.703Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -14,7 +14,8 @@
     "B5": "user-tabs/B5.png",
     "B6": "user-tabs/B6.png",
     "B7": "user-tabs/B7.png",
-    "S3": "user-tabs/S3.png"
+    "S3": "user-tabs/S3.png",
+    "L1": "user-tabs/L1.png"
   },
   "albums": [
     {
@@ -511,7 +512,7 @@
             [
               "L1",
               1,
-              "",
+              "L1",
               [
                 1,
                 2
