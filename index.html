@@ -3560,6 +3560,30 @@ function loadAlbums() {
         });
       });
     });
+    /* Final Vol. 4 seeds — always win so clean localStorage / stale saves cannot blank LL rows */
+    (function seedVol4PracticeSongs(albums){
+      var snbWant = [["I1",2,"SNB-I1"],["V1",2,"SNB-V1"],["V2",2,"SNB-V2"],["B1",2,"SNB-B1"],["S1",1,"SNB-S1"],["B2",2,"SNB-B2"],["S2",1,"SNB-S2"]];
+      var svdWant = [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",2,"SVD-PC1"]];
+      function upsert(album, songName, want){
+        if (!album.songs) album.songs = [];
+        var hit = null;
+        album.songs.forEach(function(s){ if (s && s.song === songName) hit = s; });
+        if (!hit) {
+          hit = { song: songName, sections: [] };
+          album.songs.push(hit);
+        }
+        hit.sections = want.map(function(x){
+          return (typeof makeChipEntry === "function")
+            ? makeChipEntry(x[0], x[1], x[2], [])
+            : x.slice();
+        });
+      }
+      (albums || []).forEach(function(a){
+        if (!a || a.name !== "Vol. 4") return;
+        upsert(a, "Snowblind", snbWant);
+        upsert(a, "St. Vitus Dance", svdWant);
+      });
+    })(albums);
     try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(albums)); } catch (err) {}
     return albums;
   } catch (e) {
@@ -4107,7 +4131,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=117";
+  var url = base + "?playboard=1&v=118";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
