@@ -3881,7 +3881,22 @@ function toggleSoloColsCollapsed() {
   setSoloColsCollapsed(!soloColsCollapsed);
 }
 
+function forceSnowblindSongMapChips(albums) {
+  var want = [["I1",2,"SNB-I1"],["V1",2,"SNB-V1"],["V2",2,"SNB-V2"],["B1",2,"SNB-B1"],["S1",1,"SNB-S1"],["B2",2,"SNB-B2"],["S2",1,"SNB-S2"]];
+  (albums || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      if (s && s.song === "Snowblind") {
+        s.sections = want.map(function(x){ return makeChipEntry(x[0], x[1], x[2], []); });
+      }
+    });
+  });
+}
 function showSections(keepScroll) {
+  /* Snowblind is newly defined; force its current chip map before every riff render so stale saves cannot blank it. */
+  if (!soloMode) {
+    forceSnowblindSongMapChips(ALBUMS);
+    try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (eSnowblindSave) {}
+  }
   bindModeSelect(document.getElementById("mapModeSelect"));
   syncModeSelects();
   smBuildPlaylist();
@@ -4051,7 +4066,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=111";
+  var url = base + "?playboard=1&v=112";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
