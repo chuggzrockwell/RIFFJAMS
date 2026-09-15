@@ -1949,6 +1949,7 @@
   body.sections-mode .album-songs { gap: var(--chip-gap, 0px); padding: var(--chip-gap, 0px) 0; }
   body.sections-mode .song-row .row-num,
   body.sections-mode .song-row .song-thumb,
+  body.sections-mode .song-row .song-songsterr,
   body.sections-mode .song-row .song-name-wrap,
   body.sections-mode .song-row .song-name {
     cursor: pointer;
@@ -1969,7 +1970,7 @@
     flex: 0 1 auto;
     width: auto;
     min-width: 0;
-    max-width: calc(var(--name-w) - (var(--chip-h) - 4px) - 14px);
+    max-width: calc(var(--name-w) - 2 * (var(--chip-h) - 4px) - 18px);
     margin: 0 8px 0 2px;
     box-shadow: none;
     border: 0;
@@ -1992,6 +1993,28 @@
   }
   body.sections-mode .song-thumb.empty {
     background: transparent;
+  }
+  body.sections-mode .song-songsterr {
+    flex: 0 0 calc(var(--chip-h) - 4px);
+    width: calc(var(--chip-h) - 4px);
+    height: calc(var(--chip-h) - 4px);
+    max-width: calc(var(--chip-h) - 4px);
+    max-height: calc(var(--chip-h) - 4px);
+    margin: 0 4px 0 0;
+    padding: 0;
+    border: 0;
+    align-self: center;
+    border-radius: 8px;
+    background: #1a1a1a;
+    overflow: hidden;
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+  body.sections-mode .song-songsterr img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   body.sections-mode .song-name,
   body.sections-mode .song-name.np-paranoid,
@@ -2095,7 +2118,7 @@
   /* Song lists + Excel-style grid; covers hug max chip column (Acrobat = 10) */
   .sections-wrap {
     --row-g: 34px;
-    --name-w: 200px;
+    --name-w: 236px;
     --chip-w: 48px;
     --chip-h: 28px;
     --chip-gap: 1px;
@@ -3941,7 +3964,14 @@ function showSections(keepScroll) {
       var chips = chipArr.join("");
       var np = (album.font === 'font-sbs') ? 'np-sbs' : (album.font === 'font-mor') ? 'np-mor' : (album.font === 'font-vol4') ? 'np-vol4' : 'np-paranoid';
       var thumb = album.cover ? '<img class="song-thumb '+np+'" src="'+album.cover+'" alt="">' : '<span class="song-thumb empty '+np+'" aria-hidden="true"></span>';
-      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+'<div class="song-name-wrap '+np+'-wrap"><div class="song-name '+np+'">'+s.song+'</div></div><div class="song-secs">'+chips+'</div></div>';
+      var stUrl = smSongsterrUrl(s.song);
+      var songsterrBtn = "";
+      if (stUrl) {
+        var stEsc = String(stUrl).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+        var snEsc = String(s.song).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+        songsterrBtn = '<button type="button" class="song-songsterr" data-songsterr="'+stEsc+'" title="Songsterr: '+snEsc+'" aria-label="Open Songsterr tab for '+snEsc+'"><img src="covers/songsterr.png" alt=""></button>';
+      }
+      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"><div class="song-name '+np+'">'+s.song+'</div></div><div class="song-secs">'+chips+'</div></div>';
     }).join("");
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
@@ -4016,7 +4046,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=107";
+  var url = base + "?playboard=1&v=108";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -4600,6 +4630,54 @@ var SM_YT_PLAYALONG = {
   "Snowblind": "aw-B5B1ndds",
   "Iron Man": "z5lj36TFJYc"
 };
+var SM_SONGSTERR = {
+  "War Pigs": "https://www.songsterr.com/a/wsa/black-sabbath-war-pigs-tab-s10137",
+  "Paranoid": "https://www.songsterr.com/a/wsa/black-sabbath-paranoid-tab-s296",
+  "Planet Caravan": "https://www.songsterr.com/a/wsa/black-sabbath-planet-caravan-tab-s23731",
+  "Iron Man": "https://www.songsterr.com/a/wsa/black-sabbath-iron-man-tab-s8",
+  "Electric Funeral": "https://www.songsterr.com/a/wsa/black-sabbath-electric-funeral-tab-s26921",
+  "Hand of Doom": "https://www.songsterr.com/a/wsa/black-sabbath-hand-of-doom-tab-s2621",
+  "Rat Salad": "https://www.songsterr.com/a/wsa/black-sabbath-rat-salad-tab-s26910",
+  "Fairies Wear Boots": "https://www.songsterr.com/a/wsa/black-sabbath-fairies-wear-boots-tab-s26800",
+  "Sabbath Bloody Sabbath": "https://www.songsterr.com/a/wsa/black-sabbath-sabbath-bloody-sabbath-tab-s2654",
+  "A National Acrobat": "https://www.songsterr.com/a/wsa/black-sabbath-a-national-acrobat-tab-s2889",
+  "Fluff": "https://www.songsterr.com/a/wsa/black-sabbath-fluff-tab-s26943",
+  "Sabbra Cadabra": "https://www.songsterr.com/a/wsa/black-sabbath-sabbra-cadabra-tab-s162576",
+  "Killing Yourself to Live": "https://www.songsterr.com/a/wsa/black-sabbath-killing-yourself-to-live-tab-s2574",
+  "Who Are You?": "https://www.songsterr.com/a/wsa/black-sabbath-who-are-you-tab-s66432",
+  "Looking for Today": "https://www.songsterr.com/a/wsa/black-sabbath-looking-for-today-tab-s86852",
+  "Spiral Architect": "https://www.songsterr.com/a/wsa/black-sabbath-spiral-architect-tab-s26922",
+  "Sweet Leaf": "https://www.songsterr.com/a/wsa/black-sabbath-sweet-leaf-tab-s86850",
+  "After Forever": "https://www.songsterr.com/a/wsa/black-sabbath-after-forever-tab-s26909",
+  "Embryo": "https://www.songsterr.com/a/wsa/black-sabbath-embryo-tab-s26936",
+  "Children of the Grave": "https://www.songsterr.com/a/wsa/black-sabbath-children-of-the-grave-tab-s2849",
+  "Orchid": "https://www.songsterr.com/a/wsa/black-sabbath-orchid-tab-s26908",
+  "Lord of This World": "https://www.songsterr.com/a/wsa/black-sabbath-lord-of-this-world-tab-s26916",
+  "Solitude": "https://www.songsterr.com/a/wsa/black-sabbath-solitude-tab-s26945",
+  "Into the Void": "https://www.songsterr.com/a/wsa/black-sabbath-into-the-void-tab-s2709",
+  "Wheels of Confusion": "https://www.songsterr.com/a/wsa/black-sabbath-wheels-of-confusion-tab-s83226",
+  "Tomorrow's Dream": "https://www.songsterr.com/a/wsa/black-sabbath-tomorrows-dream-tab-s26939",
+  "Changes": "https://www.songsterr.com/a/wsa/black-sabbath-changes-tab-s2493",
+  "FX": "https://www.songsterr.com/a/wsa/black-sabbath-fx-tab-s800492",
+  "Supernaut": "https://www.songsterr.com/a/wsa/black-sabbath-supernaut-tab-s2939",
+  "Snowblind": "https://www.songsterr.com/a/wsa/black-sabbath-snowblind-tab-s2605",
+  "Cornucopia": "https://www.songsterr.com/a/wsa/black-sabbath-cornucopia-tab-s26917",
+  "Laguna Sunrise": "https://www.songsterr.com/a/wsa/black-sabbath-laguna-sunrise-tab-s184",
+  "St. Vitus Dance": "https://www.songsterr.com/a/wsa/black-sabbath-st-vitus-dance-tab-s26935",
+  "Under the Sun": "https://www.songsterr.com/a/wsa/black-sabbath-under-the-sun-tab-s4841025"
+};
+function smSongsterrUrl(songName) {
+  return (SM_SONGSTERR && SM_SONGSTERR[songName]) || "";
+}
+function openSongsterrPopup(url) {
+  if (!url) return;
+  var w = Math.min(1100, Math.max(720, (window.screen && screen.availWidth) ? Math.floor(screen.availWidth * 0.7) : 960));
+  var h = Math.min(900, Math.max(600, (window.screen && screen.availHeight) ? Math.floor(screen.availHeight * 0.8) : 800));
+  var left = Math.max(0, Math.floor(((window.screen && screen.availWidth) || w) - w) / 2);
+  var top = Math.max(0, Math.floor(((window.screen && screen.availHeight) || h) - h) / 2);
+  var feats = "popup=yes,noopener,noreferrer,width="+w+",height="+h+",left="+left+",top="+top+",scrollbars=yes,resizable=yes";
+  window.open(url, "riffjams-songsterr", feats);
+}
 /* Target speedup for playalongs (nativeBpm → desired). YT only allows discrete rates; we snap to nearest. */
 var SM_YT_PLAYALONG_RATE = {
   "Paranoid": 166 / 142
@@ -7258,6 +7336,13 @@ document.getElementById("sectionsSheet").addEventListener("scroll", hideHighligh
 window.addEventListener("scroll", function(){ if (highlightMode) hideHighlightTip(); }, true);
 
 document.getElementById("sectionsSheet").onclick = function(e){
+  var stBtn = e.target.closest(".song-songsterr");
+  if (stBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    openSongsterrPopup(stBtn.getAttribute("data-songsterr") || "");
+    return;
+  }
   /* Nameplate / art → song; row # → playalong (falls back to song) */
   var playHit = e.target.closest(".song-name, .song-name-wrap, .song-thumb, .row-num");
   if (playHit && !e.target.closest(".sec-chip") && document.body.classList.contains("sections-mode")) {
