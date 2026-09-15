@@ -2955,7 +2955,7 @@ var ALBUMS_DEFAULT = [
     { song: "Snowblind", sections: [["I1",2,"SNB-I1"],["V1",2,"SNB-V1"],["V2",2,"SNB-V2"],["B1",2,"SNB-B1"],["S1",1,"SNB-S1"],["B2",2,"SNB-B2"],["S2",1,"SNB-S2"]] },
     { song: "Cornucopia", sections: [] },
     { song: "Laguna Sunrise", sections: [] },
-    { song: "St. Vitus Dance", sections: [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",2,"SVD-PC1"]] },
+    { song: "St. Vitus Dance", sections: [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",3,"SVD-PC1"]] },
     { song: "Under the Sun", sections: [] },
   ]},
 ];
@@ -3267,8 +3267,20 @@ function loadAlbums() {
           var svdChips = 0;
           (s.sections || []).forEach(function(p){ if (p && p[0]) svdChips++; });
           if (svdChips === 0) {
-            var svdWant = [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",2,"SVD-PC1"]];
+            var svdWant = [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",3,"SVD-PC1"]];
             s.sections = svdWant.map(function(x){ return x.slice(); });
+          } else {
+            /* Default PC1 was T2; bump saved PC1 still on T2 up to T3 */
+            (s.sections || []).forEach(function(p){
+              if (!p || p[0] !== "PC1") return;
+              var lick = String(p[2] || "");
+              if (lick && lick.indexOf("SVD-") !== 0) return;
+              var tv = parseInt(p[1], 10);
+              if (tv === 2) {
+                p[1] = 3;
+                if (!lick) p[2] = "SVD-PC1";
+              }
+            });
           }
         }
         if (s.song === "War Pigs") {
@@ -3571,7 +3583,7 @@ function loadAlbums() {
     /* Final Vol. 4 seeds — only when song missing or chip row empty (never clobber chip-editor saves) */
     (function seedVol4PracticeSongs(albums){
       var snbWant = [["I1",2,"SNB-I1"],["V1",2,"SNB-V1"],["V2",2,"SNB-V2"],["B1",2,"SNB-B1"],["S1",1,"SNB-S1"],["B2",2,"SNB-B2"],["S2",1,"SNB-S2"]];
-      var svdWant = [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",2,"SVD-PC1"]];
+      var svdWant = [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",3,"SVD-PC1"]];
       function upsertIfEmpty(album, songName, want){
         if (!album.songs) album.songs = [];
         var hit = null;
@@ -3960,7 +3972,7 @@ function forceSnowblindSongMapChips(albums) {
 }
 function forceStVitusSongMapChips(albums) {
   /* Fill-only: never overwrite chip-editor / Song Map edits */
-  var want = [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",2,"SVD-PC1"]];
+  var want = [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",3,"SVD-PC1"]];
   (albums || []).forEach(function(a){
     (a.songs || []).forEach(function(s){
       if (!s || s.song !== "St. Vitus Dance") return;
@@ -4147,7 +4159,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=119";
+  var url = base + "?playboard=1&v=120";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -7279,7 +7291,9 @@ document.addEventListener("pointerdown", function(e){
   var ed = document.getElementById("chipEditor");
   if (!ed || !ed.classList.contains("open")) return;
   if (ed.contains(e.target)) return;
-  closeChipEditor();
+  /* Persist edits on outside click (Cancel still discards) */
+  if (typeof saveChipEditor === "function") saveChipEditor();
+  else closeChipEditor();
 }, true);
 document.getElementById("chipEditDelete").onclick = deleteChipEditor;
 document.getElementById("chipEditCopy").onclick = function(){
@@ -7293,6 +7307,37 @@ document.getElementById("chipEditTiers").onclick = function(e){
   if (!b) return;
   document.querySelectorAll("#chipEditTiers .tier-pick").forEach(function(x){ x.classList.remove("on"); });
   b.classList.add("on");
+  /* Live-apply tier so Song Map / LL update without relying only on Save */
+  if (!chipEditState || chipEditState.isNew) return;
+  var tier = parseInt(b.getAttribute("data-tier"), 10);
+  if (!(tier >= 1 && tier <= 5)) return;
+  tier = (tier >= 3) ? 3 : tier;
+  var song = getEditSong(chipEditState.ai, chipEditState.si);
+  if (!song) return;
+  var ci = chipEditState.ci;
+  if (soloMode) {
+    ensureSoloSlots(song);
+    if (!isChipPair(song.licks[ci])) return;
+    pushSoloHistory();
+    song.licks[ci][1] = tier;
+    chipEditState.tier = tier;
+    saveSoloMap();
+  } else {
+    ensureSongSlots(song);
+    if (!isChipPair(song.sections[ci])) return;
+    pushAlbumHistory();
+    song.sections[ci][1] = tier;
+    chipEditState.tier = tier;
+    saveAlbums();
+  }
+  var chip = document.querySelector('.sec-chip[data-ai="'+chipEditState.ai+'"][data-si="'+chipEditState.si+'"][data-ci="'+ci+'"]');
+  if (chip) {
+    chip.classList.remove("tier-1","tier-2","tier-3","tier-4","tier-5");
+    chip.classList.add("tier-"+tier);
+    chip.setAttribute("data-tier", String(tier));
+  }
+  albumsDirty = true;
+  updateEditSaveUi();
 };
 document.getElementById("chipEditPos").onclick = function(e){
   var b = e.target.closest(".pos-pick");
