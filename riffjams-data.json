@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-15T15:15:24.149Z",
+  "updatedAt": "2026-09-15T15:16:42.179Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -535,7 +535,7 @@
             [
               "B1",
               3,
-              "",
+              "B1",
               []
             ],
             [
