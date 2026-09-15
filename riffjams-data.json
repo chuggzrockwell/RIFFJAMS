@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-15T15:22:47.727Z",
+  "updatedAt": "2026-09-15T15:23:58.611Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -317,7 +317,6 @@
               3,
               "FOB-V1"
             ],
-            null,
             [
               "B1",
               3,
@@ -333,6 +332,7 @@
               2,
               "FOB-L1"
             ],
+            null,
             null
           ]
         }
