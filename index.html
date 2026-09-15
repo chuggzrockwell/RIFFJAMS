@@ -3835,7 +3835,8 @@ function repairAlbumsFromDefaults(albums) {
       (ds.sections || []).forEach(function(pair){
         if (isChipPair(pair)) defN++;
       });
-      if (chips === 0 && defN > 0) {
+      var needsSnowblind = (s.song === "Snowblind" && defN > 0 && (chips === 0 || !(s.sections || []).some(function(p){ return p && p[2] && String(p[2]).indexOf("SNB-") === 0; })));
+      if ((chips === 0 && defN > 0) || needsSnowblind) {
         s.sections = JSON.parse(JSON.stringify(ds.sections));
         ensureSongSlots(s);
         repaired++;
@@ -4050,7 +4051,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=110";
+  var url = base + "?playboard=1&v=111";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
