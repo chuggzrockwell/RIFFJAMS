@@ -3613,10 +3613,51 @@ function loadAlbums() {
     return cloneAlbums(ALBUMS_DEFAULT);
   }
 }
+var _lastAlbumsRaw = null;
 function saveAlbums() {
-  try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (e) {}
+  try {
+    var raw = JSON.stringify(ALBUMS);
+    localStorage.setItem(ALBUMS_KEY, raw);
+    _lastAlbumsRaw = raw;
+  } catch (e) {}
   albumsDirty = false;
   updateEditSaveUi();
+  publishAlbumsChanged();
+}
+/** Reload Song Map albums from localStorage (other ?v= tabs / windows). */
+function pullAlbumsFromStorage() {
+  try {
+    var raw = localStorage.getItem(ALBUMS_KEY);
+    if (!raw) return false;
+    if (raw === _lastAlbumsRaw) return false;
+    var parsed = JSON.parse(raw);
+    if (!parsed || !parsed.length) return false;
+    ALBUMS = parsed;
+    _lastAlbumsRaw = raw;
+    if (typeof ensureAllSongSlots === "function") ensureAllSongSlots(ALBUMS);
+    return true;
+  } catch (ePull) { return false; }
+}
+function publishAlbumsChanged() {
+  if (typeof playChannel !== "undefined" && playChannel) {
+    try { playChannel.postMessage({ type: "albums" }); } catch (ePub) {}
+  }
+}
+function refreshViewsAfterAlbumsChange() {
+  if (typeof isPlayboardPage === "function" && isPlayboardPage()) return;
+  var series = document.getElementById("series");
+  var sec = document.getElementById("sections");
+  if (series && !series.classList.contains("hidden") && currentLetter === "B" && typeof showSeries === "function") {
+    showSeries("B");
+    return;
+  }
+  if (series && !series.classList.contains("hidden") && currentLetter && typeof showSeries === "function") {
+    showSeries(currentLetter);
+    return;
+  }
+  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") {
+    showSections(true);
+  }
 }
 var albumHistory = [];
 var albumsDirty = false;
@@ -3984,7 +4025,8 @@ function forceStVitusSongMapChips(albums) {
   });
 }
 function showSections(keepScroll) {
-  /* Snowblind is newly defined; force its current chip map before every riff render so stale saves cannot blank it. */
+  if (!albumsDirty) pullAlbumsFromStorage();
+  /* Snowblind/St Vitus: fill empty rows only — never clobber chip-editor saves */
   if (!soloMode) {
     forceSnowblindSongMapChips(ALBUMS);
     forceStVitusSongMapChips(ALBUMS);
@@ -4159,7 +4201,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=120";
+  var url = base + "?playboard=1&v=121";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -4203,8 +4245,14 @@ function openPlayWindow() {
 function bindPlaySync() {
   if (playChannel) {
     playChannel.onmessage = function(ev){
-    if (ev.data && ev.data.type === "ll-mode") { setPracticeMode(ev.data.mode, { silent: true }); return; }
-      if (!ev || !ev.data || ev.data.type !== "queue") return;
+      if (!ev || !ev.data) return;
+      if (ev.data.type === "ll-mode") { setPracticeMode(ev.data.mode, { silent: true }); return; }
+      if (ev.data.type === "albums") {
+        if (typeof albumsDirty !== "undefined" && albumsDirty) return;
+        if (pullAlbumsFromStorage()) refreshViewsAfterAlbumsChange();
+        return;
+      }
+      if (ev.data.type !== "queue") return;
       playQueue = ev.data.queue || [];
       if (isPlayboardPage()) {
         if (trimPlayQueueToFit()) publishPlayQueue();
@@ -4213,6 +4261,11 @@ function bindPlaySync() {
     };
   }
   window.addEventListener("storage", function(ev){
+    if (ev.key === ALBUMS_KEY) {
+      if (typeof albumsDirty !== "undefined" && albumsDirty) return;
+      if (pullAlbumsFromStorage()) refreshViewsAfterAlbumsChange();
+      return;
+    }
     if (ev.key !== PLAY_QUEUE_KEY) return;
     pullPlayQueue();
     if (isPlayboardPage()) {
@@ -7024,6 +7077,8 @@ function clearLlFilters() {
 function clearLlTierFilters() { clearLlFilters(); }
 
 function showSeries(letter) {
+  /* Pick up Song Map edits from this or another ?v= tab before remounting LL */
+  if (!albumsDirty) pullAlbumsFromStorage();
   currentLetter = letter;
   pcColExpanded = false;
   document.body.className = "sheet-mode stage";
