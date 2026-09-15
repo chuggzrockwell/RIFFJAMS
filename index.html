@@ -2951,7 +2951,7 @@ var ALBUMS_DEFAULT = [
     { song: "Changes", sections: [] },
     { song: "FX", sections: [] },
     { song: "Supernaut", sections: [] },
-    { song: "Snowblind", sections: [] },
+    { song: "Snowblind", sections: [["I1",2,"SNB-I1"],["V1",2,"SNB-V1"],["V2",2,"SNB-V2"],["B1",2,"SNB-B1"],["S1",1,"SNB-S1"],["B2",2,"SNB-B2"],["S2",1,"SNB-S2"]] },
     { song: "Cornucopia", sections: [] },
     { song: "Laguna Sunrise", sections: [] },
     { song: "St. Vitus Dance", sections: [] },
@@ -3253,6 +3253,10 @@ function loadAlbums() {
         if (s.song === "Looking for Today") {
           var lftWant = [["V1",2,"LFT-V1"],["PC1",2,"LFT-PC1"],["C1",1,"LFT-C1"],["S1",1,"LFT-S1"]];
           s.sections = lftWant.map(function(x){ return x.slice(); });
+        }
+        if (s.song === "Snowblind") {
+          var snbWant = [["I1",2,"SNB-I1"],["V1",2,"SNB-V1"],["V2",2,"SNB-V2"],["B1",2,"SNB-B1"],["S1",1,"SNB-S1"],["B2",2,"SNB-B2"],["S2",1,"SNB-S2"]];
+          s.sections = snbWant.map(function(x){ return x.slice(); });
         }
         if (s.song === "War Pigs") {
           var links = { "I1": ["I1",2,"WP-I1",3], "V1": ["V1",3,"WP-V1"], "V2": ["V2",2,"WP-V2"], "V3": ["V3",2,"WP-V3"], "V4": ["V4",2,"WP-V4"], "S1": ["S1",1,"WP-S1"] , "O1": ["O1",2,"WP-O1"] , "O2": ["O2",1,"WP-O2"] , "S2": ["S2",1,"WP-S2"] };
@@ -3714,7 +3718,7 @@ var SECTION_SONG_PREFIX = {
   "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-",
   "Sabbath Bloody Sabbath": "SBS-", "A National Acrobat": "ANA-", "Fluff": "FLU-",
   "Sabbra Cadabra": "SAC-", "Killing Yourself to Live": "KYTL-", "Who Are You?": "WAY-",
-  "Looking for Today": "LFT-", "Spiral Architect": "SAR-",
+  "Looking for Today": "LFT-", "Spiral Architect": "SAR-", "Snowblind": "SNB-",
   "Sweet Leaf": "SL-", "After Forever": "AF-", "Embryo": "EMB-", "Children of the Grave": "COTG-",
   "Orchid": "ORC-", "Lord of This World": "LOTW-", "Solitude": "SOL-", "Into the Void": "ITV-"
 };
@@ -4046,7 +4050,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=109";
+  var url = base + "?playboard=1&v=110";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
