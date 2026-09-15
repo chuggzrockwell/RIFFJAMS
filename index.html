@@ -1071,7 +1071,7 @@
   .chip-editor {
     position: fixed; z-index: 80;
     width: min(360px, calc(100vw - 32px));
-    max-height: calc(100vh - 24px);
+    max-height: calc(100vh - 32px);
     overflow-y: auto;
     box-sizing: border-box;
     background: #fff;
@@ -4046,7 +4046,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=108";
+  var url = base + "?playboard=1&v=109";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5432,15 +5432,88 @@ function togglePlayPhrase(el) {
   syncPlayLibraryClasses();
 }
 function playSectionChip(chip) { togglePlayChip(chip); }
+var chipEditAnchor = null;
+var CHIP_EDIT_PAD = 16;
+var CHIP_EDIT_GAP = 8;
+/* Extra height reserved when placing so Paste / image preview can grow without clipping */
+var CHIP_EDIT_EXPAND_RESERVE = 220;
+var chipEditResizeObs = null;
 function closeChipEditor() {
   chipEditState = null;
+  chipEditAnchor = null;
   var ed = document.getElementById("chipEditor");
   if (!ed) return;
   ed.classList.remove("open");
   ed.setAttribute("aria-hidden", "true");
 }
+function clampChipEditorInView() {
+  var ed = document.getElementById("chipEditor");
+  if (!ed || !ed.classList.contains("open")) return;
+  var pad = CHIP_EDIT_PAD;
+  var vh = window.innerHeight || 800;
+  var vw = window.innerWidth || 1200;
+  var maxH = Math.max(180, vh - 2 * pad);
+  ed.style.maxHeight = maxH + "px";
+  var editorWidth = ed.offsetWidth || 360;
+  var editorHeight = ed.offsetHeight || 0;
+  var left = parseFloat(ed.style.left);
+  if (isNaN(left)) left = ed.getBoundingClientRect().left;
+  left = Math.min(vw - editorWidth - pad, Math.max(pad, left));
+  var top = parseFloat(ed.style.top);
+  if (isNaN(top)) top = ed.getBoundingClientRect().top;
+  if (top + editorHeight > vh - pad) top = Math.max(pad, vh - pad - editorHeight);
+  if (top < pad) top = pad;
+  ed.style.left = left + "px";
+  ed.style.top = top + "px";
+}
+function placeChipEditor(anchor) {
+  var ed = document.getElementById("chipEditor");
+  if (!ed || !ed.classList.contains("open")) return;
+  if (anchor) chipEditAnchor = anchor;
+  var a = chipEditAnchor;
+  var pad = CHIP_EDIT_PAD;
+  var gap = CHIP_EDIT_GAP;
+  var vh = window.innerHeight || 800;
+  var vw = window.innerWidth || 1200;
+  var maxH = Math.max(180, vh - 2 * pad);
+  ed.style.maxHeight = maxH + "px";
+  var editorWidth = ed.offsetWidth || 360;
+  var naturalH = ed.offsetHeight || 420;
+  var neededH = Math.min(maxH, naturalH + CHIP_EDIT_EXPAND_RESERVE);
+  var left = pad;
+  var top = pad;
+  if (a && a.getBoundingClientRect) {
+    var r = a.getBoundingClientRect();
+    left = Math.min(vw - editorWidth - pad, Math.max(pad, r.left));
+    var belowTop = r.bottom + gap;
+    if (belowTop + neededH <= vh - pad) {
+      /* Fits under the chip even after Paste expands the panel */
+      top = belowTop;
+    } else if (r.top - gap - neededH >= pad) {
+      /* Place above, high enough that expanded height still clears the chip + bottom pad */
+      top = r.top - gap - neededH;
+    } else {
+      /* Not enough room beside the chip — pin so full expanded panel stays in view */
+      top = Math.max(pad, vh - pad - neededH);
+    }
+  } else {
+    top = Math.max(pad, vh - pad - neededH);
+  }
+  ed.style.left = left + "px";
+  ed.style.top = top + "px";
+  clampChipEditorInView();
+}
+function ensureChipEditResizeObserver() {
+  var ed = document.getElementById("chipEditor");
+  if (!ed || chipEditResizeObs || typeof ResizeObserver === "undefined") return;
+  chipEditResizeObs = new ResizeObserver(function(){
+    if (ed.classList.contains("open")) clampChipEditorInView();
+  });
+  chipEditResizeObs.observe(ed);
+}
 function openChipEditor(anchor, state) {
   chipEditState = state;
+  chipEditAnchor = anchor || null;
   var ed = document.getElementById("chipEditor");
   var idLabel = document.getElementById("chipEditIdLabel");
   if (idLabel) idLabel.textContent = soloMode ? "Lick label" : "Section ID";
@@ -5472,14 +5545,10 @@ function openChipEditor(anchor, state) {
   document.getElementById("chipEditDelete").style.display = state.isNew ? "none" : "";
   ed.classList.add("open");
   ed.setAttribute("aria-hidden", "false");
-  var r = anchor.getBoundingClientRect();
-  var editorWidth = ed.offsetWidth || 360;
-  var editorHeight = ed.offsetHeight || 520;
-  var left = Math.min(window.innerWidth - editorWidth - 12, Math.max(12, r.left));
-  var top = r.bottom + 8;
-  if (top + editorHeight > window.innerHeight - 12) top = Math.max(12, window.innerHeight - editorHeight - 12);
-  ed.style.left = left + "px";
-  ed.style.top = top + "px";
+  ensureChipEditResizeObserver();
+  placeChipEditor(anchor);
+  /* Re-measure after paint (fonts / layout) */
+  requestAnimationFrame(function(){ placeChipEditor(anchor); });
   idInput.focus();
   idInput.select();
 }
@@ -7607,6 +7676,11 @@ function handleModeEntryKey(e) {
   }
   return false;
 }
+window.addEventListener("resize", function(){
+  if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) {
+    placeChipEditor(chipEditAnchor);
+  }
+});
 document.addEventListener("keydown", function(e){
   if ((e.metaKey || e.ctrlKey) && !e.altKey && document.body.classList.contains("sections-mode") && sectionsMode === "edit") {
     var tag0 = (e.target && e.target.tagName) || "";
