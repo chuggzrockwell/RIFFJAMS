@@ -4546,7 +4546,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=129";
+  var url = base + "?playboard=1&v=130";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5236,13 +5236,22 @@ var smTabId = Math.random().toString(36).slice(2) + String(Date.now());
 var smSyncApplying = false;
 var smSyncPublishTimer = null;
 var smLastSyncSig = "";
+var smLastLocalActionTs = 0;
+var smTrackChangeGraceUntil = 0;
 
-function smPlayerSyncSnapshot() {
+function smMarkLocalPlayerAction() {
+  smLastLocalActionTs = Date.now();
+}
+function smPlayerSyncSnapshot(tOverride) {
   var cur = smCurrent();
   var t = 0;
-  try {
-    if (smYtPlayer && smYtPlayer.getCurrentTime) t = smYtPlayer.getCurrentTime() || 0;
-  } catch (errT) {}
+  if (typeof tOverride === "number") {
+    t = tOverride;
+  } else {
+    try {
+      if (smYtPlayer && smYtPlayer.getCurrentTime) t = smYtPlayer.getCurrentTime() || 0;
+    } catch (errT) {}
+  }
   return {
     type: "sm-player",
     tab: smTabId,
@@ -5255,10 +5264,10 @@ function smPlayerSyncSnapshot() {
     ts: Date.now()
   };
 }
-function smPublishPlayerSync(force) {
+function smPublishPlayerSync(force, tOverride) {
   if (smSyncApplying) return;
   if (typeof isPlayboardPage === "function" && isPlayboardPage()) return;
-  var snap = smPlayerSyncSnapshot();
+  var snap = smPlayerSyncSnapshot(tOverride);
   var sig = [snap.song, snap.playalong ? 1 : 0, snap.playing ? 1 : 0, snap.shuffle ? 1 : 0, snap.repeat ? 1 : 0, Math.floor(snap.t)].join("|");
   if (!force && sig === smLastSyncSig) return;
   smLastSyncSig = sig;
@@ -5272,6 +5281,13 @@ function smSchedulePublishPlayerSync() {
   clearTimeout(smSyncPublishTimer);
   smSyncPublishTimer = setTimeout(function(){ smPublishPlayerSync(false); }, 40);
 }
+/* Local track change: authoritative publish with t=0 (YT still has previous video time). */
+function smPublishTrackChangeSync() {
+  smMarkLocalPlayerAction();
+  smTrackChangeGraceUntil = Date.now() + 1000;
+  clearTimeout(smSyncPublishTimer);
+  smPublishPlayerSync(true, 0);
+}
 function smFindPlaylistIndexBySong(name) {
   if (!name) return -1;
   if (!smPlaylist.length) smBuildPlaylist();
@@ -5284,6 +5300,18 @@ function smApplyRemotePlayerSync(msg) {
   if (!msg || msg.type !== "sm-player") return;
   if (msg.tab === smTabId) return;
   if (typeof isPlayboardPage === "function" && isPlayboardPage()) return;
+  var msgTs = typeof msg.ts === "number" ? msg.ts : 0;
+  /* Authoritative local actions win over stale / lagging-tab snapshots */
+  if (msgTs <= smLastLocalActionTs) return;
+  var now = Date.now();
+  var localCur = smCurrent();
+  var localSong = localCur ? localCur.song : "";
+  var remoteSong = msg.song || "";
+  if (now < smTrackChangeGraceUntil) {
+    /* After local next/prev/pick: ignore lagging tabs still on the old song or yanking time */
+    if (remoteSong && localSong && remoteSong !== localSong) return;
+    if (typeof msg.t === "number" && msg.t > 2) return;
+  }
   smSyncApplying = true;
   try {
     if (!!msg.shuffle !== !!smShuffle) {
@@ -5328,11 +5356,15 @@ function smApplyRemotePlayerSync(msg) {
     var wantT = typeof msg.t === "number" ? msg.t : 0;
     smEnsureApi(function(){
       if (!smYtPlayer) { smSyncApplying = false; return; }
+      var vid = "";
+      try { vid = (smYtPlayer.getVideoData && smYtPlayer.getVideoData().video_id) || ""; } catch (errV) {}
+      var videoChanging = !!(yt && vid !== yt);
       function finishApply() {
         try {
           if (document.hidden) smYtPlayer.mute();
           else smYtPlayer.unMute();
         } catch (errM) {}
+        /* Seek after load; publishers force t=0 on local track change so stale high t is rare */
         if (wantT > 0.5 && smYtPlayer.seekTo) {
           try { smYtPlayer.seekTo(wantT, true); } catch (errS) {}
         }
@@ -5349,9 +5381,7 @@ function smApplyRemotePlayerSync(msg) {
         smLastSyncSig = [name, smPlayalongActive ? 1 : 0, wantPlay ? 1 : 0, smShuffle ? 1 : 0, smRepeat ? 1 : 0, Math.floor(wantT)].join("|");
         smSyncApplying = false;
       }
-      var vid = "";
-      try { vid = (smYtPlayer.getVideoData && smYtPlayer.getVideoData().video_id) || ""; } catch (errV) {}
-      if (yt && vid !== yt) {
+      if (videoChanging) {
         if (wantPlay) smYtPlayer.loadVideoById(yt);
         else smYtPlayer.cueVideoById(yt);
         setTimeout(finishApply, 350);
@@ -5449,7 +5479,7 @@ function smTogglePlayalong() {
   smPlayalongActive = wantPa;
   var yt = wantPa ? pa : (cur.yt || "");
   smUpdateMeta();
-  smSchedulePublishPlayerSync();
+  smPublishTrackChangeSync();
   if (!yt) return;
   smEnsureApi(function(){
     if (!smYtPlayer || !smYtPlayer.loadVideoById) return;
@@ -5460,7 +5490,7 @@ function smTogglePlayalong() {
     smApplyPlaybackRate();
     setTimeout(smApplyPlaybackRate, 400);
     setTimeout(smApplyPlaybackRate, 1200);
-    smSchedulePublishPlayerSync();
+    smPublishTrackChangeSync();
   });
 }
 function smSetPlayIcon(playing) {
@@ -5533,14 +5563,15 @@ function smLoadCurrent(autoplay) {
   /* next/prev/shuffle load clears one-shot playalong override */
   smPlayalongActive = false;
   smUpdateMeta();
-  smSchedulePublishPlayerSync();
+  /* Force t=0 — YT player still reports previous video's getCurrentTime() */
+  smPublishTrackChangeSync();
   if (!cur) return;
   smEnsureApi(function(){
     if (!smYtPlayer || !smYtPlayer.loadVideoById) return;
     if (autoplay) smYtPlayer.loadVideoById(cur.yt);
     else smYtPlayer.cueVideoById(cur.yt);
     smApplyPlaybackRate();
-    smSchedulePublishPlayerSync();
+    smPublishTrackChangeSync();
   });
 }
 function smPlayIndex(i, autoplay) {
@@ -5551,6 +5582,7 @@ function smPlayIndex(i, autoplay) {
 function smSeekBy(deltaSec) {
   smEnsureApi(function(){
     if (!smYtPlayer || !smYtPlayer.getCurrentTime) return;
+    smMarkLocalPlayerAction();
     var cur = smYtPlayer.getCurrentTime() || 0;
     var dur = smYtPlayer.getDuration() || 0;
     var next = Math.max(0, Math.min(dur || 1e9, cur + deltaSec));
@@ -5568,8 +5600,10 @@ function smCtrlLeftArrow() {
     }
     var cur = smYtPlayer.getCurrentTime() || 0;
     if (cur <= 3) {
+      smMarkLocalPlayerAction();
       smYtPlayer.seekTo(0, true);
       smTick();
+      smSchedulePublishPlayerSync();
     } else {
       smPlayIndex(smIndex - 1, true);
     }
@@ -5602,7 +5636,7 @@ function smPlaySongName(name, autoplay, playalong) {
     }
   }
   smUpdateMeta();
-  smSchedulePublishPlayerSync();
+  smPublishTrackChangeSync();
   if (!yt) return;
   smEnsureApi(function(){
     if (!smYtPlayer || !smYtPlayer.loadVideoById) return;
@@ -5612,10 +5646,12 @@ function smPlaySongName(name, autoplay, playalong) {
     /* YT often applies rate only after the video is playing */
     setTimeout(smApplyPlaybackRate, 400);
     setTimeout(smApplyPlaybackRate, 1200);
-    smSchedulePublishPlayerSync();
+    smPublishTrackChangeSync();
   });
 }
 function smOnEnded() {
+  /* Avoid ENDED→next ping-pong while a remote sync is loading/seeking */
+  if (smSyncApplying) return;
   if (smRepeat) smPlayIndex(smIndex + 1, true);
   else if (smIndex + 1 < smOrder.length) smPlayIndex(smIndex + 1, true);
   else smSetPlayIcon(false);
@@ -5627,6 +5663,7 @@ function smTogglePlay() {
       smBuildPlaylist();
       if (!smCurrent()) return;
     }
+    smMarkLocalPlayerAction();
     var st = smYtPlayer.getPlayerState && smYtPlayer.getPlayerState();
     if (st === YT.PlayerState.PLAYING) {
       smYtPlayer.pauseVideo();
@@ -5675,12 +5712,13 @@ function smTick() {
   if (tc) tc.textContent = smFmtTime(cur);
   if (td) td.textContent = smFmtTime(dur);
   if (scrub) scrub.setAttribute("aria-valuenow", String(Math.round(pct)));
-  /* Soft time sync for other tabs (~every 2s while playing) */
-  if (!smSyncApplying && smPlaying && Math.floor(cur * 2) % 4 === 0) smPublishPlayerSync(false);
+  /* Soft time sync for other tabs (~every 2s while playing); skip during track-change grace */
+  if (!smSyncApplying && smPlaying && Date.now() >= smTrackChangeGraceUntil && Math.floor(cur * 2) % 4 === 0) smPublishPlayerSync(false);
 }
 function smSeekFromClientX(clientX) {
   var scrub = document.getElementById("smScrub");
   if (!scrub || !smYtPlayer || !smYtPlayer.getDuration) return;
+  smMarkLocalPlayerAction();
   var r = scrub.getBoundingClientRect();
   var pct = r.width ? Math.min(1, Math.max(0, (clientX - r.left) / r.width)) : 0;
   var dur = smYtPlayer.getDuration() || 0;
@@ -5698,6 +5736,7 @@ function smInitPlayerUi() {
   var repeat = document.getElementById("smRepeat");
   var scrub = document.getElementById("smScrub");
   if (shuffle) shuffle.onclick = function(){
+    smMarkLocalPlayerAction();
     smShuffle = !smShuffle;
     shuffle.classList.toggle("on", smShuffle);
     shuffle.setAttribute("aria-pressed", smShuffle ? "true" : "false");
@@ -5710,6 +5749,7 @@ function smInitPlayerUi() {
   var playalongBtn = document.getElementById("smPlayalong");
   if (playalongBtn) playalongBtn.onclick = smTogglePlayalong;
   if (repeat) repeat.onclick = function(){
+    smMarkLocalPlayerAction();
     smRepeat = !smRepeat;
     repeat.classList.toggle("on", smRepeat);
     repeat.setAttribute("aria-pressed", smRepeat ? "true" : "false");
