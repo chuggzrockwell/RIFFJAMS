@@ -1117,6 +1117,119 @@
     display: none;
   }
   .chip-editor.open { display: block; }
+
+  .chip-editor .chip-edit-time-row {
+    display: none;
+    margin: 0 0 10px;
+  }
+  body.sections-arrange .chip-editor.open .chip-edit-time-row {
+    display: block;
+  }
+  .chip-editor .chip-edit-time-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .chip-editor #chipEditTime {
+    flex: 1;
+    width: auto;
+    margin-bottom: 0;
+  }
+  .chip-editor #chipEditTimeFromPlayer {
+    flex: 0 0 auto;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: #1a6b6b;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .chip-editor #chipEditTimeFromPlayer:hover { filter: brightness(1.08); }
+  .sm-arr-next-panel {
+    display: none;
+    flex: 0 0 auto;
+    position: sticky;
+    top: 12px;
+    align-self: flex-start;
+    margin: 28px 0 0 12px;
+    min-width: 140px;
+    max-width: 220px;
+    z-index: 5;
+    pointer-events: none;
+  }
+  body.sections-mode.sections-arrange .sm-arr-next-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .sm-arr-next-label {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(0,0,0,.45);
+    text-align: center;
+  }
+  .sm-arr-next-chip {
+    box-sizing: border-box;
+    min-height: 96px;
+    padding: 18px 16px;
+    border-radius: 14px;
+    border: 2px solid rgba(0,0,0,.28);
+    background: #546e7a;
+    color: #fff;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 2.4rem;
+    font-weight: 900;
+    letter-spacing: .04em;
+    line-height: 1.05;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 28px rgba(0,0,0,.18);
+    word-break: break-word;
+  }
+  .sm-arr-next-chip.is-empty {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    line-height: 1.25;
+    background: #e8e6e1;
+    color: rgba(0,0,0,.45);
+    border-color: rgba(0,0,0,.12);
+    box-shadow: none;
+  }
+  .sm-arr-next-chip.is-end {
+    font-size: 1.6rem;
+  }
+  .sm-arr-next-countdown {
+    display: none;
+    text-align: center;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 2.8rem;
+    font-weight: 900;
+    line-height: 1;
+    color: #c62828;
+    text-shadow: 0 2px 0 rgba(255,255,255,.65);
+    letter-spacing: .02em;
+  }
+  .sm-arr-next-countdown.is-on { display: block; }
+  body.sections-arrange .sec-chip.is-arr-now:not(.empty):not(.filtered-out) {
+    outline: 3px solid #111 !important;
+    outline-offset: 1px;
+    z-index: 2;
+  }
+  body.sections-arrange .sec-chip.is-arr-next:not(.empty):not(.filtered-out) {
+    outline: 3px dashed rgba(0,0,0,.55) !important;
+    outline-offset: 1px;
+    z-index: 2;
+  }
   .chip-editor label {
     display: block; font-size: 0.68rem; font-weight: 700;
     letter-spacing: .08em; text-transform: uppercase;
@@ -2952,6 +3065,13 @@
         <option value="S">single string</option>
       </select>
     </div>
+    <div class="chip-edit-time-row" id="chipEditTimeRow" hidden>
+      <label for="chipEditTime">Start time</label>
+      <div class="chip-edit-time-controls">
+        <input type="text" id="chipEditTime" maxlength="12" placeholder="0:00 or seconds" autocomplete="off" inputmode="decimal">
+        <button type="button" id="chipEditTimeFromPlayer" title="Grab current Song Map player time">Set from player</button>
+      </div>
+    </div>
     <div class="editor-actions">
       <button type="button" class="btn-save" id="chipEditSave">Save</button>
       <button type="button" class="btn-cancel" id="chipEditCancel">Cancel</button>
@@ -4111,6 +4231,54 @@ function arrChipColors(code) {
 function isChipPair(pair) {
   return !!(pair && pair[0]);
 }
+
+function chipStartSec(pair) {
+  if (!pair || pair.length < 5) return null;
+  var v = pair[4];
+  if (v == null || v === "") return null;
+  var n = typeof v === "number" ? v : parseFloat(String(v).trim());
+  return (typeof n === "number" && isFinite(n) && n >= 0) ? n : null;
+}
+function setChipStartSec(pair, sec) {
+  if (!pair) return pair;
+  if (sec == null || sec === "" || !isFinite(Number(sec))) {
+    if (pair.length > 4) pair[4] = null;
+    return pair;
+  }
+  while (pair.length < 4) {
+    if (pair.length === 2) pair.push("");
+    else if (pair.length === 3) pair.push([]);
+  }
+  pair[4] = Number(sec);
+  return pair;
+}
+function parseChipTimeInput(raw) {
+  if (raw == null) return null;
+  var s = String(raw).trim();
+  if (!s) return null;
+  if (/^\d+(\.\d+)?$/.test(s)) {
+    var plain = parseFloat(s);
+    return (isFinite(plain) && plain >= 0) ? plain : null;
+  }
+  var m = s.match(/^(\d{1,3}):([0-5]?\d)(?:\.(\d+))?$/);
+  if (!m) return null;
+  var mins = parseInt(m[1], 10);
+  var secs = parseInt(m[2], 10);
+  var frac = m[3] ? parseFloat("0." + m[3]) : 0;
+  if (!isFinite(mins) || !isFinite(secs)) return null;
+  return mins * 60 + secs + frac;
+}
+function formatChipTime(sec) {
+  if (sec == null || !isFinite(sec) || sec < 0) return "";
+  var whole = Math.floor(sec);
+  var m = Math.floor(whole / 60);
+  var s = whole % 60;
+  var frac = sec - whole;
+  var out = m + ":" + (s < 10 ? "0" : "") + s;
+  if (frac > 0.049) out += "." + String(Math.round(frac * 10));
+  return out;
+}
+
 function normalizeSlot(v, fallback) {
   if (v == null || v === "") return fallback;
   var s = String(v).toUpperCase();
@@ -4228,11 +4396,16 @@ function sectionLickId(songName, code, pairLick) {
   var c = String(code || "").trim();
   return (pref && c) ? (pref + c) : "";
 }
-function makeChipEntry(code, tier, lick, positions) {
+function makeChipEntry(code, tier, lick, positions, startSec) {
   tier = chipTier([code, tier]);
   // Preserve explicit empty array; don't coerce missing→[1] when caller passed []
   var posList = Array.isArray(positions) ? parsePosList(positions) : parsePosList(positions == null ? null : positions);
   lick = lick || "";
+  var hasStart = (arguments.length >= 5 && startSec != null && startSec !== "" && isFinite(Number(startSec)));
+  if (hasStart) {
+    var storedFull = posList.length === 0 ? [] : (posList.length === 1 ? posList[0] : posList.slice());
+    return [code, tier, lick, storedFull, Number(startSec)];
+  }
   if (posList.length === 0) return [code, tier, lick, []];
   if (isDefaultPosList(posList) && !lick) return [code, tier];
   if (isDefaultPosList(posList)) return [code, tier, lick];
@@ -4497,8 +4670,10 @@ function showSections(keepScroll) {
             var acode = ap[0], atier = chipTier(ap), alick = ap[2] || "", apos = posListAttr(chipPositions(ap));
             var atyp = secType(acode) || "S";
             var arrTone = arrChipColors(acode);
+            var aStart = chipStartSec(ap);
+            var aStartAttr = (aStart != null) ? String(aStart) : "";
             n++;
-            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" style="--arr-bg:'+arrTone.bg+';--arr-fg:'+arrTone.fg+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+alick+'" data-position="'+apos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
+            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" style="--arr-bg:'+arrTone.bg+';--arr-fg:'+arrTone.fg+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+alick+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
           }
         }
       } else if (soloMode) {
@@ -4546,7 +4721,15 @@ function showSections(keepScroll) {
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
   }).join("");
-  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+outline+ruler+html+'</div></div>';
+  var nextCueHtml = arrangementMode
+    ? '<aside class="sm-arr-next-panel" id="smArrNextPanel" aria-live="polite">'
+      + '<div class="sm-arr-next-label">Next section</div>'
+      + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
+      + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
+      + '</aside>'
+    : "";
+  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+outline+ruler+html+'</div>'+nextCueHtml+'</div>';
+  if (arrangementMode && typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
   var wrapEl = document.querySelector("#sectionsSheet .sections-wrap");
   if (wrapEl) {
     wrapEl.style.setProperty("--cols", String(displayCols));
@@ -4619,7 +4802,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=134";
+  var url = base + "?playboard=1&v=135";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5527,6 +5710,7 @@ function smUpdateMeta() {
     }
   }
   smSyncPlayalongBtn();
+  if (typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
 }
 function smSyncPlayalongBtn() {
   var btn = document.getElementById("smPlayalong");
@@ -5772,6 +5956,126 @@ function smStopTick() {
   if (smTickTimer) clearInterval(smTickTimer);
   smTickTimer = null;
 }
+function smFindArrangementSongByName(songName) {
+  if (!songName || !ARRANGEMENT_MAP || !ARRANGEMENT_MAP.albums) return null;
+  var hit = null;
+  ARRANGEMENT_MAP.albums.forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      if (!hit && s && s.song === songName) hit = s;
+    });
+  });
+  return hit;
+}
+function smCollectTimedArrChips(song) {
+  var out = [];
+  if (!song) return out;
+  (song.chips || []).forEach(function(pair, ci){
+    if (!isChipPair(pair)) return;
+    var start = chipStartSec(pair);
+    if (start == null) return;
+    out.push({ code: pair[0], start: start, ci: ci, pair: pair });
+  });
+  out.sort(function(a, b){ return a.start - b.start || a.ci - b.ci; });
+  return out;
+}
+function smPickArrNextCue(timed, t) {
+  if (!timed || !timed.length) return { current: null, next: null, empty: true };
+  var current = null;
+  var next = null;
+  var i;
+  for (i = 0; i < timed.length; i++) {
+    if (timed[i].start <= t) current = timed[i];
+    else { next = timed[i]; break; }
+  }
+  return { current: current, next: next, empty: false };
+}
+function smUpdateArrNextCue(force) {
+  var panel = document.getElementById("smArrNextPanel");
+  var chipEl = document.getElementById("smArrNextChip");
+  var cdEl = document.getElementById("smArrNextCountdown");
+  if (!panel || !chipEl) return;
+  if (!arrangementMode || !document.body.classList.contains("sections-arrange")) {
+    if (cdEl) { cdEl.textContent = ""; cdEl.classList.remove("is-on"); cdEl.setAttribute("aria-hidden", "true"); }
+    return;
+  }
+  var curTrack = (typeof smCurrent === "function") ? smCurrent() : null;
+  var songName = curTrack && curTrack.song ? curTrack.song : "";
+  var song = smFindArrangementSongByName(songName);
+  var timed = smCollectTimedArrChips(song);
+  var t = 0;
+  try {
+    if (smYtPlayer && smYtPlayer.getCurrentTime) t = smYtPlayer.getCurrentTime() || 0;
+  } catch (eT) { t = 0; }
+  var pick = smPickArrNextCue(timed, t);
+  var display = null;
+  var emptyMsg = "Set times on chips";
+  var endMsg = "End";
+  if (pick.empty) {
+    chipEl.className = "sm-arr-next-chip is-empty";
+    chipEl.style.background = "";
+    chipEl.style.color = "";
+    chipEl.textContent = emptyMsg;
+    if (cdEl) { cdEl.textContent = ""; cdEl.classList.remove("is-on"); cdEl.setAttribute("aria-hidden", "true"); }
+  } else {
+    display = pick.next || null;
+    if (!display) {
+      chipEl.className = "sm-arr-next-chip is-end";
+      if (pick.current) {
+        var lastTone = arrChipColors(pick.current.code);
+        chipEl.style.background = lastTone.bg;
+        chipEl.style.color = lastTone.fg;
+        chipEl.textContent = pick.current.code;
+      } else {
+        chipEl.className = "sm-arr-next-chip is-empty is-end";
+        chipEl.style.background = "";
+        chipEl.style.color = "";
+        chipEl.textContent = endMsg;
+      }
+    } else {
+      var tone = arrChipColors(display.code);
+      chipEl.className = "sm-arr-next-chip";
+      chipEl.style.background = tone.bg;
+      chipEl.style.color = tone.fg;
+      chipEl.textContent = display.code;
+    }
+    /* Countdown: within 5s of next section start */
+    if (cdEl) {
+      if (pick.next) {
+        var remain = pick.next.start - t;
+        if (remain > 0 && remain <= 5) {
+          var n = Math.max(1, Math.ceil(remain));
+          if (n > 5) n = 5;
+          cdEl.textContent = String(n);
+          cdEl.classList.add("is-on");
+          cdEl.setAttribute("aria-hidden", "false");
+        } else {
+          cdEl.textContent = "";
+          cdEl.classList.remove("is-on");
+          cdEl.setAttribute("aria-hidden", "true");
+        }
+      } else {
+        cdEl.textContent = "";
+        cdEl.classList.remove("is-on");
+        cdEl.setAttribute("aria-hidden", "true");
+      }
+    }
+  }
+  /* Optional grid highlights for playing song */
+  document.querySelectorAll(".sec-chip.is-arr-now, .sec-chip.is-arr-next").forEach(function(el){
+    el.classList.remove("is-arr-now");
+    el.classList.remove("is-arr-next");
+  });
+  if (songName && !pick.empty) {
+    var nowCi = pick.current ? pick.current.ci : -1;
+    var nextCi = pick.next ? pick.next.ci : -1;
+    document.querySelectorAll('.sec-chip[data-arrange="1"][data-song]').forEach(function(el){
+      if (el.getAttribute("data-song") !== songName) return;
+      var ci = parseInt(el.getAttribute("data-ci"), 10);
+      if (ci === nowCi) el.classList.add("is-arr-now");
+      if (ci === nextCi) el.classList.add("is-arr-next");
+    });
+  }
+}
 function smTick() {
   if (smSeeking || !smYtPlayer || !smYtPlayer.getCurrentTime) return;
   var cur = smYtPlayer.getCurrentTime() || 0;
@@ -5787,6 +6091,7 @@ function smTick() {
   if (scrub) scrub.setAttribute("aria-valuenow", String(Math.round(pct)));
   /* Soft time sync for other tabs (~every 2s while playing); skip during track-change grace */
   if (!smSyncApplying && smPlaying && Date.now() >= smTrackChangeGraceUntil && Math.floor(cur * 2) % 4 === 0) smPublishPlayerSync(false);
+  if (typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(false);
 }
 function smSeekFromClientX(clientX) {
   var scrub = document.getElementById("smScrub");
@@ -6389,6 +6694,18 @@ function openChipEditor(anchor, state) {
   var typeSel = document.getElementById("chipEditType");
   if (typeSel) typeSel.value = typeVal;
   document.getElementById("chipEditDelete").style.display = state.isNew ? "none" : "";
+  var timeRow = document.getElementById("chipEditTimeRow");
+  var timeInput = document.getElementById("chipEditTime");
+  if (timeRow && timeInput) {
+    if (arrangementMode) {
+      timeRow.hidden = false;
+      var startSec = (state.startSec != null) ? state.startSec : null;
+      timeInput.value = (startSec != null && isFinite(startSec)) ? formatChipTime(startSec) : "";
+    } else {
+      timeRow.hidden = true;
+      timeInput.value = "";
+    }
+  }
   ed.classList.add("open");
   ed.setAttribute("aria-hidden", "false");
   ensureChipEditResizeObserver();
@@ -6422,7 +6739,13 @@ function saveChipEditor() {
   var lick = (document.getElementById("chipEditLick").value || "").trim();
   if ((soloMode || arrangementMode) && !lick) lick = code;
   var posList = readChipEditPosList();
-  var entry = makeChipEntry(code, tier, lick, posList);
+  var startSec = null;
+  if (arrangementMode) {
+    startSec = parseChipTimeInput((document.getElementById("chipEditTime") || {}).value);
+  }
+  var entry = arrangementMode
+    ? makeChipEntry(code, tier, lick, posList, startSec)
+    : makeChipEntry(code, tier, lick, posList);
   if (arrangementMode) {
     pushArrangementHistory();
     ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).forEach(function(a){
@@ -6521,7 +6844,12 @@ function copyFromChipEditor() {
     if (!(tier >= 1 && tier <= 5)) tier = 3;
     var lick = (document.getElementById("chipEditLick").value || "").trim();
     var posList = readChipEditPosList();
-    sectionClipboard = makeChipEntry(code, tier, lick, posList);
+    if (arrangementMode) {
+      var copyStart = parseChipTimeInput((document.getElementById("chipEditTime") || {}).value);
+      sectionClipboard = makeChipEntry(code, tier, lick, posList, copyStart);
+    } else {
+      sectionClipboard = makeChipEntry(code, tier, lick, posList);
+    }
     return true;
   }
   return copySongSectionAt(chipEditState.ai, chipEditState.si, chipEditState.ci);
@@ -8188,6 +8516,36 @@ document.getElementById("chipEditLick").addEventListener("keydown", function(e){
   if (e.key === "Enter") { e.preventDefault(); saveChipEditor(); }
   if (e.key === "Escape") { e.preventDefault(); closeChipEditor(); }
 });
+(function(){
+  var timeInput = document.getElementById("chipEditTime");
+  var fromBtn = document.getElementById("chipEditTimeFromPlayer");
+  if (timeInput) {
+    timeInput.addEventListener("keydown", function(e){
+      if (e.key === "Enter") { e.preventDefault(); saveChipEditor(); }
+      if (e.key === "Escape") { e.preventDefault(); closeChipEditor(); }
+    });
+  }
+  if (fromBtn) {
+    fromBtn.onclick = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var sec = null;
+      try {
+        if (smYtPlayer && smYtPlayer.getCurrentTime) sec = smYtPlayer.getCurrentTime();
+      } catch (errT) { sec = null; }
+      if (sec == null || !isFinite(sec) || sec < 0) {
+        alert("Song Map player time is not available yet — play or cue a track first.");
+        return;
+      }
+      var inp = document.getElementById("chipEditTime");
+      if (inp) {
+        inp.value = formatChipTime(sec);
+        inp.focus();
+        inp.select();
+      }
+    };
+  }
+})();
 
 var chipDrag = null;
 var didChipDrag = false;
@@ -8506,19 +8864,24 @@ document.getElementById("sectionsSheet").onclick = function(e){
         }
       }
       var newPos = (soloMode || arrangementMode) ? [1] : defaultPositionsForAlbum(ALBUMS[ai]);
-      openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "", positions: newPos });
+      openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "", positions: newPos, startSec: null });
       return;
     }
     var rawPos = chip.getAttribute("data-position");
     var editPos = (rawPos == null)
       ? ((soloMode || arrangementMode) ? [1] : defaultPositionsForAlbum(ALBUMS[ai]))
       : parsePosList(rawPos);
+    var existStart = null;
+    if (arrangementMode && song && song.chips && isChipPair(song.chips[ci])) {
+      existStart = chipStartSec(song.chips[ci]);
+    }
     openChipEditor(chip, {
       ai: ai, si: si, ci: ci, isNew: false,
       code: chip.getAttribute("data-sec") || "",
       tier: normalizeSlot(chip.getAttribute("data-tier"), 3),
       lick: sectionLickId(chip.getAttribute("data-song") || "", chip.getAttribute("data-sec") || "", chip.getAttribute("data-lick") || ""),
-      positions: editPos
+      positions: editPos,
+      startSec: existStart
     });
     return;
   }
