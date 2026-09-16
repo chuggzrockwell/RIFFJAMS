@@ -4248,7 +4248,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=125";
+  var url = base + "?playboard=1&v=126";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -4299,6 +4299,10 @@ function bindPlaySync() {
         if (pullAlbumsFromStorage()) refreshViewsAfterAlbumsChange();
         return;
       }
+      if (ev.data.type === "sm-player") {
+        smApplyRemotePlayerSync(ev.data);
+        return;
+      }
       if (ev.data.type !== "queue") return;
       playQueue = ev.data.queue || [];
       if (isPlayboardPage()) {
@@ -4311,6 +4315,12 @@ function bindPlaySync() {
     if (ev.key === ALBUMS_KEY) {
       if (typeof albumsDirty !== "undefined" && albumsDirty) return;
       if (pullAlbumsFromStorage()) refreshViewsAfterAlbumsChange();
+      return;
+    }
+    if (ev.key === SM_PLAYER_SYNC_KEY) {
+      try {
+        if (ev.newValue) smApplyRemotePlayerSync(JSON.parse(ev.newValue));
+      } catch (errSmSt) {}
       return;
     }
     if (ev.key !== PLAY_QUEUE_KEY) return;
@@ -4907,7 +4917,138 @@ var smPlaying = false;
 var smTickTimer = null;
 var smSeeking = false;
 var smPlayalongActive = false;
+var SM_PLAYER_SYNC_KEY = "lick-sm-player-sync";
+var smTabId = Math.random().toString(36).slice(2) + String(Date.now());
+var smSyncApplying = false;
+var smSyncPublishTimer = null;
+var smLastSyncSig = "";
 
+function smPlayerSyncSnapshot() {
+  var cur = smCurrent();
+  var t = 0;
+  try {
+    if (smYtPlayer && smYtPlayer.getCurrentTime) t = smYtPlayer.getCurrentTime() || 0;
+  } catch (errT) {}
+  return {
+    type: "sm-player",
+    tab: smTabId,
+    song: cur ? cur.song : "",
+    playalong: !!smPlayalongActive,
+    playing: !!smPlaying,
+    t: t,
+    shuffle: !!smShuffle,
+    repeat: !!smRepeat,
+    ts: Date.now()
+  };
+}
+function smPublishPlayerSync(force) {
+  if (smSyncApplying) return;
+  if (typeof isPlayboardPage === "function" && isPlayboardPage()) return;
+  var snap = smPlayerSyncSnapshot();
+  var sig = [snap.song, snap.playalong ? 1 : 0, snap.playing ? 1 : 0, snap.shuffle ? 1 : 0, snap.repeat ? 1 : 0, Math.floor(snap.t)].join("|");
+  if (!force && sig === smLastSyncSig) return;
+  smLastSyncSig = sig;
+  try { localStorage.setItem(SM_PLAYER_SYNC_KEY, JSON.stringify(snap)); } catch (errLs) {}
+  if (typeof playChannel !== "undefined" && playChannel) {
+    try { playChannel.postMessage(snap); } catch (errCh) {}
+  }
+}
+function smSchedulePublishPlayerSync() {
+  if (smSyncApplying) return;
+  clearTimeout(smSyncPublishTimer);
+  smSyncPublishTimer = setTimeout(function(){ smPublishPlayerSync(false); }, 40);
+}
+function smFindPlaylistIndexBySong(name) {
+  if (!name) return -1;
+  if (!smPlaylist.length) smBuildPlaylist();
+  for (var i = 0; i < smPlaylist.length; i++) {
+    if (smPlaylist[i].song === name) return i;
+  }
+  return -1;
+}
+function smApplyRemotePlayerSync(msg) {
+  if (!msg || msg.type !== "sm-player") return;
+  if (msg.tab === smTabId) return;
+  if (typeof isPlayboardPage === "function" && isPlayboardPage()) return;
+  smSyncApplying = true;
+  try {
+    if (!!msg.shuffle !== !!smShuffle) {
+      smShuffle = !!msg.shuffle;
+      var shuffleBtn = document.getElementById("smShuffle");
+      if (shuffleBtn) {
+        shuffleBtn.classList.toggle("on", smShuffle);
+        shuffleBtn.setAttribute("aria-pressed", smShuffle ? "true" : "false");
+      }
+      smRebuildOrder(true);
+    }
+    smRepeat = !!msg.repeat;
+    var repeatBtn = document.getElementById("smRepeat");
+    if (repeatBtn) {
+      repeatBtn.classList.toggle("on", smRepeat);
+      repeatBtn.setAttribute("aria-pressed", smRepeat ? "true" : "false");
+    }
+    var name = msg.song || "";
+    var pi = smFindPlaylistIndexBySong(name);
+    if (pi >= 0) {
+      if (smShuffle) {
+        /* keep current shuffle order; just point index at song */
+        var oi = smOrder.indexOf(pi);
+        if (oi < 0) {
+          smRebuildOrder(false);
+          oi = smOrder.indexOf(pi);
+        }
+        smIndex = oi >= 0 ? oi : 0;
+      } else {
+        smOrder = smPlaylist.map(function(_, i){ return i; });
+        smIndex = pi;
+      }
+    }
+    smPlayalongActive = !!msg.playalong && !!(name && SM_YT_PLAYALONG[name]);
+    smUpdateMeta();
+    var cur = smCurrent();
+    var yt = "";
+    if (cur) {
+      yt = smPlayalongActive ? (SM_YT_PLAYALONG[cur.song] || cur.yt) : cur.yt;
+    }
+    var wantPlay = !!msg.playing;
+    var wantT = typeof msg.t === "number" ? msg.t : 0;
+    smEnsureApi(function(){
+      if (!smYtPlayer) { smSyncApplying = false; return; }
+      function finishApply() {
+        try {
+          if (document.hidden) smYtPlayer.mute();
+          else smYtPlayer.unMute();
+        } catch (errM) {}
+        if (wantT > 0.5 && smYtPlayer.seekTo) {
+          try { smYtPlayer.seekTo(wantT, true); } catch (errS) {}
+        }
+        if (wantPlay) {
+          try { smYtPlayer.playVideo(); } catch (errP) {}
+          smSetPlayIcon(true);
+          smStartTick();
+        } else {
+          try { smYtPlayer.pauseVideo(); } catch (errPa) {}
+          smSetPlayIcon(false);
+          smStopTick();
+        }
+        smApplyPlaybackRate();
+        smLastSyncSig = [name, smPlayalongActive ? 1 : 0, wantPlay ? 1 : 0, smShuffle ? 1 : 0, smRepeat ? 1 : 0, Math.floor(wantT)].join("|");
+        smSyncApplying = false;
+      }
+      var vid = "";
+      try { vid = (smYtPlayer.getVideoData && smYtPlayer.getVideoData().video_id) || ""; } catch (errV) {}
+      if (yt && vid !== yt) {
+        if (wantPlay) smYtPlayer.loadVideoById(yt);
+        else smYtPlayer.cueVideoById(yt);
+        setTimeout(finishApply, 350);
+      } else {
+        finishApply();
+      }
+    });
+  } catch (errApply) {
+    smSyncApplying = false;
+  }
+}
 function smFmtTime(sec) {
   sec = Math.max(0, Math.floor(sec || 0));
   var m = Math.floor(sec / 60);
@@ -4994,6 +5135,7 @@ function smTogglePlayalong() {
   smPlayalongActive = wantPa;
   var yt = wantPa ? pa : (cur.yt || "");
   smUpdateMeta();
+  smSchedulePublishPlayerSync();
   if (!yt) return;
   smEnsureApi(function(){
     if (!smYtPlayer || !smYtPlayer.loadVideoById) return;
@@ -5004,6 +5146,7 @@ function smTogglePlayalong() {
     smApplyPlaybackRate();
     setTimeout(smApplyPlaybackRate, 400);
     setTimeout(smApplyPlaybackRate, 1200);
+    smSchedulePublishPlayerSync();
   });
 }
 function smSetPlayIcon(playing) {
@@ -5031,8 +5174,8 @@ function smEnsureApi(cb) {
         onReady: function(){ cb && cb(); },
         onStateChange: function(e){
           if (e.data === YT.PlayerState.ENDED) smOnEnded();
-          if (e.data === YT.PlayerState.PLAYING) { smSetPlayIcon(true); smStartTick(); smApplyPlaybackRate(); }
-          if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.CUED) { smSetPlayIcon(false); smStopTick(); }
+          if (e.data === YT.PlayerState.PLAYING) { smSetPlayIcon(true); smStartTick(); smApplyPlaybackRate(); smSchedulePublishPlayerSync(); }
+          if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.CUED) { smSetPlayIcon(false); smStopTick(); smSchedulePublishPlayerSync(); }
         }
       }
     });
@@ -5076,12 +5219,14 @@ function smLoadCurrent(autoplay) {
   /* next/prev/shuffle load clears one-shot playalong override */
   smPlayalongActive = false;
   smUpdateMeta();
+  smSchedulePublishPlayerSync();
   if (!cur) return;
   smEnsureApi(function(){
     if (!smYtPlayer || !smYtPlayer.loadVideoById) return;
     if (autoplay) smYtPlayer.loadVideoById(cur.yt);
     else smYtPlayer.cueVideoById(cur.yt);
     smApplyPlaybackRate();
+    smSchedulePublishPlayerSync();
   });
 }
 function smPlayIndex(i, autoplay) {
@@ -5097,6 +5242,7 @@ function smSeekBy(deltaSec) {
     var next = Math.max(0, Math.min(dur || 1e9, cur + deltaSec));
     smYtPlayer.seekTo(next, true);
     smTick();
+    smSchedulePublishPlayerSync();
   });
 }
 /* Ctrl+Left: if <=3s into track → restart; else → previous song */
@@ -5142,6 +5288,7 @@ function smPlaySongName(name, autoplay, playalong) {
     }
   }
   smUpdateMeta();
+  smSchedulePublishPlayerSync();
   if (!yt) return;
   smEnsureApi(function(){
     if (!smYtPlayer || !smYtPlayer.loadVideoById) return;
@@ -5151,6 +5298,7 @@ function smPlaySongName(name, autoplay, playalong) {
     /* YT often applies rate only after the video is playing */
     setTimeout(smApplyPlaybackRate, 400);
     setTimeout(smApplyPlaybackRate, 1200);
+    smSchedulePublishPlayerSync();
   });
 }
 function smOnEnded() {
@@ -5213,6 +5361,8 @@ function smTick() {
   if (tc) tc.textContent = smFmtTime(cur);
   if (td) td.textContent = smFmtTime(dur);
   if (scrub) scrub.setAttribute("aria-valuenow", String(Math.round(pct)));
+  /* Soft time sync for other tabs (~every 2s while playing) */
+  if (!smSyncApplying && smPlaying && Math.floor(cur * 2) % 4 === 0) smPublishPlayerSync(false);
 }
 function smSeekFromClientX(clientX) {
   var scrub = document.getElementById("smScrub");
@@ -5222,6 +5372,7 @@ function smSeekFromClientX(clientX) {
   var dur = smYtPlayer.getDuration() || 0;
   smYtPlayer.seekTo(dur * pct, true);
   smTick();
+  smSchedulePublishPlayerSync();
 }
 function smInitPlayerUi() {
   smBuildPlaylist();
@@ -5237,6 +5388,7 @@ function smInitPlayerUi() {
     shuffle.classList.toggle("on", smShuffle);
     shuffle.setAttribute("aria-pressed", smShuffle ? "true" : "false");
     smRebuildOrder(true);
+    smSchedulePublishPlayerSync();
   };
   if (prev) prev.onclick = function(){ smPlayIndex(smIndex - 1, true); };
   if (next) next.onclick = function(){ smPlayIndex(smIndex + 1, true); };
@@ -5247,6 +5399,7 @@ function smInitPlayerUi() {
     smRepeat = !smRepeat;
     repeat.classList.toggle("on", smRepeat);
     repeat.setAttribute("aria-pressed", smRepeat ? "true" : "false");
+    smSchedulePublishPlayerSync();
   };
   if (scrub) {
     scrub.addEventListener("pointerdown", function(e){
@@ -5265,6 +5418,20 @@ function smInitPlayerUi() {
   }
   /* Cue first track (War Pigs) so Play / Space work without a prior click */
   if (smPlaylist.length) smLoadCurrent(false);
+  try {
+    var rawSync = localStorage.getItem(SM_PLAYER_SYNC_KEY);
+    if (rawSync) smApplyRemotePlayerSync(JSON.parse(rawSync));
+  } catch (errBoot) {}
+  document.addEventListener("visibilitychange", function(){
+    if (!smYtPlayer) return;
+    try {
+      if (document.hidden) smYtPlayer.mute();
+      else {
+        smYtPlayer.unMute();
+        if (smPlaying) smYtPlayer.playVideo();
+      }
+    } catch (errVis) {}
+  });
 }
 smInitPlayerUi();
 
