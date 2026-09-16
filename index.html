@@ -2356,7 +2356,7 @@
 
   /* Arrangement mode (Song Map): SBS pink by section type+number (not tier purple) */
   body.sections-arrange .sec-chip[data-arrange="1"]:not(.empty):not(.filtered-out) {
-    background: var(--arr-bg, #ff5da5) !important;
+    background: var(--arr-bg, #e6b800) !important;
     color: var(--arr-fg, #fff) !important;
     text-shadow: none !important;
     box-shadow:
@@ -2369,7 +2369,7 @@
   body.sections-arrange .sec-chip.tier-3:not(.empty):not(.filtered-out),
   body.sections-arrange .sec-chip.tier-4:not(.empty):not(.filtered-out),
   body.sections-arrange .sec-chip.tier-5:not(.empty):not(.filtered-out) {
-    background: var(--arr-bg, #ff5da5) !important;
+    background: var(--arr-bg, #e6b800) !important;
     color: var(--arr-fg, #fff) !important;
     box-shadow:
       inset -1px 0 0 rgba(0,0,0,.25),
@@ -4088,16 +4088,18 @@ function mixTowardWhite(hex, amount) {
 }
 /* Arrangement Song Map: SBS pink family by section type; number lightens within band */
 function arrChipColors(code) {
+  /* Arrangement: color by section type; higher variant # → lighter within family */
   var typ = secType(code) || "";
   var n = Math.max(1, secNum(code));
   var base;
-  if (typ === "I" || typ === "S") base = "#b01050";
-  else if (typ === "V") base = "#ff5da5";
-  else if (typ === "PC" || typ === "P") base = "#ff6eb0";
-  else if (typ === "B") base = "#ff7eb5";
-  else if (typ === "C" || typ === "L") base = "#ffc1dc";
-  else base = "#ff5da5";
-  var lighten = Math.min(0.45, (n - 1) * 0.10);
+  if (typ === "I" || typ === "C") base = "#e6b800";      /* yellow — intros + choruses */
+  else if (typ === "V") base = "#c62828";                 /* red — verses */
+  else if (typ === "B") base = "#7b1fa2";                 /* purple — bridges */
+  else if (typ === "S") base = "#1565c0";                 /* blue — solos */
+  else if (typ === "L") base = "#ef6c00";                 /* orange — leads */
+  else if (typ === "PC" || typ === "P") base = "#2e7d32"; /* green — PCs */
+  else base = "#546e7a";                                  /* unknown — slate */
+  var lighten = Math.min(0.48, (n - 1) * 0.12);
   var bg = mixTowardWhite(base, lighten);
   var rgb = hexToRgb(bg);
   var lum = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
@@ -4615,7 +4617,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=131";
+  var url = base + "?playboard=1&v=132";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
