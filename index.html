@@ -338,7 +338,7 @@
     width: min(420px, calc(100% - 32px));
     max-width: 420px;
     margin: 0;
-    padding: 14px 16px 12px;
+    padding: 18px 16px 12px;
     background: #000;
     border: 1px solid #222;
     border-radius: 14px;
@@ -384,7 +384,9 @@
     border-color: #1db954;
   }
   .sm-player-playalong:disabled {
-    opacity: 0.35;
+    opacity: 0.7;
+    color: rgba(255,255,255,.45);
+    border-color: #333;
     cursor: default;
   }
   .sm-player-main {
@@ -4246,7 +4248,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=124";
+  var url = base + "?playboard=1&v=125";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
