@@ -1155,16 +1155,31 @@
     top: 12px;
     align-self: flex-start;
     margin: 28px 0 0 12px;
-    min-width: 140px;
-    max-width: 220px;
+    min-width: 280px;
+    max-width: 420px;
     z-index: 5;
     pointer-events: none;
   }
   body.sections-mode.sections-arrange .sm-arr-next-panel {
     display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .sm-arr-cue-col {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
+    min-width: 0;
+  }
+  .sm-arr-cue-current {
+    flex: 1.6 1 0;
+    min-width: 150px;
+  }
+  .sm-arr-cue-next {
+    flex: 0.85 1 0;
+    min-width: 100px;
   }
   .sm-arr-next-label {
     font-family: "Segoe UI", system-ui, sans-serif;
@@ -1177,14 +1192,14 @@
   }
   .sm-arr-next-chip {
     box-sizing: border-box;
-    min-height: 96px;
-    padding: 18px 16px;
-    border-radius: 14px;
+    min-height: 56px;
+    padding: 10px 12px;
+    border-radius: 12px;
     border: 2px solid rgba(0,0,0,.28);
     background: #546e7a;
     color: #fff;
     font-family: "Segoe UI", system-ui, sans-serif;
-    font-size: 2.4rem;
+    font-size: 1.35rem;
     font-weight: 900;
     letter-spacing: .04em;
     line-height: 1.05;
@@ -1192,11 +1207,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10px 28px rgba(0,0,0,.18);
+    box-shadow: 0 6px 18px rgba(0,0,0,.14);
     word-break: break-word;
   }
+  .sm-arr-cur-chip {
+    min-height: 112px;
+    padding: 20px 16px;
+    border-radius: 14px;
+    font-size: 2.7rem;
+    box-shadow: 0 10px 28px rgba(0,0,0,.18);
+  }
   .sm-arr-next-chip.is-empty {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: .02em;
     line-height: 1.25;
@@ -1205,14 +1227,20 @@
     border-color: rgba(0,0,0,.12);
     box-shadow: none;
   }
+  .sm-arr-cur-chip.is-empty {
+    font-size: 1.1rem;
+  }
   .sm-arr-next-chip.is-end {
-    font-size: 1.6rem;
+    font-size: 1.15rem;
+  }
+  .sm-arr-cur-chip.is-end {
+    font-size: 1.8rem;
   }
   .sm-arr-next-countdown {
     display: none;
     text-align: center;
     font-family: "Segoe UI", system-ui, sans-serif;
-    font-size: 2.8rem;
+    font-size: 1.85rem;
     font-weight: 900;
     line-height: 1;
     color: #c62828;
@@ -1220,6 +1248,14 @@
     letter-spacing: .02em;
   }
   .sm-arr-next-countdown.is-on { display: block; }
+  .sm-arr-next-countdown.is-urgent {
+    font-size: 2.6rem;
+    animation: smArrCdPulse 0.55s ease-in-out infinite alternate;
+  }
+  @keyframes smArrCdPulse {
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(1.1); opacity: 0.88; }
+  }
   body.sections-arrange .sec-chip.is-arr-now:not(.empty):not(.filtered-out) {
     outline: 3px solid #111 !important;
     outline-offset: 1px;
@@ -4723,9 +4759,15 @@ function showSections(keepScroll) {
   }).join("");
   var nextCueHtml = arrangementMode
     ? '<aside class="sm-arr-next-panel" id="smArrNextPanel" aria-live="polite">'
+      + '<div class="sm-arr-cue-col sm-arr-cue-current">'
+      + '<div class="sm-arr-next-label">Current section</div>'
+      + '<div class="sm-arr-next-chip sm-arr-cur-chip is-empty" id="smArrCurChip">—</div>'
+      + '</div>'
+      + '<div class="sm-arr-cue-col sm-arr-cue-next">'
       + '<div class="sm-arr-next-label">Next section</div>'
       + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
       + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
+      + '</div>'
       + '</aside>'
     : "";
   document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+outline+ruler+html+'</div>'+nextCueHtml+'</div>';
@@ -4802,7 +4844,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=135";
+  var url = base + "?playboard=1&v=136";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5989,13 +6031,33 @@ function smPickArrNextCue(timed, t) {
   }
   return { current: current, next: next, empty: false };
 }
+function smPaintArrCueChip(el, baseClass, item, emptyText) {
+  if (!el) return;
+  if (!item) {
+    el.className = baseClass + " is-empty";
+    el.style.background = "";
+    el.style.color = "";
+    el.textContent = emptyText || "—";
+    return;
+  }
+  var tone = arrChipColors(item.code);
+  el.className = baseClass;
+  el.style.background = tone.bg;
+  el.style.color = tone.fg;
+  el.textContent = item.code;
+}
 function smUpdateArrNextCue(force) {
   var panel = document.getElementById("smArrNextPanel");
+  var curEl = document.getElementById("smArrCurChip");
   var chipEl = document.getElementById("smArrNextChip");
   var cdEl = document.getElementById("smArrNextCountdown");
   if (!panel || !chipEl) return;
   if (!arrangementMode || !document.body.classList.contains("sections-arrange")) {
-    if (cdEl) { cdEl.textContent = ""; cdEl.classList.remove("is-on"); cdEl.setAttribute("aria-hidden", "true"); }
+    if (cdEl) {
+      cdEl.textContent = "";
+      cdEl.classList.remove("is-on", "is-urgent");
+      cdEl.setAttribute("aria-hidden", "true");
+    }
     return;
   }
   var curTrack = (typeof smCurrent === "function") ? smCurrent() : null;
@@ -6007,55 +6069,46 @@ function smUpdateArrNextCue(force) {
     if (smYtPlayer && smYtPlayer.getCurrentTime) t = smYtPlayer.getCurrentTime() || 0;
   } catch (eT) { t = 0; }
   var pick = smPickArrNextCue(timed, t);
-  var display = null;
   var emptyMsg = "Set times on chips";
   var endMsg = "End";
   if (pick.empty) {
-    chipEl.className = "sm-arr-next-chip is-empty";
-    chipEl.style.background = "";
-    chipEl.style.color = "";
-    chipEl.textContent = emptyMsg;
-    if (cdEl) { cdEl.textContent = ""; cdEl.classList.remove("is-on"); cdEl.setAttribute("aria-hidden", "true"); }
-  } else {
-    display = pick.next || null;
-    if (!display) {
-      chipEl.className = "sm-arr-next-chip is-end";
-      if (pick.current) {
-        var lastTone = arrChipColors(pick.current.code);
-        chipEl.style.background = lastTone.bg;
-        chipEl.style.color = lastTone.fg;
-        chipEl.textContent = pick.current.code;
-      } else {
-        chipEl.className = "sm-arr-next-chip is-empty is-end";
-        chipEl.style.background = "";
-        chipEl.style.color = "";
-        chipEl.textContent = endMsg;
-      }
-    } else {
-      var tone = arrChipColors(display.code);
-      chipEl.className = "sm-arr-next-chip";
-      chipEl.style.background = tone.bg;
-      chipEl.style.color = tone.fg;
-      chipEl.textContent = display.code;
+    smPaintArrCueChip(curEl, "sm-arr-next-chip sm-arr-cur-chip", null, "—");
+    smPaintArrCueChip(chipEl, "sm-arr-next-chip", null, emptyMsg);
+    if (cdEl) {
+      cdEl.textContent = "";
+      cdEl.classList.remove("is-on", "is-urgent");
+      cdEl.setAttribute("aria-hidden", "true");
     }
-    /* Countdown: within 5s of next section start */
+  } else {
+    /* Current: last timed chip with start <= t (or — before first) */
+    smPaintArrCueChip(curEl, "sm-arr-next-chip sm-arr-cur-chip", pick.current, "—");
+    /* Next: first with start > t; past last => End */
+    if (pick.next) {
+      smPaintArrCueChip(chipEl, "sm-arr-next-chip", pick.next, "—");
+    } else {
+      chipEl.className = "sm-arr-next-chip is-empty is-end";
+      chipEl.style.background = "";
+      chipEl.style.color = "";
+      chipEl.textContent = endMsg;
+    }
+    /* Countdown for whole remainder of current section until next start */
     if (cdEl) {
       if (pick.next) {
         var remain = pick.next.start - t;
-        if (remain > 0 && remain <= 5) {
+        if (remain > 0) {
           var n = Math.max(1, Math.ceil(remain));
-          if (n > 5) n = 5;
           cdEl.textContent = String(n);
           cdEl.classList.add("is-on");
+          cdEl.classList.toggle("is-urgent", remain <= 5);
           cdEl.setAttribute("aria-hidden", "false");
         } else {
           cdEl.textContent = "";
-          cdEl.classList.remove("is-on");
+          cdEl.classList.remove("is-on", "is-urgent");
           cdEl.setAttribute("aria-hidden", "true");
         }
       } else {
         cdEl.textContent = "";
-        cdEl.classList.remove("is-on");
+        cdEl.classList.remove("is-on", "is-urgent");
         cdEl.setAttribute("aria-hidden", "true");
       }
     }
