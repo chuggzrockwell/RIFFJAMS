@@ -355,9 +355,42 @@
   body.sheet-mode #series {
     padding-bottom: 0;
   }
+  .sm-player-playalong {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    z-index: 2;
+    appearance: none;
+    border: 1px solid #444;
+    background: #111;
+    color: rgba(255,255,255,.75);
+    font-family: inherit;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1;
+    padding: 4px 7px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .sm-player-playalong:hover:not(:disabled) {
+    color: #fff;
+    border-color: #666;
+  }
+  .sm-player-playalong.on {
+    color: #000;
+    background: #1db954;
+    border-color: #1db954;
+  }
+  .sm-player-playalong:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
   .sm-player-main {
     flex: 1 1 auto;
     min-width: 0;
+    padding-top: 14px; /* room for Playalong chip */
   }
   .sm-player-art {
     flex: 0 0 auto;
@@ -2696,7 +2729,7 @@
       max-width: 104px;
       max-height: calc(100vh - 12px);
       margin: 0;
-      padding: 10px 8px;
+      padding: 28px 8px 10px;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
@@ -2704,6 +2737,13 @@
       overflow-x: hidden;
       overflow-y: auto;
       z-index: 60;
+    }
+    .sm-player-playalong {
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.5rem;
+      padding: 3px 5px;
     }
     .sm-player-main {
       display: flex;
@@ -2713,6 +2753,7 @@
       flex: 1 1 auto;
       min-width: 0;
       min-height: 0;
+      padding-top: 0;
     }
     .sm-player-art {
       order: -1;
@@ -2889,6 +2930,7 @@
 
   <div id="ytPlayerHost" aria-hidden="true"></div>
   <div class="sm-player" id="smPlayer" aria-label="Song player">
+    <button type="button" class="sm-player-playalong" id="smPlayalong" title="Toggle playalong backing track" aria-pressed="false" disabled>Playalong</button>
     <div class="sm-player-main">
       <div class="sm-player-meta" id="smPlayerMeta">Pick a song · Space play/pause</div>
       <div class="sm-player-controls">
@@ -4204,7 +4246,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=123";
+  var url = base + "?playboard=1&v=124";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -4924,6 +4966,43 @@ function smUpdateMeta() {
       art.classList.remove("show");
     }
   }
+  smSyncPlayalongBtn();
+}
+function smSyncPlayalongBtn() {
+  var btn = document.getElementById("smPlayalong");
+  if (!btn) return;
+  var cur = smCurrent();
+  var name = cur ? cur.song : "";
+  var hasPa = !!(name && SM_YT_PLAYALONG[name]);
+  btn.disabled = !hasPa;
+  btn.classList.toggle("on", !!smPlayalongActive && hasPa);
+  btn.setAttribute("aria-pressed", (smPlayalongActive && hasPa) ? "true" : "false");
+  btn.title = !hasPa
+    ? "No playalong mapped for this song"
+    : (smPlayalongActive ? "Switch to album version" : "Switch to playalong");
+}
+function smTogglePlayalong() {
+  var cur = smCurrent();
+  if (!cur) return;
+  var name = cur.song;
+  var pa = SM_YT_PLAYALONG[name] || "";
+  if (!smPlayalongActive && !pa) return;
+  var wantPa = !smPlayalongActive;
+  if (wantPa && !pa) return;
+  smPlayalongActive = wantPa;
+  var yt = wantPa ? pa : (cur.yt || "");
+  smUpdateMeta();
+  if (!yt) return;
+  smEnsureApi(function(){
+    if (!smYtPlayer || !smYtPlayer.loadVideoById) return;
+    var st = smYtPlayer.getPlayerState && smYtPlayer.getPlayerState();
+    var playing = (st === YT.PlayerState.PLAYING);
+    if (playing) smYtPlayer.loadVideoById(yt);
+    else smYtPlayer.cueVideoById(yt);
+    smApplyPlaybackRate();
+    setTimeout(smApplyPlaybackRate, 400);
+    setTimeout(smApplyPlaybackRate, 1200);
+  });
 }
 function smSetPlayIcon(playing) {
   smPlaying = !!playing;
@@ -5160,6 +5239,8 @@ function smInitPlayerUi() {
   if (prev) prev.onclick = function(){ smPlayIndex(smIndex - 1, true); };
   if (next) next.onclick = function(){ smPlayIndex(smIndex + 1, true); };
   if (play) play.onclick = smTogglePlay;
+  var playalongBtn = document.getElementById("smPlayalong");
+  if (playalongBtn) playalongBtn.onclick = smTogglePlayalong;
   if (repeat) repeat.onclick = function(){
     smRepeat = !smRepeat;
     repeat.classList.toggle("on", smRepeat);
