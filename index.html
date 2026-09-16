@@ -2353,6 +2353,68 @@
     min-width: var(--chip-w);
     max-width: var(--chip-w);
   }
+
+  /* Arrangement mode: uniform teal chips (no tier coloring) */
+  body.sections-arrange .sec-chip:not(.empty) {
+    background: #1a6b6b !important;
+    color: #fff !important;
+    text-shadow: none !important;
+    box-shadow:
+      inset -1px 0 0 rgba(0,0,0,.25),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 0 1px rgba(0,0,0,.35) !important;
+  }
+  body.sections-arrange .sec-chip.tier-1,
+  body.sections-arrange .sec-chip.tier-2,
+  body.sections-arrange .sec-chip.tier-3,
+  body.sections-arrange .sec-chip.tier-4,
+  body.sections-arrange .sec-chip.tier-5,
+  body.sections-arrange .sec-chip.S,
+  body.sections-arrange .sec-chip.L {
+    background: #1a6b6b !important;
+    color: #fff !important;
+    text-shadow: none !important;
+    box-shadow:
+      inset -1px 0 0 rgba(0,0,0,.25),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 0 1px rgba(0,0,0,.35) !important;
+  }
+  body.sheet-mode #llArrangeBtn.sec-mode-btn {
+    border-color: #4a4e5a;
+    background: #1a1d26;
+    color: #c8c6c0;
+    margin-left: 4px;
+  }
+  body.sheet-mode #llArrangeBtn.sec-mode-btn.on {
+    background: #1a6b6b;
+    color: #fff;
+    border-color: #1a6b6b;
+  }
+  body.sheet-mode.ll-arrange .phrase:not(.flipped) {
+    /* neutralize tier neon differences on LL cover chips */
+  }
+  body.sheet-mode.ll-arrange .phrase.tier-1 .ref,
+  body.sheet-mode.ll-arrange .phrase.tier-2 .ref,
+  body.sheet-mode.ll-arrange .phrase.tier-3 .ref,
+  body.sheet-mode.ll-arrange .phrase.tier-arr .ref {
+    background: #1a6b6b !important;
+    color: #fff !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+  body.sheet-mode.ll-arrange .phrase .ref,
+  body.sheet-mode.ll-arrange .phrase:not(.flipped) .ref,
+  body.sheet-mode.ll-arrange .phrase.song-im:not(.flipped) .ref,
+  body.sheet-mode.ll-arrange .phrase.song-p:not(.flipped) .ref,
+  body.sheet-mode.ll-arrange .phrase.song-wp:not(.flipped) .ref,
+  body.sheet-mode.ll-arrange .phrase.song-hod:not(.flipped) .ref,
+  body.sheet-mode.ll-arrange .phrase.song-rs:not(.flipped) .ref,
+  body.sheet-mode.ll-arrange .phrase.song-fob:not(.flipped) .ref,
+  body.sheet-mode.ll-arrange .phrase.song-pc:not(.flipped) .ref,
+  body.sheet-mode.ll-arrange .phrase.song-other:not(.flipped) .ref {
+    background: #1a6b6b !important;
+    color: #fff !important;
+  }
   .album-block {
     position: relative;
     width: 100%;
@@ -2828,7 +2890,7 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · Mode dropdown / 4 Solo · 5 Peek · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · Mode dropdown / 4 Solo · 5 Peek · Arrangement · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
@@ -2841,6 +2903,7 @@
         </select>
       </label>
       <button type="button" class="sec-mode-btn" id="secPeekBtn" aria-pressed="false" title="Hover chips to peek tabs">Peek</button>
+      <button type="button" class="sec-mode-btn" id="secArrangeBtn" aria-pressed="false" title="Arrangement chip set">Arrangement</button>
       <span class="sec-edit-tools" id="secEditTools" hidden>
         <button type="button" class="sec-tool-btn" id="secUndoBtn" title="Undo (Ctrl+Z)">Undo</button>
         <button type="button" class="sec-tool-btn primary" id="secSaveBtn" title="Save (Ctrl+S)">Save</button>
@@ -2905,6 +2968,7 @@
           <option value="solo">Solo mode</option>
         </select>
       </label>
+      <button type="button" class="sec-mode-btn" id="llArrangeBtn" aria-pressed="false" title="Arrangement chip set">Arrangement</button>
       <div class="ll-filters" id="llFilters" aria-label="Filter lick library" hidden>
         <div class="sec-filter-group" id="llAlbumFilters"></div>
         <div class="sec-filter-group" id="llTypeFilters"></div>
@@ -3209,6 +3273,10 @@ function countSoloSongChips(song) {
   return n;
 }
 function getEditSong(ai, si) {
+  if (arrangementMode) {
+    var ar = ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums && ARRANGEMENT_MAP.albums[ai];
+    return ar && ar.songs ? ar.songs[si] : null;
+  }
   if (soloMode) {
     var a = SOLO_MAP && SOLO_MAP.albums && SOLO_MAP.albums[ai];
     return a && a.songs ? a.songs[si] : null;
@@ -3228,12 +3296,220 @@ function totalSoloChips(map) {
   return n;
 }
 function updateSoloUi() {
-  document.body.classList.toggle("sections-solo", !!soloMode);
-  if (!soloMode) document.body.classList.remove("solo-cols-collapsed");
+  document.body.classList.toggle("sections-solo", !!soloMode && !arrangementMode);
+  if (!soloMode || arrangementMode) document.body.classList.remove("solo-cols-collapsed");
+  document.body.classList.toggle("sections-arrange", !!arrangementMode && document.body.classList.contains("sections-mode"));
   syncModeSelects();
+  syncArrangementButtons();
 }
 function setSoloMode(on) {
   setPracticeMode(on ? "solo" : "riff");
+}
+
+/* Arrangement-map: same Song Map grid; separate chip set from riff sections / solo licks.
+Shape: { albums: [{ name, cover, font, songs: [{ song, chips: [[code,tier,lick?], null, ...] }] }] }
+*/
+var ARRANGEMENT_MAP_KEY = "lick-arrangement-map-v1";
+var ARRANGEMENT_MODE_KEY = "riffjams-arrangement-mode";
+var arrangementMode = false;
+try { arrangementMode = localStorage.getItem(ARRANGEMENT_MODE_KEY) === "1"; } catch (eArrM) {}
+var ARRANGEMENT_MAP = null;
+var arrangementHistory = [];
+var arrangementDirty = false;
+
+function blankArrangementMapFromAlbums(albums) {
+  return (albums || []).map(function(a){
+    return {
+      name: a.name,
+      cover: a.cover,
+      font: a.font,
+      songs: (a.songs || []).map(function(s){
+        return { song: s.song, chips: [] };
+      })
+    };
+  });
+}
+function normalizeArrangementSong(song) {
+  if (!song) return { song: "", chips: [] };
+  var src = song.chips || song.sections || song.licks || [];
+  var out = [];
+  var i;
+  for (i = 0; i < src.length; i++) out.push(isChipPair(src[i]) ? src[i] : null);
+  while (out.length < SONG_SLOTS) out.push(null);
+  return { song: song.song || "", chips: out };
+}
+function normalizeArrangementMap(map, albumsFallback) {
+  var base = blankArrangementMapFromAlbums(albumsFallback || ALBUMS_DEFAULT);
+  if (!map || !map.albums || !map.albums.length) {
+    if (Array.isArray(map) && map.length) map = { albums: map };
+    else return { albums: base };
+  }
+  renameJackTheStripperInAlbums(map.albums);
+  var byAlbum = {};
+  map.albums.forEach(function(a){ if (a && a.name) byAlbum[a.name] = a; });
+  var albums = base.map(function(ba){
+    var src = byAlbum[ba.name] || null;
+    var songByName = {};
+    if (src && src.songs) src.songs.forEach(function(s){ if (s && s.song) songByName[s.song] = s; });
+    return {
+      name: ba.name,
+      cover: ba.cover,
+      font: ba.font,
+      songs: ba.songs.map(function(bs){
+        var ss = songByName[bs.song] || { song: bs.song, chips: [] };
+        return normalizeArrangementSong(ss);
+      })
+    };
+  });
+  map.albums.forEach(function(a){
+    if (!a || !a.name) return;
+    var exists = albums.some(function(x){ return x.name === a.name; });
+    if (exists) {
+      var host = null;
+      albums.forEach(function(x){ if (x.name === a.name) host = x; });
+      (a.songs || []).forEach(function(s){
+        if (!s || !s.song) return;
+        if (host.songs.some(function(x){ return x.song === s.song; })) return;
+        host.songs.push(normalizeArrangementSong(s));
+      });
+      return;
+    }
+    albums.push({
+      name: a.name,
+      cover: a.cover || "",
+      font: a.font || "",
+      songs: (a.songs || []).map(normalizeArrangementSong)
+    });
+  });
+  return { albums: albums };
+}
+function countArrangementChips(song) {
+  var n = 0;
+  (song.chips || []).forEach(function(pair){ if (isChipPair(pair)) n++; });
+  return n;
+}
+function totalArrangementChips(map) {
+  var n = 0;
+  ((map && map.albums) || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){ n += countArrangementChips(s); });
+  });
+  return n;
+}
+function seedArrangementChipsFromAlbums(map, albums) {
+  var byAlbum = {};
+  (albums || []).forEach(function(a){ if (a && a.name) byAlbum[a.name] = a; });
+  ((map && map.albums) || []).forEach(function(a){
+    var src = byAlbum[a.name];
+    if (!src) return;
+    var songBy = {};
+    (src.songs || []).forEach(function(s){ if (s && s.song) songBy[s.song] = s; });
+    (a.songs || []).forEach(function(s){
+      if (!s) return;
+      if (countArrangementChips(s) > 0) return;
+      var ss = songBy[s.song];
+      if (!ss) return;
+      var out = [];
+      (ss.sections || []).forEach(function(pair){
+        out.push(isChipPair(pair) ? pair.slice() : null);
+      });
+      while (out.length < SONG_SLOTS) out.push(null);
+      s.chips = out;
+    });
+  });
+  return map;
+}
+function loadArrangementMap() {
+  try {
+    var raw = localStorage.getItem(ARRANGEMENT_MAP_KEY);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      if (parsed && (parsed.albums || Array.isArray(parsed))) {
+        var map = normalizeArrangementMap(parsed, ALBUMS_DEFAULT);
+        if (totalArrangementChips(map) === 0) {
+          seedArrangementChipsFromAlbums(map, typeof ALBUMS !== "undefined" && ALBUMS ? ALBUMS : ALBUMS_DEFAULT);
+        }
+        return map;
+      }
+    }
+  } catch (e) {}
+  var blank = normalizeArrangementMap(null, ALBUMS_DEFAULT);
+  seedArrangementChipsFromAlbums(blank, typeof ALBUMS !== "undefined" && ALBUMS ? ALBUMS : ALBUMS_DEFAULT);
+  return blank;
+}
+function saveArrangementMap() {
+  try { localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP)); } catch (e) {}
+  arrangementDirty = false;
+  updateEditSaveUi();
+}
+function pushArrangementHistory() {
+  try {
+    arrangementHistory.push(JSON.parse(JSON.stringify(ARRANGEMENT_MAP)));
+    if (arrangementHistory.length > 40) arrangementHistory.shift();
+  } catch (e) {}
+  arrangementDirty = true;
+  updateEditSaveUi();
+}
+function undoArrangementMap() {
+  if (!arrangementHistory.length) return;
+  ARRANGEMENT_MAP = arrangementHistory.pop();
+  closeChipEditor();
+  saveArrangementMap();
+  showSections(true);
+  setSaveStatus("Undid");
+}
+function saveArrangementMapNow() {
+  saveArrangementMap();
+  arrangementDirty = false;
+  updateEditSaveUi();
+  setSaveStatus("Saved");
+  var btn = document.getElementById("secSaveBtn");
+  if (btn) {
+    btn.classList.add("saved");
+    btn.textContent = "Saved";
+    setTimeout(function(){ btn.classList.remove("saved"); btn.textContent = "Save"; }, 1200);
+  }
+}
+function ensureArrangementSlots(song) {
+  if (!song) return;
+  var slots = (typeof SONG_SLOTS === "number" && SONG_SLOTS > 0) ? SONG_SLOTS : 10;
+  var src = song.chips || [];
+  var out = [];
+  var i;
+  for (i = 0; i < Math.max(slots, src.length); i++) out[i] = isChipPair(src[i]) ? src[i] : null;
+  while (out.length < slots) out.push(null);
+  song.chips = out;
+}
+function arrangementMapSlotCount(map) {
+  var n = SONG_SLOTS;
+  ((map && map.albums) || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      var sn = songArraySlots(s && s.chips);
+      if (sn > n) n = sn;
+    });
+  });
+  return n;
+}
+function syncArrangementButtons() {
+  ["secArrangeBtn", "llArrangeBtn"].forEach(function(id){
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.classList.toggle("on", !!arrangementMode);
+    btn.setAttribute("aria-pressed", arrangementMode ? "true" : "false");
+  });
+}
+function setArrangementMode(on) {
+  arrangementMode = !!on;
+  try { localStorage.setItem(ARRANGEMENT_MODE_KEY, arrangementMode ? "1" : "0"); } catch (eSet) {}
+  syncArrangementButtons();
+  closeChipEditor();
+  updateEditSaveUi();
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden")) showSections(true);
+  if (document.body.classList.contains("sheet-mode") && currentLetter) {
+    showSeries(currentLetter);
+  } else {
+    document.body.classList.toggle("ll-arrange", !!arrangementMode && document.body.classList.contains("sheet-mode"));
+  }
 }
 function cloneAlbums(src) {
   return JSON.parse(JSON.stringify(src));
@@ -3757,11 +4033,18 @@ function updateEditSaveUi() {
     if (sectionsMode === "edit") tools.removeAttribute("hidden");
     else tools.setAttribute("hidden", "");
   }
-  if (undoBtn) undoBtn.disabled = soloMode ? !soloHistory.length : !albumHistory.length;
+  if (undoBtn) {
+    if (arrangementMode) undoBtn.disabled = !arrangementHistory.length;
+    else undoBtn.disabled = soloMode ? !soloHistory.length : !albumHistory.length;
+  }
   if (saveBtn) saveBtn.disabled = false;
   var keys = document.getElementById("sectionsKeys");
   if (keys && document.body.className.indexOf("sections-mode") >= 0) {
-    if (soloMode) {
+    if (arrangementMode) {
+      if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · Esc/0 home";
+      else if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Undo/Save · Esc/0 home";
+      else keys.textContent = "Arrangement · Esc/0 home";
+    } else if (soloMode) {
       if (sectionsMode === "play") keys.textContent = "Solo · lick clicks queue · Esc/0 home";
       else if (sectionsMode === "edit") keys.textContent = "Solo · Edit · drag · Undo/Save · Esc/0 home";
       else keys.textContent = "Solo · Esc/0 home";
@@ -3827,6 +4110,10 @@ function collapseAlbumTiers(albums) {
         pair[1] = chipTier(pair);
       });
       (s.licks || []).forEach(function(pair){
+        if (!isChipPair(pair)) return;
+        pair[1] = chipTier(pair);
+      });
+      (s.chips || []).forEach(function(pair){
         if (!isChipPair(pair)) return;
         pair[1] = chipTier(pair);
       });
@@ -3956,7 +4243,10 @@ function ensureAllSongSlots(albums, minSlots) {
 function growSongSlotsTo(song, indexInclusive) {
   if (!song) return;
   var need = Math.max(SONG_SLOTS, (indexInclusive | 0) + 1);
-  if (soloMode) {
+  if (arrangementMode) {
+    ensureArrangementSlots(song);
+    while ((song.chips || []).length < need) song.chips.push(null);
+  } else if (soloMode) {
     ensureSoloSlots(song);
     while ((song.licks || []).length < need) song.licks.push(null);
   } else {
@@ -4026,6 +4316,15 @@ try {
     localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP));
   }
 } catch (eTierSolo) {}
+ARRANGEMENT_MAP = loadArrangementMap();
+try {
+  if (ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) {
+    collapseAlbumTiers(ARRANGEMENT_MAP.albums);
+    localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP));
+  }
+} catch (eTierArr) {}
+try { if (!localStorage.getItem(ARRANGEMENT_MAP_KEY)) localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP)); } catch (eArrPersist) {}
+syncArrangementButtons();
 
 var SOLO_COL_GROUP_START = 12; // 1-based; collapse 12..end in Solo
 var SOLO_COLS_COLLAPSED_KEY = "lick-solo-cols-collapsed";
@@ -4038,8 +4337,8 @@ try {
 function setSoloColsCollapsed(on) {
   soloColsCollapsed = !!on;
   try { localStorage.setItem(SOLO_COLS_COLLAPSED_KEY, soloColsCollapsed ? "1" : "0"); } catch (e) {}
-  document.body.classList.toggle("solo-cols-collapsed", !!soloMode && soloColsCollapsed);
-  if (soloMode) showSections(true);
+  document.body.classList.toggle("solo-cols-collapsed", !!soloMode && !arrangementMode && soloColsCollapsed);
+  if (soloMode && !arrangementMode) showSections(true);
 }
 function toggleSoloColsCollapsed() {
   setSoloColsCollapsed(!soloColsCollapsed);
@@ -4074,7 +4373,7 @@ function forceStVitusSongMapChips(albums) {
 function showSections(keepScroll) {
   if (!albumsDirty) pullAlbumsFromStorage();
   /* Snowblind/St Vitus: fill empty rows only — never clobber chip-editor saves */
-  if (!soloMode) {
+  if (!soloMode && !arrangementMode) {
     forceSnowblindSongMapChips(ALBUMS);
     forceStVitusSongMapChips(ALBUMS);
     try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (eSnowblindSave) {}
@@ -4089,22 +4388,28 @@ function showSections(keepScroll) {
   closeChipEditor();
   ensureAllSongSlots(ALBUMS);
   if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
+  if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap();
   document.body.className = "sections-mode"
     + (sectionsMode === "edit" ? " sections-edit" : "")
     + (sectionsMode === "play" ? " sections-play" : "")
-    + (soloMode ? " sections-solo" : "");
+    + (arrangementMode ? " sections-arrange" : "")
+    + (!arrangementMode && soloMode ? " sections-solo" : "");
   document.getElementById("home").className = "hidden";
   document.getElementById("series").className = "hidden";
   document.getElementById("sections").className = "";
   var n = 0;
   var rowN = 0;
-  var sourceAlbums = soloMode ? ((SOLO_MAP && SOLO_MAP.albums) || []) : ALBUMS;
-  var contentCols = soloMode ? soloMapSlotCount(SOLO_MAP) : mapSlotCount(ALBUMS);
+  var sourceAlbums = arrangementMode
+    ? ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || [])
+    : (soloMode ? ((SOLO_MAP && SOLO_MAP.albums) || []) : ALBUMS);
+  var contentCols = arrangementMode
+    ? arrangementMapSlotCount(ARRANGEMENT_MAP)
+    : (soloMode ? soloMapSlotCount(SOLO_MAP) : mapSlotCount(ALBUMS));
   if (contentCols < SONG_SLOTS) contentCols = SONG_SLOTS;
   /* Edit: one empty column past the end so dragging right creates a new numbered column (display only until drop) */
   var maxCols = (sectionsMode === "edit") ? (contentCols + 1) : contentCols;
   var groupStart = SOLO_COL_GROUP_START; // 1-based
-  var hasSoloGroup = soloMode && maxCols >= groupStart;
+  var hasSoloGroup = !arrangementMode && soloMode && maxCols >= groupStart;
   var displayCols = (hasSoloGroup && soloColsCollapsed) ? (groupStart - 1) : maxCols;
   var colNums = "";
   for (var c = 1; c <= maxCols; c++) {
@@ -4125,7 +4430,7 @@ function showSections(keepScroll) {
       + '<button type="button" class="col-group-toggle" id="soloColGroupToggle" title="'+btnTitle+'" aria-expanded="'+(soloColsCollapsed?"false":"true")+'">'+btnLabel+'</button>'
       + '</div></div>';
   }
-  var headLabel = soloMode ? "Lick" : "Section";
+  var headLabel = arrangementMode ? "Arrange" : (soloMode ? "Lick" : "Section");
   var head = '<div class="sec-head"><div class="sec-head-label song">Song</div><div class="sec-head-label section">'+headLabel+'</div><div class="sec-head-label album">Album</div></div>';
   var ruler = '<div class="sec-ruler"><div class="row-num"></div><div class="song-name-spacer" aria-hidden="true"></div><div class="song-secs">'+colNums+'</div></div>';
   var html = sourceAlbums.map(function(album, ai){
@@ -4133,7 +4438,21 @@ function showSections(keepScroll) {
       rowN += 1;
       var chipArr = [];
       var ci;
-      if (soloMode) {
+      if (arrangementMode) {
+        ensureArrangementSlots(s);
+        var achips = (s.chips || []);
+        for (ci = 0; ci < maxCols; ci++) {
+          var ap = (ci < achips.length) ? achips[ci] : null;
+          if (!isChipPair(ap)) {
+            chipArr.push('<button type="button" class="sec-chip empty" data-arrange="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty arrangement slot"></button>');
+          } else {
+            var acode = ap[0], atier = chipTier(ap), alick = ap[2] || "", apos = posListAttr(chipPositions(ap));
+            var atyp = secType(acode) || "S";
+            n++;
+            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+alick+'" data-position="'+apos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
+          }
+        }
+      } else if (soloMode) {
         ensureSoloSlots(s);
         var licks = (s.licks || []);
         for (ci = 0; ci < maxCols; ci++) {
@@ -4184,7 +4503,7 @@ function showSections(keepScroll) {
     wrapEl.style.setProperty("--cols", String(displayCols));
     if (hasSoloGroup) wrapEl.style.setProperty("--solo-group-cols", String(maxCols - groupStart + 1));
   }
-  document.body.classList.toggle("solo-cols-collapsed", !!soloMode && hasSoloGroup && soloColsCollapsed);
+  document.body.classList.toggle("solo-cols-collapsed", !arrangementMode && !!soloMode && hasSoloGroup && soloColsCollapsed);
   var groupBtn = document.getElementById("soloColGroupToggle");
   if (groupBtn) {
     groupBtn.addEventListener("click", function(e){
@@ -4193,10 +4512,13 @@ function showSections(keepScroll) {
       toggleSoloColsCollapsed();
     });
   }
-  document.getElementById("sectionsCount").textContent = soloMode ? (n + " licks") : (n + " sections");
+  document.getElementById("sectionsCount").textContent = arrangementMode
+    ? (n + (n === 1 ? " arrangement" : " arrangements"))
+    : (soloMode ? (n + " licks") : (n + " sections"));
   buildSecFilters();
   applySecFilters();
   updateSoloUi();
+  syncArrangementButtons();
   if (sectionsMode === "play") {
     pullPlayQueue();
     syncPlayChipClasses();
@@ -4248,7 +4570,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=126";
+  var url = base + "?playboard=1&v=127";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -4479,7 +4801,16 @@ function initPlayboardPage() {
 var SEC_TYPE_ORDER = ["I","V","B","S","L","O","C","PC","F"];
 function collectSecTypes() {
   var seen = {};
-  if (soloMode && SOLO_MAP && SOLO_MAP.albums) {
+  if (arrangementMode && ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) {
+    ARRANGEMENT_MAP.albums.forEach(function(a){
+      (a.songs || []).forEach(function(s){
+        (s.chips || []).forEach(function(pair){
+          if (!isChipPair(pair)) return;
+          seen[secType(pair[0]) || "S"] = true;
+        });
+      });
+    });
+  } else if (soloMode && SOLO_MAP && SOLO_MAP.albums) {
     SOLO_MAP.albums.forEach(function(a){
       (a.songs || []).forEach(function(s){
         (s.licks || []).forEach(function(pair){
@@ -4528,7 +4859,9 @@ function buildSecFilters() {
   if (openEl) openId = openEl.id;
 
   if (albumHost) {
-    var albums = (soloMode && SOLO_MAP && SOLO_MAP.albums) ? SOLO_MAP.albums : (ALBUMS || []);
+    var albums = arrangementMode
+      ? ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || [])
+      : ((soloMode && SOLO_MAP && SOLO_MAP.albums) ? SOLO_MAP.albums : (ALBUMS || []));
     var albumNames = albums.map(function(a){ return a && a.name; }).filter(Boolean);
     var albumKeys = Object.keys(secAlbumFilter).filter(function(k){ return secAlbumFilter[k]; });
     var albumItems = albumNames.map(function(name){
@@ -4656,10 +4989,11 @@ function applySecFilters() {
     });
   });
   var total = 0;
-  if (soloMode && SOLO_MAP) total = totalSoloChips(SOLO_MAP);
+  if (arrangementMode && ARRANGEMENT_MAP) total = totalArrangementChips(ARRANGEMENT_MAP);
+  else if (soloMode && SOLO_MAP) total = totalSoloChips(SOLO_MAP);
   else ALBUMS.forEach(function(a){ a.songs.forEach(function(s){ total += countSongChips(s); }); });
   var el = document.getElementById("sectionsCount");
-  var unit = soloMode ? "licks" : "sections";
+  var unit = arrangementMode ? "arrangements" : (soloMode ? "licks" : "sections");
   if (el) el.textContent = active ? (shown + " / " + total + " " + unit) : (total + " " + unit);
   sizeAlbumCovers();
   if (typeof playQueue !== "undefined" && playQueue.length) {
@@ -4765,13 +5099,17 @@ function setSectionsMode(mode) {
   });
   var keys = document.getElementById("sectionsKeys");
   if (keys) {
-    if (soloMode) {
+    if (arrangementMode) {
+      if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
+      else if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Arrangement · Peek · 0 clear filters · Esc closes chip edit · Backspace home";
+    } else if (soloMode) {
       if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 4/5 Solo/Peek · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
       else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 4/5 · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
       else keys.textContent = "Solo · Numpad 4/5 Solo/Peek · 0 clear filters · Esc closes chip edit · Backspace home";
-    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
-    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · section clicks queue · Playboard window · 0 clear filters · Esc closes chip edit · Backspace home";
-    else keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
+    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Arrangement · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Arrangement · section clicks queue · Playboard window · 0 clear filters · Esc closes chip edit · Backspace home";
+    else keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Arrangement · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
   }
   if (sectionsMode === "play") {
     pullPlayQueue();
@@ -5935,7 +6273,7 @@ function openChipEditor(anchor, state) {
   chipEditAnchor = anchor || null;
   var ed = document.getElementById("chipEditor");
   var idLabel = document.getElementById("chipEditIdLabel");
-  if (idLabel) idLabel.textContent = soloMode ? "Lick label" : "Section ID";
+  if (idLabel) idLabel.textContent = arrangementMode ? "Arrange label" : (soloMode ? "Lick label" : "Section ID");
   var idInput = document.getElementById("chipEditId");
   idInput.value = state.code || "";
   var lickInput = document.getElementById("chipEditLick");
@@ -5984,7 +6322,7 @@ function readChipEditPosList() {
 function saveChipEditor() {
   if (!chipEditState) return;
   var code = (document.getElementById("chipEditId").value || "").trim();
-  if (!soloMode) code = code.toUpperCase();
+  if (!soloMode && !arrangementMode) code = code.toUpperCase();
   if (!code) { document.getElementById("chipEditId").focus(); return; }
   var tierBtn = document.querySelector("#chipEditTiers .tier-pick.on");
   var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : slotBase(chipEditState.tier || 3);
@@ -5993,10 +6331,19 @@ function saveChipEditor() {
   var song = getEditSong(ai, si);
   if (!song) return;
   var lick = (document.getElementById("chipEditLick").value || "").trim();
-  if (soloMode && !lick) lick = code;
+  if ((soloMode || arrangementMode) && !lick) lick = code;
   var posList = readChipEditPosList();
   var entry = makeChipEntry(code, tier, lick, posList);
-  if (soloMode) {
+  if (arrangementMode) {
+    pushArrangementHistory();
+    ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).forEach(function(a){
+      (a.songs || []).forEach(function(s){ growSongSlotsTo(s, ci); });
+    });
+    song = getEditSong(ai, si);
+    if (!song) return;
+    song.chips[ci] = entry;
+    saveArrangementMap();
+  } else if (soloMode) {
     pushSoloHistory();
     ((SOLO_MAP && SOLO_MAP.albums) || []).forEach(function(a){
       (a.songs || []).forEach(function(s){ growSongSlotsTo(s, ci); });
@@ -6013,7 +6360,7 @@ function saveChipEditor() {
     song.sections[ci] = entry;
     saveAlbums();
   }
-  var typ = soloMode ? "S" : secType(code);
+  var typ = (soloMode && !arrangementMode) ? "S" : secType(code);
   if (Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; })) secTypeFilter[typ] = true;
   if (Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; })) secTierFilter[tier] = true;
   if (Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter || secPosPFilter || secPosDFilter || secPosSFilter) {
@@ -6032,7 +6379,12 @@ function deleteChipEditor() {
   if (!chipEditState || chipEditState.isNew) return;
   var song = getEditSong(chipEditState.ai, chipEditState.si);
   if (!song) return;
-  if (soloMode) {
+  if (arrangementMode) {
+    pushArrangementHistory();
+    ensureArrangementSlots(song);
+    song.chips[chipEditState.ci] = null;
+    saveArrangementMap();
+  } else if (soloMode) {
     pushSoloHistory();
     ensureSoloSlots(song);
     song.licks[chipEditState.ci] = null;
@@ -6058,6 +6410,10 @@ function copySongSectionFromPair(pair) {
 function copySongSectionAt(ai, si, ci) {
   var song = getEditSong(ai, si);
   if (!song) return false;
+  if (arrangementMode) {
+    ensureArrangementSlots(song);
+    return copySongSectionFromPair(song.chips[ci]);
+  }
   if (soloMode) {
     ensureSoloSlots(song);
     return copySongSectionFromPair(song.licks[ci]);
@@ -6068,7 +6424,8 @@ function copySongSectionAt(ai, si, ci) {
 function copyFromChipEditor() {
   if (!chipEditState) return false;
   if (chipEditState.isNew) {
-    var code = (document.getElementById("chipEditId").value || "").trim().toUpperCase();
+    var code = (document.getElementById("chipEditId").value || "").trim();
+    if (!soloMode && !arrangementMode) code = code.toUpperCase();
     if (!code) return false;
     var tierBtn = document.querySelector("#chipEditTiers .tier-pick.on");
     var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : slotBase(chipEditState.tier || 3);
@@ -6084,7 +6441,14 @@ function pasteSongSectionAt(ai, si, ci) {
   if (!sectionClipboard || !isChipPair(sectionClipboard)) return false;
   var song = getEditSong(ai, si);
   if (!song) return false;
-  if (soloMode) {
+  if (arrangementMode) {
+    ensureArrangementSlots(song);
+    growSongSlotsTo(song, ci);
+    if (ci < 0 || ci >= (song.chips || []).length) return false;
+    pushArrangementHistory();
+    song.chips[ci] = sectionClipboard.slice();
+    saveArrangementMap();
+  } else if (soloMode) {
     ensureSoloSlots(song);
     if (ci < 0 || ci >= song.licks.length) return false;
     var destS = song.licks[ci];
@@ -6155,6 +6519,9 @@ function llCoverForAlbumTier(album, tier) {
 var currentLetter = "";
 SOLO_MAP = loadSoloMap();
 try { if (!localStorage.getItem(SOLO_MAP_KEY)) localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP)); } catch (e) {}
+if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap();
+try { if (!localStorage.getItem(ARRANGEMENT_MAP_KEY)) localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP)); } catch (eArr2) {}
+syncArrangementButtons();
 var dragged = null;
 var didDrag = false;
 function orderKey(letter) { return "lick-order-" + letter; }
@@ -6528,7 +6895,13 @@ function llSongRowsForLibrary() {
     if (!album) return;
     (album.songs || []).forEach(function(s, si){
       var hasChips = (s.sections || []).some(function(p){ return isChipPair(p); });
-      if (llMode === "solo") {
+      if (arrangementMode) {
+        var arrAlbum = null;
+        ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).forEach(function(a){ if (a && a.name === albumName) arrAlbum = a; });
+        var asong = null;
+        if (arrAlbum) (arrAlbum.songs || []).forEach(function(x){ if (x.song === s.song) asong = x; });
+        hasChips = !!(asong && (asong.chips || []).some(function(p){ return isChipPair(p); }));
+      } else if (llMode === "solo") {
         var soloAlbum = null;
         ((SOLO_MAP && SOLO_MAP.albums) || []).forEach(function(a){ if (a && a.name === albumName) soloAlbum = a; });
         var ss = null;
@@ -7069,7 +7442,8 @@ function llAlbumHasAttachedTab(name) {
     });
   }
   return (ALBUMS || []).some(function(a){ return albumHas(a, "sections"); }) ||
-    ((SOLO_MAP && SOLO_MAP.albums) || []).some(function(a){ return albumHas(a, "licks"); });
+    ((SOLO_MAP && SOLO_MAP.albums) || []).some(function(a){ return albumHas(a, "licks"); }) ||
+    ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).some(function(a){ return albumHas(a, "chips"); });
 }
 function llAlbumAllowed(name) {
   return (LL_LIBRARY_ALBUMS || []).indexOf(name) >= 0 || llAlbumHasAttachedTab(name);
@@ -7100,6 +7474,22 @@ function llChipItemsForMode(mode) {
       type: typ || "",
       position: posAttr || ""
     });
+  }
+  if (arrangementMode) {
+    if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap();
+    (ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums || []).forEach(function(a){
+      if (!a || !llAlbumAllowed(a.name)) return;
+      (a.songs || []).forEach(function(s){
+        (s.chips || []).forEach(function(pair){
+          if (!isChipPair(pair)) return;
+          var lab = pair[0];
+          var lick = (pair[2] || "").trim();
+          var pos = posListAttr(chipPositions(pair));
+          pushItem(lab, lick, s.song, chipTier(pair), a.name, secType(lab) || "S", pos);
+        });
+      });
+    });
+    return out;
   }
   if (mode === "solo") {
     if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
@@ -7136,7 +7526,19 @@ function llChipItemsForMode(mode) {
 
 function collectLlTypes() {
   var seen = {};
-  if (llMode === "solo") {
+  if (arrangementMode) {
+    if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap();
+    (ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums || []).forEach(function(a){
+      if (!a || !llAlbumAllowed(a.name)) return;
+      (a.songs || []).forEach(function(s){
+        (s.chips || []).forEach(function(pair){
+          if (!isChipPair(pair)) return;
+          var tp = secType(pair[0]) || "S";
+          if (tp) seen[tp] = true;
+        });
+      });
+    });
+  } else if (llMode === "solo") {
     if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
     (SOLO_MAP && SOLO_MAP.albums || []).forEach(function(a){
       if (!a || !llAlbumAllowed(a.name)) return;
@@ -7308,7 +7710,7 @@ function applyLlFilters(opts) {
   var countEl = document.getElementById("count");
   if (countEl && currentLetter === "B") {
     var n = document.querySelectorAll("#series .phrase:not(.filtered-out)").length;
-    countEl.textContent = n + (llMode === "solo" ? " solo chips" : " riff chips");
+    countEl.textContent = n + (arrangementMode ? " arrangement chips" : (llMode === "solo" ? " solo chips" : " riff chips"));
   }
 }
 function applyLlTierFilters(opts) { applyLlFilters(opts); }
@@ -7337,7 +7739,8 @@ function showSeries(letter) {
   if (!albumsDirty) pullAlbumsFromStorage();
   currentLetter = letter;
   pcColExpanded = false;
-  document.body.className = "sheet-mode stage";
+  document.body.className = "sheet-mode stage" + (arrangementMode ? " ll-arrange" : "");
+  syncArrangementButtons();
   var badgeLabel = (letter === "B") ? "Paranoid + SBS + MoR" : (letter === "B2") ? "Paranoid 2" : letter;
   document.getElementById("badge").textContent = badgeLabel;
   document.getElementById("badge").className = "badge " + letter.toLowerCase();
@@ -7346,6 +7749,14 @@ function showSeries(letter) {
   document.getElementById("series").className = "";
   bindModeSelect(document.getElementById("llBoardMode"));
   syncModeSelects();
+  var llArrBtn = document.getElementById("llArrangeBtn");
+  if (llArrBtn && !llArrBtn._arrBound) {
+    llArrBtn._arrBound = true;
+    llArrBtn.addEventListener("click", function(e){
+      e.preventDefault();
+      setArrangementMode(!arrangementMode);
+    });
+  }
   var keysEl = document.querySelector("#series .keys");
   if (keysEl) {
     keysEl.textContent = (letter === "B")
@@ -7370,7 +7781,11 @@ function showSeries(letter) {
       return { id: x[0], label: x[0], lick: x[0] };
     });
   }
-  document.getElementById("count").textContent = items.length + (llMode === "solo" && letter === "B" ? " solo chips" : letter === "B" ? " riff chips" : " licks");
+  document.getElementById("count").textContent = items.length + (
+    letter === "B"
+      ? (arrangementMode ? " arrangement chips" : (llMode === "solo" ? " solo chips" : " riff chips"))
+      : " licks"
+  );
   tabWrap.innerHTML = items.map(function(it){
     var id = it.lick || it.id;
     var label = it.label || id;
@@ -7379,8 +7794,8 @@ function showSeries(letter) {
     var on = (flipped.indexOf(id) >= 0 || flipped.indexOf(label) >= 0) ? " flipped" : "";
     var kind = lickKind(id || label).toLowerCase();
     var song = songClass(id || ("WP-"+label));
-    var tier = (it.tier >= 1 && it.tier <= 2) ? it.tier : 3;
-    var tierCls = (letter === "B") ? (" tier-"+tier) : "";
+    var tier = arrangementMode ? 3 : ((it.tier >= 1 && it.tier <= 2) ? it.tier : 3);
+    var tierCls = (letter === "B" && !arrangementMode) ? (" tier-"+tier) : (letter === "B" && arrangementMode ? " tier-arr" : "");
     var coverSrc = cover;
     if (letter === "B") {
       coverSrc = llCoverForAlbumTier(it.album || "Paranoid", tier);
@@ -7585,11 +8000,25 @@ document.addEventListener("click", function(e){
 });
 
 document.getElementById("secModes").onclick = function(e){
-  if (e.target.closest("#secUndoBtn")) { if (soloMode) undoSoloMap(); else undoAlbums(); return; }
-  if (e.target.closest("#secSaveBtn")) { if (soloMode) saveSoloMapNow(); else saveAlbumsNow(); return; }
+  if (e.target.closest("#secUndoBtn")) {
+    if (arrangementMode) undoArrangementMap();
+    else if (soloMode) undoSoloMap();
+    else undoAlbums();
+    return;
+  }
+  if (e.target.closest("#secSaveBtn")) {
+    if (arrangementMode) saveArrangementMapNow();
+    else if (soloMode) saveSoloMapNow();
+    else saveAlbumsNow();
+    return;
+  }
   /* Mode dropdown handles riff/solo; numpad 4 still toggles via setSoloMode */
   if (e.target.closest("#secPeekBtn")) {
     setHighlightMode(!highlightMode);
+    return;
+  }
+  if (e.target.closest("#secArrangeBtn")) {
+    setArrangementMode(!arrangementMode);
     return;
   }
   var btn = e.target.closest(".sec-mode-btn[data-sec-mode]");
@@ -7626,7 +8055,14 @@ document.getElementById("chipEditTiers").onclick = function(e){
   var song = getEditSong(chipEditState.ai, chipEditState.si);
   if (!song) return;
   var ci = chipEditState.ci;
-  if (soloMode) {
+  if (arrangementMode) {
+    ensureArrangementSlots(song);
+    if (!isChipPair(song.chips[ci])) return;
+    pushArrangementHistory();
+    song.chips[ci][1] = tier;
+    chipEditState.tier = tier;
+    saveArrangementMap();
+  } else if (soloMode) {
     ensureSoloSlots(song);
     if (!isChipPair(song.licks[ci])) return;
     pushSoloHistory();
@@ -7677,6 +8113,40 @@ function moveSongMapChip(fromAi, fromSi, fromCi, toAi, toSi, toCi, copy) {
   var fromSong = getEditSong(fromAi, fromSi);
   var toSong = getEditSong(toAi, toSi);
   if (!fromSong || !toSong) return false;
+  if (arrangementMode) {
+    if (fromCi < 0 || toCi < 0) return false;
+    growSongSlotsTo(fromSong, fromCi);
+    ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).forEach(function(a){
+      (a.songs || []).forEach(function(s){ growSongSlotsTo(s, toCi); });
+    });
+    var fromArrA = fromSong.chips;
+    var toArrA = toSong.chips;
+    if (fromCi >= fromArrA.length || toCi >= toArrA.length) return false;
+    if (fromAi === toAi && fromSi === toSi && fromCi === toCi) return false;
+    var itemA = fromArrA[fromCi];
+    if (!isChipPair(itemA)) return false;
+    var destA = toArrA[toCi];
+    pushArrangementHistory();
+    if (copy) {
+      toArrA[toCi] = itemA.slice();
+    } else if (fromAi === toAi && fromSi === toSi) {
+      if (isChipPair(destA)) {
+        fromArrA[fromCi] = destA;
+        fromArrA[toCi] = itemA;
+      } else {
+        fromArrA[fromCi] = null;
+        fromArrA[toCi] = itemA;
+      }
+    } else if (isChipPair(destA)) {
+      fromArrA[fromCi] = destA;
+      toArrA[toCi] = itemA;
+    } else {
+      fromArrA[fromCi] = null;
+      toArrA[toCi] = itemA;
+    }
+    saveArrangementMap();
+    return true;
+  }
   if (soloMode) {
     if (fromCi < 0 || toCi < 0) return false;
     growSongSlotsTo(fromSong, fromCi);
@@ -7916,11 +8386,20 @@ document.getElementById("sectionsSheet").onclick = function(e){
     var song = getEditSong(ai, si);
     if (!song) return;
     if (chip.classList.contains("empty")) {
-      if (soloMode) ensureSoloSlots(song); else ensureSongSlots(song);
+      if (arrangementMode) ensureArrangementSlots(song);
+      else if (soloMode) ensureSoloSlots(song);
+      else ensureSongSlots(song);
       if (sectionClipboard && (e.shiftKey || e.altKey)) {
         if (pasteSongSectionAt(ai, si, ci)) return;
       }
-      if (soloMode) {
+      if (arrangementMode) {
+        if (ci >= (song.chips || []).length) {
+          ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).forEach(function(a){
+            (a.songs || []).forEach(function(s){ growSongSlotsTo(s, ci); });
+          });
+          song = getEditSong(ai, si);
+        }
+      } else if (soloMode) {
         if (ci >= (song.licks || []).length) {
           ((SOLO_MAP && SOLO_MAP.albums) || []).forEach(function(a){
             (a.songs || []).forEach(function(s){ growSongSlotsTo(s, ci); });
@@ -7934,13 +8413,13 @@ document.getElementById("sectionsSheet").onclick = function(e){
           song = getEditSong(ai, si);
         }
       }
-      var newPos = soloMode ? [1] : defaultPositionsForAlbum(ALBUMS[ai]);
+      var newPos = (soloMode || arrangementMode) ? [1] : defaultPositionsForAlbum(ALBUMS[ai]);
       openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "", positions: newPos });
       return;
     }
     var rawPos = chip.getAttribute("data-position");
     var editPos = (rawPos == null)
-      ? (soloMode ? [1] : defaultPositionsForAlbum(ALBUMS[ai]))
+      ? ((soloMode || arrangementMode) ? [1] : defaultPositionsForAlbum(ALBUMS[ai]))
       : parsePosList(rawPos);
     openChipEditor(chip, {
       ai: ai, si: si, ci: ci, isNew: false,
@@ -8150,8 +8629,20 @@ document.addEventListener("keydown", function(e){
     var tag0 = (e.target && e.target.tagName) || "";
     if (tag0 !== "INPUT" && tag0 !== "TEXTAREA") {
       var key = (e.key || "").toLowerCase();
-      if (key === "z" && !e.shiftKey) { e.preventDefault(); if (soloMode) undoSoloMap(); else undoAlbums(); return; }
-      if (key === "s") { e.preventDefault(); if (soloMode) saveSoloMapNow(); else saveAlbumsNow(); return; }
+      if (key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        if (arrangementMode) undoArrangementMap();
+        else if (soloMode) undoSoloMap();
+        else undoAlbums();
+        return;
+      }
+      if (key === "s") {
+        e.preventDefault();
+        if (arrangementMode) saveArrangementMapNow();
+        else if (soloMode) saveSoloMapNow();
+        else saveAlbumsNow();
+        return;
+      }
       if (key === "c") {
         e.preventDefault();
         if (chipEditState && !chipEditState.isNew) copySongSectionAt(chipEditState.ai, chipEditState.si, chipEditState.ci);
