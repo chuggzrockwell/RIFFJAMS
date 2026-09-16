@@ -1760,16 +1760,16 @@
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-1[data-album="Master of Reality"] {
     outline-color: #22c55e;
   }
-  /* Vol. 4 T1 neon → orange */
+  /* Vol. 4 T1 → purple ring on stock art */
   .phrase.flipped.tier-1[data-album="Vol. 4"],
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-1[data-album="Vol. 4"] {
-    outline-color: #ff8c00;
+    outline-color: #a365d1;
   }
-  /* Vol. 4 T3 → soft violet ring (distinct from T2) */
+  /* Vol. 4 T3 → wash art only, no ring */
   .phrase.flipped.tier-3[data-album="Vol. 4"],
   .cover-board.song-cols.ll-b .song-col-body .phrase.flipped.tier-3[data-album="Vol. 4"] {
-    outline: 4px solid #c084fc;
-    outline-offset: 3px;
+    outline: none;
+    outline-offset: 0;
   }
 
   /* LL tiers: T1+T2 standard art; T3–T5 shared wash art; no invert */
@@ -4204,7 +4204,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=122";
+  var url = base + "?playboard=1&v=123";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5891,7 +5891,7 @@ function llCoverForAlbumTier(album, tier) {
     return (tier >= 3) ? "covers/mor-tier3.png?v=1" : "covers/mor-ll.png?v=1";
   }
   if (album === "Vol. 4") {
-    return (tier >= 3) ? "covers/vol4-tier3.png?v=1" : "covers/vol4.png";
+    return (tier >= 3) ? "covers/vol4-tier3.png?v=2" : "covers/vol4.png";
   }
   if (album !== "Paranoid") {
     var matchedCover = "";
