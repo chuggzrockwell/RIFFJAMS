@@ -2354,7 +2354,33 @@
     max-width: var(--chip-w);
   }
 
-  /* Arrangement mode (Song Map): same chip colors as Section mode (tier + type) */
+  /* Arrangement mode (Song Map): SBS pink by section type+number (not tier purple) */
+  body.sections-arrange .sec-chip[data-arrange="1"]:not(.empty):not(.filtered-out) {
+    background: var(--arr-bg, #ff5da5) !important;
+    color: var(--arr-fg, #fff) !important;
+    text-shadow: none !important;
+    box-shadow:
+      inset -1px 0 0 rgba(0,0,0,.25),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 0 1px rgba(0,0,0,.35) !important;
+  }
+  body.sections-arrange .sec-chip.tier-1:not(.empty):not(.filtered-out),
+  body.sections-arrange .sec-chip.tier-2:not(.empty):not(.filtered-out),
+  body.sections-arrange .sec-chip.tier-3:not(.empty):not(.filtered-out),
+  body.sections-arrange .sec-chip.tier-4:not(.empty):not(.filtered-out),
+  body.sections-arrange .sec-chip.tier-5:not(.empty):not(.filtered-out) {
+    background: var(--arr-bg, #ff5da5) !important;
+    color: var(--arr-fg, #fff) !important;
+    box-shadow:
+      inset -1px 0 0 rgba(0,0,0,.25),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 0 1px rgba(0,0,0,.35) !important;
+  }
+  body.sections-arrange .sec-chip.S:not(.filtered-out),
+  body.sections-arrange .sec-chip.L:not(.filtered-out) {
+    color: var(--arr-fg, #fff) !important;
+    text-shadow: none !important;
+  }
   body.sheet-mode #llArrangeBtn.sec-mode-btn {
     border-color: #4a4e5a;
     background: #1a1d26;
@@ -4036,6 +4062,48 @@ function secType(code) {
   var m = String(code).match(/^[A-Z]+/);
   return m ? m[0] : "";
 }
+function secNum(code) {
+  var m = String(code || "").match(/(\d+)/);
+  return m ? parseInt(m[1], 10) : 1;
+}
+function hexToRgb(hex) {
+  hex = String(hex || "").replace("#", "");
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  return [parseInt(hex.slice(0,2),16), parseInt(hex.slice(2,4),16), parseInt(hex.slice(4,6),16)];
+}
+function rgbToHex(r, g, b) {
+  return "#" + [r, g, b].map(function(x) {
+    var h = Math.round(Math.max(0, Math.min(255, x))).toString(16);
+    return h.length < 2 ? "0" + h : h;
+  }).join("");
+}
+function mixTowardWhite(hex, amount) {
+  var rgb = hexToRgb(hex);
+  var t = Math.max(0, Math.min(1, amount));
+  return rgbToHex(
+    rgb[0] + (255 - rgb[0]) * t,
+    rgb[1] + (255 - rgb[1]) * t,
+    rgb[2] + (255 - rgb[2]) * t
+  );
+}
+/* Arrangement Song Map: SBS pink family by section type; number lightens within band */
+function arrChipColors(code) {
+  var typ = secType(code) || "";
+  var n = Math.max(1, secNum(code));
+  var base;
+  if (typ === "I" || typ === "S") base = "#b01050";
+  else if (typ === "V") base = "#ff5da5";
+  else if (typ === "PC" || typ === "P") base = "#ff6eb0";
+  else if (typ === "B") base = "#ff7eb5";
+  else if (typ === "C" || typ === "L") base = "#ffc1dc";
+  else base = "#ff5da5";
+  var lighten = Math.min(0.45, (n - 1) * 0.10);
+  var bg = mixTowardWhite(base, lighten);
+  var rgb = hexToRgb(bg);
+  var lum = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
+  var fg = lum > 0.62 ? "#1a1020" : "#ffffff";
+  return { bg: bg, fg: fg };
+}
 function isChipPair(pair) {
   return !!(pair && pair[0]);
 }
@@ -4424,8 +4492,9 @@ function showSections(keepScroll) {
           } else {
             var acode = ap[0], atier = chipTier(ap), alick = ap[2] || "", apos = posListAttr(chipPositions(ap));
             var atyp = secType(acode) || "S";
+            var arrTone = arrChipColors(acode);
             n++;
-            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+alick+'" data-position="'+apos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
+            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" style="--arr-bg:'+arrTone.bg+';--arr-fg:'+arrTone.fg+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+alick+'" data-position="'+apos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
           }
         }
       } else if (soloMode) {
@@ -4546,7 +4615,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=130";
+  var url = base + "?playboard=1&v=131";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
