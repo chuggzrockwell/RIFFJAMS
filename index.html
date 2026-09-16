@@ -4042,7 +4042,7 @@ function updateEditSaveUi() {
   if (keys && document.body.className.indexOf("sections-mode") >= 0) {
     if (arrangementMode) {
       if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · Esc/0 home";
-      else if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Undo/Save · Esc/0 home";
+      else if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Undo/Save · Esc/0 home";
       else keys.textContent = "Arrangement · Esc/0 home";
     } else if (soloMode) {
       if (sectionsMode === "play") keys.textContent = "Solo · lick clicks queue · Esc/0 home";
@@ -4570,7 +4570,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=127";
+  var url = base + "?playboard=1&v=128";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5100,7 +5100,7 @@ function setSectionsMode(mode) {
   var keys = document.getElementById("sectionsKeys");
   if (keys) {
     if (arrangementMode) {
-      if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
+      if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
       else if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
       else keys.textContent = "Arrangement · Peek · 0 clear filters · Esc closes chip edit · Backspace home";
     } else if (soloMode) {
@@ -8262,6 +8262,7 @@ function finishChipMove(toChip) {
 function onChipPointerMove(e) {
   if (!chipDrag || e.pointerId !== chipDrag.pointerId) return;
   if (sectionsMode !== "edit") { endChipPointerDrag(true); return; }
+  chipDrag.copy = arrangementMode ? !!(e.ctrlKey || e.metaKey) : !!e.altKey;
   var dx = e.clientX - chipDrag.startX;
   var dy = e.clientY - chipDrag.startY;
   if (!pointerDragActive) {
@@ -8297,6 +8298,8 @@ sectionsSheetEl.addEventListener("pointerdown", function(e){
   if (!chip || chip.classList.contains("empty")) return;
   // Don't start a new drag while editing text in the chip editor
   if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) return;
+  /* Arrangement Edit: Ctrl/Cmd+drag duplicates; riff Edit: Alt+drag duplicates */
+  var wantCopy = arrangementMode ? !!(e.ctrlKey || e.metaKey) : !!e.altKey;
   chipDrag = {
     ai: parseInt(chip.getAttribute("data-ai"), 10),
     si: parseInt(chip.getAttribute("data-si"), 10),
@@ -8306,7 +8309,7 @@ sectionsSheetEl.addEventListener("pointerdown", function(e){
     startY: e.clientY,
     pointerId: e.pointerId,
     over: null,
-    copy: !!e.altKey
+    copy: wantCopy
   };
   lastSectionFocus = { ai: chipDrag.ai, si: chipDrag.si, ci: chipDrag.ci };
   pointerDragActive = false;
