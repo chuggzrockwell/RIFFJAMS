@@ -362,45 +362,16 @@
   body.sheet-mode #series {
     padding-bottom: 0;
   }
-  .sm-player-playalong {
-    position: absolute;
-    top: 8px;
-    left: 10px;
-    z-index: 2;
-    appearance: none;
-    border: 1px solid #444;
-    background: #111;
-    color: #fff;
-    font-family: inherit;
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    line-height: 1;
-    padding: 4px 7px;
-    border-radius: 999px;
-    cursor: pointer;
-  }
-  .sm-player-playalong:hover:not(:disabled) {
-    color: #fff;
-    border-color: #666;
-  }
-  .sm-player-playalong.on {
-    color: #000;
-    background: #1db954;
-    border-color: #1db954;
-  }
-  .sm-player-playalong:disabled {
-    opacity: 0.7;
-    color: #fff;
-    border-color: #333;
-    cursor: default;
-  }
-  .sm-player-mode {
+  .sm-player-tools {
     position: absolute;
     top: 8px;
     right: 10px;
     z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .sm-player-mode {
     appearance: none;
     border: 1px solid #444;
     background: #111;
@@ -419,10 +390,47 @@
     color: #fff;
     border-color: #666;
   }
+  .sm-player-mode.on,
   .sm-player-mode.is-tool {
     color: #000;
     background: #1db954;
     border-color: #1db954;
+  }
+  .sm-player-playalong {
+    appearance: none;
+    border: 1px solid #444;
+    background: #111;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: none;
+    line-height: 1;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .sm-player-playalong:hover:not(:disabled) {
+    color: #fff;
+    border-color: #666;
+  }
+  .sm-player-playalong.on {
+    color: #000;
+    background: #1db954;
+    border-color: #1db954;
+  }
+  .sm-player-playalong:disabled {
+    opacity: 0.7;
+    color: #fff;
+    border-color: #333;
+    cursor: default;
   }
   .sm-player[data-mode="tuner"] .sm-player-playalong,
   .sm-player[data-mode="metro"] .sm-player-playalong,
@@ -585,7 +593,7 @@
   .sm-player-main {
     flex: 1 1 auto;
     min-width: 0;
-    padding-top: 14px; /* room for Playalong chip */
+    padding-top: 26px; /* room for mode + P chips */
   }
   .sm-player-art {
     flex: 0 0 auto;
@@ -2490,6 +2498,7 @@
   body.sections-mode .sm-player-btn,
   body.sections-mode .sm-player-playalong,
   body.sections-mode .sm-player-mode,
+  body.sections-mode .sm-player-tools,
   body.sections-mode .sm-tuner,
   body.sections-mode .sm-metro,
   body.sections-mode .sm-player-time,
@@ -3274,21 +3283,28 @@
       overflow-y: auto;
       z-index: 60;
     }
-    .sm-player-playalong {
-      top: 6px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.5rem;
-      padding: 3px 5px;
-    }
-    .sm-player-mode {
-      top: auto;
-      bottom: 6px;
+    .sm-player-tools {
+      top: 4px;
       right: 50%;
       left: auto;
       transform: translateX(50%);
-      font-size: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: calc(100% - 4px);
+      gap: 3px;
+    }
+    .sm-player-mode {
+      font-size: 0.48rem;
       padding: 3px 5px;
+    }
+    .sm-player-playalong {
+      width: 22px;
+      height: 22px;
+      font-size: 0.58rem;
+    }
+    body.sections-mode .sm-player,
+    body.sheet-mode .sm-player {
+      padding-top: 52px;
     }
     .sm-tuner-note { font-size: 1.35rem; }
     .sm-metro-bpm { font-size: 1.1rem; width: 2.8em; }
@@ -3486,8 +3502,12 @@
 
   <div id="ytPlayerHost" aria-hidden="true"></div>
   <div class="sm-player" id="smPlayer" aria-label="Song player" data-mode="player">
-    <button type="button" class="sm-player-playalong" id="smPlayalong" title="Toggle playalong backing track" aria-pressed="false" disabled>Playalong</button>
-    <button type="button" class="sm-player-mode" id="smPlayerMode" title="Player mode">Player</button>
+    <div class="sm-player-tools" id="smPlayerTools">
+      <button type="button" class="sm-player-mode on" id="smModePlayer" data-sm-mode="player" title="Player" aria-pressed="true">Player</button>
+      <button type="button" class="sm-player-mode" id="smModeTuner" data-sm-mode="tuner" title="Tuner" aria-pressed="false">Tuner</button>
+      <button type="button" class="sm-player-mode" id="smModeMetro" data-sm-mode="metro" title="Metronome" aria-pressed="false">Metro</button>
+      <button type="button" class="sm-player-playalong" id="smPlayalong" title="Toggle playalong backing track" aria-pressed="false" disabled>P</button>
+    </div>
     <div class="sm-player-main">
       <div class="sm-player-meta sm-player-meta-song" id="smPlayerMeta">Pick a song · Space play/pause</div>
       <div class="sm-tuner" id="smTuner" aria-label="Guitar tuner">
@@ -5224,7 +5244,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=164";
+  var url = base + "?playboard=1&v=165";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6591,12 +6611,15 @@ function smPauseYouTubeQuiet() {
 }
 
 function smSetModeChip() {
-  var btn = document.getElementById("smPlayerMode");
-  if (!btn) return;
-  var label = SM_MODE_LABELS[smPlayerMode] || "Player";
-  btn.textContent = label;
-  btn.title = "Player mode — tap to cycle (now: " + label + ")";
-  btn.classList.toggle("is-tool", smPlayerMode !== "player");
+  var btns = document.querySelectorAll(".sm-player-mode[data-sm-mode]");
+  for (var i = 0; i < btns.length; i++) {
+    var b = btns[i];
+    var m = b.getAttribute("data-sm-mode");
+    var active = m === smPlayerMode;
+    b.classList.toggle("on", active);
+    b.classList.toggle("is-tool", active && m !== "player");
+    b.setAttribute("aria-pressed", active ? "true" : "false");
+  }
   var bar = document.getElementById("smPlayer");
   if (bar) {
     bar.setAttribute("data-mode", smPlayerMode);
@@ -6931,8 +6954,12 @@ function smInitModeUi() {
       if (n >= 40 && n <= 240) smMetroBpm = n;
     }
   } catch (errBpm) {}
-  var modeBtn = document.getElementById("smPlayerMode");
-  if (modeBtn) modeBtn.onclick = smCyclePlayerMode;
+  var modeBtns = document.querySelectorAll(".sm-player-mode[data-sm-mode]");
+  for (var mi = 0; mi < modeBtns.length; mi++) {
+    (function(btn){
+      btn.onclick = function(){ smSetPlayerMode(btn.getAttribute("data-sm-mode")); };
+    })(modeBtns[mi]);
+  }
   var bpmInput = document.getElementById("smMetroBpm");
   if (bpmInput) {
     bpmInput.value = String(smMetroBpm);
