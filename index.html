@@ -1190,6 +1190,57 @@
     flex: 0 0 90px;
     min-width: 90px;
   }
+  .sm-arr-current-row {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 10px;
+    max-width: min(520px, calc(100vw - 40px));
+  }
+  .sm-arr-cur-tab {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: stretch;
+  }
+  .sm-arr-cur-tab-view {
+    position: relative;
+    box-sizing: border-box;
+    width: 320px;
+    max-width: 100%;
+    min-height: 90px;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,.18);
+    background: rgba(0,0,0,.14);
+    pointer-events: none;
+  }
+  .sm-arr-cur-tab-view img {
+    display: block;
+    height: 100%;
+    width: auto;
+    max-width: none;
+    transform: translateX(0);
+    will-change: transform;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  .sm-arr-cur-tab-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.55);
+    pointer-events: none;
+  }
+  .sm-arr-cur-tab-empty.is-hidden { display: none; }
   .sm-arr-next-label {
     font-family: "Paranoid Title", "Black Ops One", cursive;
     font-size: 1.7rem;
@@ -4899,9 +4950,17 @@ function showSections(keepScroll) {
       + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
       + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
       + '</div>'
+      + '<div class="sm-arr-current-row">'
       + '<div class="sm-arr-cue-col sm-arr-cue-current">'
       + '<div class="sm-arr-next-label">Current section</div>'
       + '<div class="sm-arr-next-chip sm-arr-cur-chip is-empty" id="smArrCurChip">—</div>'
+      + '</div>'
+      + '<div class="sm-arr-cur-tab" id="smArrCurTab">'
+      + '<div class="sm-arr-cur-tab-view" id="smArrCurTabView">'
+      + '<img id="smArrCurTabImg" alt="">'
+      + '<div class="sm-arr-cur-tab-empty" id="smArrCurTabEmpty">No tab</div>'
+      + '</div>'
+      + '</div>'
       + '</div>'
       + '</aside>'
     : "";
@@ -4979,7 +5038,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=152";
+  var url = base + "?playboard=1&v=153";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6181,6 +6240,81 @@ function smPaintArrCueChip(el, baseClass, item, emptyText) {
   el.style.color = tone.fg;
   el.textContent = item.code;
 }
+
+var smArrCurTabKey = "";
+function smArrResolveCurTabLick(item, songName) {
+  if (!item || !item.pair) return "";
+  var pair = item.pair;
+  var fromPair = String(pair[2] || "").trim();
+  if (fromPair) return fromPair;
+  return sectionLickId(songName || "", item.code || pair[0], pair[2]);
+}
+function smUpdateArrCurTabPreview(pick, songName, t, force) {
+  var view = document.getElementById("smArrCurTabView");
+  var img = document.getElementById("smArrCurTabImg");
+  var emptyEl = document.getElementById("smArrCurTabEmpty");
+  if (!view || !img) return;
+  if (force) smArrCurTabKey = "";
+  var item = (pick && !pick.empty) ? pick.current : null;
+  var lickId = smArrResolveCurTabLick(item, songName);
+  var key = item ? ("c:" + (item.ci != null ? item.ci : "") + ":" + lickId) : "empty";
+  if (key !== smArrCurTabKey) {
+    smArrCurTabKey = key;
+    img.style.transform = "translateX(0px)";
+    img.onload = null;
+    img.onerror = null;
+    if (!lickId) {
+      img.removeAttribute("src");
+      img.style.visibility = "hidden";
+      if (emptyEl) {
+        emptyEl.textContent = "No tab";
+        emptyEl.classList.remove("is-hidden");
+      }
+    } else {
+      if (emptyEl) emptyEl.classList.add("is-hidden");
+      img.style.visibility = "hidden";
+      img.onload = function(){
+        img.style.visibility = "visible";
+        if (emptyEl) emptyEl.classList.add("is-hidden");
+        smPanArrCurTab(pick, t);
+      };
+      img.onerror = function(){
+        img.removeAttribute("src");
+        img.style.visibility = "hidden";
+        img.style.transform = "translateX(0px)";
+        if (emptyEl) {
+          emptyEl.textContent = "No tab";
+          emptyEl.classList.remove("is-hidden");
+        }
+      };
+      img.src = lickSrc(lickId);
+    }
+  }
+  smPanArrCurTab(pick, t);
+}
+function smPanArrCurTab(pick, t) {
+  var view = document.getElementById("smArrCurTabView");
+  var img = document.getElementById("smArrCurTabImg");
+  if (!view || !img) return;
+  if (!img.getAttribute("src") || img.style.visibility === "hidden") {
+    img.style.transform = "translateX(0px)";
+    return;
+  }
+  var item = (pick && !pick.empty) ? pick.current : null;
+  var next = (pick && !pick.empty) ? pick.next : null;
+  if (!item || !next) {
+    img.style.transform = "translateX(0px)";
+    return;
+  }
+  var span = next.start - item.start;
+  var progress = span > 0 ? Math.max(0, Math.min(1, (t - item.start) / span)) : 0;
+  var maxScroll = Math.max(0, img.offsetWidth - view.clientWidth);
+  if (maxScroll <= 0) {
+    img.style.transform = "translateX(0px)";
+    return;
+  }
+  img.style.transform = "translateX(" + (-progress * maxScroll) + "px)";
+}
 function smUpdateArrNextCue(force) {
   var panel = document.getElementById("smArrNextPanel");
   var curEl = document.getElementById("smArrCurChip");
@@ -6263,6 +6397,7 @@ function smUpdateArrNextCue(force) {
       if (ci === nextCi) el.classList.add("is-arr-next");
     });
   }
+  if (typeof smUpdateArrCurTabPreview === "function") smUpdateArrCurTabPreview(pick, songName, t, !!force);
 }
 function smTick() {
   if (smSeeking || !smYtPlayer || !smYtPlayer.getCurrentTime) return;
