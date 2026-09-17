@@ -356,6 +356,13 @@
     gap: 14px;
     /* Stay pinned to the viewport while page content scrolls */
     transform: none;
+    text-transform: uppercase;
+  }
+  #smPlayer,
+  #smPlayer *,
+  .sm-player,
+  .sm-player * {
+    text-transform: uppercase;
   }
   body.sections-mode .sm-player,
   body.sheet-mode .sm-player { display: flex; }
@@ -2860,6 +2867,41 @@
     color: var(--arr-fg, #fff) !important;
     text-shadow: none !important;
   }
+  /* Arrangement variants 4+: top-right dog-ear corner accent + thin black diagonal */
+  body.sections-arrange .sec-chip[data-arr-corner]:not(.empty),
+  .sm-arr-next-chip[data-arr-corner],
+  .sm-arr-cur-chip[data-arr-corner] {
+    position: relative;
+    overflow: hidden;
+  }
+  body.sections-arrange .sec-chip[data-arr-corner]:not(.empty)::before,
+  .sm-arr-next-chip[data-arr-corner]::before,
+  .sm-arr-cur-chip[data-arr-corner]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 38%;
+    height: 38%;
+    background: #0a0a0a;
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  body.sections-arrange .sec-chip[data-arr-corner]:not(.empty)::after,
+  .sm-arr-next-chip[data-arr-corner]::after,
+  .sm-arr-cur-chip[data-arr-corner]::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 38%;
+    height: 38%;
+    background: var(--arr-corner, #39d353);
+    clip-path: polygon(100% 0, 2.5px 0, 100% calc(100% - 2.5px));
+    pointer-events: none;
+    z-index: 2;
+  }
   body.sheet-mode #llArrangeBtn.sec-mode-btn {
     border-color: #4a4e5a;
     background: #1a1d26;
@@ -4635,34 +4677,49 @@ function mixTowardWhite(hex, amount) {
 }
 /* Arrangement Song Map: SBS pink family by section type; number lightens within band */
 function arrChipColors(code) {
-  /* Arrangement: color by section type; V and B use per-variant swatches */
+  /* Arrangement: color by section type; V and B use per-variant swatches.
+     Variants 1–3: existing lightening. Variants 4+: freeze at variant-3 base + dog-ear corner. */
   var typ = secType(code) || "";
   var n = Math.max(1, secNum(code));
+  var colorN = (n >= 4) ? 3 : n;
   var bg;
   if (typ === "V") {
     /* V1→T1, V2→T2, V3+→T3 (same as Section mode chip purples) */
-    if (n <= 1) bg = "#7030a0";
-    else if (n === 2) bg = "#a365d1";
+    if (colorN <= 1) bg = "#7030a0";
+    else if (colorN === 2) bg = "#a365d1";
     else bg = "#d4bbe3";
   } else if (typ === "B") {
-    /* B1 / B2 from Jacob swatches; B3+ lighten from B2 */
-    if (n <= 1) bg = "#f3101f";
-    else if (n === 2) bg = "#f4716c";
-    else bg = mixTowardWhite("#f4716c", 1 - Math.pow(0.5, n - 2));
+    /* B1 / B2 from Jacob swatches; B3 (+4+) use B3 mixTowardWhite from B2 */
+    if (colorN <= 1) bg = "#f3101f";
+    else if (colorN === 2) bg = "#f4716c";
+    else bg = mixTowardWhite("#f4716c", 1 - Math.pow(0.5, colorN - 2));
   } else {
     var base;
     if (typ === "I") base = "#e860e8";                      /* magenta purple — intros */
     else if (typ === "S" || typ === "L") base = "#2866bd"; /* blue — solos + leads */
     else if (typ === "C" || typ === "PC" || typ === "P") base = "#65301e"; /* brown — choruses + PCs */
     else base = "#546e7a";                                  /* unknown — slate */
-    /* n=1: 0; n=2: 0.5; n=3: 0.75; n=4: 0.875 … toward white */
-    var lighten = 1 - Math.pow(0.5, n - 1);
+    /* n=1: 0; n=2: 0.5; n=3: 0.75 (frozen for n≥4) toward white */
+    var lighten = 1 - Math.pow(0.5, colorN - 1);
     bg = mixTowardWhite(base, lighten);
   }
   var rgb = hexToRgb(bg);
   var lum = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
   var fg = lum > 0.62 ? "#1a1020" : "#ffffff";
-  return { bg: bg, fg: fg };
+  var corner = null;
+  if (n >= 4) {
+    var ARR_CORNER_PALETTE = [
+      "#39d353", /* 4 green */
+      "#ffd60a", /* 5 yellow */
+      "#00d4ff", /* 6 cyan */
+      "#ff9f0a", /* 7 orange */
+      "#ff2d55", /* 8 hot pink/red */
+      "#bf5af2", /* 9 violet */
+      "#ffffff"  /* 10 white */
+    ];
+    corner = ARR_CORNER_PALETTE[(n - 4) % ARR_CORNER_PALETTE.length];
+  }
+  return { bg: bg, fg: fg, corner: corner };
 }
 function isChipPair(pair) {
   return !!(pair && pair[0]);
@@ -5108,8 +5165,14 @@ function showSections(keepScroll) {
             var arrTone = arrChipColors(acode);
             var aStart = chipStartSec(ap);
             var aStartAttr = (aStart != null) ? String(aStart) : "";
+            var arrStyle = "--arr-bg:"+arrTone.bg+";--arr-fg:"+arrTone.fg;
+            var arrCornerAttr = "";
+            if (arrTone.corner) {
+              arrStyle += ";--arr-corner:"+arrTone.corner;
+              arrCornerAttr = ' data-arr-corner="1"';
+            }
             n++;
-            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" style="--arr-bg:'+arrTone.bg+';--arr-fg:'+arrTone.fg+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+alick+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
+            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" style="'+arrStyle+'" data-arrange="1"'+arrCornerAttr+' data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+alick+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
           }
         }
       } else if (soloMode) {
@@ -5244,7 +5307,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=165";
+  var url = base + "?playboard=1&v=166";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6453,6 +6516,8 @@ function smPaintArrCueChip(el, baseClass, item, emptyText) {
     el.className = baseClass + " is-empty";
     el.style.background = "";
     el.style.color = "";
+    el.style.removeProperty("--arr-corner");
+    el.removeAttribute("data-arr-corner");
     el.textContent = emptyText || "—";
     return;
   }
@@ -6460,6 +6525,13 @@ function smPaintArrCueChip(el, baseClass, item, emptyText) {
   el.className = baseClass;
   el.style.background = tone.bg;
   el.style.color = tone.fg;
+  if (tone.corner) {
+    el.style.setProperty("--arr-corner", tone.corner);
+    el.setAttribute("data-arr-corner", "1");
+  } else {
+    el.style.removeProperty("--arr-corner");
+    el.removeAttribute("data-arr-corner");
+  }
   el.textContent = item.code;
 }
 
