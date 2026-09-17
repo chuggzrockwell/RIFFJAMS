@@ -2353,6 +2353,12 @@
       inset -1px 0 0 rgba(0,0,0,.25),
       inset 0 -1px 0 rgba(0,0,0,.25),
       0 0 0 1px rgba(0,0,0,.35);
+    /* One fixed type size for every grid chip (Gadget metrics) */
+    font-size: 0.7rem !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1 !important;
+    text-transform: uppercase;
   }
   body.sections-mode .sec-chip.S {
     text-shadow: 0 0 8px rgba(255,228,74,.55);
@@ -4920,7 +4926,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=143";
+  var url = base + "?playboard=1&v=144";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
