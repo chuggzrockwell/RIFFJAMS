@@ -2634,6 +2634,63 @@
     max-width: var(--chip-w);
   }
 
+
+  /* Variants 4–7+: N vertical stripes to the right of the label */
+  body.sections-mode .sec-chip[data-varn]:not(.empty) {
+    position: relative;
+    padding-right: calc(var(--varn, 4) * 2px + 3px) !important;
+  }
+  body.sections-mode .sec-chip[data-varn]:not(.empty)::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    right: 2px;
+    width: calc(var(--varn) * 2px - 1px);
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to right,
+      rgba(255,255,255,.92) 0 1px,
+      transparent 1px 2px
+    );
+  }
+  /* Dark-on-light chips: dark stripes */
+  body.sections-mode .sec-chip.tier-3[data-varn]:not(.empty)::after {
+    background: repeating-linear-gradient(
+      to right,
+      rgba(26,16,32,.78) 0 1px,
+      transparent 1px 2px
+    );
+  }
+  .sm-arr-next-chip[data-varn],
+  .sm-arr-cur-chip[data-varn] {
+    position: relative;
+    padding-right: calc(var(--varn, 4) * 10px + 12px) !important;
+  }
+  .sm-arr-next-chip[data-varn]::after,
+  .sm-arr-cur-chip[data-varn]::after {
+    content: "";
+    position: absolute;
+    top: 12%;
+    bottom: 12%;
+    right: 10px;
+    width: calc(var(--varn) * 10px - 4px);
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to right,
+      currentColor 0 4px,
+      transparent 4px 10px
+    );
+    opacity: 0.85;
+  }
+
+  body.sections-arrange .sec-chip[data-varn][data-stripe-ink="dark"]:not(.empty)::after {
+    background: repeating-linear-gradient(
+      to right,
+      rgba(26,16,32,.78) 0 1px,
+      transparent 1px 2px
+    );
+  }
   /* Arrangement mode (Song Map): SBS pink by section type+number (not tier purple) */
   body.sections-arrange .sec-chip[data-arrange="1"]:not(.empty):not(.filtered-out) {
     background: var(--arr-bg, #e6b800) !important;
@@ -4366,6 +4423,13 @@ function secNum(code) {
   var m = String(code || "").match(/(\d+)/);
   return m ? parseInt(m[1], 10) : 1;
 }
+/* Variant stripe markup for codes numbered 4+ (B4→4 stripes, …) */
+function variantStripeAttrs(code) {
+  var n = secNum(code);
+  if (n < 4) return { attr: "", style: "" };
+  if (n > 7) n = 7;
+  return { attr: ' data-varn="'+n+'"', style: "--varn:"+n+";" };
+}
 function hexToRgb(hex) {
   hex = String(hex || "").replace("#", "");
   if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
@@ -4861,8 +4925,10 @@ function showSections(keepScroll) {
             var arrTone = arrChipColors(acode);
             var aStart = chipStartSec(ap);
             var aStartAttr = (aStart != null) ? String(aStart) : "";
+            var aVar = variantStripeAttrs(acode);
+            var aInk = (arrTone.fg && arrTone.fg.toLowerCase() !== "#ffffff" && arrTone.fg !== "#fff") ? ' data-stripe-ink="dark"' : "";
             n++;
-            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" style="--arr-bg:'+arrTone.bg+';--arr-fg:'+arrTone.fg+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+alick+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
+            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" style="--arr-bg:'+arrTone.bg+';--arr-fg:'+arrTone.fg+';'+aVar.style+'" data-arrange="1"'+aVar.attr+aInk+' data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+alick+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
           }
         }
       } else if (soloMode) {
@@ -4891,7 +4957,8 @@ function showSections(keepScroll) {
           } else {
             var code = pair[0], tier = chipTier(pair), lick = sectionLickId(s.song, code, pair[2]), pos = posListAttr(chipPositions(pair));
             var typ = secType(code);
-            chipArr.push('<button type="button" class="sec-chip '+typ+' '+slotCss("tier", tier)+'" data-song="'+s.song+'" data-sec="'+code+'" data-type="'+typ+'" data-tier="'+tier+'" data-lick="'+lick+'" data-position="'+pos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+code+'</button>');
+            var sVar = variantStripeAttrs(code);
+            chipArr.push('<button type="button" class="sec-chip '+typ+' '+slotCss("tier", tier)+'" style="'+sVar.style+'"'+sVar.attr+' data-song="'+s.song+'" data-sec="'+code+'" data-type="'+typ+'" data-tier="'+tier+'" data-lick="'+lick+'" data-position="'+pos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+code+'</button>');
           }
         }
       }
@@ -4997,7 +5064,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=160";
+  var url = base + "?playboard=1&v=161";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6190,13 +6257,24 @@ function smPaintArrCueChip(el, baseClass, item, emptyText) {
     el.className = baseClass + " is-empty";
     el.style.background = "";
     el.style.color = "";
+    el.style.removeProperty("--varn");
+    el.removeAttribute("data-varn");
     el.textContent = emptyText || "—";
     return;
   }
   var tone = arrChipColors(item.code);
+  var vn = secNum(item.code);
   el.className = baseClass;
   el.style.background = tone.bg;
   el.style.color = tone.fg;
+  if (vn >= 4) {
+    var n = Math.min(7, vn);
+    el.style.setProperty("--varn", String(n));
+    el.setAttribute("data-varn", String(n));
+  } else {
+    el.style.removeProperty("--varn");
+    el.removeAttribute("data-varn");
+  }
   el.textContent = item.code;
 }
 
