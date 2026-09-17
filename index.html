@@ -2242,14 +2242,50 @@
     content: none !important;
   }
   /* Nameplates: charcoal #333, rounded all corners, white text; no glow */
+
+  /* Song Map: all UI text uses Vol4/Gadget */
+  body.sections-mode,
+  body.sections-mode button,
+  body.sections-mode input,
+  body.sections-mode select,
+  body.sections-mode label,
+  body.sections-mode .sec-mode-btn,
+  body.sections-mode .sm-player,
+  body.sections-mode .sm-player-meta,
+  body.sections-mode .sm-player-btn,
+  body.sections-mode .sm-player-playalong,
+  body.sections-mode .sm-player-time,
+  body.sections-mode .sec-filter-group,
+  body.sections-mode .sec-dd,
+  body.sections-mode .chip-editor,
+  body.sections-mode .sm-arr-next-label,
+  body.sections-mode .sm-arr-next-chip,
+  body.sections-mode .sm-arr-cur-chip,
+  body.sections-mode .sm-arr-next-countdown,
+  body.sections-mode .song-name,
+  body.sections-mode .song-name.np-paranoid,
+  body.sections-mode .song-name.np-sbs,
+  body.sections-mode .song-name.np-mor,
+  body.sections-mode .song-name.np-vol4,
+  body.sections-mode .sec-chip,
+  body.sections-mode .song-row.np-paranoid .sec-chip,
+  body.sections-mode .song-row.np-sbs .sec-chip,
+  body.sections-mode .song-row.np-mor .sec-chip,
+  body.sections-mode .song-row.np-vol4 .sec-chip,
+  body.sections-mode .row-num,
+  body.sections-mode .sec-head,
+  body.sections-mode .col-num,
+  body.sections-mode .sec-outline {
+    font-family: "Vol4 Title", "Impact", sans-serif !important;
+  }
   /* Album title fonts (Fonts In Use / Sabbath cousins) */
   body.sections-mode .song-name.np-paranoid {
-    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-family: "Vol4 Title", "Impact", sans-serif;
     font-weight: 400;
     letter-spacing: 0.02em;
   }
   body.sections-mode .song-name.np-sbs {
-    font-family: "SBS Title", "Metal Mania", cursive;
+    font-family: "Vol4 Title", "Impact", sans-serif;
     font-weight: 400;
     letter-spacing: 0.02em;
   }
@@ -2260,17 +2296,17 @@
     text-transform: uppercase;
   }
   body.sections-mode .song-name.np-mor {
-    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-family: "Vol4 Title", "Impact", sans-serif;
     font-weight: 400;
     letter-spacing: 0.02em;
   }
   /* Section chips inherit album font from song-row */
   body.sections-mode .song-row.np-paranoid .sec-chip {
-    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-family: "Vol4 Title", "Impact", sans-serif;
     font-weight: 400;
   }
   body.sections-mode .song-row.np-sbs .sec-chip {
-    font-family: "SBS Title", "Metal Mania", cursive;
+    font-family: "Vol4 Title", "Impact", sans-serif;
     font-weight: 400;
   }
   body.sections-mode .song-row.np-vol4 .sec-chip {
@@ -2279,7 +2315,7 @@
     text-transform: uppercase;
   }
   body.sections-mode .song-row.np-mor .sec-chip {
-    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-family: "Vol4 Title", "Impact", sans-serif;
     font-weight: 400;
   }
   body.sections-mode .song-name.np-paranoid,
@@ -4884,7 +4920,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=142";
+  var url = base + "?playboard=1&v=143";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
