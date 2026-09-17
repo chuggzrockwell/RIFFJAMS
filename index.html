@@ -4387,7 +4387,7 @@ function mixTowardWhite(hex, amount) {
 }
 /* Arrangement Song Map: SBS pink family by section type; number lightens within band */
 function arrChipColors(code) {
-  /* Arrangement: color by section type; verses use Section-mode tier purples by variant # */
+  /* Arrangement: color by section type; V and B use per-variant swatches */
   var typ = secType(code) || "";
   var n = Math.max(1, secNum(code));
   var bg;
@@ -4396,10 +4396,14 @@ function arrChipColors(code) {
     if (n <= 1) bg = "#7030a0";
     else if (n === 2) bg = "#a365d1";
     else bg = "#d4bbe3";
+  } else if (typ === "B") {
+    /* B1 / B2 from Jacob swatches; B3+ lighten from B2 */
+    if (n <= 1) bg = "#f3101f";
+    else if (n === 2) bg = "#f4716c";
+    else bg = mixTowardWhite("#f4716c", 1 - Math.pow(0.5, n - 2));
   } else {
     var base;
     if (typ === "I") base = "#e860e8";                      /* magenta purple — intros */
-    else if (typ === "B") base = "#a8242c";                 /* red — bridges */
     else if (typ === "S" || typ === "L") base = "#2866bd"; /* blue — solos + leads */
     else if (typ === "C" || typ === "PC" || typ === "P") base = "#65301e"; /* brown — choruses + PCs */
     else base = "#546e7a";                                  /* unknown — slate */
@@ -4992,7 +4996,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=158";
+  var url = base + "?playboard=1&v=159";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
