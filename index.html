@@ -461,13 +461,13 @@
     display: none !important;
   }
   .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play {
-    width: 80px;
-    height: 80px;
+    width: 64px;
+    height: 64px;
     flex: 0 0 auto;
   }
   .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play svg {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
   }
   .sm-tuner, .sm-metro {
     display: none;
@@ -529,10 +529,10 @@
   }
   .sm-player[data-mode="metro"] .sm-metro {
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     justify-content: flex-start;
     gap: 14px;
-    min-height: 72px;
+    min-height: 220px;
     max-height: none;
     box-sizing: border-box;
     width: 100%;
@@ -541,9 +541,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    justify-content: space-evenly;
+    gap: 0;
     flex: 0 0 auto;
+    align-self: stretch;
+    min-height: 100%;
+    box-sizing: border-box;
   }
   .sm-metro-main {
     display: flex;
@@ -568,10 +571,10 @@
     border: 1px solid #444;
     background: #111;
     color: #fff;
-    width: 76px;
-    height: 76px;
+    width: 61px;
+    height: 61px;
     border-radius: 50%;
-    font-size: 2.4rem;
+    font-size: 1.92rem;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
@@ -3361,18 +3364,17 @@
     }
     .sm-tuner-note { font-size: 1.35rem; }
     .sm-metro-bpm { font-size: 1.45rem; width: 3em; }
-    .sm-metro-bpm-btn { width: 56px; height: 56px; font-size: 1.8rem; }
-    .sm-metro-accent { font-size: 0.7rem; padding: 6px 12px; }
+    .sm-metro-bpm-btn { width: 49px; height: 49px; font-size: 1.45rem; }
     .sm-metro-label { font-size: 0.7rem; }
-    .sm-player[data-mode="metro"] .sm-metro { max-height: none; gap: 10px; }
-    .sm-metro-speed { gap: 6px; }
+    .sm-player[data-mode="metro"] .sm-metro { max-height: none; gap: 10px; min-height: 180px; }
+    .sm-metro-speed { gap: 0; justify-content: space-evenly; }
     .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play {
-      width: 64px;
-      height: 64px;
+      width: 51px;
+      height: 51px;
     }
     .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play svg {
-      width: 26px;
-      height: 26px;
+      width: 21px;
+      height: 21px;
     }
     .sm-player-main {
       display: flex;
@@ -3600,7 +3602,6 @@
             <input type="number" class="sm-metro-bpm" id="smMetroBpm" min="40" max="240" step="1" value="120" inputmode="numeric" aria-label="Beats per minute">
           </div>
           <div class="sm-metro-row">
-            <button type="button" class="sm-metro-accent on" id="smMetroAccent" title="Accent every 4 beats" aria-pressed="true">4/4</button>
             <div class="sm-metro-pulse" id="smMetroPulse" aria-hidden="true"></div>
           </div>
         </div>
@@ -5317,7 +5318,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=172";
+  var url = base + "?playboard=1&v=173";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -7069,14 +7070,6 @@ function smInitModeUi() {
   var plus = document.getElementById("smMetroPlus");
   if (minus) minus.onclick = function(){ smMetroSetBpm(smMetroBpm - 1); };
   if (plus) plus.onclick = function(){ smMetroSetBpm(smMetroBpm + 1); };
-  var accent = document.getElementById("smMetroAccent");
-  if (accent) {
-    accent.onclick = function(){
-      smMetroAccent = !smMetroAccent;
-      accent.classList.toggle("on", smMetroAccent);
-      accent.setAttribute("aria-pressed", smMetroAccent ? "true" : "false");
-    };
-  }
   smSetModeChip();
 }
 
