@@ -344,6 +344,9 @@
     z-index: 200;
     width: min(420px, calc(100% - 32px));
     max-width: 420px;
+    height: 197px;
+    min-height: 197px;
+    max-height: 197px;
     margin: 0;
     padding: 18px 16px 12px;
     background: #000;
@@ -461,13 +464,13 @@
     display: none !important;
   }
   .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play {
-    width: 35px;
-    height: 35px;
+    width: 41px;
+    height: 41px;
     flex: 0 0 auto;
   }
   .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play svg {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
   }
   .sm-tuner, .sm-metro {
     display: none;
@@ -476,7 +479,9 @@
     justify-content: center;
     gap: 6px;
     width: 100%;
-    min-height: 120px;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
     box-sizing: border-box;
   }
   .sm-player[data-mode="tuner"] .sm-tuner,
@@ -533,16 +538,16 @@
     align-items: stretch;
     justify-content: flex-start;
     gap: 10px;
-    min-height: 120px;
-    height: 120px;
-    max-height: 120px;
+    min-height: 0;
+    height: 100%;
+    max-height: none;
     box-sizing: border-box;
     width: 100%;
   }
   .sm-player[data-mode="tuner"] .sm-tuner {
-    min-height: 120px;
-    height: 120px;
-    max-height: 120px;
+    min-height: 0;
+    height: 100%;
+    max-height: none;
     box-sizing: border-box;
   }
   .sm-metro-speed {
@@ -579,10 +584,10 @@
     border: 1px solid #444;
     background: #111;
     color: #fff;
-    width: 33px;
-    height: 33px;
+    width: 39px;
+    height: 39px;
     border-radius: 50%;
-    font-size: 1.05rem;
+    font-size: 1.2rem;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
@@ -591,9 +596,9 @@
   }
   .sm-metro-bpm-btn:hover { border-color: #666; }
   .sm-metro-bpm {
-    width: 3.2em;
+    width: 3.6em;
     text-align: center;
-    font-size: 2.4rem;
+    font-size: 2.85rem;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     background: transparent;
@@ -611,7 +616,7 @@
     margin: 0;
   }
   .sm-metro-label {
-    font-size: 1.15rem;
+    font-size: 1.35rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -658,7 +663,13 @@
   .sm-player-main {
     flex: 1 1 auto;
     min-width: 0;
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding-top: 26px; /* room for mode + P chips */
+    box-sizing: border-box;
   }
   .sm-player-art {
     flex: 0 0 auto;
@@ -3375,21 +3386,28 @@
     .sm-metro-bpm { font-size: 1.85rem; width: 2.8em; }
     .sm-metro-label { font-size: 0.95rem; }
     .sm-metro-bpm-btn { width: 28px; height: 28px; font-size: 0.95rem; }
+    body.sections-mode .sm-player,
+    body.sheet-mode .sm-player {
+      height: 197px;
+      min-height: 197px;
+      max-height: 197px;
+    }
     .sm-player[data-mode="metro"] .sm-metro,
     .sm-player[data-mode="tuner"] .sm-tuner {
-      min-height: 100px;
-      height: 100px;
-      max-height: 100px;
+      min-height: 0;
+      height: 100%;
+      max-height: none;
       gap: 8px;
     }
     .sm-metro-speed { gap: 0; justify-content: space-evenly; }
+    .sm-metro-bpm-btn { width: 34px; height: 34px; font-size: 1.05rem; }
     .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play {
-      width: 30px;
-      height: 30px;
+      width: 36px;
+      height: 36px;
     }
     .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play svg {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
     }
     .sm-player-main {
       display: flex;
@@ -5335,7 +5353,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=177";
+  var url = base + "?playboard=1&v=178";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
