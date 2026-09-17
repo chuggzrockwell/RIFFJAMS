@@ -4727,7 +4727,9 @@ function arrChipColors(code) {
     var base;
     if (typ === "I") base = "#e860e8";                      /* magenta purple — intros */
     else if (typ === "S" || typ === "L") base = "#2866bd"; /* blue — solos + leads */
-    else if (typ === "C" || typ === "PC" || typ === "P") base = "#65301e"; /* brown — choruses + PCs */
+    else if (typ === "PC" || typ === "P") base = "#f0c008"; /* yellow — pre-choruses (Jacob swatch) */
+    else if (typ === "C") base = "#18d060";                 /* green — choruses (Jacob swatch) */
+    else if (typ === "O") base = "#d86820";                 /* orange — outros (Jacob swatch) */
     else base = "#546e7a";                                  /* unknown — slate */
     /* n=1: 0; n=2: 0.5; n=3: 0.75 (frozen for n≥4) toward white */
     var lighten = 1 - Math.pow(0.5, colorN - 1);
@@ -5319,7 +5321,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=175";
+  var url = base + "?playboard=1&v=176";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
