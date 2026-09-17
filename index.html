@@ -464,13 +464,13 @@
     overflow: hidden;
   }
   .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play {
-    width: 28px;
-    height: 28px;
-    flex: 0 0 auto;
+    width: var(--sm-metro-btn, 22px);
+    height: var(--sm-metro-btn, 22px);
+    flex: 0 0 var(--sm-metro-btn, 22px);
   }
   .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play svg {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
   }
   .sm-tuner, .sm-metro {
     display: none;
@@ -535,7 +535,7 @@
   }
   .sm-player[data-mode="metro"] .sm-metro {
     flex-direction: row;
-    align-items: flex-start;
+    align-items: stretch;
     justify-content: flex-start;
     gap: 10px;
     min-height: 0;
@@ -555,16 +555,16 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
+    justify-content: space-evenly;
+    gap: 0;
     flex: 0 0 auto;
-    align-self: flex-start;
-    height: auto;
+    align-self: stretch;
+    height: 100%;
     max-height: 100%;
     min-height: 0;
-    overflow: visible;
+    overflow: hidden;
     box-sizing: border-box;
-    padding: 4px 0 0;
+    padding: 0;
     margin-top: 0;
   }
   .sm-metro-main {
@@ -592,15 +592,15 @@
     border: 1px solid #444;
     background: #111;
     color: #fff;
-    width: 28px;
-    height: 28px;
+    width: var(--sm-metro-btn, 22px);
+    height: var(--sm-metro-btn, 22px);
     border-radius: 50%;
-    font-size: 1.05rem;
+    font-size: 0.9rem;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
     padding: 0;
-    flex: 0 0 auto;
+    flex: 0 0 var(--sm-metro-btn, 22px);
   }
   .sm-metro-bpm-btn:hover { border-color: #666; }
   .sm-metro-bpm {
@@ -3408,15 +3408,16 @@
       gap: 8px;
     }
     .sm-metro-speed { gap: 0; justify-content: space-evenly; }
-    .sm-metro-bpm-btn { width: 26px; height: 26px; font-size: 0.95rem; }
-    .sm-metro-speed { gap: 10px; }
+    .sm-metro-bpm-btn { width: 20px; height: 20px; font-size: 0.8rem; flex-basis: 20px; }
+    .sm-metro-speed { gap: 0; justify-content: space-evenly; }
     .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play {
-      width: 26px;
-      height: 26px;
+      width: 20px;
+      height: 20px;
+      flex: 0 0 20px;
     }
     .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play svg {
-      width: 11px;
-      height: 11px;
+      width: 9px;
+      height: 9px;
     }
     .sm-player-main {
       display: flex;
@@ -5362,7 +5363,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=181";
+  var url = base + "?playboard=1&v=182";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6065,10 +6066,10 @@ function smApplyModeBarHeight() {
     bar.style.height = "";
     bar.style.minHeight = "";
     bar.style.maxHeight = "";
+    bar.style.removeProperty("--sm-metro-btn");
     return;
   }
   if (!smPlayerNaturalHeight) smCapturePlayerNaturalHeight();
-  /* If still unknown (opened directly on tool mode), measure after briefly clearing */
   var h = smPlayerNaturalHeight;
   if (!h) {
     var prev = smPlayerMode;
@@ -6076,7 +6077,6 @@ function smApplyModeBarHeight() {
     bar.style.height = "";
     bar.style.minHeight = "";
     bar.style.maxHeight = "";
-    /* force player chrome visible for measure */
     h = Math.round(bar.getBoundingClientRect().height);
     bar.setAttribute("data-mode", prev);
     if (h > 40) smPlayerNaturalHeight = h;
@@ -6085,6 +6085,16 @@ function smApplyModeBarHeight() {
   bar.style.height = h + "px";
   bar.style.minHeight = h + "px";
   bar.style.maxHeight = h + "px";
+  /* Size −/+/Play so all three + even gaps fit in the inner metro column */
+  requestAnimationFrame(function(){
+    var speed = document.querySelector("#smMetro .sm-metro-speed");
+    if (!speed) return;
+    var avail = speed.clientHeight || 0;
+    if (avail < 40) return;
+    /* 3 buttons + 4 equal gaps (space-evenly) → btn ≈ avail/5 */
+    var btn = Math.max(16, Math.min(26, Math.floor(avail / 5)));
+    bar.style.setProperty("--sm-metro-btn", btn + "px");
+  });
 }
 
 var SM_PLAYER_SYNC_KEY = "lick-sm-player-sync";
