@@ -4330,17 +4330,15 @@ function mixTowardWhite(hex, amount) {
 }
 /* Arrangement Song Map: SBS pink family by section type; number lightens within band */
 function arrChipColors(code) {
-  /* Arrangement: color by section type; each next variant = 50% lighter than previous */
+  /* Arrangement: color by section type (swatches from Jacob); each next variant = 50% lighter */
   var typ = secType(code) || "";
   var n = Math.max(1, secNum(code));
   var base;
-  if (typ === "I") base = "#c62828";                      /* red — intros */
-  else if (typ === "C") base = "#ff5da5";                 /* pink — choruses */
-  else if (typ === "V") base = "#1565c0";                 /* blue — verses */
-  else if (typ === "B") base = "#7b1fa2";                 /* purple — bridges */
-  else if (typ === "S") base = "#2e7d32";                 /* green — solos */
-  else if (typ === "L") base = "#ef6c00";                 /* orange — leads */
-  else if (typ === "PC" || typ === "P") base = "#00897b"; /* teal — PCs (distinct from solo green) */
+  if (typ === "I") base = "#e860e8";                      /* purple — intros */
+  else if (typ === "V") base = "#e89820";                 /* yellow/amber — verses */
+  else if (typ === "B") base = "#a8242c";                 /* red — bridges */
+  else if (typ === "S" || typ === "L") base = "#2866bd"; /* blue — solos + leads */
+  else if (typ === "C" || typ === "PC" || typ === "P") base = "#65301e"; /* brown — choruses + PCs */
   else base = "#546e7a";                                  /* unknown — slate */
   /* n=1: 0; n=2: 0.5; n=3: 0.75; n=4: 0.875 … toward white */
   var lighten = 1 - Math.pow(0.5, n - 1);
@@ -4930,7 +4928,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=146";
+  var url = base + "?playboard=1&v=147";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
