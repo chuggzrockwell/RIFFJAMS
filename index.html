@@ -4330,19 +4330,26 @@ function mixTowardWhite(hex, amount) {
 }
 /* Arrangement Song Map: SBS pink family by section type; number lightens within band */
 function arrChipColors(code) {
-  /* Arrangement: color by section type (swatches from Jacob); each next variant = 50% lighter */
+  /* Arrangement: color by section type; verses use Section-mode tier purples by variant # */
   var typ = secType(code) || "";
   var n = Math.max(1, secNum(code));
-  var base;
-  if (typ === "I") base = "#e860e8";                      /* purple — intros */
-  else if (typ === "V") base = "#7030a0";                 /* section-mode purple — verses */
-  else if (typ === "B") base = "#e89820";                 /* yellow/amber — bridges */
-  else if (typ === "S" || typ === "L") base = "#2866bd"; /* blue — solos + leads */
-  else if (typ === "C" || typ === "PC" || typ === "P") base = "#65301e"; /* brown — choruses + PCs */
-  else base = "#546e7a";                                  /* unknown — slate */
-  /* n=1: 0; n=2: 0.5; n=3: 0.75; n=4: 0.875 … toward white */
-  var lighten = 1 - Math.pow(0.5, n - 1);
-  var bg = mixTowardWhite(base, lighten);
+  var bg;
+  if (typ === "V") {
+    /* V1→T1, V2→T2, V3+→T3 (same as Section mode chip purples) */
+    if (n <= 1) bg = "#7030a0";
+    else if (n === 2) bg = "#a365d1";
+    else bg = "#d4bbe3";
+  } else {
+    var base;
+    if (typ === "I") base = "#e860e8";                      /* magenta purple — intros */
+    else if (typ === "B") base = "#e89820";                 /* yellow/amber — bridges */
+    else if (typ === "S" || typ === "L") base = "#2866bd"; /* blue — solos + leads */
+    else if (typ === "C" || typ === "PC" || typ === "P") base = "#65301e"; /* brown — choruses + PCs */
+    else base = "#546e7a";                                  /* unknown — slate */
+    /* n=1: 0; n=2: 0.5; n=3: 0.75; n=4: 0.875 … toward white */
+    var lighten = 1 - Math.pow(0.5, n - 1);
+    bg = mixTowardWhite(base, lighten);
+  }
   var rgb = hexToRgb(bg);
   var lum = (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255;
   var fg = lum > 0.62 ? "#1a1020" : "#ffffff";
@@ -4928,7 +4935,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=149";
+  var url = base + "?playboard=1&v=150";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
