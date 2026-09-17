@@ -1169,9 +1169,9 @@
   }
   body.sections-mode.sections-arrange .sm-arr-next-panel {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 20px;
+    gap: 14px;
   }
   .sm-arr-cue-col {
     display: flex;
@@ -4894,14 +4894,14 @@ function showSections(keepScroll) {
   }).join("");
   var nextCueHtml = arrangementMode
     ? '<aside class="sm-arr-next-panel" id="smArrNextPanel" aria-live="polite">'
-      + '<div class="sm-arr-cue-col sm-arr-cue-current">'
-      + '<div class="sm-arr-next-label">Current section</div>'
-      + '<div class="sm-arr-next-chip sm-arr-cur-chip is-empty" id="smArrCurChip">—</div>'
-      + '</div>'
       + '<div class="sm-arr-cue-col sm-arr-cue-next">'
       + '<div class="sm-arr-next-label">Next section</div>'
       + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
       + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
+      + '</div>'
+      + '<div class="sm-arr-cue-col sm-arr-cue-current">'
+      + '<div class="sm-arr-next-label">Current section</div>'
+      + '<div class="sm-arr-next-chip sm-arr-cur-chip is-empty" id="smArrCurChip">—</div>'
       + '</div>'
       + '</aside>'
     : "";
@@ -4979,7 +4979,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=151";
+  var url = base + "?playboard=1&v=152";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
