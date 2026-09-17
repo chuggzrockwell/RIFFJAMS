@@ -4399,7 +4399,7 @@ function arrChipColors(code) {
   } else {
     var base;
     if (typ === "I") base = "#e860e8";                      /* magenta purple — intros */
-    else if (typ === "B") base = "#e89820";                 /* yellow/amber — bridges */
+    else if (typ === "B") base = "#a8242c";                 /* red — bridges */
     else if (typ === "S" || typ === "L") base = "#2866bd"; /* blue — solos + leads */
     else if (typ === "C" || typ === "PC" || typ === "P") base = "#65301e"; /* brown — choruses + PCs */
     else base = "#546e7a";                                  /* unknown — slate */
@@ -4992,7 +4992,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=157";
+  var url = base + "?playboard=1&v=158";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
