@@ -467,6 +467,12 @@
     width: 100%;
     min-height: 72px;
   }
+  .sm-metro {
+    align-items: stretch;
+    gap: 10px;
+    box-sizing: border-box;
+    padding: 0 4px;
+  }
   .sm-player[data-mode="tuner"] .sm-tuner,
   .sm-player[data-mode="metro"] .sm-metro {
     display: flex;
@@ -519,35 +525,41 @@
   .sm-metro-row {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: stretch;
     gap: 10px;
+    width: 100%;
   }
   .sm-metro-bpm-btn {
     appearance: none;
     border: 1px solid #444;
     background: #111;
     color: #fff;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    font-size: 1rem;
-    font-weight: 700;
+    flex: 1 1 0;
+    min-width: 0;
+    height: 44px;
+    border-radius: 10px;
+    font-size: 1.55rem;
+    font-weight: 800;
     line-height: 1;
     cursor: pointer;
     padding: 0;
   }
   .sm-metro-bpm-btn:hover { border-color: #666; }
   .sm-metro-bpm {
-    width: 3.2em;
+    flex: 1.15 1 0;
+    min-width: 0;
+    width: auto;
     text-align: center;
-    font-size: 1.35rem;
+    font-size: 2.1rem;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
-    background: transparent;
-    border: 0;
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 10px;
     color: #fff;
     font-family: inherit;
     padding: 0;
+    height: 44px;
     -moz-appearance: textfield;
   }
   .sm-metro-bpm::-webkit-outer-spin-button,
@@ -556,11 +568,13 @@
     margin: 0;
   }
   .sm-metro-label {
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: #fff;
+    text-align: center;
+    width: 100%;
   }
   .sm-metro-accent {
     appearance: none;
@@ -568,13 +582,16 @@
     background: #111;
     color: #fff;
     font-family: inherit;
-    font-size: 0.58rem;
-    font-weight: 700;
-    letter-spacing: 0.04em;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    padding: 4px 7px;
-    border-radius: 999px;
+    padding: 0 14px;
+    height: 44px;
+    border-radius: 10px;
     cursor: pointer;
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .sm-metro-accent.on {
     color: #000;
@@ -582,12 +599,28 @@
     border-color: #1db954;
   }
   .sm-metro-pulse {
-    width: 14px;
-    height: 14px;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 auto;
     border-radius: 50%;
     background: #333;
-    margin-top: 2px;
+    margin-top: 0;
     transition: background .05s linear, transform .05s linear;
+  }
+  .sm-player[data-mode="metro"] .sm-player-controls {
+    width: 100%;
+    justify-content: stretch;
+    margin-top: 4px;
+  }
+  .sm-player[data-mode="metro"] #smPlay {
+    width: 100%;
+    max-width: none;
+    height: 48px;
+    border-radius: 12px;
+  }
+  .sm-player[data-mode="metro"] #smPlay svg {
+    width: 22px;
+    height: 22px;
   }
   .sm-metro-pulse.beat {
     background: #1db954;
@@ -3314,7 +3347,11 @@
       padding-top: 52px;
     }
     .sm-tuner-note { font-size: 1.35rem; }
-    .sm-metro-bpm { font-size: 1.1rem; width: 2.8em; }
+    .sm-metro-bpm { font-size: 1.55rem; }
+    .sm-metro-bpm-btn { height: 40px; font-size: 1.35rem; }
+    .sm-metro-accent { height: 40px; font-size: 0.95rem; }
+    .sm-metro-label { font-size: 0.85rem; }
+    .sm-player[data-mode="metro"] #smPlay { height: 44px; }
     .sm-player-main {
       display: flex;
       flex-direction: column;
@@ -5254,7 +5291,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=167";
+  var url = base + "?playboard=1&v=168";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
