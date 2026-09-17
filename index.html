@@ -4930,7 +4930,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=145";
+  var url = base + "?playboard=1&v=146";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6183,7 +6183,7 @@ function smUpdateArrNextCue(force) {
         var remain = pick.next.start - t;
         if (remain > 0) {
           var n = Math.max(1, Math.ceil(remain));
-          cdEl.textContent = String(n);
+          cdEl.textContent = "IN: " + n;
           cdEl.classList.add("is-on");
           cdEl.classList.toggle("is-urgent", remain <= 5);
           cdEl.setAttribute("aria-hidden", "false");
