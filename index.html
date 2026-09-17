@@ -1243,14 +1243,18 @@
     font-size: 4.5rem;
     font-weight: 400;
     line-height: 1;
-    color: #c62828;
-    text-shadow: 0 2px 0 rgba(255,255,255,.65);
+    color: #fff;
+    text-shadow: none;
     letter-spacing: .04em;
+    filter: none;
+    transform: none;
   }
   .sm-arr-next-countdown.is-on { display: block; }
   .sm-arr-next-countdown.is-urgent {
     font-size: 5.5rem;
-    animation: smArrCdPulse 0.55s ease-in-out infinite alternate;
+    color: #fff;
+    text-shadow: none;
+    animation: none;
   }
   @keyframes smArrCdPulse {
     from { transform: scale(1); opacity: 1; }
@@ -4926,7 +4930,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=144";
+  var url = base + "?playboard=1&v=145";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
