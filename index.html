@@ -344,9 +344,6 @@
     z-index: 200;
     width: min(420px, calc(100% - 32px));
     max-width: 420px;
-    height: 197px;
-    min-height: 197px;
-    max-height: 197px;
     margin: 0;
     padding: 18px 16px 12px;
     background: #000;
@@ -663,12 +660,15 @@
   .sm-player-main {
     flex: 1 1 auto;
     min-width: 0;
-    min-height: 0;
-    height: 100%;
+    padding-top: 26px; /* room for mode + P chips */
+  }
+  .sm-player[data-mode="tuner"] .sm-player-main,
+  .sm-player[data-mode="metro"] .sm-player-main {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-top: 26px; /* room for mode + P chips */
+    min-height: 0;
+    height: 100%;
     box-sizing: border-box;
   }
   .sm-player-art {
@@ -3386,12 +3386,6 @@
     .sm-metro-bpm { font-size: 1.85rem; width: 2.8em; }
     .sm-metro-label { font-size: 0.95rem; }
     .sm-metro-bpm-btn { width: 28px; height: 28px; font-size: 0.95rem; }
-    body.sections-mode .sm-player,
-    body.sheet-mode .sm-player {
-      height: 197px;
-      min-height: 197px;
-      max-height: 197px;
-    }
     .sm-player[data-mode="metro"] .sm-metro,
     .sm-player[data-mode="tuner"] .sm-tuner {
       min-height: 0;
@@ -5353,7 +5347,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=178";
+  var url = base + "?playboard=1&v=179";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6039,6 +6033,45 @@ var smTickTimer = null;
 var smSeeking = false;
 var smPlayalongActive = false;
 var smPlayerMode = "player";
+var smPlayerNaturalHeight = 0;
+function smCapturePlayerNaturalHeight() {
+  var bar = document.getElementById("smPlayer");
+  if (!bar || smPlayerMode !== "player") return;
+  bar.style.height = "";
+  bar.style.minHeight = "";
+  bar.style.maxHeight = "";
+  var h = Math.round(bar.getBoundingClientRect().height);
+  if (h > 40) smPlayerNaturalHeight = h;
+}
+function smApplyModeBarHeight() {
+  var bar = document.getElementById("smPlayer");
+  if (!bar) return;
+  if (smPlayerMode === "player") {
+    bar.style.height = "";
+    bar.style.minHeight = "";
+    bar.style.maxHeight = "";
+    return;
+  }
+  if (!smPlayerNaturalHeight) smCapturePlayerNaturalHeight();
+  /* If still unknown (opened directly on tool mode), measure after briefly clearing */
+  var h = smPlayerNaturalHeight;
+  if (!h) {
+    var prev = smPlayerMode;
+    bar.setAttribute("data-mode", "player");
+    bar.style.height = "";
+    bar.style.minHeight = "";
+    bar.style.maxHeight = "";
+    /* force player chrome visible for measure */
+    h = Math.round(bar.getBoundingClientRect().height);
+    bar.setAttribute("data-mode", prev);
+    if (h > 40) smPlayerNaturalHeight = h;
+  }
+  if (!h) return;
+  bar.style.height = h + "px";
+  bar.style.minHeight = h + "px";
+  bar.style.maxHeight = h + "px";
+}
+
 var SM_PLAYER_SYNC_KEY = "lick-sm-player-sync";
 var smTabId = Math.random().toString(36).slice(2) + String(Date.now());
 var smSyncApplying = false;
@@ -7036,14 +7069,20 @@ function smSetPlayerMode(mode) {
   if (mode === prev) {
     smSetModeChip();
     smMountPlayButton(mode);
+    smApplyModeBarHeight();
     return;
   }
   if (prev === "tuner") smStopTuner();
   if (prev === "metro") smMetroStop();
   if (mode !== "player") smPauseYouTubeQuiet();
   smPlayerMode = mode;
+  if (mode === "player") {
+    smApplyModeBarHeight();
+    smCapturePlayerNaturalHeight();
+  }
   smSetModeChip();
   smMountPlayButton(mode);
+  smApplyModeBarHeight();
   if (mode === "tuner") smStartTuner();
   if (mode === "metro") {
     smSetPlayIcon(false);
@@ -7089,6 +7128,14 @@ function smInitModeUi() {
     })(modeBtns[mi]);
   }
   smMountPlayButton(smPlayerMode);
+  requestAnimationFrame(function(){
+    smCapturePlayerNaturalHeight();
+    smApplyModeBarHeight();
+  });
+  window.addEventListener("resize", function(){
+    if (smPlayerMode === "player") smCapturePlayerNaturalHeight();
+    else smApplyModeBarHeight();
+  });
   var bpmInput = document.getElementById("smMetroBpm");
   if (bpmInput) {
     bpmInput.value = String(smMetroBpm);
