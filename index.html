@@ -1239,13 +1239,13 @@
   .sm-arr-next-countdown {
     display: none;
     text-align: center;
-    font-family: "Segoe UI", system-ui, sans-serif;
-    font-size: 1.85rem;
-    font-weight: 900;
+    font-family: "Vol4 Title", "Paranoid Title", "Impact", sans-serif;
+    font-size: 4.5rem;
+    font-weight: 400;
     line-height: 1;
     color: #c62828;
     text-shadow: 0 2px 0 rgba(255,255,255,.65);
-    letter-spacing: .02em;
+    letter-spacing: .04em;
   }
   .sm-arr-next-countdown.is-on { display: block; }
   .sm-arr-next-countdown.is-urgent {
@@ -4884,7 +4884,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=140";
+  var url = base + "?playboard=1&v=141";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
