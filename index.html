@@ -451,12 +451,23 @@
   .sm-player[data-mode="metro"] .sm-player-meta-song {
     display: none !important;
   }
-  .sm-player[data-mode="tuner"] .sm-player-controls,
-  .sm-player[data-mode="metro"] .sm-player-controls {
+  .sm-player[data-mode="tuner"] .sm-player-controls {
     gap: 0;
+  }
+  .sm-player[data-mode="metro"] .sm-player-controls {
+    display: none !important;
   }
   .sm-player[data-mode="tuner"] #smPlay {
     display: none !important;
+  }
+  .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play {
+    width: 80px;
+    height: 80px;
+    flex: 0 0 auto;
+  }
+  .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play svg {
+    width: 32px;
+    height: 32px;
   }
   .sm-tuner, .sm-metro {
     display: none;
@@ -3355,6 +3366,14 @@
     .sm-metro-label { font-size: 0.7rem; }
     .sm-player[data-mode="metro"] .sm-metro { max-height: none; gap: 10px; }
     .sm-metro-speed { gap: 6px; }
+    .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play {
+      width: 64px;
+      height: 64px;
+    }
+    .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play svg {
+      width: 26px;
+      height: 26px;
+    }
     .sm-player-main {
       display: flex;
       flex-direction: column;
@@ -5298,7 +5317,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=171";
+  var url = base + "?playboard=1&v=172";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6962,11 +6981,25 @@ function smMetroToggle() {
   else smMetroStart();
 }
 
+function smMountPlayButton(mode) {
+  var play = document.getElementById("smPlay");
+  if (!play) return;
+  var speed = document.querySelector("#smMetro .sm-metro-speed");
+  var next = document.getElementById("smNext");
+  var controls = document.querySelector("#smPlayer .sm-player-controls");
+  if (mode === "metro" && speed) {
+    if (play.parentNode !== speed) speed.appendChild(play);
+  } else if (controls) {
+    if (next && next.parentNode === controls) controls.insertBefore(play, next);
+    else if (play.parentNode !== controls) controls.appendChild(play);
+  }
+}
 function smSetPlayerMode(mode) {
   if (SM_PLAYER_MODES.indexOf(mode) < 0) mode = "player";
   var prev = smPlayerMode;
   if (mode === prev) {
     smSetModeChip();
+    smMountPlayButton(mode);
     return;
   }
   if (prev === "tuner") smStopTuner();
@@ -6974,6 +7007,7 @@ function smSetPlayerMode(mode) {
   if (mode !== "player") smPauseYouTubeQuiet();
   smPlayerMode = mode;
   smSetModeChip();
+  smMountPlayButton(mode);
   if (mode === "tuner") smStartTuner();
   if (mode === "metro") {
     smSetPlayIcon(false);
@@ -7018,6 +7052,7 @@ function smInitModeUi() {
       btn.onclick = function(){ smSetPlayerMode(btn.getAttribute("data-sm-mode")); };
     })(modeBtns[mi]);
   }
+  smMountPlayButton(smPlayerMode);
   var bpmInput = document.getElementById("smMetroBpm");
   if (bpmInput) {
     bpmInput.value = String(smMetroBpm);
