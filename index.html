@@ -461,13 +461,13 @@
     display: none !important;
   }
   .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play {
-    width: 64px;
-    height: 64px;
+    width: 35px;
+    height: 35px;
     flex: 0 0 auto;
   }
   .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play svg {
-    width: 26px;
-    height: 26px;
+    width: 14px;
+    height: 14px;
   }
   .sm-tuner, .sm-metro {
     display: none;
@@ -476,7 +476,8 @@
     justify-content: center;
     gap: 6px;
     width: 100%;
-    min-height: 72px;
+    min-height: 120px;
+    box-sizing: border-box;
   }
   .sm-player[data-mode="tuner"] .sm-tuner,
   .sm-player[data-mode="metro"] .sm-metro {
@@ -531,11 +532,18 @@
     flex-direction: row;
     align-items: stretch;
     justify-content: flex-start;
-    gap: 14px;
-    min-height: 220px;
-    max-height: none;
+    gap: 10px;
+    min-height: 120px;
+    height: 120px;
+    max-height: 120px;
     box-sizing: border-box;
     width: 100%;
+  }
+  .sm-player[data-mode="tuner"] .sm-tuner {
+    min-height: 120px;
+    height: 120px;
+    max-height: 120px;
+    box-sizing: border-box;
   }
   .sm-metro-speed {
     display: flex;
@@ -553,7 +561,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 4px;
     flex: 1 1 auto;
     min-width: 0;
   }
@@ -571,10 +579,10 @@
     border: 1px solid #444;
     background: #111;
     color: #fff;
-    width: 61px;
-    height: 61px;
+    width: 33px;
+    height: 33px;
     border-radius: 50%;
-    font-size: 1.92rem;
+    font-size: 1.05rem;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
@@ -583,9 +591,9 @@
   }
   .sm-metro-bpm-btn:hover { border-color: #666; }
   .sm-metro-bpm {
-    width: 4.8em;
+    width: 3.2em;
     text-align: center;
-    font-size: 4.42rem;
+    font-size: 2.4rem;
     font-weight: 800;
     font-variant-numeric: tabular-nums;
     background: transparent;
@@ -603,7 +611,7 @@
     margin: 0;
   }
   .sm-metro-label {
-    font-size: 2.145rem;
+    font-size: 1.15rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -631,8 +639,8 @@
     border-color: #1db954;
   }
   .sm-metro-pulse {
-    width: 18px;
-    height: 18px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: #333;
     margin-top: 0;
@@ -3364,18 +3372,24 @@
       padding-top: 52px;
     }
     .sm-tuner-note { font-size: 1.35rem; }
-    .sm-metro-bpm { font-size: 3.12rem; width: 4em; }
-    .sm-metro-label { font-size: 1.56rem; }
-    .sm-metro-bpm-btn { width: 49px; height: 49px; font-size: 1.45rem; }
-    .sm-player[data-mode="metro"] .sm-metro { max-height: none; gap: 10px; min-height: 180px; }
+    .sm-metro-bpm { font-size: 1.85rem; width: 2.8em; }
+    .sm-metro-label { font-size: 0.95rem; }
+    .sm-metro-bpm-btn { width: 28px; height: 28px; font-size: 0.95rem; }
+    .sm-player[data-mode="metro"] .sm-metro,
+    .sm-player[data-mode="tuner"] .sm-tuner {
+      min-height: 100px;
+      height: 100px;
+      max-height: 100px;
+      gap: 8px;
+    }
     .sm-metro-speed { gap: 0; justify-content: space-evenly; }
     .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play {
-      width: 51px;
-      height: 51px;
+      width: 30px;
+      height: 30px;
     }
     .sm-player[data-mode="metro"] #smPlay.sm-player-btn.play svg {
-      width: 21px;
-      height: 21px;
+      width: 12px;
+      height: 12px;
     }
     .sm-player-main {
       display: flex;
@@ -5321,7 +5335,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=176";
+  var url = base + "?playboard=1&v=177";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
