@@ -517,17 +517,36 @@
     min-height: 1em;
   }
   .sm-player[data-mode="metro"] .sm-metro {
-    /* Use existing player footprint; spread controls horizontally */
-    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
     min-height: 72px;
-    max-height: 72px;
-    justify-content: center;
+    max-height: none;
     box-sizing: border-box;
+    width: 100%;
+  }
+  .sm-metro-speed {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+  .sm-metro-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .sm-metro-row {
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: center;
     gap: 16px;
     width: 100%;
     max-width: 100%;
@@ -538,10 +557,10 @@
     border: 1px solid #444;
     background: #111;
     color: #fff;
-    width: 38px;
-    height: 38px;
+    width: 76px;
+    height: 76px;
     border-radius: 50%;
-    font-size: 1.35rem;
+    font-size: 2.4rem;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
@@ -3331,10 +3350,11 @@
     }
     .sm-tuner-note { font-size: 1.35rem; }
     .sm-metro-bpm { font-size: 1.45rem; width: 3em; }
-    .sm-metro-bpm-btn { width: 34px; height: 34px; font-size: 1.2rem; }
+    .sm-metro-bpm-btn { width: 56px; height: 56px; font-size: 1.8rem; }
     .sm-metro-accent { font-size: 0.7rem; padding: 6px 12px; }
     .sm-metro-label { font-size: 0.7rem; }
-    .sm-player[data-mode="metro"] .sm-metro { max-height: none; }
+    .sm-player[data-mode="metro"] .sm-metro { max-height: none; gap: 10px; }
+    .sm-metro-speed { gap: 6px; }
     .sm-player-main {
       display: flex;
       flex-direction: column;
@@ -3551,15 +3571,19 @@
         <div class="sm-tuner-status" id="smTunerStatus">Listening…</div>
       </div>
       <div class="sm-metro" id="smMetro" aria-label="Metronome">
-        <div class="sm-metro-label">BPM</div>
-        <div class="sm-metro-row">
-          <button type="button" class="sm-metro-bpm-btn" id="smMetroMinus" title="Slower">−</button>
-          <input type="number" class="sm-metro-bpm" id="smMetroBpm" min="40" max="240" step="1" value="120" inputmode="numeric" aria-label="Beats per minute">
-          <button type="button" class="sm-metro-bpm-btn" id="smMetroPlus" title="Faster">+</button>
+        <div class="sm-metro-speed" aria-label="Tempo">
+          <button type="button" class="sm-metro-bpm-btn" id="smMetroMinus" title="Decrease speed">−</button>
+          <button type="button" class="sm-metro-bpm-btn" id="smMetroPlus" title="Increase speed">+</button>
         </div>
-        <div class="sm-metro-row">
-          <button type="button" class="sm-metro-accent on" id="smMetroAccent" title="Accent every 4 beats" aria-pressed="true">4/4</button>
-          <div class="sm-metro-pulse" id="smMetroPulse" aria-hidden="true"></div>
+        <div class="sm-metro-main">
+          <div class="sm-metro-label">BPM</div>
+          <div class="sm-metro-row">
+            <input type="number" class="sm-metro-bpm" id="smMetroBpm" min="40" max="240" step="1" value="120" inputmode="numeric" aria-label="Beats per minute">
+          </div>
+          <div class="sm-metro-row">
+            <button type="button" class="sm-metro-accent on" id="smMetroAccent" title="Accent every 4 beats" aria-pressed="true">4/4</button>
+            <div class="sm-metro-pulse" id="smMetroPulse" aria-hidden="true"></div>
+          </div>
         </div>
       </div>
       <div class="sm-player-controls">
@@ -5274,7 +5298,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=170";
+  var url = base + "?playboard=1&v=171";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
