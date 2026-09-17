@@ -1178,12 +1178,17 @@
     flex-direction: column;
     align-items: center;
     gap: 8px;
+  }
+  .sm-arr-cue-next {
     width: 360px;
     flex: 0 0 360px;
-  }
-  .sm-arr-cue-current,
-  .sm-arr-cue-next {
     min-width: 360px;
+  }
+  /* Current = 25% of Next (360×280 → 90×70) */
+  .sm-arr-cue-current {
+    width: 90px;
+    flex: 0 0 90px;
+    min-width: 90px;
   }
   .sm-arr-next-label {
     font-family: "Paranoid Title", "Black Ops One", cursive;
@@ -1195,8 +1200,11 @@
     text-align: center;
     width: 100%;
   }
-  .sm-arr-next-chip,
-  .sm-arr-cur-chip {
+  .sm-arr-cue-current .sm-arr-next-label {
+    font-size: 0.55rem;
+    letter-spacing: .08em;
+  }
+  .sm-arr-next-chip {
     box-sizing: border-box;
     width: 360px;
     height: 280px;
@@ -1221,8 +1229,32 @@
     box-shadow: 0 10px 28px rgba(0,0,0,.18);
     word-break: break-word;
   }
-  .sm-arr-next-chip.is-empty,
-  .sm-arr-cur-chip.is-empty {
+  .sm-arr-cur-chip {
+    box-sizing: border-box;
+    width: 90px;
+    height: 70px;
+    min-width: 90px;
+    min-height: 70px;
+    max-width: 90px;
+    max-height: 70px;
+    padding: 4px;
+    border-radius: 8px;
+    border: 2px solid rgba(0,0,0,.28);
+    background: #546e7a;
+    color: #fff;
+    font-family: "Vol4 Title", "Paranoid Title", "Impact", sans-serif;
+    font-size: 1.15rem;
+    font-weight: 900;
+    letter-spacing: .04em;
+    line-height: 1.05;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,.18);
+    word-break: break-word;
+  }
+  .sm-arr-next-chip.is-empty {
     font-size: 1.35rem;
     font-weight: 700;
     letter-spacing: .02em;
@@ -1232,9 +1264,21 @@
     border-color: rgba(0,0,0,.12);
     box-shadow: none;
   }
-  .sm-arr-next-chip.is-end,
-  .sm-arr-cur-chip.is-end {
+  .sm-arr-cur-chip.is-empty {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    line-height: 1.15;
+    background: #e8e6e1;
+    color: rgba(0,0,0,.45);
+    border-color: rgba(0,0,0,.12);
+    box-shadow: none;
+  }
+  .sm-arr-next-chip.is-end {
     font-size: 2.4rem;
+  }
+  .sm-arr-cur-chip.is-end {
+    font-size: 0.85rem;
   }
   .sm-arr-next-countdown {
     display: none;
@@ -4935,7 +4979,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=150";
+  var url = base + "?playboard=1&v=151";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
