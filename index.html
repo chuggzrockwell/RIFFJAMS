@@ -323,9 +323,9 @@
     display: block;
     width: auto;
     height: auto;
-    max-width: 100%;
-    max-height: none; /* keep block aspect; tip scrolls if needed */
-    object-fit: contain;
+    max-width: none; /* never scale peek tabs down — native pixels */
+    max-height: none;
+    object-fit: none;
     object-position: top left;
     background: #fff;
     border-radius: 10px;
@@ -3236,11 +3236,11 @@
       font-size: 0.72rem;
     }
     #secHighlightTip img.peek-tab {
-      max-width: min(92vw, 420px);
-      max-height: min(55vh, 320px);
+      max-width: none;
+      max-height: none;
       width: auto;
       height: auto;
-      object-fit: contain;
+      object-fit: none;
     }
     .phrase:not(.flipped) img.tab {
       max-width: calc(100vw - 24px);
@@ -5383,7 +5383,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=184";
+  var url = base + "?playboard=1&v=185";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -7305,11 +7305,10 @@ function placeHighlightTip(anchor) {
   var glowPad = 36;
   var img = tip.querySelector("img.peek-tab");
   if (img) {
-    /* Block-form tabs: constrain width; height can exceed tip (scroll). Avoid ultra-wide→thin strip. */
-    var maxImgW = Math.max(120, Math.min(availW - glowPad, 560));
+    /* Native size — never scale peek tabs down; tip scrolls if needed */
     img.style.width = "auto";
     img.style.height = "auto";
-    img.style.maxWidth = maxImgW + "px";
+    img.style.maxWidth = "none";
     img.style.maxHeight = "none";
   }
   /* Measure after constraints, then clamp into the dock column */
