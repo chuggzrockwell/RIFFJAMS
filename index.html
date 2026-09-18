@@ -290,12 +290,12 @@
     appearance: none; -webkit-appearance: none; margin: 0;
     padding: 5px 28px 5px 12px; border-radius: 999px;
     border: 1px solid #3a3f4d; background: #1a1d26;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23c2c2be' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ffffff' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 10px center;
     color: #e8e6e1; font-size: 0.78rem; font-weight: 700; cursor: pointer;
   }
   body.sections-mode .map-mode-dd > select {
-    border-color: #2c3040; background-color: #12141a; color: #e8e6e1;
+    border-color: #2c3040; background-color: #12141a; color: #fff;
   }
   #series .board-mode-dd > select {
     border-radius: 999px; padding: 5px 28px 5px 12px;
@@ -2431,7 +2431,7 @@
   }
   body.sections-mode .sec-mode-btn {
     background: #12141a;
-    color: rgba(232,230,225,.65);
+    color: #fff;
     border-color: #2c3040;
   }
   body.sections-mode .sec-mode-btn.on {
@@ -5383,7 +5383,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=183";
+  var url = base + "?playboard=1&v=184";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
