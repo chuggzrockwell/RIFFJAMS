@@ -142,6 +142,19 @@
     color: #e8e6e1;
   }
   body.sections-mode .back { border-color: #4a4e5a; color: #e8e6e1; }
+
+  /* Song Map toolbar: all-caps labels (CSS; chips already uppercase) */
+  body.sections-mode #sections > .bar .back,
+  body.sections-mode #sections > .bar .badge,
+  body.sections-mode #secModes .sec-mode-btn,
+  body.sections-mode #secModes .map-mode-dd > select,
+  body.sections-mode #secModes .sec-tool-btn,
+  body.sections-mode #secFilters .filter-dd-toggle,
+  body.sections-mode #secFilters .sec-filter-clear {
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+
   body.sections-mode .count, body.sections-mode .keys { opacity: .55; color: #c8c6c0; }
   .badge { font-size: 1.15rem; font-weight: 800; padding: 4px 12px; border-radius: 8px; color: #111; }
   .badge.a { background: #3ec8ff; } .badge.b { background: #3ee45e; }
@@ -297,17 +310,23 @@
     border-radius: 0;
     box-shadow: none;
     box-sizing: border-box;
-    overflow: visible;
+    /* Prefer natural block-form peeks; scroll if taller than dock */
+    overflow: auto;
+    overscroll-behavior: contain;
   }
-  #secHighlightTip.open { display: block; }
+  #secHighlightTip.open {
+    display: block;
+    pointer-events: auto; /* allow manual scroll; no auto-crawl */
+  }
   /* Glow only on the Peek tab image — not on empty/missing text */
   #secHighlightTip img.peek-tab {
     display: block;
     width: auto;
     height: auto;
     max-width: 100%;
-    max-height: 100%;
+    max-height: none; /* keep block aspect; tip scrolls if needed */
     object-fit: contain;
+    object-position: top left;
     background: #fff;
     border-radius: 10px;
     box-shadow:
@@ -3716,7 +3735,7 @@ var ALBUMS_DEFAULT = [
     { song: "Changes", sections: [] },
     { song: "FX", sections: [] },
     { song: "Supernaut", sections: [] },
-    { song: "Snowblind", sections: [["I1",1,"SNB-I1","4S"],["V1",3,"SNB-V1",4],["V2",2,"SNB-V2",["3O","1O"]],["B1",1,"SNB-B1","1S"],["S1",1,"SNB-S1",[1,3]],["B2",3,"SNB-B2",3],["S2",1,"SNB-S2"]] },
+    { song: "Snowblind", sections: [["I1",1,"SNB-I1","4S"],["V1",3,"SNB-V1",4],["V2",2,"SNB-V2",["3O","1O"]],["B1",1,"SNB-B1","1S"],["S1",1,"SNB-S1",[1,3]],["B2",3,"SNB-B2",3],["S2",1,"SNB-S2",1]] },
     { song: "Cornucopia", sections: [] },
     { song: "Laguna Sunrise", sections: [] },
     { song: "St. Vitus Dance", sections: [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",3,"SVD-PC1"]] },
@@ -4235,7 +4254,7 @@ function loadAlbums() {
           var snbChips = 0;
           (s.sections || []).forEach(function(p){ if (p && p[0]) snbChips++; });
           if (snbChips === 0) {
-            var snbWant = [["I1",1,"SNB-I1","4S"],["V1",3,"SNB-V1",4],["V2",2,"SNB-V2",["3O","1O"]],["B1",1,"SNB-B1","1S"],["S1",1,"SNB-S1",[1,3]],["B2",3,"SNB-B2",3],["S2",1,"SNB-S2"]];
+            var snbWant = [["I1",1,"SNB-I1","4S"],["V1",3,"SNB-V1",4],["V2",2,"SNB-V2",["3O","1O"]],["B1",1,"SNB-B1","1S"],["S1",1,"SNB-S1",[1,3]],["B2",3,"SNB-B2",3],["S2",1,"SNB-S2",1]];
             s.sections = snbWant.map(function(x){ return x.slice(); });
           } else {
             /* Jacob tab crops: I1 T1/4S, V1 T3/pos4, V2 T2/3O+1O */
@@ -4249,6 +4268,7 @@ function loadAlbums() {
               else if (p[0] === "B1") { p[1] = 1; p[2] = "SNB-B1"; p[3] = "1S"; }
               else if (p[0] === "S1") { p[1] = 1; p[2] = "SNB-S1"; p[3] = [1,3]; }
               else if (p[0] === "B2") { p[1] = 3; p[2] = "SNB-B2"; p[3] = 3; }
+              else if (p[0] === "S2") { p[1] = 1; p[2] = "SNB-S2"; p[3] = 1; }
             });
           }
         }
@@ -4568,7 +4588,7 @@ function loadAlbums() {
     });
     /* Final Vol. 4 seeds — only when song missing or chip row empty (never clobber chip-editor saves) */
     (function seedVol4PracticeSongs(albums){
-      var snbWant = [["I1",1,"SNB-I1","4S"],["V1",3,"SNB-V1",4],["V2",2,"SNB-V2",["3O","1O"]],["B1",1,"SNB-B1","1S"],["S1",1,"SNB-S1",[1,3]],["B2",3,"SNB-B2",3],["S2",1,"SNB-S2"]];
+      var snbWant = [["I1",1,"SNB-I1","4S"],["V1",3,"SNB-V1",4],["V2",2,"SNB-V2",["3O","1O"]],["B1",1,"SNB-B1","1S"],["S1",1,"SNB-S1",[1,3]],["B2",3,"SNB-B2",3],["S2",1,"SNB-S2",1]];
       var svdWant = [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",3,"SVD-PC1"]];
       function upsertIfEmpty(album, songName, want){
         if (!album.songs) album.songs = [];
@@ -4583,7 +4603,7 @@ function loadAlbums() {
         if (n > 0) return; /* keep user / editor edits */
         hit.sections = want.map(function(x){
           return (typeof makeChipEntry === "function")
-            ? makeChipEntry(x[0], x[1], x[2], [])
+            ? makeChipEntry(x[0], x[1], x[2], x.length > 3 ? x[3] : [])
             : x.slice();
         });
       }
@@ -5121,14 +5141,14 @@ function toggleSoloColsCollapsed() {
 
 function forceSnowblindSongMapChips(albums) {
   /* Fill-only: never overwrite chip-editor / Song Map edits */
-  var want = [["I1",1,"SNB-I1","4S"],["V1",3,"SNB-V1",4],["V2",2,"SNB-V2",["3O","1O"]],["B1",1,"SNB-B1","1S"],["S1",1,"SNB-S1",[1,3]],["B2",3,"SNB-B2",3],["S2",1,"SNB-S2"]];
+  var want = [["I1",1,"SNB-I1","4S"],["V1",3,"SNB-V1",4],["V2",2,"SNB-V2",["3O","1O"]],["B1",1,"SNB-B1","1S"],["S1",1,"SNB-S1",[1,3]],["B2",3,"SNB-B2",3],["S2",1,"SNB-S2",1]];
   (albums || []).forEach(function(a){
     (a.songs || []).forEach(function(s){
       if (!s || s.song !== "Snowblind") return;
       var n = 0;
       (s.sections || []).forEach(function(p){ if (p && p[0]) n++; });
       if (n > 0) return;
-      s.sections = want.map(function(x){ return makeChipEntry(x[0], x[1], x[2], []); });
+      s.sections = want.map(function(x){ return makeChipEntry(x[0], x[1], x[2], x.length > 3 ? x[3] : []); });
     });
   });
 }
@@ -5363,7 +5383,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=182";
+  var url = base + "?playboard=1&v=183";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -7285,8 +7305,12 @@ function placeHighlightTip(anchor) {
   var glowPad = 36;
   var img = tip.querySelector("img.peek-tab");
   if (img) {
-    img.style.maxWidth = Math.max(120, availW - glowPad) + "px";
-    img.style.maxHeight = Math.max(80, availH - glowPad) + "px";
+    /* Block-form tabs: constrain width; height can exceed tip (scroll). Avoid ultra-wide→thin strip. */
+    var maxImgW = Math.max(120, Math.min(availW - glowPad, 560));
+    img.style.width = "auto";
+    img.style.height = "auto";
+    img.style.maxWidth = maxImgW + "px";
+    img.style.maxHeight = "none";
   }
   /* Measure after constraints, then clamp into the dock column */
   var tw = tip.offsetWidth || Math.min(availW, 240);
