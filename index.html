@@ -1610,13 +1610,15 @@
     to { transform: scale(1.1); opacity: 0.88; }
   }
   body.sections-arrange .sec-chip.is-arr-now:not(.empty):not(.filtered-out) {
-    outline: 2px solid #fff !important;
-    outline-offset: 2px;
+    outline: none !important;
+    /* Full 4-side border (outline was getting clipped on some edges) */
+    border: 4px solid #ffffff !important;
     box-shadow:
-      0 0 0 1px rgba(255,255,255,.95),
-      0 0 10px 3px rgba(255,255,255,.85),
-      0 0 22px 6px rgba(255,255,255,.45) !important;
-    z-index: 3;
+      0 0 0 3px #ffffff,
+      0 0 14px 5px rgba(255,255,255,1),
+      0 0 32px 12px rgba(255,255,255,.85),
+      0 0 56px 20px rgba(255,255,255,.5) !important;
+    z-index: 5;
     position: relative;
   }
   /* Next section is shown in the cue panel only — no second grid highlight */
@@ -5417,7 +5419,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=201";
+  var url = base + "?playboard=1&v=202";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
