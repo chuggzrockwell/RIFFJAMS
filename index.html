@@ -361,8 +361,10 @@
     left: auto;
     top: auto;
     z-index: 200;
-    width: min(420px, calc(100% - 32px));
+    /* Fixed footprint: do not shrink/grow with window resize or Ctrl+/- zoom viewport */
+    width: 420px;
     max-width: 420px;
+    min-width: 420px;
     margin: 0;
     padding: 18px 16px 12px;
     background: #000;
@@ -5426,7 +5428,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=190";
+  var url = base + "?playboard=1&v=191";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
