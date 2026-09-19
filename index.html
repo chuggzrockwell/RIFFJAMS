@@ -5428,7 +5428,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=191";
+  var url = base + "?playboard=1&v=192";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6334,6 +6334,11 @@ function smFmtTime(sec) {
 }
 function smBuildPlaylist() {
   var albums = (typeof ALBUMS !== "undefined" && ALBUMS) ? ALBUMS : (typeof ALBUMS_DEFAULT !== "undefined" ? ALBUMS_DEFAULT : []);
+  var keepName = "";
+  try {
+    var keepCur = smCurrent();
+    if (keepCur && keepCur.song) keepName = keepCur.song;
+  } catch (eKeep) {}
   var out = [];
   albums.forEach(function(a){
     (a.songs || []).forEach(function(s){
@@ -6343,7 +6348,27 @@ function smBuildPlaylist() {
     });
   });
   smPlaylist = out;
-  smRebuildOrder(false);
+  /* Keep the playing song — showSections/chip-save used to reset to War Pigs (index 0) */
+  smRebuildOrder(true);
+  if (keepName) {
+    var pi = -1, i;
+    for (i = 0; i < smPlaylist.length; i++) {
+      if (smPlaylist[i].song === keepName) { pi = i; break; }
+    }
+    if (pi >= 0) {
+      if (smShuffle) {
+        var oi = smOrder.indexOf(pi);
+        if (oi < 0) {
+          smRebuildOrder(false);
+          oi = smOrder.indexOf(pi);
+        }
+        smIndex = oi >= 0 ? oi : smIndex;
+      } else {
+        smOrder = smPlaylist.map(function(_, idx){ return idx; });
+        smIndex = pi;
+      }
+    }
+  }
 }
 function smRebuildOrder(keepSong) {
   var cur = keepSong && smOrder.length ? smOrder[smIndex] : null;
@@ -9590,13 +9615,17 @@ document.getElementById("secModes").onclick = function(e){
 };
 document.getElementById("chipEditSave").onclick = saveChipEditor;
 document.getElementById("chipEditCancel").onclick = closeChipEditor;
+var smBlockSongPlayFromChipEditDismiss = false;
 document.addEventListener("pointerdown", function(e){
   var ed = document.getElementById("chipEditor");
   if (!ed || !ed.classList.contains("open")) return;
   if (ed.contains(e.target)) return;
-  /* Persist edits on outside click (Cancel still discards) */
+  /* Persist edits on outside click (Cancel still discards).
+     Block the trailing click from changing the player song unless it is album art / row #. */
+  smBlockSongPlayFromChipEditDismiss = !e.target.closest(".song-thumb, .row-num");
   if (typeof saveChipEditor === "function") saveChipEditor();
   else closeChipEditor();
+  setTimeout(function(){ smBlockSongPlayFromChipEditDismiss = false; }, 80);
 }, true);
 document.getElementById("chipEditDelete").onclick = deleteChipEditor;
 document.getElementById("chipEditCopy").onclick = function(){
@@ -9942,9 +9971,11 @@ document.getElementById("sectionsSheet").onclick = function(e){
     openSongsterrPopup(stBtn.getAttribute("data-songsterr") || "");
     return;
   }
-  /* Nameplate / art → song; row # → playalong (falls back to song) */
+  /* Nameplate / art → song; row # → playalong (falls back to song).
+     Chip-edit outside-click dismiss must not steal the track (War Pigs reset). */
   var playHit = e.target.closest(".song-name, .song-name-wrap, .song-thumb, .row-num");
   if (playHit && !e.target.closest(".sec-chip") && document.body.classList.contains("sections-mode")) {
+    if (typeof smBlockSongPlayFromChipEditDismiss !== "undefined" && smBlockSongPlayFromChipEditDismiss) return;
     var row = playHit.closest(".song-row");
     if (row) {
       var titleEl = row.querySelector(".song-name");
