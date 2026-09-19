@@ -5383,7 +5383,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=185";
+  var url = base + "?playboard=1&v=186";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5920,7 +5920,7 @@ function setSectionsMode(mode) {
       if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 4/5 Solo/Peek · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
       else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 4/5 · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
       else keys.textContent = "Solo · Numpad 4/5 Solo/Peek · 0 clear filters · Esc closes chip edit · Backspace home";
-    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Arrangement · drag · Alt-drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
+    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Arrangement · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
     else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Arrangement · section clicks queue · Playboard window · 0 clear filters · Esc closes chip edit · Backspace home";
     else keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · Arrangement · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
   }
@@ -9809,7 +9809,7 @@ function finishChipMove(toChip) {
 function onChipPointerMove(e) {
   if (!chipDrag || e.pointerId !== chipDrag.pointerId) return;
   if (sectionsMode !== "edit") { endChipPointerDrag(true); return; }
-  chipDrag.copy = arrangementMode ? !!(e.ctrlKey || e.metaKey) : !!e.altKey;
+  chipDrag.copy = !!(e.ctrlKey || e.metaKey) || (!arrangementMode && !!e.altKey);
   var dx = e.clientX - chipDrag.startX;
   var dy = e.clientY - chipDrag.startY;
   if (!pointerDragActive) {
@@ -9845,8 +9845,8 @@ sectionsSheetEl.addEventListener("pointerdown", function(e){
   if (!chip || chip.classList.contains("empty")) return;
   // Don't start a new drag while editing text in the chip editor
   if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) return;
-  /* Arrangement Edit: Ctrl/Cmd+drag duplicates; riff Edit: Alt+drag duplicates */
-  var wantCopy = arrangementMode ? !!(e.ctrlKey || e.metaKey) : !!e.altKey;
+  /* Edit: Ctrl/Cmd+drag duplicates (Section + Arrangement); Alt+drag also works in Section mode */
+  var wantCopy = !!(e.ctrlKey || e.metaKey) || (!arrangementMode && !!e.altKey);
   chipDrag = {
     ai: parseInt(chip.getAttribute("data-ai"), 10),
     si: parseInt(chip.getAttribute("data-si"), 10),
