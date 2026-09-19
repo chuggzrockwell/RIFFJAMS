@@ -5428,7 +5428,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=194";
+  var url = base + "?playboard=1&v=195";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6286,7 +6286,11 @@ function smApplyRemotePlayerSync(msg) {
     var wantPlay = !!msg.playing;
     var wantT = typeof msg.t === "number" ? msg.t : 0;
     /* Never yank time during track-change grace (was allowing t<=2 → 2s loop) */
-    if (now < smTrackChangeGraceUntil) wantT = 0;
+    if (now < smTrackChangeGraceUntil) {
+      wantT = 0;
+      /* Peer CUED/pause blips must not stop local playback after play / auto-advance */
+      if (!wantPlay) wantPlay = !!smPlaying;
+    }
     smEnsureApi(function(){
       if (!smYtPlayer) { smSyncApplying = false; return; }
       var vid = "";
@@ -6492,7 +6496,10 @@ function smEnsureApi(cb) {
             if (smPlayerMode === "player") smSetPlayIcon(true);
             smStartTick(); smApplyPlaybackRate(); smSchedulePublishPlayerSync();
           }
-          if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.CUED) {
+          /* CUED fires on every load — must not count as pause (was publishing playing:false ~1s in).
+             PAUSED during track-change grace is a load blip — ignore. */
+          if (e.data === YT.PlayerState.PAUSED) {
+            if (smSyncApplying || Date.now() < smTrackChangeGraceUntil) return;
             smPlaying = false;
             if (smPlayerMode === "player") smSetPlayIcon(false);
             smStopTick(); smSchedulePublishPlayerSync();
@@ -6649,6 +6656,8 @@ function smTogglePlay() {
       smYtPlayer.pauseVideo();
       return;
     }
+    /* Guard against peer sync pausing us during the load/start blip */
+    smTrackChangeGraceUntil = Math.max(smTrackChangeGraceUntil, Date.now() + 2500);
     /* Fresh load: meta shows War Pigs but nothing is cued yet — load & play */
     var vid = "";
     try { vid = (smYtPlayer.getVideoData && smYtPlayer.getVideoData().video_id) || ""; } catch (err) {}
