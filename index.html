@@ -5428,7 +5428,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=193";
+  var url = base + "?playboard=1&v=194";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6568,7 +6568,7 @@ function smSeekBy(deltaSec) {
     smSchedulePublishPlayerSync();
   });
 }
-/* Ctrl+Left: if <=3s into track → restart; else → previous song */
+/* Ctrl+Left: ≥3s into track → restart; <3s → previous song */
 function smCtrlLeftArrow() {
   smEnsureApi(function(){
     if (!smYtPlayer || !smYtPlayer.getCurrentTime) {
@@ -6576,7 +6576,7 @@ function smCtrlLeftArrow() {
       return;
     }
     var cur = smYtPlayer.getCurrentTime() || 0;
-    if (cur <= 3) {
+    if (cur >= 3) {
       smMarkLocalPlayerAction();
       smYtPlayer.seekTo(0, true);
       smTick();
