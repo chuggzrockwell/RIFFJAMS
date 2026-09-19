@@ -5179,6 +5179,10 @@ function showSections(keepScroll) {
   smUpdateMeta();
   var sx = window.scrollX || window.pageXOffset || 0;
   var sy = window.scrollY || window.pageYOffset || 0;
+  var sheetEl = document.getElementById("sectionsSheet");
+  var wrapEl = sheetEl && (sheetEl.querySelector(".sections-wrap") || sheetEl);
+  var sheetSx = wrapEl ? wrapEl.scrollLeft : 0;
+  var sheetSy = wrapEl ? wrapEl.scrollTop : 0;
   currentLetter = "";
   closeChipEditor();
   ensureAllSongSlots(ALBUMS);
@@ -5336,8 +5340,17 @@ function showSections(keepScroll) {
     pullPlayQueue();
     syncPlayChipClasses();
   }
-  if (keepScroll) window.scrollTo(sx, sy);
-  else window.scrollTo(0, 0);
+  if (keepScroll) {
+    window.scrollTo(sx, sy);
+    var sheetEl2 = document.getElementById("sectionsSheet");
+    var wrapEl2 = sheetEl2 && (sheetEl2.querySelector(".sections-wrap") || sheetEl2);
+    if (wrapEl2) {
+      wrapEl2.scrollLeft = sheetSx;
+      wrapEl2.scrollTop = sheetSy;
+    }
+  } else {
+    window.scrollTo(0, 0);
+  }
   updateEditSaveUi();
 }
 
@@ -5383,7 +5396,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=186";
+  var url = base + "?playboard=1&v=187";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5932,7 +5945,7 @@ function setSectionsMode(mode) {
   updateEditSaveUi();
   updateSoloUi();
   if (document.getElementById("sections") && !document.getElementById("sections").classList.contains("hidden")) {
-    showSections();
+    showSections(true); /* keep scroll when toggling View/Edit/Play */
   }
 }
 function lickLetter(id) {
