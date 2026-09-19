@@ -1610,15 +1610,16 @@
     to { transform: scale(1.1); opacity: 0.88; }
   }
   body.sections-arrange .sec-chip.is-arr-now:not(.empty):not(.filtered-out) {
-    outline: 3px solid #111 !important;
-    outline-offset: 1px;
-    z-index: 2;
+    outline: 2px solid #fff !important;
+    outline-offset: 2px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.95),
+      0 0 10px 3px rgba(255,255,255,.85),
+      0 0 22px 6px rgba(255,255,255,.45) !important;
+    z-index: 3;
+    position: relative;
   }
-  body.sections-arrange .sec-chip.is-arr-next:not(.empty):not(.filtered-out) {
-    outline: 3px dashed rgba(0,0,0,.55) !important;
-    outline-offset: 1px;
-    z-index: 2;
-  }
+  /* Next section is shown in the cue panel only — no second grid highlight */
   .chip-editor label {
     display: block; font-size: 0.68rem; font-weight: 700;
     letter-spacing: .08em; text-transform: uppercase;
@@ -5416,7 +5417,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=200";
+  var url = base + "?playboard=1&v=201";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6880,19 +6881,17 @@ function smUpdateArrNextCue(force) {
       }
     }
   }
-  /* Optional grid highlights for playing song */
+  /* Grid: white glow on currently playing chip only */
   document.querySelectorAll(".sec-chip.is-arr-now, .sec-chip.is-arr-next").forEach(function(el){
     el.classList.remove("is-arr-now");
     el.classList.remove("is-arr-next");
   });
-  if (songName && !pick.empty) {
-    var nowCi = pick.current ? pick.current.ci : -1;
-    var nextCi = pick.next ? pick.next.ci : -1;
+  if (songName && !pick.empty && pick.current) {
+    var nowCi = pick.current.ci;
     document.querySelectorAll('.sec-chip[data-arrange="1"][data-song]').forEach(function(el){
       if (el.getAttribute("data-song") !== songName) return;
       var ci = parseInt(el.getAttribute("data-ci"), 10);
       if (ci === nowCi) el.classList.add("is-arr-now");
-      if (ci === nextCi) el.classList.add("is-arr-next");
     });
   }
 }
