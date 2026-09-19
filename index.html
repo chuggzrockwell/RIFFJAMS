@@ -375,8 +375,9 @@
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
     align-items: center;
     gap: 14px;
-    /* Stay pinned to the viewport while page content scrolls */
+    /* Stay pinned; JS smApplyPlayerZoomLock counters Ctrl+/- page zoom */
     transform: none;
+    transform-origin: bottom right;
     text-transform: uppercase;
   }
   #smPlayer,
@@ -5567,7 +5568,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=205";
+  var url = base + "?playboard=1&v=206";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -7523,6 +7524,61 @@ function smInitModeUi() {
   smSetModeChip();
 }
 
+
+/* Keep player the same on-screen size when the page is Ctrl+/- zoomed */
+function smMeasurePageZoom() {
+  var vv = window.visualViewport;
+  if (vv && typeof vv.scale === "number" && Math.abs(vv.scale - 1) > 0.02) {
+    return vv.scale;
+  }
+  var ow = window.outerWidth || 0;
+  var iw = window.innerWidth || 0;
+  if (ow > 0 && iw > 0) {
+    var z = ow / iw;
+    /* Ignore wild ratios (DevTools docked, multi-monitor quirks) */
+    if (z >= 0.7 && z <= 2.75) {
+      if (Math.abs(z - 1) < 0.08) return 1;
+      return z;
+    }
+  }
+  return 1;
+}
+function smApplyPlayerZoomLock() {
+  var el = document.getElementById("smPlayer");
+  if (!el) return;
+  var z = smMeasurePageZoom();
+  var inv = 1 / z;
+  if (Math.abs(z - 1) < 0.02) {
+    el.style.zoom = "";
+    el.style.transform = "";
+    return;
+  }
+  /* Chromium/Safari: CSS zoom keeps fixed bottom-right placement cleanly */
+  try {
+    el.style.zoom = String(inv);
+    el.style.transform = "";
+  } catch (eZ) {
+    el.style.zoom = "";
+    el.style.transform = "scale(" + inv + ")";
+    el.style.transformOrigin = "bottom right";
+  }
+}
+function smBindPlayerZoomLock() {
+  if (window._smZoomLockBound) return;
+  window._smZoomLockBound = true;
+  var kick = function(){ smApplyPlayerZoomLock(); };
+  window.addEventListener("resize", kick);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", kick);
+    window.visualViewport.addEventListener("scroll", kick);
+  }
+  /* Catch Ctrl+/- which sometimes doesn't fire resize immediately */
+  window.addEventListener("wheel", function(e){
+    if (e.ctrlKey) setTimeout(kick, 50);
+  }, { passive: true });
+  kick();
+}
+
 function smInitPlayerUi() {
   smBuildPlaylist();
   smUpdateMeta();
@@ -7598,6 +7654,7 @@ function smInitPlayerUi() {
   } catch (errBootLead) {}
   if (!document.hidden) smClaimAudioLeader();
   else smApplyAudioRole();
+  smBindPlayerZoomLock();
 }
 smInitPlayerUi();
 
