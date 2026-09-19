@@ -3731,7 +3731,7 @@ var ALBUMS_DEFAULT = [
   ]},
   { name: "Vol. 4", cover: "covers/vol4.png", font: "font-vol4", songs: [
     { song: "Wheels of Confusion", sections: [] },
-    { song: "Tomorrow's Dream", sections: [["I1",2,"TD-I1"],["V1",2,"TD-V1"],["B1",2,"TD-B1"]] },
+    { song: "Tomorrow's Dream", sections: [["I1",2,"TD-I1"],["V1",2,"TD-V1"],["B1",2,"TD-B1"],["S1",1,"TD-S1"]] },
     { song: "Changes", sections: [] },
     { song: "FX", sections: [] },
     { song: "Supernaut", sections: [] },
@@ -4590,7 +4590,7 @@ function loadAlbums() {
     (function seedVol4PracticeSongs(albums){
       var snbWant = [["I1",1,"SNB-I1","4S"],["V1",3,"SNB-V1",4],["V2",2,"SNB-V2",["3O","1O"]],["B1",1,"SNB-B1","1S"],["S1",1,"SNB-S1",[1,3]],["B2",3,"SNB-B2",3],["S2",1,"SNB-S2",1]];
       var svdWant = [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",3,"SVD-PC1"]];
-      var tdWant = [["I1",2,"TD-I1"],["V1",2,"TD-V1"],["B1",2,"TD-B1"]];
+      var tdWant = [["I1",2,"TD-I1"],["V1",2,"TD-V1"],["B1",2,"TD-B1"],["S1",1,"TD-S1"]];
       function upsertIfEmpty(album, songName, want){
         if (!album.songs) album.songs = [];
         var hit = null;
@@ -5168,8 +5168,8 @@ function forceStVitusSongMapChips(albums) {
   });
 }
 function forceTomorrowDreamSongMapChips(albums) {
-  /* Fill-only: seed empty rows and link existing I1/V1/B1 rows without a tab */
-  var want = [["I1",2,"TD-I1"],["V1",2,"TD-V1"],["B1",2,"TD-B1"]];
+  /* Fill-only: seed empty rows and link existing I1/V1/B1/S1 rows without a tab */
+  var want = [["I1",2,"TD-I1"],["V1",2,"TD-V1"],["B1",2,"TD-B1"],["S1",1,"TD-S1"]];
   (albums || []).forEach(function(a){
     (a.songs || []).forEach(function(s){
       if (!s || s.song !== "Tomorrow's Dream") return;
@@ -5180,7 +5180,7 @@ function forceTomorrowDreamSongMapChips(albums) {
         return;
       }
       (s.sections || []).forEach(function(p){
-        if (!p || (p[0] !== "I1" && p[0] !== "V1" && p[0] !== "B1")) return;
+        if (!p || (p[0] !== "I1" && p[0] !== "V1" && p[0] !== "B1" && p[0] !== "S1")) return;
         if (String(p[2] || "").trim()) return;
         p[2] = "TD-" + p[0];
       });
