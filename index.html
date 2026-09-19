@@ -5428,7 +5428,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=196";
+  var url = base + "?playboard=1&v=197";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5479,6 +5479,10 @@ function bindPlaySync() {
         if (pullAlbumsFromStorage()) refreshViewsAfterAlbumsChange();
         return;
       }
+      if (ev.data.type === "sm-audio-leader") {
+        if (ev.data.tab) smNoteRemoteAudioLeader(ev.data.tab);
+        return;
+      }
       if (ev.data.type === "sm-player") {
         smApplyRemotePlayerSync(ev.data);
         return;
@@ -5495,6 +5499,13 @@ function bindPlaySync() {
     if (ev.key === ALBUMS_KEY) {
       if (typeof albumsDirty !== "undefined" && albumsDirty) return;
       if (pullAlbumsFromStorage()) refreshViewsAfterAlbumsChange();
+      return;
+    }
+    if (ev.key === SM_AUDIO_LEADER_KEY) {
+      try {
+        var lead = ev.newValue ? JSON.parse(ev.newValue) : null;
+        if (lead && lead.tab) smNoteRemoteAudioLeader(lead.tab);
+      } catch (errLead) {}
       return;
     }
     if (ev.key === SM_PLAYER_SYNC_KEY) {
@@ -6171,8 +6182,48 @@ var smLastSyncSig = "";
 var smLastLocalActionTs = 0;
 var smTrackChangeGraceUntil = 0;
 
+var SM_AUDIO_LEADER_KEY = "lick-sm-audio-leader";
+var smAudioLeaderTab = "";
+
+function smIsAudioLeader() {
+  return !!smAudioLeaderTab && smAudioLeaderTab === smTabId;
+}
+function smClaimAudioLeader() {
+  smAudioLeaderTab = smTabId;
+  var payload = { type: "sm-audio-leader", tab: smTabId, ts: Date.now() };
+  try { localStorage.setItem(SM_AUDIO_LEADER_KEY, JSON.stringify(payload)); } catch (errL) {}
+  if (typeof playChannel !== "undefined" && playChannel) {
+    try { playChannel.postMessage(payload); } catch (errC) {}
+  }
+  smApplyAudioRole();
+}
+function smNoteRemoteAudioLeader(tab) {
+  if (!tab || tab === smTabId) return;
+  smAudioLeaderTab = tab;
+  smApplyAudioRole();
+}
+function smApplyAudioRole() {
+  if (!smYtPlayer) return;
+  try {
+    if (smIsAudioLeader()) {
+      smYtPlayer.unMute();
+      if (!smUserPaused && smPlaying && smPlayerMode === "player") {
+        var st = smYtPlayer.getPlayerState && smYtPlayer.getPlayerState();
+        if (st !== YT.PlayerState.PLAYING) smYtPlayer.playVideo();
+      }
+    } else {
+      smYtPlayer.mute();
+      var st2 = smYtPlayer.getPlayerState && smYtPlayer.getPlayerState();
+      if (st2 === YT.PlayerState.PLAYING || st2 === YT.PlayerState.BUFFERING) {
+        smYtPlayer.pauseVideo();
+      }
+    }
+  } catch (errRole) {}
+}
+
 function smMarkLocalPlayerAction() {
   smLastLocalActionTs = Date.now();
+  smClaimAudioLeader();
 }
 function smPlayerSyncSnapshot(tOverride) {
   var cur = smCurrent();
@@ -6187,6 +6238,7 @@ function smPlayerSyncSnapshot(tOverride) {
   return {
     type: "sm-player",
     tab: smTabId,
+    leader: smIsAudioLeader() ? smTabId : (smAudioLeaderTab || ""),
     song: cur ? cur.song : "",
     playalong: !!smPlayalongActive,
     playing: !!smPlaying,
@@ -6244,6 +6296,8 @@ function smApplyRemotePlayerSync(msg) {
     /* After local next/prev/ended: ignore lagging tabs on the old song entirely */
     if (remoteSong && localSong && remoteSong !== localSong) return;
   }
+  if (msg.leader) smNoteRemoteAudioLeader(msg.leader);
+  else if (msg.tab) smNoteRemoteAudioLeader(msg.tab);
   smSyncApplying = true;
   try {
     if (!!msg.shuffle !== !!smShuffle) {
@@ -6312,19 +6366,28 @@ function smApplyRemotePlayerSync(msg) {
         }
         if (wantPlay) {
           smUserPaused = false;
-          try { smYtPlayer.playVideo(); } catch (errP) {}
           smPlaying = true;
           if (smPlayerMode === "player") smSetPlayIcon(true);
           smStartTick();
+          /* Only the audio-leader tab actually makes sound */
+          if (smIsAudioLeader()) {
+            try { smYtPlayer.unMute(); smYtPlayer.playVideo(); } catch (errP) {}
+          } else {
+            try { smYtPlayer.mute(); smYtPlayer.pauseVideo(); } catch (errPf) {}
+          }
         } else {
-          /* Never pause local audio from peer sync — was causing random mid-song pauses */
-          if (smUserPaused) {
+          /* Never pause local audio from peer sync on the leader — was random pauses.
+             Followers stay silent. */
+          if (smUserPaused || !smIsAudioLeader()) {
             try { smYtPlayer.pauseVideo(); } catch (errPa) {}
-            smPlaying = false;
-            if (smPlayerMode === "player") smSetPlayIcon(false);
-            smStopTick();
+            if (smUserPaused) {
+              smPlaying = false;
+              if (smPlayerMode === "player") smSetPlayIcon(false);
+              smStopTick();
+            }
           }
         }
+        smApplyAudioRole();
         smApplyPlaybackRate();
         smLastSyncSig = [name, smPlayalongActive ? 1 : 0, wantPlay ? 1 : 0, smShuffle ? 1 : 0, smRepeat ? 1 : 0, Math.floor(wantT)].join("|");
         smSyncApplying = false;
@@ -6495,15 +6558,23 @@ function smEnsureApi(cb) {
       events: {
         onReady: function(){ cb && cb(); },
         onStateChange: function(e){
-          if (e.data === YT.PlayerState.ENDED) smOnEnded();
+          if (e.data === YT.PlayerState.ENDED) {
+            /* Only audio leader advances — followers follow via sync */
+            if (smIsAudioLeader()) smOnEnded();
+            return;
+          }
           if (e.data === YT.PlayerState.PLAYING) {
             smPlaying = true;
             if (smPlayerMode === "player") smSetPlayIcon(true);
             smStartTick(); smApplyPlaybackRate(); smSchedulePublishPlayerSync();
+            if (!smIsAudioLeader()) {
+              try { smYtPlayer.mute(); smYtPlayer.pauseVideo(); } catch (errFollow) {}
+            }
           }
-          /* CUED ignored. Spurious PAUSED (ads/sync/focus) auto-resumes unless user paused. */
+          /* CUED ignored. Spurious PAUSED auto-resumes only on audio leader. */
           if (e.data === YT.PlayerState.PAUSED) {
             if (smSyncApplying) return;
+            if (!smIsAudioLeader()) return;
             if (!smUserPaused && smPlayerMode === "player") {
               try { smYtPlayer.playVideo(); } catch (errResume) {}
               return;
@@ -7367,15 +7438,29 @@ function smInitPlayerUi() {
     if (rawSync) smApplyRemotePlayerSync(JSON.parse(rawSync));
   } catch (errBoot) {}
   document.addEventListener("visibilitychange", function(){
-    if (!smYtPlayer) return;
-    try {
-      if (document.hidden) smYtPlayer.mute();
-      else {
-        smYtPlayer.unMute();
-        if (smPlaying) smYtPlayer.playVideo();
-      }
-    } catch (errVis) {}
+    if (document.hidden) {
+      smApplyAudioRole();
+      return;
+    }
+    /* Focusing a tab makes it the one audible player */
+    smClaimAudioLeader();
+    if (smPlaying && !smUserPaused && smPlayerMode === "player") {
+      try { smYtPlayer.unMute(); smYtPlayer.playVideo(); } catch (errVis) {}
+    }
   });
+  window.addEventListener("focus", function(){
+    if (document.hidden) return;
+    smClaimAudioLeader();
+  });
+  try {
+    var rawLead = localStorage.getItem(SM_AUDIO_LEADER_KEY);
+    if (rawLead) {
+      var lead0 = JSON.parse(rawLead);
+      if (lead0 && lead0.tab && lead0.tab !== smTabId) smAudioLeaderTab = lead0.tab;
+    }
+  } catch (errBootLead) {}
+  if (!document.hidden) smClaimAudioLeader();
+  else smApplyAudioRole();
 }
 smInitPlayerUi();
 
