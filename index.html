@@ -5567,7 +5567,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=204";
+  var url = base + "?playboard=1&v=205";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -9312,6 +9312,7 @@ function llAlbumAllowed(name) {
   return (LL_LIBRARY_ALBUMS || []).indexOf(name) >= 0 || llAlbumHasAttachedTab(name);
 }
 function llChipItemsForMode(mode) {
+  try { mirrorMissingSectionArrangementChips(); } catch (eLlMirror) {}
   var out = [];
   var seen = {};
   function pushItem(label, lick, songName, tier, albumName, typ, posAttr) {
@@ -9374,13 +9375,28 @@ function llChipItemsForMode(mode) {
   (ALBUMS || ALBUMS_DEFAULT || []).forEach(function(a){
     if (!a || !llAlbumAllowed(a.name)) return;
     (a.songs || []).forEach(function(s){
+      var nSec = 0;
       (s.sections || []).forEach(function(pair){
         if (!isChipPair(pair)) return;
+        nSec++;
         var code = pair[0];
         var lick = (pair[2] || "").trim();
         var pos = posListAttr(chipPositions(pair));
         pushItem(code, lick, s.song, chipTier(pair), a.name, secType(code), pos);
       });
+      /* If Section row is still empty but Arrangement has chips, show those in LL too */
+      if (nSec === 0) {
+        if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap();
+        var asong = smFindArrangementSongByName(s.song);
+        if (!asong) return;
+        (asong.chips || []).forEach(function(pair){
+          if (!isChipPair(pair)) return;
+          var lab = pair[0];
+          var lick2 = (pair[2] || "").trim() || sectionLickId(s.song, lab, "");
+          var pos2 = posListAttr(chipPositions(pair));
+          pushItem(lab, lick2, s.song, chipTier(pair), a.name, secType(lab), pos2);
+        });
+      }
     });
   });
   return out;
@@ -9635,10 +9651,15 @@ function showSeries(letter) {
   /* LL modes (B): riff = section chips; solo = lick chips — same LL visuals, current linking */
   var items = [];
   if (letter === "B") {
+    try { mirrorMissingSectionArrangementChips(); } catch (eLlShowMirror) {}
     if (typeof forceSnowblindSongMapChips === "function") forceSnowblindSongMapChips(ALBUMS);
     if (typeof forceStVitusSongMapChips === "function") forceStVitusSongMapChips(ALBUMS);
     if (typeof forceTomorrowDreamSongMapChips === "function") forceTomorrowDreamSongMapChips(ALBUMS);
-    try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (eLlForce) {}
+    try {
+      var rawLl = JSON.stringify(ALBUMS);
+      localStorage.setItem(ALBUMS_KEY, rawLl);
+      _lastAlbumsRaw = rawLl;
+    } catch (eLlForce) {}
     items = llChipItemsForMode(llMode);
   } else {
     items = applySavedOrder(CATALOG.filter(function(x){ return x[1] === catalogLetter; }), letter).map(function(x){
