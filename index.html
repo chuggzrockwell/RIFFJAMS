@@ -5428,7 +5428,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=195";
+  var url = base + "?playboard=1&v=196";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6110,6 +6110,7 @@ var smIndex = 0;
 var smShuffle = false;
 var smRepeat = true; /* loop playlist when ON (green) */
 var smPlaying = false;
+var smUserPaused = false; /* true only after an explicit local pause */
 var smTickTimer = null;
 var smSeeking = false;
 var smPlayalongActive = false;
@@ -6310,22 +6311,26 @@ function smApplyRemotePlayerSync(msg) {
           }
         }
         if (wantPlay) {
+          smUserPaused = false;
           try { smYtPlayer.playVideo(); } catch (errP) {}
           smPlaying = true;
           if (smPlayerMode === "player") smSetPlayIcon(true);
           smStartTick();
         } else {
-          try { smYtPlayer.pauseVideo(); } catch (errPa) {}
-          smPlaying = false;
-          if (smPlayerMode === "player") smSetPlayIcon(false);
-          smStopTick();
+          /* Never pause local audio from peer sync — was causing random mid-song pauses */
+          if (smUserPaused) {
+            try { smYtPlayer.pauseVideo(); } catch (errPa) {}
+            smPlaying = false;
+            if (smPlayerMode === "player") smSetPlayIcon(false);
+            smStopTick();
+          }
         }
         smApplyPlaybackRate();
         smLastSyncSig = [name, smPlayalongActive ? 1 : 0, wantPlay ? 1 : 0, smShuffle ? 1 : 0, smRepeat ? 1 : 0, Math.floor(wantT)].join("|");
         smSyncApplying = false;
       }
       if (videoChanging) {
-        if (wantPlay) smYtPlayer.loadVideoById(yt);
+        if (wantPlay || !smUserPaused) smYtPlayer.loadVideoById(yt);
         else smYtPlayer.cueVideoById(yt);
         setTimeout(finishApply, 350);
       } else {
@@ -6496,10 +6501,13 @@ function smEnsureApi(cb) {
             if (smPlayerMode === "player") smSetPlayIcon(true);
             smStartTick(); smApplyPlaybackRate(); smSchedulePublishPlayerSync();
           }
-          /* CUED fires on every load — must not count as pause (was publishing playing:false ~1s in).
-             PAUSED during track-change grace is a load blip — ignore. */
+          /* CUED ignored. Spurious PAUSED (ads/sync/focus) auto-resumes unless user paused. */
           if (e.data === YT.PlayerState.PAUSED) {
-            if (smSyncApplying || Date.now() < smTrackChangeGraceUntil) return;
+            if (smSyncApplying) return;
+            if (!smUserPaused && smPlayerMode === "player") {
+              try { smYtPlayer.playVideo(); } catch (errResume) {}
+              return;
+            }
             smPlaying = false;
             if (smPlayerMode === "player") smSetPlayIcon(false);
             smStopTick(); smSchedulePublishPlayerSync();
@@ -6546,6 +6554,7 @@ function smLoadCurrent(autoplay) {
   var cur = smCurrent();
   /* next/prev/shuffle load clears one-shot playalong override */
   smPlayalongActive = false;
+  if (autoplay) smUserPaused = false;
   smUpdateMeta();
   /* Force t=0 — YT player still reports previous video's getCurrentTime() */
   smPublishTrackChangeSync();
@@ -6595,6 +6604,7 @@ function smCtrlLeftArrow() {
 }
 function smPlaySongName(name, autoplay, playalong) {
   if (smPlayerMode !== "player" && typeof smSetPlayerMode === "function") smSetPlayerMode("player");
+  if (autoplay !== false) smUserPaused = false;
   smBuildPlaylist();
   var pi = -1;
   for (var i = 0; i < smPlaylist.length; i++) {
@@ -6638,6 +6648,7 @@ function smOnEnded() {
   /* Avoid ENDED→next ping-pong while a remote sync is loading/seeking */
   if (smSyncApplying) return;
   smMarkLocalPlayerAction();
+  smUserPaused = false;
   smTrackChangeGraceUntil = Date.now() + 4500;
   if (smRepeat) smPlayIndex(smIndex + 1, true);
   else if (smIndex + 1 < smOrder.length) smPlayIndex(smIndex + 1, true);
@@ -6653,9 +6664,11 @@ function smTogglePlay() {
     smMarkLocalPlayerAction();
     var st = smYtPlayer.getPlayerState && smYtPlayer.getPlayerState();
     if (st === YT.PlayerState.PLAYING) {
+      smUserPaused = true;
       smYtPlayer.pauseVideo();
       return;
     }
+    smUserPaused = false;
     /* Guard against peer sync pausing us during the load/start blip */
     smTrackChangeGraceUntil = Math.max(smTrackChangeGraceUntil, Date.now() + 2500);
     /* Fresh load: meta shows War Pigs but nothing is cued yet — load & play */
@@ -6896,6 +6909,7 @@ var SM_NOTE_NAMES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
 
 function smPauseYouTubeQuiet() {
   if (!smYtPlayer) return;
+  smUserPaused = true;
   try {
     var st = smYtPlayer.getPlayerState && smYtPlayer.getPlayerState();
     if (st === YT.PlayerState.PLAYING) smYtPlayer.pauseVideo();
