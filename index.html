@@ -5428,7 +5428,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=192";
+  var url = base + "?playboard=1&v=193";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6215,7 +6215,8 @@ function smSchedulePublishPlayerSync() {
 /* Local track change: authoritative publish with t=0 (YT still has previous video time). */
 function smPublishTrackChangeSync() {
   smMarkLocalPlayerAction();
-  smTrackChangeGraceUntil = Date.now() + 1000;
+  /* Long enough that soft sync / peer tabs cannot yank the new track back to ~2s */
+  smTrackChangeGraceUntil = Date.now() + 4500;
   clearTimeout(smSyncPublishTimer);
   smPublishPlayerSync(true, 0);
 }
@@ -6239,9 +6240,8 @@ function smApplyRemotePlayerSync(msg) {
   var localSong = localCur ? localCur.song : "";
   var remoteSong = msg.song || "";
   if (now < smTrackChangeGraceUntil) {
-    /* After local next/prev/pick: ignore lagging tabs still on the old song or yanking time */
+    /* After local next/prev/ended: ignore lagging tabs on the old song entirely */
     if (remoteSong && localSong && remoteSong !== localSong) return;
-    if (typeof msg.t === "number" && msg.t > 2) return;
   }
   smSyncApplying = true;
   try {
@@ -6285,6 +6285,8 @@ function smApplyRemotePlayerSync(msg) {
     }
     var wantPlay = !!msg.playing;
     var wantT = typeof msg.t === "number" ? msg.t : 0;
+    /* Never yank time during track-change grace (was allowing t<=2 → 2s loop) */
+    if (now < smTrackChangeGraceUntil) wantT = 0;
     smEnsureApi(function(){
       if (!smYtPlayer) { smSyncApplying = false; return; }
       var vid = "";
@@ -6295,9 +6297,13 @@ function smApplyRemotePlayerSync(msg) {
           if (document.hidden) smYtPlayer.mute();
           else smYtPlayer.unMute();
         } catch (errM) {}
-        /* Seek after load; publishers force t=0 on local track change so stale high t is rare */
+        /* Soft seek only when meaningfully off — stops 2s↔4s sync ping-pong */
         if (wantT > 0.5 && smYtPlayer.seekTo) {
-          try { smYtPlayer.seekTo(wantT, true); } catch (errS) {}
+          var localT = 0;
+          try { localT = smYtPlayer.getCurrentTime() || 0; } catch (errLT) {}
+          if (Math.abs(wantT - localT) > 3) {
+            try { smYtPlayer.seekTo(wantT, true); } catch (errS) {}
+          }
         }
         if (wantPlay) {
           try { smYtPlayer.playVideo(); } catch (errP) {}
@@ -6624,6 +6630,8 @@ function smPlaySongName(name, autoplay, playalong) {
 function smOnEnded() {
   /* Avoid ENDED→next ping-pong while a remote sync is loading/seeking */
   if (smSyncApplying) return;
+  smMarkLocalPlayerAction();
+  smTrackChangeGraceUntil = Date.now() + 4500;
   if (smRepeat) smPlayIndex(smIndex + 1, true);
   else if (smIndex + 1 < smOrder.length) smPlayIndex(smIndex + 1, true);
   else smSetPlayIcon(false);
@@ -6820,8 +6828,22 @@ function smTick() {
   if (tc) tc.textContent = smFmtTime(cur);
   if (td) td.textContent = smFmtTime(dur);
   if (scrub) scrub.setAttribute("aria-valuenow", String(Math.round(pct)));
-  /* Soft time sync for other tabs (~every 2s while playing); skip during track-change grace */
-  if (!smSyncApplying && smPlaying && Date.now() >= smTrackChangeGraceUntil && Math.floor(cur * 2) % 4 === 0) smPublishPlayerSync(false);
+  /* Soft time sync for other tabs (~every 2s while playing); skip during track-change grace
+     and while YT still reports the previous video id after auto-advance. */
+  if (!smSyncApplying && smPlaying && Date.now() >= smTrackChangeGraceUntil && Math.floor(cur * 2) % 4 === 0) {
+    var expectYt = "";
+    try {
+      var tickCur = smCurrent();
+      if (tickCur) {
+        expectYt = smPlayalongActive
+          ? (SM_YT_PLAYALONG[tickCur.song] || tickCur.yt)
+          : tickCur.yt;
+      }
+    } catch (errEx) {}
+    var tickVid = "";
+    try { tickVid = (smYtPlayer.getVideoData && smYtPlayer.getVideoData().video_id) || ""; } catch (errVid) {}
+    if (!expectYt || !tickVid || tickVid === expectYt) smPublishPlayerSync(false);
+  }
   if (typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(false);
 }
 function smSeekFromClientX(clientX) {
