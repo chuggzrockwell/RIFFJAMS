@@ -4201,7 +4201,11 @@ function syncMirrorSectionArrangement(songName, pair, fromArrangement) {
     var sidx = findChipIndexByCode(secSong.sections, secCode);
     if (sidx >= 0) secSong.sections[sidx] = secEntry;
     else placeChipInSparseList(secSong.sections, secEntry);
-    try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (eSec) {}
+    try {
+      var rawMirror = JSON.stringify(ALBUMS);
+      localStorage.setItem(ALBUMS_KEY, rawMirror);
+      _lastAlbumsRaw = rawMirror;
+    } catch (eSec) {}
   } else {
     if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap();
     var arrSong = typeof smFindArrangementSongByName === "function"
@@ -4244,6 +4248,14 @@ function removeMirrorSectionArrangement(songName, code, fromArrangement) {
 }
 /** Fill any codes present in one mode but missing in the other. */
 function mirrorMissingSectionArrangementChips() {
+  /* Prefer fresh arrangement map from storage (chips saved in Arrange may not be in a stale in-memory copy). */
+  try {
+    var rawArr = localStorage.getItem(ARRANGEMENT_MAP_KEY);
+    if (rawArr) {
+      var parsedArr = JSON.parse(rawArr);
+      if (parsedArr) ARRANGEMENT_MAP = normalizeArrangementMap(parsedArr, ALBUMS_DEFAULT);
+    }
+  } catch (eReloadArr) {}
   if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap();
   var touchedSec = false, touchedArr = false;
   (ALBUMS || []).forEach(function(a){
@@ -4275,7 +4287,11 @@ function mirrorMissingSectionArrangementChips() {
     });
   });
   if (touchedSec) {
-    try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(ALBUMS)); } catch (e1) {}
+    try {
+      var rawSec = JSON.stringify(ALBUMS);
+      localStorage.setItem(ALBUMS_KEY, rawSec);
+      _lastAlbumsRaw = rawSec;
+    } catch (e1) {}
   }
   if (touchedArr) {
     try { localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP)); } catch (e2) {}
@@ -5084,7 +5100,7 @@ var SECTION_SONG_PREFIX = {
   "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-",
   "Sabbath Bloody Sabbath": "SBS-", "A National Acrobat": "ANA-", "Fluff": "FLU-",
   "Sabbra Cadabra": "SAC-", "Killing Yourself to Live": "KYTL-", "Who Are You?": "WAY-",
-  "Looking for Today": "LFT-", "Spiral Architect": "SAR-", "Snowblind": "SNB-", "St. Vitus Dance": "SVD-", "Tomorrow's Dream": "TD-",
+  "Looking for Today": "LFT-", "Spiral Architect": "SAR-", "Snowblind": "SNB-", "Cornucopia": "COR-", "St. Vitus Dance": "SVD-", "Tomorrow's Dream": "TD-",
   "Sweet Leaf": "SL-", "After Forever": "AF-", "Embryo": "EMB-", "Children of the Grave": "COTG-",
   "Orchid": "ORC-", "Lord of This World": "LOTW-", "Solitude": "SOL-", "Into the Void": "ITV-"
 };
@@ -5319,6 +5335,8 @@ function forceTomorrowDreamSongMapChips(albums) {
 }
 function showSections(keepScroll) {
   if (!albumsDirty) pullAlbumsFromStorage();
+  /* Backfill Section↔Arrangement so chips like Cornucopia show in both modes */
+  try { mirrorMissingSectionArrangementChips(); } catch (eMirrorShow) {}
   /* Snowblind/St Vitus/Tomorrow's Dream: fill empty rows only — never clobber chip-editor saves */
   if (!soloMode && !arrangementMode) {
     forceSnowblindSongMapChips(ALBUMS);
@@ -5549,7 +5567,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=203";
+  var url = base + "?playboard=1&v=204";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
