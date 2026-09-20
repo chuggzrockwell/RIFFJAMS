@@ -728,8 +728,11 @@
     position: absolute;
     top: 14px;
     left: 14px;
-    right: 168px; /* leave room for Player/Tuner/Metro + P */
+    right: auto;
     z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     text-align: left;
     font-size: 0.95rem;
     font-weight: 700;
@@ -738,9 +741,17 @@
     color: #fff;
     margin: 0;
     min-height: 0;
+    max-width: calc(100% - 182px); /* fallback until JS measures tools */
+    box-sizing: border-box;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+  }
+  .sm-player-meta .sm-meta-text {
+    display: inline-block;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: middle;
   }
   .sm-player-meta .sm-meta-song {
     display: inline;
@@ -764,6 +775,18 @@
     content: "·";
     margin-right: 0.35em;
     opacity: 0.7;
+  }
+  .sm-player-meta .sm-meta-barrier {
+    display: none;
+    flex: 0 0 2px;
+    width: 2px;
+    height: 12px;
+    border-radius: 1px;
+    background: rgba(255,255,255,0.55);
+    align-self: center;
+  }
+  .sm-player-meta.is-truncated .sm-meta-barrier {
+    display: block;
   }
   .sm-player-meta strong { color: #fff; font-weight: 800; }
   .sm-player-controls {
@@ -5703,7 +5726,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=213";
+  var url = base + "?playboard=1&v=214";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6741,21 +6764,106 @@ function smCurrent() {
   if (!smOrder.length || !smPlaylist.length) return null;
   return smPlaylist[smOrder[smIndex]] || null;
 }
+var SM_META_BUFFER_PX = 10; /* gap between meta (or barrier) and mode tools */
+var SM_META_BARRIER_RESERVE_PX = 8; /* barrier width + flex gap */
+function smEscapeMetaHtml(s) {
+  return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+}
+function smRenderPlayerMetaHtml(song, album) {
+  return '<span class="sm-meta-text">'
+    + '<span class="sm-meta-song">' + smEscapeMetaHtml(song) + '</span>'
+    + (album ? '<span class="sm-meta-album">' + smEscapeMetaHtml(album) + '</span>' : '')
+    + '</span><span class="sm-meta-barrier" aria-hidden="true"></span>';
+}
+function smPlayerMetaAvailWidth() {
+  var el = document.getElementById("smPlayerMeta");
+  var tools = document.getElementById("smPlayerTools");
+  var player = document.getElementById("smPlayer");
+  if (!el || !tools || !player) return 0;
+  var metaLeft = el.getBoundingClientRect().left;
+  var toolsLeft = tools.getBoundingClientRect().left;
+  var playerRight = player.getBoundingClientRect().right;
+  /* Prefer tools left; if tools are centered (mobile), fall back to player right - pad */
+  var limit = toolsLeft;
+  if (!(toolsLeft > metaLeft + 20)) {
+    limit = playerRight - 14;
+  }
+  return Math.max(40, Math.floor(limit - metaLeft - SM_META_BUFFER_PX));
+}
+function smFitPlayerMeta() {
+  var el = document.getElementById("smPlayerMeta");
+  if (!el) return;
+  var songFull = el.getAttribute("data-song-full");
+  var albumFull = el.getAttribute("data-album-full");
+  if (songFull == null) return; /* empty / placeholder state */
+  songFull = String(songFull);
+  albumFull = albumFull == null ? "" : String(albumFull);
+  var avail = smPlayerMetaAvailWidth();
+  el.style.maxWidth = avail + "px";
+  el.classList.remove("is-truncated");
+  el.innerHTML = smRenderPlayerMetaHtml(songFull, albumFull);
+  var textEl = el.querySelector(".sm-meta-text");
+  if (!textEl) return;
+  if (textEl.scrollWidth <= avail) return;
+  /* Need truncation + barrier: reserve barrier space */
+  var textAvail = Math.max(24, avail - SM_META_BARRIER_RESERVE_PX);
+  function fits(song, album) {
+    el.innerHTML = smRenderPlayerMetaHtml(song, album);
+    textEl = el.querySelector(".sm-meta-text");
+    return textEl && textEl.scrollWidth <= textAvail;
+  }
+  var song = songFull;
+  var album = albumFull;
+  /* Shrink album first (keep full song when possible) */
+  if (album && !fits(song, album)) {
+    var lo = 0, hi = album.length, best = 0;
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      var cand = mid >= album.length ? album : (album.slice(0, Math.max(0, mid)) + "...");
+      if (mid <= 0) cand = "";
+      if (fits(song, cand)) { best = mid; lo = mid + 1; }
+      else hi = mid - 1;
+    }
+    if (best >= album.length) album = albumFull;
+    else if (best <= 0) album = "";
+    else album = albumFull.slice(0, best) + "...";
+  }
+  if (!fits(song, album)) {
+    /* Still too long — shrink song */
+    var slo = 1, shi = song.length, sbest = 1;
+    while (slo <= shi) {
+      var smid = (slo + shi) >> 1;
+      var scand = smid >= song.length ? song : (song.slice(0, smid) + "...");
+      if (fits(scand, album)) { sbest = smid; slo = smid + 1; }
+      else shi = smid - 1;
+    }
+    if (sbest >= song.length) song = songFull;
+    else song = songFull.slice(0, Math.max(1, sbest)) + "...";
+  }
+  el.innerHTML = smRenderPlayerMetaHtml(song, album);
+  el.classList.add("is-truncated");
+  el.title = songFull + (albumFull ? (" · " + albumFull) : "");
+}
 function smUpdateMeta() {
   var el = document.getElementById("smPlayerMeta");
   var art = document.getElementById("smPlayerArt");
   if (!el) return;
   var cur = smCurrent();
   if (!cur) {
-    el.innerHTML = '<span class="sm-meta-song">No mapped tracks</span>';
+    el.removeAttribute("data-song-full");
+    el.removeAttribute("data-album-full");
+    el.removeAttribute("title");
+    el.classList.remove("is-truncated");
+    el.style.maxWidth = "";
+    el.innerHTML = '<span class="sm-meta-text"><span class="sm-meta-song">No mapped tracks</span></span>';
     if (art) { art.removeAttribute("src"); art.alt = ""; art.classList.remove("show"); }
     return;
   }
   var tag = smPlayalongActive ? "playalong" : (cur.album || "");
-  var songEsc = String(cur.song || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
-  var tagEsc = String(tag || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
-  el.innerHTML = '<span class="sm-meta-song">'+songEsc+'</span>'
-    + (tagEsc ? '<span class="sm-meta-album">'+tagEsc+'</span>' : "");
+  el.setAttribute("data-song-full", cur.song || "");
+  el.setAttribute("data-album-full", tag || "");
+  el.removeAttribute("title");
+  smFitPlayerMeta();
   if (art) {
     if (cur.cover) {
       art.src = cur.cover;
@@ -7734,14 +7842,26 @@ function smApplyPlayerZoomLock() {
   if (Math.abs(z - 1) < 0.02) {
     el.style.removeProperty("transform");
     el.style.zoom = "";
-    return;
+  } else {
+    el.style.setProperty("transform", "scale(" + inv + ")", "important");
+    el.style.setProperty("transform-origin", "bottom right", "important");
   }
-  el.style.setProperty("transform", "scale(" + inv + ")", "important");
-  el.style.setProperty("transform-origin", "bottom right", "important");
+  if (typeof smFitPlayerMeta === "function") {
+    requestAnimationFrame(function(){ smFitPlayerMeta(); });
+  }
 }
 function smBindPlayerZoomLock() {
   if (window._smZoomLockBound) return;
   window._smZoomLockBound = true;
+  var metaFitTimer = null;
+  function scheduleMetaFit(){
+    if (metaFitTimer) clearTimeout(metaFitTimer);
+    metaFitTimer = setTimeout(function(){ if (typeof smFitPlayerMeta === "function") smFitPlayerMeta(); }, 40);
+  }
+  window.addEventListener("resize", scheduleMetaFit);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", scheduleMetaFit);
+  }
   var kick = function(){ smApplyPlayerZoomLock(); };
   var kickSoon = function(){
     kick();
