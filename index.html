@@ -366,14 +366,14 @@
     max-width: 420px;
     min-width: 420px;
     margin: 0;
-    padding: 18px 16px 12px;
+    padding: 14px;
     background: #000;
     border: 1px solid #222;
     border-radius: 14px;
     box-sizing: border-box;
     color: #fff;
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
-    align-items: center;
+    align-items: stretch;
     gap: 14px;
     /* Stay pinned; JS smApplyPlayerZoomLock counters Ctrl+/- page zoom */
     transform: none;
@@ -393,8 +393,8 @@
   }
   .sm-player-tools {
     position: absolute;
-    top: 8px;
-    right: 10px;
+    top: 14px;
+    right: 14px;
     z-index: 2;
     display: flex;
     align-items: center;
@@ -715,11 +715,18 @@
     object-fit: cover;
     background: #111;
     display: none;
+    /* Equal 14px buffer: matches player padding + gap to controls */
+    align-self: flex-end;
+    margin: 0;
   }
   .sm-player-art.show { display: block; }
+  /* When art shows, reserve its column so controls don't crowd the left buffer */
+  .sm-player:has(.sm-player-art.show) .sm-player-main {
+    padding-right: 0;
+  }
   .sm-player-meta {
     position: absolute;
-    top: 8px;
+    top: 14px;
     left: 14px;
     right: 168px; /* leave room for Player/Tuner/Metro + P */
     z-index: 2;
@@ -5600,7 +5607,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=210";
+  var url = base + "?playboard=1&v=211";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
