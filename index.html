@@ -1498,6 +1498,39 @@
     white-space: nowrap;
   }
   .chip-editor #chipEditTimeFromPlayer:hover { filter: brightness(1.08); }
+  .chip-editor .chip-edit-end-time-row {
+    display: none;
+    margin: 0 0 10px;
+  }
+  body.sections-arrange .chip-editor.open .chip-edit-end-time-row:not([hidden]) {
+    display: block;
+  }
+  .chip-editor .chip-edit-end-time-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .chip-editor #chipEditEndTime {
+    flex: 1;
+    width: auto;
+    margin-bottom: 0;
+  }
+  .chip-editor #chipEditEndTimeFromPlayer {
+    flex: 0 0 auto;
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: #6b1a4a;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .chip-editor #chipEditEndTimeFromPlayer:hover { filter: brightness(1.08); }
+  .sm-arr-next-countdown.is-end {
+    /* same look as normal; marker for End-target countdown */
+  }
   .sm-arr-next-panel {
     display: none;
     flex: 0 0 auto;
@@ -3631,6 +3664,13 @@
         <button type="button" id="chipEditTimeFromPlayer" title="Grab current Song Map player time">Set from player</button>
       </div>
     </div>
+    <div class="chip-edit-end-time-row" id="chipEditEndTimeRow" hidden>
+      <label for="chipEditEndTime">End time</label>
+      <div class="chip-edit-end-time-controls">
+        <input type="text" id="chipEditEndTime" maxlength="12" placeholder="0:00 or seconds" autocomplete="off" inputmode="decimal">
+        <button type="button" id="chipEditEndTimeFromPlayer" title="Grab current Song Map player time as song end">Set from player</button>
+      </div>
+    </div>
     <div class="editor-actions">
       <button type="button" class="btn-save" id="chipEditSave">Save</button>
       <button type="button" class="btn-cancel" id="chipEditCancel">Cancel</button>
@@ -4151,6 +4191,11 @@ function loadArrangementMap() {
   return blank;
 }
 function saveArrangementMap() {
+  try {
+    ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).forEach(function(a){
+      (a.songs || []).forEach(function(s){ clearArrangementEndSecExceptLast(s); });
+    });
+  } catch (eClr) {}
   try { localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP)); } catch (e) {}
   arrangementDirty = false;
   updateEditSaveUi();
@@ -5007,6 +5052,57 @@ function setChipStartSec(pair, sec) {
   pair[4] = Number(sec);
   return pair;
 }
+function chipEndSec(pair) {
+  if (!pair || pair.length < 6) return null;
+  var v = pair[5];
+  if (v == null || v === "") return null;
+  var n = typeof v === "number" ? v : parseFloat(String(v).trim());
+  return (typeof n === "number" && isFinite(n) && n >= 0) ? n : null;
+}
+function setChipEndSec(pair, sec) {
+  if (!pair) return pair;
+  while (pair.length < 5) {
+    if (pair.length === 2) pair.push("");
+    else if (pair.length === 3) pair.push([]);
+    else if (pair.length === 4) pair.push(null);
+  }
+  if (sec == null || sec === "" || !isFinite(Number(sec))) {
+    if (pair.length > 5) pair[5] = null;
+    return pair;
+  }
+  pair[5] = Number(sec);
+  return pair;
+}
+function arrangementLastOccupiedCi(song) {
+  var last = -1;
+  ((song && song.chips) || []).forEach(function(p, i){
+    if (isChipPair(p)) last = i;
+  });
+  return last;
+}
+function songArrangementEndSec(song) {
+  var li = arrangementLastOccupiedCi(song);
+  if (li < 0) return null;
+  return chipEndSec(song.chips[li]);
+}
+function clearArrangementEndSecExceptLast(song) {
+  if (!song || !song.chips) return;
+  var last = arrangementLastOccupiedCi(song);
+  if (last < 0) return;
+  var keep = chipEndSec(song.chips[last]);
+  if (keep == null) {
+    song.chips.forEach(function(p, i){
+      if (i === last || !isChipPair(p)) return;
+      var e = chipEndSec(p);
+      if (e != null && keep == null) keep = e;
+    });
+  }
+  song.chips.forEach(function(p, i){
+    if (!isChipPair(p)) return;
+    if (i !== last && p.length > 5) p[5] = null;
+  });
+  if (keep != null) setChipEndSec(song.chips[last], keep);
+}
 function parseChipTimeInput(raw) {
   if (raw == null) return null;
   var s = String(raw).trim();
@@ -5607,7 +5703,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=212";
+  var url = base + "?playboard=1&v=213";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -7016,7 +7112,7 @@ function smUpdateArrNextCue(force) {
   if (!arrangementMode || !document.body.classList.contains("sections-arrange")) {
     if (cdEl) {
       cdEl.textContent = "";
-      cdEl.classList.remove("is-on", "is-urgent");
+      cdEl.classList.remove("is-on", "is-urgent", "is-end");
       cdEl.setAttribute("aria-hidden", "true");
     }
     return;
@@ -7037,7 +7133,7 @@ function smUpdateArrNextCue(force) {
     smPaintArrCueChip(chipEl, "sm-arr-next-chip", null, emptyMsg);
     if (cdEl) {
       cdEl.textContent = "";
-      cdEl.classList.remove("is-on", "is-urgent");
+      cdEl.classList.remove("is-on", "is-urgent", "is-end");
       cdEl.setAttribute("aria-hidden", "true");
     }
   } else {
@@ -7052,24 +7148,29 @@ function smUpdateArrNextCue(force) {
       chipEl.style.color = "";
       chipEl.textContent = endMsg;
     }
-    /* Countdown for whole remainder of current section until next start */
+    /* Countdown: until next start, or until End time when Next shows End */
     if (cdEl) {
+      var remain = null;
+      var isEndCd = false;
       if (pick.next) {
-        var remain = pick.next.start - t;
-        if (remain > 0) {
-          var n = Math.max(1, Math.ceil(remain));
-          cdEl.textContent = "IN: " + n;
-          cdEl.classList.add("is-on");
-          cdEl.classList.toggle("is-urgent", remain <= 5);
-          cdEl.setAttribute("aria-hidden", "false");
-        } else {
-          cdEl.textContent = "";
-          cdEl.classList.remove("is-on", "is-urgent");
-          cdEl.setAttribute("aria-hidden", "true");
+        remain = pick.next.start - t;
+      } else {
+        var endAt = songArrangementEndSec(song);
+        if (endAt != null) {
+          remain = endAt - t;
+          isEndCd = true;
         }
+      }
+      if (remain != null && remain > 0) {
+        var n = Math.max(1, Math.ceil(remain));
+        cdEl.textContent = "IN: " + n;
+        cdEl.classList.add("is-on");
+        cdEl.classList.toggle("is-end", isEndCd);
+        cdEl.classList.toggle("is-urgent", remain <= 5);
+        cdEl.setAttribute("aria-hidden", "false");
       } else {
         cdEl.textContent = "";
-        cdEl.classList.remove("is-on", "is-urgent");
+        cdEl.classList.remove("is-on", "is-urgent", "is-end");
         cdEl.setAttribute("aria-hidden", "true");
       }
     }
@@ -8278,6 +8379,8 @@ function openChipEditor(anchor, state) {
   document.getElementById("chipEditDelete").style.display = state.isNew ? "none" : "";
   var timeRow = document.getElementById("chipEditTimeRow");
   var timeInput = document.getElementById("chipEditTime");
+  var endRow = document.getElementById("chipEditEndTimeRow");
+  var endInput = document.getElementById("chipEditEndTime");
   if (timeRow && timeInput) {
     if (arrangementMode) {
       timeRow.hidden = false;
@@ -8286,6 +8389,23 @@ function openChipEditor(anchor, state) {
     } else {
       timeRow.hidden = true;
       timeInput.value = "";
+    }
+  }
+  if (endRow && endInput) {
+    var showEnd = false;
+    if (arrangementMode) {
+      var editSong = getEditSong(state.ai, state.si);
+      var lastCi = arrangementLastOccupiedCi(editSong);
+      /* Last occupied chip, or a new chip past the current last (will become last on save) */
+      showEnd = (lastCi < 0) || (state.ci === lastCi) || (state.isNew && state.ci > lastCi);
+    }
+    if (showEnd) {
+      endRow.hidden = false;
+      var endSec = (state.endSec != null) ? state.endSec : null;
+      endInput.value = (endSec != null && isFinite(endSec)) ? formatChipTime(endSec) : "";
+    } else {
+      endRow.hidden = true;
+      endInput.value = "";
     }
   }
   ed.classList.add("open");
@@ -8322,8 +8442,13 @@ function saveChipEditor() {
   if ((soloMode || arrangementMode) && !lick) lick = code;
   var posList = readChipEditPosList();
   var startSec = null;
+  var endSec = null;
   if (arrangementMode) {
     startSec = parseChipTimeInput((document.getElementById("chipEditTime") || {}).value);
+    var endRowEl = document.getElementById("chipEditEndTimeRow");
+    if (endRowEl && !endRowEl.hidden) {
+      endSec = parseChipTimeInput((document.getElementById("chipEditEndTime") || {}).value);
+    }
   }
   var entry = arrangementMode
     ? makeChipEntry(code, tier, lick, posList, startSec)
@@ -8336,6 +8461,9 @@ function saveChipEditor() {
     song = getEditSong(ai, si);
     if (!song) return;
     song.chips[ci] = entry;
+    clearArrangementEndSecExceptLast(song);
+    var lastCi = arrangementLastOccupiedCi(song);
+    if (ci === lastCi) setChipEndSec(song.chips[ci], endSec);
     saveArrangementMap();
     syncMirrorSectionArrangement(song.song, entry, true);
   } else if (soloMode) {
@@ -8381,6 +8509,7 @@ function deleteChipEditor() {
     ensureArrangementSlots(song);
     if (isChipPair(song.chips[chipEditState.ci])) delCode = song.chips[chipEditState.ci][0];
     song.chips[chipEditState.ci] = null;
+    clearArrangementEndSecExceptLast(song);
     saveArrangementMap();
     if (delCode) removeMirrorSectionArrangement(song.song, delCode, true);
   } else if (soloMode) {
@@ -10134,6 +10263,22 @@ document.getElementById("chipEditLick").addEventListener("keydown", function(e){
   if (e.key === "Escape") { e.preventDefault(); closeChipEditor(); }
 });
 (function(){
+  function smGrabPlayerTimeInto(inputId) {
+    var sec = null;
+    try {
+      if (smYtPlayer && smYtPlayer.getCurrentTime) sec = smYtPlayer.getCurrentTime();
+    } catch (errT) { sec = null; }
+    if (sec == null || !isFinite(sec) || sec < 0) {
+      alert("Song Map player time is not available yet — play or cue a track first.");
+      return;
+    }
+    var inp = document.getElementById(inputId);
+    if (inp) {
+      inp.value = formatChipTime(sec);
+      inp.focus();
+      inp.select();
+    }
+  }
   var timeInput = document.getElementById("chipEditTime");
   var fromBtn = document.getElementById("chipEditTimeFromPlayer");
   if (timeInput) {
@@ -10146,20 +10291,22 @@ document.getElementById("chipEditLick").addEventListener("keydown", function(e){
     fromBtn.onclick = function(e){
       e.preventDefault();
       e.stopPropagation();
-      var sec = null;
-      try {
-        if (smYtPlayer && smYtPlayer.getCurrentTime) sec = smYtPlayer.getCurrentTime();
-      } catch (errT) { sec = null; }
-      if (sec == null || !isFinite(sec) || sec < 0) {
-        alert("Song Map player time is not available yet — play or cue a track first.");
-        return;
-      }
-      var inp = document.getElementById("chipEditTime");
-      if (inp) {
-        inp.value = formatChipTime(sec);
-        inp.focus();
-        inp.select();
-      }
+      smGrabPlayerTimeInto("chipEditTime");
+    };
+  }
+  var endInput = document.getElementById("chipEditEndTime");
+  var endFromBtn = document.getElementById("chipEditEndTimeFromPlayer");
+  if (endInput) {
+    endInput.addEventListener("keydown", function(e){
+      if (e.key === "Enter") { e.preventDefault(); saveChipEditor(); }
+      if (e.key === "Escape") { e.preventDefault(); closeChipEditor(); }
+    });
+  }
+  if (endFromBtn) {
+    endFromBtn.onclick = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      smGrabPlayerTimeInto("chipEditEndTime");
     };
   }
 })();
@@ -10483,7 +10630,7 @@ document.getElementById("sectionsSheet").onclick = function(e){
         }
       }
       var newPos = (soloMode || arrangementMode) ? [1] : defaultPositionsForAlbum(ALBUMS[ai]);
-      openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "", positions: newPos, startSec: null });
+      openChipEditor(chip, { ai: ai, si: si, ci: ci, isNew: true, code: "", tier: 3, lick: "", positions: newPos, startSec: null, endSec: null });
       return;
     }
     var rawPos = chip.getAttribute("data-position");
@@ -10491,8 +10638,10 @@ document.getElementById("sectionsSheet").onclick = function(e){
       ? ((soloMode || arrangementMode) ? [1] : defaultPositionsForAlbum(ALBUMS[ai]))
       : parsePosList(rawPos);
     var existStart = null;
+    var existEnd = null;
     if (arrangementMode && song && song.chips && isChipPair(song.chips[ci])) {
       existStart = chipStartSec(song.chips[ci]);
+      existEnd = chipEndSec(song.chips[ci]);
     }
     openChipEditor(chip, {
       ai: ai, si: si, ci: ci, isNew: false,
@@ -10500,7 +10649,8 @@ document.getElementById("sectionsSheet").onclick = function(e){
       tier: normalizeSlot(chip.getAttribute("data-tier"), 3),
       lick: sectionLickId(chip.getAttribute("data-song") || "", chip.getAttribute("data-sec") || "", chip.getAttribute("data-lick") || ""),
       positions: editPos,
-      startSec: existStart
+      startSec: existStart,
+      endSec: existEnd
     });
     return;
   }
