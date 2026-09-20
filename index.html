@@ -693,7 +693,7 @@
   .sm-player-main {
     flex: 1 1 auto;
     min-width: 0;
-    padding-top: 26px; /* room for mode + P chips */
+    padding-top: 34px; /* room for title row + mode chips */
   }
   .sm-player[data-mode="tuner"] .sm-player-main,
   .sm-player[data-mode="metro"] .sm-player-main {
@@ -718,17 +718,42 @@
   }
   .sm-player-art.show { display: block; }
   .sm-player-meta {
-    text-align: center;
-    font-size: 0.72rem;
+    position: absolute;
+    top: 8px;
+    left: 14px;
+    right: 168px; /* leave room for Player/Tuner/Metro + P */
+    z-index: 2;
+    text-align: left;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    color: #fff;
+    margin: 0;
+    min-height: 0;
+    white-space: normal;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .sm-player-meta .sm-meta-song {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+  }
+  .sm-player-meta .sm-meta-album {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.78rem;
     font-weight: 600;
     color: #fff;
-    margin: 0 0 8px;
-    min-height: 1em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    opacity: 0.92;
+    line-height: 1.1;
   }
-  .sm-player-meta strong { color: #fff; font-weight: 700; }
+  .sm-player-meta strong { color: #fff; font-weight: 800; }
   .sm-player-controls {
     display: flex;
     align-items: center;
@@ -5568,7 +5593,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=207";
+  var url = base + "?playboard=1&v=208";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6612,12 +6637,15 @@ function smUpdateMeta() {
   if (!el) return;
   var cur = smCurrent();
   if (!cur) {
-    el.innerHTML = "No mapped YouTube tracks yet";
+    el.innerHTML = '<span class="sm-meta-song">No mapped tracks</span>';
     if (art) { art.removeAttribute("src"); art.alt = ""; art.classList.remove("show"); }
     return;
   }
-  var tag = smPlayalongActive ? "playalong" : cur.album;
-  el.innerHTML = "<strong>"+cur.song+"</strong> · "+tag;
+  var tag = smPlayalongActive ? "playalong" : (cur.album || "");
+  var songEsc = String(cur.song || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+  var tagEsc = String(tag || "").replace(/&/g,"&amp;").replace(/</g,"&lt;");
+  el.innerHTML = '<span class="sm-meta-song">'+songEsc+'</span>'
+    + (tagEsc ? '<span class="sm-meta-album">'+tagEsc+'</span>' : "");
   if (art) {
     if (cur.cover) {
       art.src = cur.cover;
@@ -7525,10 +7553,51 @@ function smInitModeUi() {
 }
 
 
-/* Keep player the same on-screen size when the page is Ctrl+/- zoomed.
-   Mac Chrome often keeps outer/inner ≈ 1 while devicePixelRatio scales with zoom. */
+/* Keep player fixed on-screen size under Ctrl+/- page zoom (incl. 175%).
+   Infer zoom by finding which browser-zoom step makes devicePixelRatio look like a
+   common native DPR (1 / 1.25 / 1.5 / 2 / …). Works on Mac Chrome where outer/inner ≈ 1. */
 var SM_ZOOM_STEPS = [0.25,0.33,0.5,0.67,0.75,0.8,0.9,1,1.1,1.25,1.5,1.75,2,2.5,3,4,5];
-function smSnapZoomStep(z) {
+var SM_NATIVE_DPR_CANDIDATES = [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 3, 3.5, 4];
+function smInferPageZoomFromDpr() {
+  var dpr = window.devicePixelRatio || 1;
+  var bestZ = 1, bestErr = 1e9, bestNative = dpr, i, j;
+  for (i = 0; i < SM_ZOOM_STEPS.length; i++) {
+    var z = SM_ZOOM_STEPS[i];
+    if (z <= 0) continue;
+    var native = dpr / z;
+    for (j = 0; j < SM_NATIVE_DPR_CANDIDATES.length; j++) {
+      var err = Math.abs(native - SM_NATIVE_DPR_CANDIDATES[j]);
+      /* Prefer solutions near 100% when equally good */
+      var score = err + Math.abs(Math.log(z)) * 0.001;
+      if (score < bestErr) {
+        bestErr = score;
+        bestZ = z;
+        bestNative = SM_NATIVE_DPR_CANDIDATES[j];
+      }
+    }
+  }
+  if (bestErr > 0.22) {
+    /* Ambiguous — fall back to calibrated native if we have one */
+    if (window._smNativeDpr) return (dpr / window._smNativeDpr);
+    return 1;
+  }
+  window._smNativeDpr = bestNative;
+  return bestZ;
+}
+function smMeasurePageZoom() {
+  var z = smInferPageZoomFromDpr();
+  var oi = 1;
+  if (window.outerWidth && window.innerWidth) {
+    oi = window.outerWidth / window.innerWidth;
+    if (oi >= 1.12 && oi <= 3 && Math.abs(oi - z) > 0.2 && Math.abs(oi - 1) > Math.abs(z - 1)) {
+      z = oi;
+    }
+  }
+  var vv = window.visualViewport;
+  if (vv && typeof vv.scale === "number" && Math.abs(vv.scale - 1) > 0.05) {
+    if (Math.abs(vv.scale - 1) > Math.abs(z - 1)) z = vv.scale;
+  }
+  /* Snap to known browser zoom steps */
   var best = 1, bestD = 99, i;
   for (i = 0; i < SM_ZOOM_STEPS.length; i++) {
     var d = Math.abs(SM_ZOOM_STEPS[i] - z);
@@ -7536,45 +7605,20 @@ function smSnapZoomStep(z) {
   }
   return best;
 }
-function smCalibrateNativeDpr(force) {
-  var dpr = window.devicePixelRatio || 1;
-  var oi = 1;
-  if (window.outerWidth && window.innerWidth) oi = window.outerWidth / window.innerWidth;
-  if (force || window._smNativeDpr == null) {
-    /* If outer/inner already says zoomed, back out native DPR; else treat current as 100%. */
-    if (!force && oi >= 1.12 && oi <= 3) window._smNativeDpr = dpr / oi;
-    else window._smNativeDpr = dpr;
-  }
-}
-function smMeasurePageZoom() {
-  smCalibrateNativeDpr(false);
-  var dpr = window.devicePixelRatio || 1;
-  var native = window._smNativeDpr || dpr;
-  var zDpr = (native > 0) ? (dpr / native) : 1;
-  var zOi = 1;
-  if (window.outerWidth && window.innerWidth) {
-    zOi = window.outerWidth / window.innerWidth;
-    if (!(zOi >= 0.7 && zOi <= 3)) zOi = 1;
-  }
-  var vv = window.visualViewport;
-  var zVv = (vv && typeof vv.scale === "number") ? vv.scale : 1;
-  /* Prefer the strongest signal that looks like real page zoom */
-  var z = zDpr;
-  if (Math.abs(zOi - 1) > Math.abs(z - 1) && zOi >= 1.12) z = zOi;
-  if (Math.abs(zVv - 1) > Math.abs(z - 1) && Math.abs(zVv - 1) > 0.02) z = zVv;
-  if (Math.abs(z - 1) < 0.06) return 1;
-  return smSnapZoomStep(z);
-}
 function smApplyPlayerZoomLock() {
   var el = document.getElementById("smPlayer");
   if (!el) return;
   var z = smMeasurePageZoom();
   var inv = 1 / z;
   el.setAttribute("data-sm-page-zoom", String(z));
-  /* Use transform (not CSS zoom) — counters page zoom reliably on Mac Chrome */
-  el.style.zoom = "";
+  el.style.zoom = "1";
+  /* Lock box so zoom counter doesn't change layout shape */
+  el.style.setProperty("width", "420px", "important");
+  el.style.setProperty("min-width", "420px", "important");
+  el.style.setProperty("max-width", "420px", "important");
   if (Math.abs(z - 1) < 0.02) {
     el.style.removeProperty("transform");
+    el.style.zoom = "";
     return;
   }
   el.style.setProperty("transform", "scale(" + inv + ")", "important");
@@ -7583,13 +7627,12 @@ function smApplyPlayerZoomLock() {
 function smBindPlayerZoomLock() {
   if (window._smZoomLockBound) return;
   window._smZoomLockBound = true;
-  smCalibrateNativeDpr(false);
   var kick = function(){ smApplyPlayerZoomLock(); };
   var kickSoon = function(){
     kick();
-    setTimeout(kick, 50);
-    setTimeout(kick, 150);
-    setTimeout(kick, 300);
+    setTimeout(kick, 30);
+    setTimeout(kick, 120);
+    setTimeout(kick, 280);
   };
   window.addEventListener("resize", kickSoon);
   if (window.visualViewport) {
@@ -7604,10 +7647,6 @@ function smBindPlayerZoomLock() {
     var k = e.key;
     if (k === "+" || k === "=" || k === "-" || k === "_" || k === "0" ||
         e.code === "NumpadAdd" || e.code === "NumpadSubtract" || e.code === "Digit0") {
-      /* Ctrl+0 = browser zoom reset → recalibrate native DPR */
-      if (k === "0" || e.code === "Digit0") {
-        setTimeout(function(){ smCalibrateNativeDpr(true); kick(); }, 100);
-      }
       kickSoon();
     }
   });
