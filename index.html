@@ -5607,7 +5607,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=211";
+  var url = base + "?playboard=1&v=212";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6273,7 +6273,7 @@ var SM_SONGSTERR = {
   "Cornucopia": "https://www.songsterr.com/a/wsa/black-sabbath-cornucopia-tab-s26917",
   "Laguna Sunrise": "https://www.songsterr.com/a/wsa/black-sabbath-laguna-sunrise-tab-s184",
   "St. Vitus Dance": "https://www.songsterr.com/a/wsa/black-sabbath-st-vitus-dance-tab-s26935",
-  "Under the Sun": "https://www.songsterr.com/a/wsa/black-sabbath-under-the-sun-tab-s4841025"
+  "Under the Sun": "https://www.songsterr.com/a/wsa/black-sabbath-under-the-sun-everyday-comes-and-goes-tab-s24192"
 };
 function smSongsterrUrl(songName) {
   return (SM_SONGSTERR && SM_SONGSTERR[songName]) || "";
