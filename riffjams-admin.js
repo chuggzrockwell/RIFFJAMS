@@ -280,12 +280,17 @@
         delete nextAssets[next.previousLick];
       }
       nextAssets[draft.lick] = imagePath;
+      var arrPack = (typeof window.exportArrangementForRepo === "function")
+        ? window.exportArrangementForRepo()
+        : { arrangementMap: sharedData.arrangementMap || null, arrangementTimings: sharedData.arrangementTimings || [] };
       var manifest = {
         version: 1,
         updatedAt: new Date().toISOString(),
         assets: nextAssets,
         albums: next.albums,
-        soloMap: next.soloMap
+        soloMap: next.soloMap,
+        arrangementMap: arrPack.arrangementMap || null,
+        arrangementTimings: arrPack.arrangementTimings || []
       };
       button.disabled = true;
       button.textContent = "Attaching…";
@@ -308,6 +313,113 @@
       if (button) { button.disabled = false; button.textContent = "Attach & Save"; }
     }
   }
+
+
+  async function commitManifestOnly(manifest, message) {
+    var prefix = "/repos/" + REPO_OWNER + "/" + REPO_NAME;
+    var ref = await github(prefix + "/git/ref/heads/" + REPO_BRANCH);
+    var parentSha = ref.object.sha;
+    var parent = await github(prefix + "/git/commits/" + parentSha);
+    var dataGitBlob = await github(prefix + "/git/blobs", {
+      method: "POST",
+      body: JSON.stringify({ content: textToBase64(JSON.stringify(manifest, null, 2) + "\n"), encoding: "base64" })
+    });
+    var tree = await github(prefix + "/git/trees", {
+      method: "POST",
+      body: JSON.stringify({
+        base_tree: parent.tree.sha,
+        tree: [{ path: DATA_PATH, mode: "100644", type: "blob", sha: dataGitBlob.sha }]
+      })
+    });
+    var commit = await github(prefix + "/git/commits", {
+      method: "POST",
+      body: JSON.stringify({ message: message, tree: tree.sha, parents: [parentSha] })
+    });
+    await github(prefix + "/git/refs/heads/" + REPO_BRANCH, {
+      method: "PATCH",
+      body: JSON.stringify({ sha: commit.sha, force: false })
+    });
+    return commit;
+  }
+
+  var arrangementSyncTimer = null;
+  var arrangementSyncInFlight = false;
+  var arrangementSyncQueued = null;
+
+  function buildManifestWithArrangement() {
+    var arrPack = (typeof window.exportArrangementForRepo === "function")
+      ? window.exportArrangementForRepo()
+      : { arrangementMap: null, arrangementTimings: [] };
+    return {
+      version: 1,
+      updatedAt: new Date().toISOString(),
+      assets: Object.assign({}, sharedData.assets || {}, window.RIFFJAMS_ASSETS || {}),
+      albums: clone(window.ALBUMS || sharedData.albums || []),
+      soloMap: clone(window.SOLO_MAP || sharedData.soloMap || { albums: [] }),
+      arrangementMap: arrPack.arrangementMap || null,
+      arrangementTimings: arrPack.arrangementTimings || []
+    };
+  }
+
+  async function syncArrangementToRepoNow(opts) {
+    opts = opts || {};
+    if (!TOKEN) {
+      if (!opts.quiet && typeof window.setSaveStatus === "function") {
+        window.setSaveStatus("Times saved locally — connect GitHub in chip editor to sync to repo");
+      }
+      return { ok: false, reason: "no-token" };
+    }
+    if (arrangementSyncInFlight) {
+      arrangementSyncQueued = opts;
+      return { ok: false, reason: "busy" };
+    }
+    arrangementSyncInFlight = true;
+    try {
+      var manifest = buildManifestWithArrangement();
+      var songLabel = opts.song ? String(opts.song) : "arrangement";
+      var msg = "Sync arrangement times (" + songLabel + ")";
+      if (!opts.quiet && typeof window.setSaveStatus === "function") {
+        window.setSaveStatus("Syncing start/stop times to GitHub…");
+      }
+      await commitManifestOnly(manifest, msg);
+      sharedData = manifest;
+      if (!opts.quiet && typeof window.setSaveStatus === "function") {
+        var n = (manifest.arrangementTimings || []).length;
+        window.setSaveStatus("Times synced to repo (" + n + " timed song" + (n === 1 ? "" : "s") + ")");
+      }
+      return { ok: true, timings: manifest.arrangementTimings };
+    } catch (error) {
+      if (/expired|Connect GitHub|Bad credentials/i.test(error.message || "")) rememberToken("");
+      if (!opts.quiet && typeof window.setSaveStatus === "function") {
+        window.setSaveStatus(error.message || "Could not sync times to repo");
+      }
+      console.warn("RIFFJAMS arrangement sync failed", error);
+      return { ok: false, error: error };
+    } finally {
+      arrangementSyncInFlight = false;
+      if (arrangementSyncQueued) {
+        var next = arrangementSyncQueued;
+        arrangementSyncQueued = null;
+        syncArrangementToRepoNow(next);
+      }
+    }
+  }
+
+  function scheduleArrangementSync(opts) {
+    opts = opts || {};
+    if (arrangementSyncTimer) clearTimeout(arrangementSyncTimer);
+    arrangementSyncTimer = setTimeout(function () {
+      arrangementSyncTimer = null;
+      syncArrangementToRepoNow(opts);
+    }, opts.immediate ? 0 : 1200);
+  }
+
+  window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES = function (opts) {
+    scheduleArrangementSync(opts || {});
+  };
+  window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES_NOW = function (opts) {
+    return syncArrangementToRepoNow(opts || { immediate: true });
+  };
 
   function injectEditor() {
     var editor = qs("chipEditor");
@@ -392,6 +504,18 @@
         window.SOLO_MAP = clone(data.soloMap);
         window.saveSoloMap();
       }
+      if (data.arrangementMap && data.arrangementMap.albums) {
+        sharedData.arrangementMap = data.arrangementMap;
+        sharedData.arrangementTimings = data.arrangementTimings || [];
+        try {
+          var localRaw = localStorage.getItem("lick-arrangement-map-v1");
+          var localEmpty = !localRaw || localRaw === "null";
+          if (localEmpty && typeof window.normalizeArrangementMap === "function") {
+            window.ARRANGEMENT_MAP = window.normalizeArrangementMap(clone(data.arrangementMap), window.ALBUMS_DEFAULT || window.ALBUMS);
+            if (typeof window.saveArrangementMap === "function") window.saveArrangementMap();
+          }
+        } catch (eArrHydrate) {}
+      }
       if (document.body.classList.contains("sections-mode")) window.showSections(true);
       if (document.body.classList.contains("sheet-mode") && window.currentLetter) window.showSeries(window.currentLetter);
     } catch (e) {
@@ -402,6 +526,15 @@
   injectEditor();
   loadStoredToken();
   loadSharedData();
+  /* After local arrangement loads, push start/implied-stop times to the repo when GitHub is connected */
+  setTimeout(function () {
+    if (TOKEN && typeof window.exportArrangementForRepo === "function") {
+      var pack = window.exportArrangementForRepo();
+      if (pack && pack.arrangementTimings && pack.arrangementTimings.length) {
+        scheduleArrangementSync({ quiet: true, reason: "startup", song: "startup" });
+      }
+    }
+  }, 2500);
 
   var originalOpen = window.openChipEditor;
   window.openChipEditor = function (anchor, state) {

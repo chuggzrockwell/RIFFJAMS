@@ -5126,6 +5126,75 @@ function clearArrangementEndSecExceptLast(song) {
   });
   if (keep != null) setChipEndSec(song.chips[last], keep);
 }
+function arrangementTierPoints(tier) {
+  var t = chipTier([null, tier]);
+  if (t === 1) return 3;
+  if (t === 2) return 2;
+  return 1;
+}
+/** Build export rows: start times + implied stops (next start, or End time on last). */
+function buildArrangementTimings(map) {
+  var out = [];
+  ((map && map.albums) || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      var timed = [];
+      (s.chips || []).forEach(function(pair, ci){
+        if (!isChipPair(pair)) return;
+        var start = chipStartSec(pair);
+        if (start == null) return;
+        timed.push({
+          code: String(pair[0] || ""),
+          tier: chipTier(pair),
+          start: start,
+          ci: ci,
+          lick: String(pair[2] || "")
+        });
+      });
+      if (!timed.length) return;
+      timed.sort(function(x, y){ return x.start - y.start || x.ci - y.ci; });
+      var endSec = songArrangementEndSec(s);
+      timed.forEach(function(item, i){
+        var stop = (i + 1 < timed.length) ? timed[i + 1].start : endSec;
+        item.stop = (stop != null && isFinite(stop)) ? stop : null;
+        item.duration = (item.stop != null && item.stop > item.start) ? (item.stop - item.start) : null;
+      });
+      var durSum = 0;
+      var pointSum = 0;
+      timed.forEach(function(item){
+        if (item.duration == null || item.duration <= 0) return;
+        durSum += item.duration;
+        pointSum += arrangementTierPoints(item.tier) * item.duration;
+      });
+      var rsi = (durSum > 0) ? (pointSum / durSum) : null;
+      out.push({
+        album: a.name || "",
+        song: s.song || "",
+        endSec: endSec,
+        complete: timed.every(function(t){ return t.duration != null && t.duration > 0; }),
+        riffSaturationIndex: rsi == null ? null : Math.round(rsi * 1000) / 1000,
+        chips: timed.map(function(t){
+          return {
+            code: t.code,
+            tier: t.tier,
+            start: t.start,
+            stop: t.stop,
+            duration: t.duration == null ? null : Math.round(t.duration * 1000) / 1000,
+            lick: t.lick
+          };
+        })
+      });
+    });
+  });
+  return out;
+}
+function exportArrangementForRepo() {
+  if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap();
+  return {
+    arrangementMap: ARRANGEMENT_MAP,
+    arrangementTimings: buildArrangementTimings(ARRANGEMENT_MAP)
+  };
+}
+
 function parseChipTimeInput(raw) {
   if (raw == null) return null;
   var s = String(raw).trim();
@@ -5726,7 +5795,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=214";
+  var url = base + "?playboard=1&v=215";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -8586,6 +8655,9 @@ function saveChipEditor() {
     if (ci === lastCi) setChipEndSec(song.chips[ci], endSec);
     saveArrangementMap();
     syncMirrorSectionArrangement(song.song, entry, true);
+    if (typeof window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES === "function") {
+      window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES({ reason: "chip-save", song: song.song });
+    }
   } else if (soloMode) {
     pushSoloHistory();
     ((SOLO_MAP && SOLO_MAP.albums) || []).forEach(function(a){
@@ -8632,6 +8704,9 @@ function deleteChipEditor() {
     clearArrangementEndSecExceptLast(song);
     saveArrangementMap();
     if (delCode) removeMirrorSectionArrangement(song.song, delCode, true);
+    if (typeof window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES === "function") {
+      window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES({ reason: "chip-delete", song: song.song });
+    }
   } else if (soloMode) {
     pushSoloHistory();
     ensureSoloSlots(song);
