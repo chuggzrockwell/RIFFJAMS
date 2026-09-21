@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T21:53:52.329Z",
+  "updatedAt": "2026-09-21T23:03:13.561Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1125,10 +1125,28 @@
         {
           "song": "Supernaut",
           "sections": [
-            null,
-            null,
-            null,
-            null,
+            [
+              "I1",
+              1,
+              "I1",
+              3
+            ],
+            [
+              "V1",
+              1,
+              "",
+              4
+            ],
+            [
+              "S1",
+              1
+            ],
+            [
+              "B1",
+              3,
+              "",
+              []
+            ],
             null,
             null,
             null,
@@ -3412,13 +3430,42 @@
           {
             "song": "Supernaut",
             "chips": [
+              [
+                "I1",
+                1,
+                "I1",
+                3,
+                4.2
+              ],
+              [
+                "V1",
+                1,
+                "V1",
+                4
+              ],
+              [
+                "I1",
+                1,
+                "I1",
+                3
+              ],
+              [
+                "V1",
+                1,
+                "V1",
+                4
+              ],
               null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              [
+                "S1",
+                1,
+                "S1"
+              ],
+              [
+                "B1",
+                3,
+                "B1"
+              ],
               null,
               null,
               null,
@@ -3871,6 +3918,23 @@
           "stop": 179.2,
           "duration": 13.9,
           "lick": "V2"
+        }
+      ]
+    },
+    {
+      "album": "Vol. 4",
+      "song": "Supernaut",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 4.2,
+          "stop": null,
+          "duration": null,
+          "lick": "I1"
         }
       ]
     },
