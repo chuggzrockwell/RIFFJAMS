@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T23:03:13.561Z",
+  "updatedAt": "2026-09-21T23:04:16.701Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1134,12 +1134,13 @@
             [
               "V1",
               1,
-              "",
+              "V1",
               4
             ],
             [
               "S1",
-              1
+              1,
+              "S1"
             ],
             [
               "B1",
@@ -3441,25 +3442,36 @@
                 "V1",
                 1,
                 "V1",
-                4
+                4,
+                20.7
               ],
               [
                 "I1",
                 1,
                 "I1",
-                3
+                3,
+                53.2
               ],
               [
                 "V1",
                 1,
                 "V1",
-                4
+                4,
+                69.2
               ],
-              null,
+              [
+                "I1",
+                1,
+                "I1",
+                3,
+                93.4
+              ],
               [
                 "S1",
                 1,
-                "S1"
+                "S1",
+                1,
+                100.4
               ],
               [
                 "B1",
@@ -3926,15 +3938,55 @@
       "song": "Supernaut",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": null,
+      "riffSaturationIndex": 3,
       "chips": [
         {
           "code": "I1",
           "tier": 1,
           "start": 4.2,
+          "stop": 20.7,
+          "duration": 16.5,
+          "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 20.7,
+          "stop": 53.2,
+          "duration": 32.5,
+          "lick": "V1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 53.2,
+          "stop": 69.2,
+          "duration": 16,
+          "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 69.2,
+          "stop": 93.4,
+          "duration": 24.2,
+          "lick": "V1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 93.4,
+          "stop": 100.4,
+          "duration": 7,
+          "lick": "I1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 100.4,
           "stop": null,
           "duration": null,
-          "lick": "I1"
+          "lick": "S1"
         }
       ]
     },
