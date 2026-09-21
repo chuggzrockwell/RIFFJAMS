@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T23:05:21.964Z",
+  "updatedAt": "2026-09-21T23:10:48.679Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3498,7 +3498,8 @@
                 1,
                 "I1",
                 3,
-                228
+                228,
+                263.5
               ],
               null,
               null,
@@ -3955,9 +3956,9 @@
     {
       "album": "Vol. 4",
       "song": "Supernaut",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 2.72,
+      "endSec": 263.5,
+      "complete": true,
+      "riffSaturationIndex": 2.759,
       "chips": [
         {
           "code": "I1",
@@ -4035,8 +4036,8 @@
           "code": "I1",
           "tier": 1,
           "start": 228,
-          "stop": null,
-          "duration": null,
+          "stop": 263.5,
+          "duration": 35.5,
           "lick": "I1"
         }
       ]
