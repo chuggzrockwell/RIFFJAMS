@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T20:30:06.521Z",
+  "updatedAt": "2026-09-21T20:32:32.531Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1258,8 +1258,7 @@
             [
               "I1",
               2,
-              "",
-              []
+              "SVD-I1"
             ],
             [
               "V1",
@@ -1267,12 +1266,7 @@
               "",
               []
             ],
-            [
-              "PC1",
-              3,
-              "",
-              []
-            ],
+            null,
             [
               "B1",
               3,
@@ -3747,13 +3741,10 @@
                 2,
                 "SVD-I1",
                 [],
-                128.4
+                128.4,
+                140.7
               ],
-              [
-                "PC1",
-                3,
-                "SVD-PC1"
-              ],
+              null,
               null,
               null,
               null,
@@ -4136,9 +4127,9 @@
     {
       "album": "Vol. 4",
       "song": "St. Vitus Dance",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 2.309,
+      "endSec": 140.7,
+      "complete": true,
+      "riffSaturationIndex": 2.282,
       "chips": [
         {
           "code": "I1",
@@ -4208,8 +4199,8 @@
           "code": "I1",
           "tier": 2,
           "start": 128.4,
-          "stop": null,
-          "duration": null,
+          "stop": 140.7,
+          "duration": 12.3,
           "lick": "SVD-I1"
         }
       ]
