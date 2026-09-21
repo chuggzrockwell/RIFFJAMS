@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T18:47:00.000Z",
+  "updatedAt": "2026-09-21T20:25:41.167Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -333,7 +333,11 @@
               3,
               "FOB-L2"
             ],
-            null,
+            [
+              "B1",
+              3,
+              "FOB-B1"
+            ],
             null
           ]
         }
@@ -1052,11 +1056,32 @@
         {
           "song": "Tomorrow's Dream",
           "sections": [
-            null,
-            null,
-            null,
-            null,
-            null,
+            [
+              "I1",
+              2,
+              "I1",
+              "1S"
+            ],
+            [
+              "V1",
+              3,
+              "V1"
+            ],
+            [
+              "V2",
+              3,
+              "V2"
+            ],
+            [
+              "B1",
+              3,
+              "B1"
+            ],
+            [
+              "S1",
+              3,
+              "S1"
+            ],
             null,
             null,
             null,
@@ -1116,13 +1141,41 @@
         {
           "song": "Snowblind",
           "sections": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
+            [
+              "I1",
+              2,
+              "SNB-I1"
+            ],
+            [
+              "V1",
+              2,
+              "SNB-V1"
+            ],
+            [
+              "V2",
+              2,
+              "SNB-V2"
+            ],
+            [
+              "B1",
+              2,
+              "SNB-B1"
+            ],
+            [
+              "S1",
+              1,
+              "SNB-S1"
+            ],
+            [
+              "B2",
+              2,
+              "SNB-B2"
+            ],
+            [
+              "S2",
+              1,
+              "SNB-S2"
+            ],
             null,
             null,
             null,
@@ -1132,13 +1185,51 @@
         {
           "song": "Cornucopia",
           "sections": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
+            [
+              "I1",
+              3,
+              "I1"
+            ],
+            [
+              "V1",
+              3,
+              "V1"
+            ],
+            [
+              "V2",
+              2,
+              "V2",
+              [
+                1,
+                4
+              ]
+            ],
+            [
+              "C1",
+              3,
+              "C1",
+              [
+                1,
+                4
+              ]
+            ],
+            [
+              "B1",
+              1,
+              "B1",
+              4
+            ],
+            [
+              "B2",
+              3,
+              "B2",
+              "1O"
+            ],
+            [
+              "B3",
+              3,
+              "B3"
+            ],
             null,
             null,
             null,
@@ -1182,7 +1273,11 @@
               "",
               []
             ],
-            null,
+            [
+              "B1",
+              3,
+              "SVD-PC1"
+            ],
             null,
             null,
             null,
@@ -2057,6 +2152,2064 @@
       }
     ]
   },
-  "arrangementMap": null,
-  "arrangementTimings": []
+  "arrangementMap": {
+    "albums": [
+      {
+        "name": "Paranoid",
+        "cover": "covers/paranoid.png",
+        "font": "font-paranoid",
+        "songs": [
+          {
+            "song": "War Pigs",
+            "chips": [
+              [
+                "I1",
+                1,
+                "WP-I1",
+                "1P"
+              ],
+              [
+                "V1",
+                3,
+                "WP-V1"
+              ],
+              [
+                "V2",
+                2,
+                "WP-V2"
+              ],
+              [
+                "V3",
+                2,
+                "WP-V3"
+              ],
+              [
+                "V4",
+                1,
+                "WP-V4",
+                "1O"
+              ],
+              [
+                "S1",
+                1,
+                "WP-S1",
+                "1P"
+              ],
+              [
+                "O1",
+                2,
+                "WP-O1"
+              ],
+              [
+                "O2",
+                1,
+                "WP-O2",
+                3
+              ],
+              [
+                "S2",
+                1,
+                "WP-S2"
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Paranoid",
+            "chips": [
+              [
+                "I1",
+                2,
+                "P-I1",
+                "4S"
+              ],
+              [
+                "V1",
+                3,
+                "P-V1"
+              ],
+              [
+                "V2",
+                3,
+                "P-V2"
+              ],
+              [
+                "S1",
+                1
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Planet Caravan",
+            "chips": [
+              [
+                "V",
+                3
+              ],
+              [
+                "S1",
+                1
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Iron Man",
+            "chips": [
+              [
+                "V1",
+                1,
+                "IM-V1",
+                []
+              ],
+              [
+                "V2",
+                2,
+                "IM-V2",
+                3
+              ],
+              [
+                "V3",
+                2,
+                "IM-V3",
+                3
+              ],
+              [
+                "V4",
+                2,
+                "IM-V4",
+                3
+              ],
+              [
+                "S1",
+                1,
+                "IM-S1"
+              ],
+              [
+                "S2",
+                1,
+                "IM-S2"
+              ],
+              [
+                "O1",
+                1,
+                "IM-O1",
+                [
+                  1,
+                  3
+                ]
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Electric Funeral",
+            "chips": [
+              [
+                "I1",
+                3
+              ],
+              [
+                "V1",
+                3
+              ],
+              [
+                "B1",
+                3
+              ],
+              [
+                "B2",
+                3
+              ],
+              [
+                "B3",
+                3
+              ],
+              [
+                "B4",
+                3
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Hand of Doom",
+            "chips": [
+              [
+                "V1",
+                3
+              ],
+              [
+                "V2",
+                3
+              ],
+              [
+                "B1",
+                2
+              ],
+              [
+                "B2",
+                2
+              ],
+              [
+                "S1",
+                1,
+                "HOD-S1"
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Rat Salad",
+            "chips": [
+              [
+                "I1",
+                3,
+                "RS-I1"
+              ],
+              [
+                "V2",
+                3
+              ],
+              [
+                "S1",
+                1
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Fairies Wear Boots",
+            "chips": [
+              [
+                "I1",
+                2,
+                "FOB-I1"
+              ],
+              [
+                "I2",
+                2,
+                "FOB-I2",
+                "1D"
+              ],
+              [
+                "I3",
+                2,
+                "FOB-I3",
+                []
+              ],
+              [
+                "I4",
+                2,
+                "FOB-I4",
+                []
+              ],
+              [
+                "S1",
+                1,
+                "FOB-S1",
+                []
+              ],
+              [
+                "V1",
+                3,
+                "FOB-V1"
+              ],
+              [
+                "B1",
+                3,
+                "FOB-B1"
+              ],
+              [
+                "S2",
+                1,
+                "FOB-S2"
+              ],
+              [
+                "L1",
+                2,
+                "FOB-L1"
+              ],
+              [
+                "L2",
+                3,
+                "FOB-L2"
+              ],
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Sabbath Bloody Sabbath",
+        "cover": "covers/sbs.png?v=5",
+        "font": "font-sbs",
+        "songs": [
+          {
+            "song": "Sabbath Bloody Sabbath",
+            "chips": [
+              [
+                "V1",
+                1,
+                "V1",
+                "3S"
+              ],
+              [
+                "PC1",
+                3,
+                "PC1",
+                [
+                  1,
+                  5
+                ]
+              ],
+              [
+                "PC2",
+                3,
+                "PC2",
+                [
+                  1,
+                  5
+                ]
+              ],
+              [
+                "S1",
+                1,
+                "S1",
+                [
+                  1,
+                  3
+                ]
+              ],
+              [
+                "B1",
+                3,
+                "B1",
+                "5S"
+              ],
+              [
+                "B2",
+                2,
+                "B2",
+                "1O"
+              ],
+              [
+                "B3",
+                3,
+                "B3",
+                "3S"
+              ],
+              [
+                "B4",
+                3,
+                "B4",
+                "1O"
+              ],
+              [
+                "S2",
+                2,
+                "",
+                []
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "A National Acrobat",
+            "chips": [
+              [
+                "I1",
+                1,
+                "I1",
+                3
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                []
+              ],
+              [
+                "B1",
+                1,
+                "B1",
+                3
+              ],
+              [
+                "S1",
+                1,
+                "S1",
+                [
+                  1,
+                  2
+                ]
+              ],
+              [
+                "B2",
+                2,
+                "B2",
+                3
+              ],
+              [
+                "B3",
+                2,
+                "B3",
+                []
+              ],
+              [
+                "B4",
+                2,
+                "B4",
+                []
+              ],
+              [
+                "B5",
+                2,
+                "B5",
+                []
+              ],
+              [
+                "B6",
+                3,
+                "B6",
+                []
+              ],
+              [
+                "B7",
+                3,
+                "B7",
+                []
+              ],
+              [
+                "S3",
+                3,
+                "S3",
+                []
+              ],
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Fluff",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Sabbra Cadabra",
+            "chips": [
+              [
+                "I1",
+                1,
+                "I1",
+                [
+                  1,
+                  5
+                ]
+              ],
+              [
+                "L1",
+                1,
+                "L1",
+                [
+                  1,
+                  2
+                ]
+              ],
+              [
+                "L2",
+                1,
+                "L2",
+                2
+              ],
+              [
+                "V1",
+                2,
+                "V1",
+                4
+              ],
+              [
+                "B1",
+                3,
+                "B1",
+                []
+              ],
+              [
+                "B2",
+                3,
+                "B2",
+                [
+                  "1O",
+                  "3O"
+                ]
+              ],
+              [
+                "B3",
+                3,
+                "B3",
+                [
+                  1,
+                  3
+                ]
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Killing Yourself to Live",
+            "chips": [
+              [
+                "I1",
+                2,
+                "KYTL-I1",
+                []
+              ],
+              [
+                "V1",
+                2,
+                "KYTL-V1",
+                []
+              ],
+              [
+                "C1",
+                2,
+                "KYTL-C1",
+                []
+              ],
+              [
+                "S1",
+                1,
+                "KYTL-S1",
+                []
+              ],
+              [
+                "B1",
+                2,
+                "KYTL-B1",
+                []
+              ],
+              [
+                "B2",
+                2,
+                "KYTL-B2",
+                []
+              ],
+              [
+                "S2",
+                1,
+                "KYTL-S2",
+                []
+              ],
+              [
+                "B3",
+                2,
+                "KYTL-B3",
+                []
+              ],
+              [
+                "S3",
+                1,
+                "KYTL-S3",
+                []
+              ],
+              [
+                "B4",
+                2,
+                "KYTL-B4",
+                []
+              ],
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Who Are You?",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Looking for Today",
+            "chips": [
+              [
+                "V1",
+                2,
+                "LFT-V1",
+                []
+              ],
+              [
+                "PC1",
+                2,
+                "LFT-PC1",
+                []
+              ],
+              [
+                "C1",
+                1,
+                "LFT-C1",
+                []
+              ],
+              [
+                "S1",
+                1,
+                "LFT-S1",
+                []
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Spiral Architect",
+            "chips": [
+              [
+                "I1",
+                1,
+                "",
+                []
+              ],
+              [
+                "L1",
+                2,
+                "",
+                []
+              ],
+              [
+                "I2",
+                3,
+                "",
+                []
+              ],
+              [
+                "V1",
+                3,
+                "",
+                []
+              ],
+              [
+                "C1",
+                3,
+                "",
+                []
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Master of Reality",
+        "cover": "covers/mor.png",
+        "font": "font-mor",
+        "songs": [
+          {
+            "song": "Sweet Leaf",
+            "chips": [
+              [
+                "V1",
+                3,
+                "",
+                []
+              ],
+              [
+                "V2",
+                3,
+                "",
+                []
+              ],
+              [
+                "B1",
+                3,
+                "",
+                []
+              ],
+              [
+                "B2",
+                3,
+                "",
+                []
+              ],
+              [
+                "S1",
+                1,
+                "",
+                []
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "After Forever",
+            "chips": [
+              [
+                "I1",
+                1,
+                "",
+                []
+              ],
+              [
+                "V1",
+                2,
+                "",
+                "4S"
+              ],
+              [
+                "B1",
+                3,
+                "",
+                []
+              ],
+              [
+                "B2",
+                2,
+                "",
+                []
+              ],
+              [
+                "S1",
+                1,
+                "",
+                []
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Embryo",
+            "chips": [
+              [
+                "V1",
+                2,
+                "",
+                []
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Children of the Grave",
+            "chips": [
+              [
+                "I1",
+                1,
+                "",
+                3
+              ],
+              [
+                "I2",
+                3,
+                "",
+                []
+              ],
+              [
+                "B1",
+                2,
+                "",
+                []
+              ],
+              [
+                "B2",
+                3,
+                "",
+                []
+              ],
+              [
+                "S1",
+                1,
+                "",
+                []
+              ],
+              [
+                "L1",
+                3,
+                "",
+                []
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Orchid",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Lord of This World",
+            "chips": [
+              [
+                "I1",
+                1,
+                "",
+                3
+              ],
+              [
+                "V1",
+                2,
+                "",
+                3
+              ],
+              [
+                "B1",
+                2,
+                "",
+                []
+              ],
+              [
+                "S1",
+                1,
+                "",
+                [
+                  1,
+                  3,
+                  4
+                ]
+              ],
+              [
+                "B2",
+                1,
+                "",
+                3
+              ],
+              [
+                "S2",
+                1,
+                "",
+                [
+                  1,
+                  3,
+                  4
+                ]
+              ],
+              [
+                "B3",
+                1,
+                "",
+                3
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Solitude",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Into the Void",
+            "chips": [
+              [
+                "I1",
+                2,
+                "ITV-I1",
+                "1O"
+              ],
+              [
+                "I2",
+                3,
+                "",
+                []
+              ],
+              [
+                "V1",
+                1,
+                "",
+                3
+              ],
+              [
+                "B1",
+                2,
+                "",
+                "1O"
+              ],
+              [
+                "S1",
+                1,
+                "",
+                []
+              ],
+              [
+                "B2",
+                1,
+                "",
+                3
+              ],
+              [
+                "B3",
+                1,
+                "",
+                []
+              ],
+              [
+                "S2",
+                1,
+                "",
+                []
+              ],
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Vol. 4",
+        "cover": "covers/vol4.png",
+        "font": "font-vol4",
+        "songs": [
+          {
+            "song": "Wheels of Confusion",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Tomorrow's Dream",
+            "chips": [
+              [
+                "I1",
+                2,
+                "I1",
+                "1S",
+                0
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                18.9
+              ],
+              [
+                "V2",
+                3,
+                "V2",
+                1,
+                36.3
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                44.1
+              ],
+              [
+                "I1",
+                2,
+                "I1",
+                "1S",
+                69.5
+              ],
+              [
+                "B1",
+                3,
+                "B1",
+                1,
+                87.1
+              ],
+              [
+                "V2",
+                3,
+                "V2",
+                1,
+                105.8
+              ],
+              [
+                "S1",
+                3,
+                "S1",
+                1,
+                114.5
+              ],
+              [
+                "V2",
+                3,
+                "V2",
+                1,
+                131.9
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                140.5
+              ],
+              [
+                "V2",
+                3,
+                "V2",
+                1,
+                165.3
+              ],
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Changes",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "FX",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Supernaut",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Snowblind",
+            "chips": [
+              [
+                "I1",
+                2,
+                "SNB-I1",
+                [],
+                0
+              ],
+              [
+                "V1",
+                2,
+                "SNB-V1",
+                [],
+                17
+              ],
+              [
+                "V2",
+                2,
+                "SNB-V2",
+                [],
+                41.5
+              ],
+              [
+                "V1",
+                2,
+                "SNB-V1",
+                [],
+                49.7
+              ],
+              [
+                "V2",
+                2,
+                "SNB-V2",
+                [],
+                74.5
+              ],
+              [
+                "I1",
+                2,
+                "SNB-I1",
+                [],
+                82.6
+              ],
+              [
+                "B1",
+                2,
+                "SNB-B1",
+                [],
+                99.3
+              ],
+              [
+                "S1",
+                1,
+                "SNB-S1",
+                [],
+                141.1
+              ],
+              [
+                "V1",
+                2,
+                "SNB-V1",
+                [],
+                173.1
+              ],
+              [
+                "V2",
+                2,
+                "SNB-V2",
+                [],
+                198.5
+              ],
+              [
+                "B2",
+                2,
+                "SNB-B2",
+                [],
+                206.6
+              ],
+              [
+                "V2",
+                2,
+                "SNB-V2",
+                [],
+                236
+              ],
+              [
+                "V1",
+                2,
+                "SNB-V1",
+                [],
+                244.1
+              ],
+              [
+                "S2",
+                1,
+                "SNB-S2",
+                [],
+                268.7
+              ],
+              null
+            ]
+          },
+          {
+            "song": "Cornucopia",
+            "chips": [
+              [
+                "I1",
+                3,
+                "I1",
+                1,
+                0
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                31.1
+              ],
+              [
+                "V2",
+                2,
+                "V2",
+                [
+                  1,
+                  4
+                ],
+                56
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                62.5
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                [
+                  1,
+                  4
+                ],
+                82.4
+              ],
+              [
+                "I1",
+                3,
+                "I1",
+                1,
+                96.8
+              ],
+              [
+                "B1",
+                1,
+                "B1",
+                4,
+                102.85
+              ],
+              [
+                "B2",
+                3,
+                "B2",
+                "1O",
+                125.6
+              ],
+              [
+                "B3",
+                3,
+                "B3",
+                1,
+                138.7
+              ],
+              [
+                "B2",
+                3,
+                "B2",
+                "1O",
+                158.1
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                [
+                  1,
+                  4
+                ],
+                170.1
+              ],
+              [
+                "I1",
+                3,
+                "I1",
+                1,
+                177.8
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                184.4
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                [
+                  1,
+                  4
+                ],
+                206.1
+              ],
+              [
+                "I1",
+                3,
+                "I1",
+                1,
+                220.2
+              ]
+            ]
+          },
+          {
+            "song": "Laguna Sunrise",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "St. Vitus Dance",
+            "chips": [
+              [
+                "I1",
+                2,
+                "SVD-I1",
+                [],
+                0
+              ],
+              [
+                "V1",
+                1,
+                "SVD-V1",
+                [],
+                12.8
+              ],
+              [
+                "I1",
+                2,
+                "SVD-I1",
+                [],
+                32.3
+              ],
+              [
+                "V1",
+                1,
+                "SVD-V1",
+                [],
+                44.9
+              ],
+              [
+                "I1",
+                2,
+                "SVD-I1",
+                [],
+                64.2
+              ],
+              [
+                "B1",
+                3,
+                "SVD-PC1",
+                [],
+                76.9
+              ],
+              [
+                "I1",
+                2,
+                "SVD-I1",
+                [],
+                96.3
+              ],
+              [
+                "V1",
+                1,
+                "SVD-V1",
+                [],
+                108.1
+              ],
+              [
+                "I1",
+                2,
+                "SVD-I1",
+                [],
+                128.4
+              ],
+              [
+                "PC1",
+                3,
+                "SVD-PC1"
+              ],
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Under the Sun",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "arrangementTimings": [
+    {
+      "album": "Vol. 4",
+      "song": "Tomorrow's Dream",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1.221,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": 18.9,
+          "duration": 18.9,
+          "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 18.9,
+          "stop": 36.3,
+          "duration": 17.4,
+          "lick": "V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 36.3,
+          "stop": 44.1,
+          "duration": 7.8,
+          "lick": "V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 44.1,
+          "stop": 69.5,
+          "duration": 25.4,
+          "lick": "V1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 69.5,
+          "stop": 87.1,
+          "duration": 17.6,
+          "lick": "I1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 87.1,
+          "stop": 105.8,
+          "duration": 18.7,
+          "lick": "B1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 105.8,
+          "stop": 114.5,
+          "duration": 8.7,
+          "lick": "V2"
+        },
+        {
+          "code": "S1",
+          "tier": 3,
+          "start": 114.5,
+          "stop": 131.9,
+          "duration": 17.4,
+          "lick": "S1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 131.9,
+          "stop": 140.5,
+          "duration": 8.6,
+          "lick": "V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 140.5,
+          "stop": 165.3,
+          "duration": 24.8,
+          "lick": "V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 165.3,
+          "stop": null,
+          "duration": null,
+          "lick": "V2"
+        }
+      ]
+    },
+    {
+      "album": "Vol. 4",
+      "song": "Snowblind",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 2.119,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": 17,
+          "duration": 17,
+          "lick": "SNB-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 17,
+          "stop": 41.5,
+          "duration": 24.5,
+          "lick": "SNB-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 41.5,
+          "stop": 49.7,
+          "duration": 8.2,
+          "lick": "SNB-V2"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 49.7,
+          "stop": 74.5,
+          "duration": 24.8,
+          "lick": "SNB-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 74.5,
+          "stop": 82.6,
+          "duration": 8.1,
+          "lick": "SNB-V2"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 82.6,
+          "stop": 99.3,
+          "duration": 16.7,
+          "lick": "SNB-I1"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 99.3,
+          "stop": 141.1,
+          "duration": 41.8,
+          "lick": "SNB-B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 141.1,
+          "stop": 173.1,
+          "duration": 32,
+          "lick": "SNB-S1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 173.1,
+          "stop": 198.5,
+          "duration": 25.4,
+          "lick": "SNB-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 198.5,
+          "stop": 206.6,
+          "duration": 8.1,
+          "lick": "SNB-V2"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 206.6,
+          "stop": 236,
+          "duration": 29.4,
+          "lick": "SNB-B2"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 236,
+          "stop": 244.1,
+          "duration": 8.1,
+          "lick": "SNB-V2"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 244.1,
+          "stop": 268.7,
+          "duration": 24.6,
+          "lick": "SNB-V1"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 268.7,
+          "stop": null,
+          "duration": null,
+          "lick": "SNB-S2"
+        }
+      ]
+    },
+    {
+      "album": "Vol. 4",
+      "song": "Cornucopia",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1.236,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 0,
+          "stop": 31.1,
+          "duration": 31.1,
+          "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 31.1,
+          "stop": 56,
+          "duration": 24.9,
+          "lick": "V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 56,
+          "stop": 62.5,
+          "duration": 6.5,
+          "lick": "V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 62.5,
+          "stop": 82.4,
+          "duration": 19.9,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 82.4,
+          "stop": 96.8,
+          "duration": 14.4,
+          "lick": "C1"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 96.8,
+          "stop": 102.85,
+          "duration": 6.05,
+          "lick": "I1"
+        },
+        {
+          "code": "B1",
+          "tier": 1,
+          "start": 102.85,
+          "stop": 125.6,
+          "duration": 22.75,
+          "lick": "B1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 125.6,
+          "stop": 138.7,
+          "duration": 13.1,
+          "lick": "B2"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 138.7,
+          "stop": 158.1,
+          "duration": 19.4,
+          "lick": "B3"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 158.1,
+          "stop": 170.1,
+          "duration": 12,
+          "lick": "B2"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 170.1,
+          "stop": 177.8,
+          "duration": 7.7,
+          "lick": "C1"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 177.8,
+          "stop": 184.4,
+          "duration": 6.6,
+          "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 184.4,
+          "stop": 206.1,
+          "duration": 21.7,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 206.1,
+          "stop": 220.2,
+          "duration": 14.1,
+          "lick": "C1"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 220.2,
+          "stop": null,
+          "duration": null,
+          "lick": "I1"
+        }
+      ]
+    },
+    {
+      "album": "Vol. 4",
+      "song": "St. Vitus Dance",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 2.309,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": 12.8,
+          "duration": 12.8,
+          "lick": "SVD-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 12.8,
+          "stop": 32.3,
+          "duration": 19.5,
+          "lick": "SVD-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 32.3,
+          "stop": 44.9,
+          "duration": 12.6,
+          "lick": "SVD-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 44.9,
+          "stop": 64.2,
+          "duration": 19.3,
+          "lick": "SVD-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 64.2,
+          "stop": 76.9,
+          "duration": 12.7,
+          "lick": "SVD-I1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 76.9,
+          "stop": 96.3,
+          "duration": 19.4,
+          "lick": "SVD-PC1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 96.3,
+          "stop": 108.1,
+          "duration": 11.8,
+          "lick": "SVD-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 108.1,
+          "stop": 128.4,
+          "duration": 20.3,
+          "lick": "SVD-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 128.4,
+          "stop": null,
+          "duration": null,
+          "lick": "SVD-I1"
+        }
+      ]
+    }
+  ]
 }
