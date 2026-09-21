@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-21T20:29:05.393Z",
+  "updatedAt": "2026-09-21T20:30:06.521Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3366,7 +3366,8 @@
                 3,
                 "V2",
                 1,
-                165.3
+                165.3,
+                179.2
               ],
               null,
               null,
@@ -3533,7 +3534,8 @@
                 1,
                 "SNB-S2",
                 [],
-                268.7
+                268.7,
+                320.7
               ],
               null
             ]
@@ -3656,7 +3658,8 @@
                 3,
                 "I1",
                 1,
-                220.2
+                220.2,
+                225.1
               ]
             ]
           },
@@ -3786,9 +3789,9 @@
     {
       "album": "Vol. 4",
       "song": "Tomorrow's Dream",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.221,
+      "endSec": 179.2,
+      "complete": true,
+      "riffSaturationIndex": 1.204,
       "chips": [
         {
           "code": "I1",
@@ -3874,8 +3877,8 @@
           "code": "V2",
           "tier": 3,
           "start": 165.3,
-          "stop": null,
-          "duration": null,
+          "stop": 179.2,
+          "duration": 13.9,
           "lick": "V2"
         }
       ]
@@ -3883,9 +3886,9 @@
     {
       "album": "Vol. 4",
       "song": "Snowblind",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 2.119,
+      "endSec": 320.7,
+      "complete": true,
+      "riffSaturationIndex": 2.262,
       "chips": [
         {
           "code": "I1",
@@ -3995,8 +3998,8 @@
           "code": "S2",
           "tier": 1,
           "start": 268.7,
-          "stop": null,
-          "duration": null,
+          "stop": 320.7,
+          "duration": 52,
           "lick": "SNB-S2"
         }
       ]
@@ -4004,9 +4007,9 @@
     {
       "album": "Vol. 4",
       "song": "Cornucopia",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.236,
+      "endSec": 225.1,
+      "complete": true,
+      "riffSaturationIndex": 1.231,
       "chips": [
         {
           "code": "I1",
@@ -4124,8 +4127,8 @@
           "code": "I1",
           "tier": 3,
           "start": 220.2,
-          "stop": null,
-          "duration": null,
+          "stop": 225.1,
+          "duration": 4.9,
           "lick": "I1"
         }
       ]
