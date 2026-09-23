@@ -1784,6 +1784,21 @@
   .chip-editor .btn-cancel { background: #eee; color: #333; }
   .chip-editor .btn-copy { background: #f3eef8; color: #7030a0; }
   .chip-editor .btn-del { background: transparent; color: #c0392b; margin-left: auto; }
+  .song-meta-editor .song-meta-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+    color: #111;
+  }
+  body.sections-edit .song-name-wrap {
+    cursor: pointer;
+  }
+  body.sections-edit .song-name-wrap:hover {
+    outline: 2px solid #7030a0;
+    outline-offset: -2px;
+  }
   .chip-attachment { margin: 2px 0 12px; }
   .chip-paste-actions { display: flex; gap: 7px; margin-bottom: 8px; }
   .chip-paste-button { flex: 1; border: 0; border-radius: 8px; padding: 9px 12px; background: #7030a0; color: #fff; font-size: .78rem; font-weight: 800; cursor: pointer; }
@@ -3690,6 +3705,13 @@
       <button type="button" class="btn-cancel" id="chipEditCancel">Cancel</button>
       <button type="button" class="btn-copy" id="chipEditCopy">Copy</button>
       <button type="button" class="btn-del" id="chipEditDelete">Delete</button>
+    </div>
+  </div>
+  <div id="songMetaEditor" class="chip-editor song-meta-editor" aria-hidden="true">
+    <div class="song-meta-title" id="songMetaEditorTitle">Song</div>
+    <div class="editor-actions">
+      <button type="button" class="btn-save" id="songMetaSave">Save</button>
+      <button type="button" class="btn-cancel" id="songMetaCancel">Cancel</button>
     </div>
   </div>
   <section id="series" class="hidden">
@@ -5617,6 +5639,7 @@ function showSections(keepScroll) {
   var sheetSy = wrapEl ? wrapEl.scrollTop : 0;
   currentLetter = "";
   closeChipEditor();
+  if (typeof closeSongMetaEditor === "function") closeSongMetaEditor();
   ensureAllSongSlots(ALBUMS);
   if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
   if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap();
@@ -5727,7 +5750,8 @@ function showSections(keepScroll) {
         var snEsc = String(s.song).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
         songsterrBtn = '<button type="button" class="song-songsterr" data-songsterr="'+stEsc+'" title="Songsterr: '+snEsc+'" aria-label="Open Songsterr tab for '+snEsc+'"><img src="covers/songsterr.png" alt=""></button>';
       }
-      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"><div class="song-name '+np+'">'+s.song+'</div></div><div class="song-secs">'+chips+'</div></div>';
+      var nameTitle = (sectionsMode === "edit") ? ' title="Edit key, tuning, and BPM"' : "";
+      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div><div class="song-secs">'+chips+'</div></div>';
     }).join("");
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
@@ -8558,6 +8582,7 @@ function ensureChipEditResizeObserver() {
   chipEditResizeObs.observe(ed);
 }
 function openChipEditor(anchor, state) {
+  if (typeof closeSongMetaEditor === "function") closeSongMetaEditor();
   chipEditState = state;
   chipEditAnchor = anchor || null;
   var ed = document.getElementById("chipEditor");
@@ -8628,6 +8653,70 @@ function openChipEditor(anchor, state) {
   requestAnimationFrame(function(){ placeChipEditor(anchor); });
   idInput.focus();
   idInput.select();
+}
+var songMetaState = null;
+var songMetaAnchor = null;
+var songMetaDismissBlock = false;
+function closeSongMetaEditor() {
+  songMetaState = null;
+  songMetaAnchor = null;
+  var ed = document.getElementById("songMetaEditor");
+  if (!ed) return;
+  ed.classList.remove("open");
+  ed.setAttribute("aria-hidden", "true");
+}
+function placeSongMetaEditor(anchor) {
+  var ed = document.getElementById("songMetaEditor");
+  if (!ed || !ed.classList.contains("open")) return;
+  if (anchor) songMetaAnchor = anchor;
+  var a = songMetaAnchor;
+  var pad = CHIP_EDIT_PAD;
+  var gap = CHIP_EDIT_GAP;
+  var vh = window.innerHeight || 800;
+  var vw = window.innerWidth || 1200;
+  var maxH = Math.max(180, vh - 2 * pad);
+  ed.style.maxHeight = maxH + "px";
+  var editorWidth = ed.offsetWidth || 360;
+  var naturalH = ed.offsetHeight || 220;
+  var neededH = Math.min(maxH, naturalH + 40);
+  var left = pad;
+  var top = pad;
+  if (a && a.getBoundingClientRect) {
+    var r = a.getBoundingClientRect();
+    left = Math.min(vw - editorWidth - pad, Math.max(pad, r.left));
+    var belowTop = r.bottom + gap;
+    if (belowTop + neededH <= vh - pad) top = belowTop;
+    else if (r.top - gap - neededH >= pad) top = r.top - gap - neededH;
+    else top = Math.max(pad, vh - pad - neededH);
+  } else {
+    top = Math.max(pad, vh - pad - neededH);
+  }
+  ed.style.left = left + "px";
+  ed.style.top = top + "px";
+  var editorHeight = ed.offsetHeight || 0;
+  if (top + editorHeight > vh - pad) top = Math.max(pad, vh - pad - editorHeight);
+  if (top < pad) top = pad;
+  ed.style.left = left + "px";
+  ed.style.top = top + "px";
+}
+function openSongMetaEditor(anchor, ai, si) {
+  if (sectionsMode !== "edit") return;
+  closeChipEditor();
+  var rowSong = getEditSong(ai, si);
+  if (!rowSong || !rowSong.song) return;
+  songMetaState = { ai: ai, si: si, song: rowSong.song };
+  songMetaAnchor = anchor || null;
+  var ed = document.getElementById("songMetaEditor");
+  var title = document.getElementById("songMetaEditorTitle");
+  if (title) title.textContent = rowSong.song;
+  if (!ed) return;
+  ed.classList.add("open");
+  ed.setAttribute("aria-hidden", "false");
+  placeSongMetaEditor(anchor);
+  requestAnimationFrame(function(){ placeSongMetaEditor(anchor); });
+}
+function saveSongMetaEditor() {
+  closeSongMetaEditor();
 }
 function readChipEditPosList() {
   var posBases = [];
@@ -10387,17 +10476,38 @@ document.getElementById("secModes").onclick = function(e){
 };
 document.getElementById("chipEditSave").onclick = saveChipEditor;
 document.getElementById("chipEditCancel").onclick = closeChipEditor;
+document.getElementById("songMetaSave").onclick = function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  saveSongMetaEditor();
+};
+document.getElementById("songMetaCancel").onclick = function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  closeSongMetaEditor();
+};
 var smBlockSongPlayFromChipEditDismiss = false;
 document.addEventListener("pointerdown", function(e){
   var ed = document.getElementById("chipEditor");
-  if (!ed || !ed.classList.contains("open")) return;
-  if (ed.contains(e.target)) return;
+  var metaEd = document.getElementById("songMetaEditor");
+  var chipOpen = ed && ed.classList.contains("open");
+  var metaOpen = metaEd && metaEd.classList.contains("open");
+  if (!chipOpen && !metaOpen) return;
+  if (chipOpen && ed.contains(e.target)) return;
+  if (metaOpen && metaEd.contains(e.target)) return;
   /* Persist edits on outside click (Cancel still discards).
      Block the trailing click from changing the player song unless it is album art / row #. */
   smBlockSongPlayFromChipEditDismiss = !e.target.closest(".song-thumb, .row-num");
-  if (typeof saveChipEditor === "function") saveChipEditor();
-  else closeChipEditor();
-  setTimeout(function(){ smBlockSongPlayFromChipEditDismiss = false; }, 80);
+  songMetaDismissBlock = true;
+  if (chipOpen) {
+    if (typeof saveChipEditor === "function") saveChipEditor();
+    else closeChipEditor();
+  }
+  if (metaOpen) saveSongMetaEditor();
+  setTimeout(function(){
+    smBlockSongPlayFromChipEditDismiss = false;
+    songMetaDismissBlock = false;
+  }, 80);
 }, true);
 document.getElementById("chipEditDelete").onclick = deleteChipEditor;
 document.getElementById("chipEditCopy").onclick = function(){
@@ -10766,6 +10876,16 @@ document.getElementById("sectionsSheet").onclick = function(e){
   var playHit = e.target.closest(".song-name, .song-name-wrap, .song-thumb, .row-num");
   if (playHit && !e.target.closest(".sec-chip") && document.body.classList.contains("sections-mode")) {
     if (typeof smBlockSongPlayFromChipEditDismiss !== "undefined" && smBlockSongPlayFromChipEditDismiss) return;
+    var nameplate = e.target.closest(".song-name, .song-name-wrap");
+    if (nameplate && sectionsMode === "edit" && !songMetaDismissBlock) {
+      var rowEdit = nameplate.closest(".song-row");
+      if (rowEdit) {
+        e.preventDefault();
+        openSongMetaEditor(nameplate, parseInt(rowEdit.getAttribute("data-ai"), 10), parseInt(rowEdit.getAttribute("data-si"), 10));
+        return;
+      }
+    }
+    if (songMetaDismissBlock) return;
     var row = playHit.closest(".song-row");
     if (row) {
       var titleEl = row.querySelector(".song-name");
@@ -11023,6 +11143,9 @@ window.addEventListener("resize", function(){
   if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) {
     placeChipEditor(chipEditAnchor);
   }
+  if (document.getElementById("songMetaEditor") && document.getElementById("songMetaEditor").classList.contains("open")) {
+    placeSongMetaEditor(songMetaAnchor);
+  }
 });
 document.addEventListener("keydown", function(e){
   if ((e.metaKey || e.ctrlKey) && !e.altKey && document.body.classList.contains("sections-mode") && sectionsMode === "edit") {
@@ -11126,6 +11249,10 @@ document.addEventListener("keydown", function(e){
   }
   if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) {
     if (k === "escape") { e.preventDefault(); closeChipEditor(); return; }
+    return;
+  }
+  if (document.getElementById("songMetaEditor") && document.getElementById("songMetaEditor").classList.contains("open")) {
+    if (k === "escape") { e.preventDefault(); closeSongMetaEditor(); return; }
     return;
   }
   /* Player transport: Song Map + LL */
