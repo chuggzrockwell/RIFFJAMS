@@ -3609,7 +3609,7 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Play · View menu: Arrangement / Solo / Riff · 4 toggles Solo · 5 Peek · 6 toggles Arrangement · .1 Riff · .2 Solo · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Play · 5 Peek · 6 cycles Arrangement → Riff → Solo · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
@@ -4419,7 +4419,7 @@ function arrangementMapSlotCount(map) {
 function syncArrangementButtons() {
   syncModeSelects();
 }
-/* View menu: Arrangement, Solo, or Riff. Shortcuts still toggle via setSoloMode / setArrangementMode. */
+/* View menu: Arrangement, Solo, or Riff. Numpad 6 cycles the same setter. */
 function setMapView(view) {
   if (view !== "arrangement" && view !== "solo") view = "riff";
   if (view === "arrangement") {
@@ -4449,6 +4449,11 @@ function setMapView(view) {
   if (secView && !secView.classList.contains("hidden")) showSections(true);
   else if (document.body.classList.contains("sheet-mode") && currentLetter) showSeries(currentLetter);
   else document.body.classList.remove("sections-arrange", "ll-arrange");
+}
+function cycleMapView() {
+  var order = ["arrangement", "riff", "solo"];
+  var i = order.indexOf(songMapViewValue());
+  setMapView(order[(i + 1) % order.length]);
 }
 function setArrangementMode(on) {
   arrangementMode = !!on;
@@ -5821,7 +5826,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=216";
+  var url = base + "?playboard=1&v=217";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6011,16 +6016,9 @@ function initPlayboardPage() {
       commitBoardEntry();
       return;
     }
-    /* Decimal: start mode (.1 / .2) or song.class (1.3 …) */
+    /* Decimal: song.class (1.3 …) */
     var isDot = e.code === "NumpadDecimal" || e.key === "." || e.key === "," || e.code === "Period";
     if (isDot) {
-      if (boardEntryBuf === "") {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        boardEntryBuf = ".";
-        updateBoardEntryMeta();
-        return;
-      }
       if (!/^[1-8]$/.test(boardEntryBuf)) return;
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -6038,16 +6036,13 @@ function initPlayboardPage() {
     e.stopImmediatePropagation();
     if (!boardEntryBuf) {
       if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
-    } else if (boardEntryBuf === ".") {
-      if (digit === "1" || digit === "2") boardEntryBuf += digit;
     } else if (/^[1-8]$/.test(boardEntryBuf)) {
       if (digit >= "1" && digit <= "8") boardEntryBuf = digit;
       else if (digit === "0") boardEntryBuf = "0";
     } else if (/^[1-8]\.$/.test(boardEntryBuf)) {
       if (digit >= "1" && digit <= "5") boardEntryBuf += digit;
-    } else if (/^\.[12]$/.test(boardEntryBuf) || /^[1-8]\.[1-5]$/.test(boardEntryBuf)) {
+    } else if (/^[1-8]\.[1-5]$/.test(boardEntryBuf)) {
       if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
-      else if (digit === "1" || digit === "2") boardEntryBuf = "." + digit;
     }
     updateBoardEntryMeta();
   }
@@ -6366,12 +6361,12 @@ function setSectionsMode(mode) {
       else if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
       else keys.textContent = "Arrangement · Peek · 0 clear filters · Esc closes chip edit · Backspace home";
     } else if (soloMode) {
-      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 4/5 Solo/Peek · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
-      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 4/5 · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-      else keys.textContent = "Solo · Numpad 4/5 Solo/Peek · 0 clear filters · Esc closes chip edit · Backspace home";
-    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · 6 Arrangement · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
-    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · 6 Arrangement · section clicks queue · Playboard window · 0 clear filters · Esc closes chip edit · Backspace home";
-    else keys.textContent = "Numpad 1/2/3 · 4 Solo · 5 Peek · 6 Arrangement · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
+      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 5 Peek · 6 cycles View · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
+      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 0 clear filters · Esc closes chip edit · Backspace home";
+    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · section clicks queue · Playboard window · 0 clear filters · Esc closes chip edit · Backspace home";
+    else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
   }
   if (sectionsMode === "play") {
     pullPlayQueue();
@@ -9682,9 +9677,6 @@ var BOARD_CLASS_BY_DIGIT = { "1": "A", "2": "B", "3": "C", "4": "D", "5": "E" };
 function boardEntryLabel(buf) {
   if (!buf) return "";
   if (buf === "0") return "Clear board";
-  if (buf === ".") return "Mode…";
-  if (buf === ".1") return "Riff mode";
-  if (buf === ".2") return "Solo mode";
   var parts = String(buf).split(".");
   var song = PARANOID_TRACK_NAME[parts[0]] || ("#" + parts[0]);
   if (parts.length === 1 || parts[1] === "") return song + " (all classes)";
@@ -9751,8 +9743,6 @@ function commitBoardEntry() {
   boardEntryBuf = "";
   if (!buf) return;
   if (buf === "0") { clearPlayQueue(); updateBoardEntryMeta(); return; }
-  if (buf === ".1") { setPracticeMode("riff"); updateBoardEntryMeta(); return; }
-  if (buf === ".2") { setPracticeMode("solo"); updateBoardEntryMeta(); return; }
   var m = buf.match(/^([1-8])(?:\.([1-5]))?$/);
   if (!m) { updateBoardEntryMeta(); return; }
   var kind = m[2] ? BOARD_CLASS_BY_DIGIT[m[2]] : null;
@@ -10384,7 +10374,7 @@ document.getElementById("secModes").onclick = function(e){
     else saveAlbumsNow();
     return;
   }
-  /* View menu handles Arrangement / Solo / Riff. Numpad 4 still toggles Solo; numpad 6 still toggles Arrangement. */
+  /* View menu handles Arrangement / Solo / Riff. Numpad 6 cycles that menu. */
   if (e.target.closest("#secPeekBtn")) {
     setHighlightMode(!highlightMode);
     return;
@@ -10972,7 +10962,7 @@ function isNumpadKey(e, digit) {
   return false;
 }
 function goHomeKey(e) {
-  /* Numpad 0 is not Back/Home — mode codes are .1 / .2 + Enter.
+  /* Numpad 0 is not Back/Home — 0+Enter clears filters.
      Escape is home only outside LL; sheet-mode handles Esc separately (no-op). */
   return e.key === "Escape" || e.key === "Backspace" || e.key === "escape" || e.key === "backspace";
 }
@@ -10980,8 +10970,6 @@ var modeEntryBuf = "";
 function commitModeEntry() {
   var buf = String(modeEntryBuf || "").trim();
   modeEntryBuf = "";
-  if (buf === ".1") { setPracticeMode("riff"); return true; }
-  if (buf === ".2") { setPracticeMode("solo"); return true; }
   if (buf === "0") {
     if (document.body.classList.contains("sections-mode")) { clearSecFilters(); return true; }
     if (document.body.classList.contains("playboard-mode")) { clearPlayQueue(); return true; }
@@ -11010,13 +10998,6 @@ function handleModeEntryKey(e) {
     modeEntryBuf = "";
     return true;
   }
-  var isDot = e.code === "NumpadDecimal" || e.key === "." || e.key === "," || e.code === "Period";
-  if (isDot) {
-    if (modeEntryBuf) return false;
-    e.preventDefault();
-    modeEntryBuf = ".";
-    return true;
-  }
   var digit = null;
   for (var ti = 0; ti <= 9; ti++) {
     if (typeof isNumpadKey === "function" && isNumpadKey(e, String(ti))) { digit = String(ti); break; }
@@ -11029,22 +11010,6 @@ function handleModeEntryKey(e) {
       return true;
     }
     return false;
-  }
-  if (modeEntryBuf === ".") {
-    if (digit === "1" || digit === "2") {
-      e.preventDefault();
-      modeEntryBuf += digit;
-      return true;
-    }
-    e.preventDefault();
-    return true;
-  }
-  if (modeEntryBuf === ".1" || modeEntryBuf === ".2") {
-    if (digit === "0") {
-      e.preventDefault();
-      modeEntryBuf = "0";
-      return true;
-    }
   }
   if (modeEntryBuf === "0") {
     e.preventDefault();
@@ -11183,9 +11148,8 @@ document.addEventListener("keydown", function(e){
     if (isNumpadKey(e, "1")) { setSectionsMode("view"); return; }
     if (isNumpadKey(e, "2")) { setSectionsMode("edit"); return; }
     if (isNumpadKey(e, "3")) { setSectionsMode("play"); return; }
-    if (isNumpadKey(e, "4")) { setSoloMode(!soloMode); return; }
     if (isNumpadKey(e, "5")) { setHighlightMode(!highlightMode); return; }
-    if (isNumpadKey(e, "6")) { setArrangementMode(!arrangementMode); return; }
+    if (isNumpadKey(e, "6")) { cycleMapView(); return; }
     if (e.shiftKey && k === "v") { setSectionsMode("view"); return; }
     if (e.shiftKey && k === "e") { setSectionsMode("edit"); return; }
     if (e.shiftKey && k === "p") { setSectionsMode("play"); return; }
@@ -11207,7 +11171,7 @@ document.addEventListener("keydown", function(e){
       // Chip edit popup already handled above; Esc does nothing else on Song Map
       return;
     }
-    /* Mode is .1 / .2 + Enter; 0+Enter clears filters via commitModeEntry */
+    /* 0+Enter clears filters via commitModeEntry */
     if (k === "backspace") {
       e.preventDefault();
       showHome();
