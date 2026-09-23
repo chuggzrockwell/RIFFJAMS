@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-23T22:53:28.032Z",
+  "updatedAt": "2026-09-23T23:13:24.268Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1088,6 +1088,13 @@
             null,
             null,
             null
+          ],
+          "keys": [
+            "Em"
+          ],
+          "tuning": "C# (+.75)",
+          "bpms": [
+            "112"
           ]
         },
         {
@@ -1158,6 +1165,13 @@
             null,
             null,
             null
+          ],
+          "keys": [
+            "Em"
+          ],
+          "tuning": "C#",
+          "bpms": [
+            "116"
           ]
         },
         {
@@ -1202,6 +1216,14 @@
             null,
             null,
             null
+          ],
+          "keys": [
+            "Em"
+          ],
+          "tuning": "C#",
+          "bpms": [
+            "115",
+            "130"
           ]
         },
         {
@@ -3361,7 +3383,7 @@
               ],
               [
                 "S1",
-                3,
+                2,
                 "S1",
                 1,
                 114.5
@@ -3872,7 +3894,7 @@
       "song": "Tomorrow's Dream",
       "endSec": 179.2,
       "complete": true,
-      "riffSaturationIndex": 1.204,
+      "riffSaturationIndex": 1.301,
       "chips": [
         {
           "code": "I1",
@@ -3932,7 +3954,7 @@
         },
         {
           "code": "S1",
-          "tier": 3,
+          "tier": 2,
           "start": 114.5,
           "stop": 131.9,
           "duration": 17.4,
