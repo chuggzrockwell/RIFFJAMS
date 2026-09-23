@@ -910,7 +910,7 @@
   body.sections-edit .sec-filters { opacity: .55; pointer-events: none; }
 
   body.sections-play .sec-filters { opacity: 1; }
-  /* Song Map: map only (no right preview). Play queues to Playboard window. */
+  /* Song Map: map only (no right preview). Play stays on the map; Playboard is a separate page. */
   body.sections-mode .sec-play-pane { display: none !important; }
   body.playboard-mode {
     background: #0a0a0c;
@@ -5955,7 +5955,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=218";
+  var url = base + "?playboard=1&v=219";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5984,7 +5984,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=218") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=219") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -6494,12 +6494,12 @@ function setSectionsMode(mode) {
       else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
       else keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 0 clear filters · Esc closes chip edit · Backspace home";
     } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
-    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · section clicks queue · Playboard window · 0 clear filters · Esc closes chip edit · Backspace home";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
     else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
   }
   if (sectionsMode === "play") {
+    /* Stay on Song Map. Next/Current cues are the playalong UI; Playboard is a separate entry. */
     pullPlayQueue();
-    openPlayWindow();
     publishPlayQueue();
   }
   updateEditSaveUi();
