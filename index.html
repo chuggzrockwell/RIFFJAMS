@@ -910,7 +910,7 @@
   body.sections-edit .sec-filters { opacity: .55; pointer-events: none; }
 
   body.sections-play .sec-filters { opacity: 1; }
-  /* Song Map: map only (no right preview). Play queues to Playboard window. */
+  /* Song Map: map only (no right preview). Play stays on the map; Playboard is a separate page. */
   body.sections-mode .sec-play-pane { display: none !important; }
   body.playboard-mode {
     background: #0a0a0c;
@@ -1873,15 +1873,12 @@
     white-space: nowrap;
     overflow: hidden;
   }
-  .song-meta-k {
-    flex: 0 0 auto;
-    opacity: 0.55;
-    letter-spacing: .08em;
-  }
   .song-meta-v {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #fff;
+    opacity: 1;
   }
   .chip-attachment { margin: 2px 0 12px; }
   .chip-paste-actions { display: flex; gap: 7px; margin-bottom: 8px; }
@@ -5955,7 +5952,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=218";
+  var url = base + "?playboard=1&v=220";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5984,7 +5981,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=218") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=220") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -6494,12 +6491,12 @@ function setSectionsMode(mode) {
       else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
       else keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 0 clear filters · Esc closes chip edit · Backspace home";
     } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
-    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · section clicks queue · Playboard window · 0 clear filters · Esc closes chip edit · Backspace home";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
     else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
   }
   if (sectionsMode === "play") {
+    /* Stay on Song Map. Next/Current cues are the playalong UI; Playboard is a separate entry. */
     pullPlayQueue();
-    openPlayWindow();
     publishPlayQueue();
   }
   updateEditSaveUi();
@@ -8835,14 +8832,14 @@ function songMetaStripHtml(songName) {
   var meta = readCanonicalSongMeta(songName);
   var keyText = meta.keys.join(" · ");
   var bpmText = meta.bpms.join(" · ");
-  var title = "Key " + (keyText || "—") + " · Tuning " + (meta.tuning || "—") + " · BPM " + (bpmText || "—");
-  function bit(label, value) {
-    return '<span class="song-meta-bit"><span class="song-meta-k">'+label+'</span><span class="song-meta-v">'+songMetaEscapeAttr(value || "—")+'</span></span>';
+  function bit(value) {
+    return '<span class="song-meta-bit"><span class="song-meta-v">'+songMetaEscapeAttr(value || "—")+'</span></span>';
   }
+  var title = [keyText || "—", meta.tuning || "—", bpmText || "—"].join(" · ");
   return '<div class="song-meta-strip" title="'+songMetaEscapeAttr(title)+'">'
-    + bit("Key", keyText)
-    + bit("Tuning", meta.tuning)
-    + bit("BPM", bpmText)
+    + bit(keyText)
+    + bit(meta.tuning)
+    + bit(bpmText)
     + '</div>';
 }
 function readSongMetaDraft(containerId) {
