@@ -1830,6 +1830,59 @@
     width: 32px;
     height: 34px;
   }
+  /* Song metadata sits between the nameplate and chips in View only. */
+  body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta {
+    --song-meta-w: 300px;
+  }
+  .song-meta-strip { display: none; }
+  body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta .song-meta-strip {
+    display: flex;
+    flex: 0 0 var(--song-meta-w);
+    width: var(--song-meta-w);
+    min-width: var(--song-meta-w);
+    max-width: var(--song-meta-w);
+    height: calc(var(--chip-h) - 6px);
+    max-height: calc(var(--chip-h) - 6px);
+    align-self: center;
+    align-items: stretch;
+    gap: 4px;
+    margin: 0;
+    padding: 0 8px 0 0;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  body.sections-edit .song-meta-strip,
+  body.sections-play .song-meta-strip {
+    display: none !important;
+  }
+  .song-meta-bit {
+    flex: 1 1 0;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 6px;
+    border-radius: 8px;
+    background: #333;
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 400;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .song-meta-k {
+    flex: 0 0 auto;
+    opacity: 0.55;
+    letter-spacing: .08em;
+  }
+  .song-meta-v {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .chip-attachment { margin: 2px 0 12px; }
   .chip-paste-actions { display: flex; gap: 7px; margin-bottom: 8px; }
   .chip-paste-button { flex: 1; border: 0; border-radius: 8px; padding: 9px 12px; background: #7030a0; color: #fff; font-size: .78rem; font-weight: 800; cursor: pointer; }
@@ -2897,15 +2950,16 @@
   .sections-wrap {
     --row-g: 34px;
     --name-w: 236px;
+    --song-meta-w: 0px;
     --chip-w: 48px;
     --chip-h: 28px;
     --chip-gap: 1px;
     --cols: 10;
     --cover-rows: 6;
     --cover: calc(var(--chip-h) * var(--cover-rows));
-    --grid-left: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
+    --grid-left: calc(var(--row-g) + var(--name-w) + var(--song-meta-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
     width: 100%;
-    max-width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
+    max-width: calc(var(--row-g) + var(--name-w) + var(--song-meta-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -2935,10 +2989,10 @@
     padding: 0 10px;
   }
   .sec-head-label.song {
-    flex: 0 0 calc(var(--row-g) + var(--name-w));
-    width: calc(var(--row-g) + var(--name-w));
-    min-width: calc(var(--row-g) + var(--name-w));
-    max-width: calc(var(--row-g) + var(--name-w));
+    flex: 0 0 calc(var(--row-g) + var(--name-w) + var(--song-meta-w, 0px));
+    width: calc(var(--row-g) + var(--name-w) + var(--song-meta-w, 0px));
+    min-width: calc(var(--row-g) + var(--name-w) + var(--song-meta-w, 0px));
+    max-width: calc(var(--row-g) + var(--name-w) + var(--song-meta-w, 0px));
     justify-content: center;
   }
   .sec-head-label.section {
@@ -2991,10 +3045,10 @@
     display: none !important;
   }
   .sec-ruler .song-name-spacer {
-    flex: 0 0 var(--name-w);
-    width: var(--name-w);
-    min-width: var(--name-w);
-    max-width: var(--name-w);
+    flex: 0 0 calc(var(--name-w) + var(--song-meta-w, 0px));
+    width: calc(var(--name-w) + var(--song-meta-w, 0px));
+    min-width: calc(var(--name-w) + var(--song-meta-w, 0px));
+    max-width: calc(var(--name-w) + var(--song-meta-w, 0px));
     height: 20px;
     background: transparent !important;
     border: 0;
@@ -3035,7 +3089,9 @@
     width: var(--row-g); min-width: var(--row-g); max-width: var(--row-g);
   }
   .sec-outline .song-name-spacer {
-    width: var(--name-w); min-width: var(--name-w); max-width: var(--name-w);
+    width: calc(var(--name-w) + var(--song-meta-w, 0px));
+    min-width: calc(var(--name-w) + var(--song-meta-w, 0px));
+    max-width: calc(var(--name-w) + var(--song-meta-w, 0px));
   }
   .sec-outline .song-secs {
     display: flex;
@@ -5724,6 +5780,14 @@ function showSections(keepScroll) {
   var headLabel = arrangementMode ? "Arrange" : (soloMode ? "Lick" : "Section");
   var head = '<div class="sec-head"><div class="sec-head-label song">Song</div><div class="sec-head-label section">'+headLabel+'</div><div class="sec-head-label album">Album</div></div>';
   var ruler = '<div class="sec-ruler"><div class="row-num"></div><div class="song-name-spacer" aria-hidden="true"></div><div class="song-secs">'+colNums+'</div></div>';
+  var anySongMeta = false;
+  if (sectionsMode === "view") {
+    sourceAlbums.forEach(function(album){
+      (album.songs || []).forEach(function(s){
+        if (s && songHasVisibleMeta(s.song)) anySongMeta = true;
+      });
+    });
+  }
   var html = sourceAlbums.map(function(album, ai){
     var rows = (album.songs || []).map(function(s, si){
       rowN += 1;
@@ -5788,7 +5852,8 @@ function showSections(keepScroll) {
         songsterrBtn = '<button type="button" class="song-songsterr" data-songsterr="'+stEsc+'" title="Songsterr: '+snEsc+'" aria-label="Open Songsterr tab for '+snEsc+'"><img src="covers/songsterr.png" alt=""></button>';
       }
       var nameTitle = (sectionsMode === "edit") ? ' title="Edit key, tuning, and BPM"' : "";
-      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div><div class="song-secs">'+chips+'</div></div>';
+      var metaStrip = (sectionsMode === "view" && anySongMeta) ? songMetaStripHtml(s.song) : "";
+      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-secs">'+chips+'</div></div>';
     }).join("");
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
@@ -5806,7 +5871,8 @@ function showSections(keepScroll) {
       + '</div>'
       + '</aside>'
     : "";
-  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+outline+ruler+html+'</div>'+nextCueHtml+'</div>';
+  var wrapCls = (sectionsMode === "view" && anySongMeta) ? "sections-wrap has-song-meta" : "sections-wrap";
+  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="'+wrapCls+'">'+head+outline+ruler+html+'</div>'+nextCueHtml+'</div>';
   if (arrangementMode && typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
   var wrapEl = document.querySelector("#sectionsSheet .sections-wrap");
   if (wrapEl) {
@@ -8760,6 +8826,24 @@ function readCanonicalSongMeta(songName) {
     tuning: String((song && song.tuning) || "").trim(),
     bpms: normalizeSongMetaList(song && song.bpms)
   };
+}
+function songHasVisibleMeta(songName) {
+  var meta = readCanonicalSongMeta(songName);
+  return !!(meta.keys.length || meta.tuning || meta.bpms.length);
+}
+function songMetaStripHtml(songName) {
+  var meta = readCanonicalSongMeta(songName);
+  var keyText = meta.keys.join(" · ");
+  var bpmText = meta.bpms.join(" · ");
+  var title = "Key " + (keyText || "—") + " · Tuning " + (meta.tuning || "—") + " · BPM " + (bpmText || "—");
+  function bit(label, value) {
+    return '<span class="song-meta-bit"><span class="song-meta-k">'+label+'</span><span class="song-meta-v">'+songMetaEscapeAttr(value || "—")+'</span></span>';
+  }
+  return '<div class="song-meta-strip" title="'+songMetaEscapeAttr(title)+'">'
+    + bit("Key", keyText)
+    + bit("Tuning", meta.tuning)
+    + bit("BPM", bpmText)
+    + '</div>';
 }
 function readSongMetaDraft(containerId) {
   var box = document.getElementById(containerId);
