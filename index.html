@@ -1566,7 +1566,9 @@
     z-index: 5;
     pointer-events: none;
   }
-  body.sections-mode.sections-arrange .sm-arr-next-panel {
+  /* Next/Current cues: Edit and Play only. View hides them so song metadata can use the row. */
+  body.sections-mode.sections-arrange.sections-edit .sm-arr-next-panel,
+  body.sections-mode.sections-arrange.sections-play .sm-arr-next-panel {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
