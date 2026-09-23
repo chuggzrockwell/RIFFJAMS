@@ -1799,6 +1799,37 @@
     outline: 2px solid #7030a0;
     outline-offset: -2px;
   }
+  .chip-editor .song-meta-line {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .chip-editor .song-meta-line input[type="text"] {
+    flex: 1;
+    width: auto;
+    margin-bottom: 0;
+  }
+  .chip-editor .song-meta-add {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 34px;
+    border: 0;
+    border-radius: 8px;
+    background: #7030a0;
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+  }
+  .chip-editor .song-meta-add:hover { filter: brightness(1.08); }
+  .chip-editor .song-meta-add-spacer {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 34px;
+  }
   .chip-attachment { margin: 2px 0 12px; }
   .chip-paste-actions { display: flex; gap: 7px; margin-bottom: 8px; }
   .chip-paste-button { flex: 1; border: 0; border-radius: 8px; padding: 9px 12px; background: #7030a0; color: #fff; font-size: .78rem; font-weight: 800; cursor: pointer; }
@@ -3709,6 +3740,12 @@
   </div>
   <div id="songMetaEditor" class="chip-editor song-meta-editor" aria-hidden="true">
     <div class="song-meta-title" id="songMetaEditorTitle">Song</div>
+    <label>Key</label>
+    <div id="songMetaKeys" class="song-meta-multi"></div>
+    <label for="songMetaTuning">Tuning</label>
+    <input type="text" id="songMetaTuning" maxlength="32" placeholder="e.g. Eb" autocomplete="off">
+    <label>BPM</label>
+    <div id="songMetaBpms" class="song-meta-multi"></div>
     <div class="editor-actions">
       <button type="button" class="btn-save" id="songMetaSave">Save</button>
       <button type="button" class="btn-cancel" id="songMetaCancel">Cancel</button>
@@ -8699,6 +8736,67 @@ function placeSongMetaEditor(anchor) {
   ed.style.left = left + "px";
   ed.style.top = top + "px";
 }
+function songMetaEscapeAttr(value) {
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;");
+}
+function normalizeSongMetaList(value) {
+  var list = [];
+  if (Array.isArray(value)) list = value;
+  else if (value != null && String(value).trim()) list = [value];
+  var out = [];
+  list.forEach(function(item){
+    var text = String(item == null ? "" : item).trim();
+    if (text) out.push(text);
+  });
+  return out;
+}
+function readCanonicalSongMeta(songName) {
+  var song = findSongInAlbumsByName(ALBUMS, songName);
+  return {
+    keys: normalizeSongMetaList(song && song.keys),
+    tuning: String((song && song.tuning) || "").trim(),
+    bpms: normalizeSongMetaList(song && song.bpms)
+  };
+}
+function readSongMetaDraft(containerId) {
+  var box = document.getElementById(containerId);
+  var out = [];
+  if (!box) return [""];
+  box.querySelectorAll("input[type='text']").forEach(function(inp){
+    out.push(String(inp.value || ""));
+  });
+  if (!out.length) out.push("");
+  return out;
+}
+function fillSongMetaList(containerId, values, kind) {
+  var box = document.getElementById(containerId);
+  if (!box) return;
+  var list = (values && values.length) ? values.slice() : [""];
+  var html = "";
+  var placeholder = kind === "bpm" ? "e.g. 120" : "e.g. Em";
+  var maxLen = kind === "bpm" ? 16 : 32;
+  var addLabel = kind === "bpm" ? "Add BPM" : "Add key";
+  list.forEach(function(val, idx){
+    var extra = (idx === list.length - 1)
+      ? '<button type="button" class="song-meta-add" data-add="'+kind+'" title="'+addLabel+'" aria-label="'+addLabel+'">+</button>'
+      : '<span class="song-meta-add-spacer" aria-hidden="true"></span>';
+    html += '<div class="song-meta-line"><input type="text" maxlength="'+maxLen+'" placeholder="'+placeholder+'" autocomplete="off" value="'+songMetaEscapeAttr(val)+'">'+extra+'</div>';
+  });
+  box.innerHTML = html;
+}
+function addSongMetaField(kind) {
+  var containerId = kind === "bpm" ? "songMetaBpms" : "songMetaKeys";
+  var vals = readSongMetaDraft(containerId);
+  vals.push("");
+  fillSongMetaList(containerId, vals, kind === "bpm" ? "bpm" : "key");
+  var box = document.getElementById(containerId);
+  var inputs = box ? box.querySelectorAll("input[type='text']") : [];
+  if (inputs.length) inputs[inputs.length - 1].focus();
+  placeSongMetaEditor(songMetaAnchor);
+}
 function openSongMetaEditor(anchor, ai, si) {
   if (sectionsMode !== "edit") return;
   closeChipEditor();
@@ -8709,11 +8807,18 @@ function openSongMetaEditor(anchor, ai, si) {
   var ed = document.getElementById("songMetaEditor");
   var title = document.getElementById("songMetaEditorTitle");
   if (title) title.textContent = rowSong.song;
+  var meta = readCanonicalSongMeta(rowSong.song);
+  fillSongMetaList("songMetaKeys", meta.keys, "key");
+  fillSongMetaList("songMetaBpms", meta.bpms, "bpm");
+  var tuning = document.getElementById("songMetaTuning");
+  if (tuning) tuning.value = meta.tuning || "";
   if (!ed) return;
   ed.classList.add("open");
   ed.setAttribute("aria-hidden", "false");
   placeSongMetaEditor(anchor);
   requestAnimationFrame(function(){ placeSongMetaEditor(anchor); });
+  var firstKey = document.querySelector("#songMetaKeys input");
+  if (firstKey) firstKey.focus();
 }
 function saveSongMetaEditor() {
   closeSongMetaEditor();
@@ -10486,6 +10591,17 @@ document.getElementById("songMetaCancel").onclick = function(e){
   e.stopPropagation();
   closeSongMetaEditor();
 };
+document.getElementById("songMetaEditor").addEventListener("click", function(e){
+  var add = e.target.closest("[data-add]");
+  if (!add) return;
+  e.preventDefault();
+  e.stopPropagation();
+  addSongMetaField(add.getAttribute("data-add"));
+});
+document.getElementById("songMetaEditor").addEventListener("keydown", function(e){
+  if (e.key === "Enter") { e.preventDefault(); saveSongMetaEditor(); }
+  if (e.key === "Escape") { e.preventDefault(); closeSongMetaEditor(); }
+});
 var smBlockSongPlayFromChipEditDismiss = false;
 document.addEventListener("pointerdown", function(e){
   var ed = document.getElementById("chipEditor");
