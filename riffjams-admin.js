@@ -496,7 +496,11 @@
       sharedData = data;
       window.RIFFJAMS_ASSETS = Object.assign({}, data.assets || {});
       if (Array.isArray(data.albums) && data.albums.length) {
-        window.ALBUMS = clone(data.albums);
+        var nextAlbums = clone(data.albums);
+        if (typeof window.mergeSongMetaInto === "function") {
+          window.mergeSongMetaInto(nextAlbums, window.ALBUMS);
+        }
+        window.ALBUMS = nextAlbums;
         window.ensureAllSongSlots(window.ALBUMS);
         window.saveAlbums();
       }

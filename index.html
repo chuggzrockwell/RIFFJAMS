@@ -1566,7 +1566,9 @@
     z-index: 5;
     pointer-events: none;
   }
-  body.sections-mode.sections-arrange .sm-arr-next-panel {
+  /* Next/Current cues: Edit and Play only. View hides them so song metadata can use the row. */
+  body.sections-mode.sections-arrange.sections-edit .sm-arr-next-panel,
+  body.sections-mode.sections-arrange.sections-play .sm-arr-next-panel {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -1782,6 +1784,105 @@
   .chip-editor .btn-cancel { background: #eee; color: #333; }
   .chip-editor .btn-copy { background: #f3eef8; color: #7030a0; }
   .chip-editor .btn-del { background: transparent; color: #c0392b; margin-left: auto; }
+  .song-meta-editor .song-meta-title {
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+    color: #111;
+  }
+  body.sections-edit .song-name-wrap {
+    cursor: pointer;
+  }
+  body.sections-edit .song-name-wrap:hover {
+    outline: 2px solid #7030a0;
+    outline-offset: -2px;
+  }
+  .chip-editor .song-meta-line {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .chip-editor .song-meta-line input[type="text"] {
+    flex: 1;
+    width: auto;
+    margin-bottom: 0;
+  }
+  .chip-editor .song-meta-add {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 34px;
+    border: 0;
+    border-radius: 8px;
+    background: #7030a0;
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+  }
+  .chip-editor .song-meta-add:hover { filter: brightness(1.08); }
+  .chip-editor .song-meta-add-spacer {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 34px;
+  }
+  /* Song metadata sits between the nameplate and chips in View only. */
+  body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta {
+    --song-meta-w: 300px;
+  }
+  .song-meta-strip { display: none; }
+  body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta .song-meta-strip {
+    display: flex;
+    flex: 0 0 var(--song-meta-w);
+    width: var(--song-meta-w);
+    min-width: var(--song-meta-w);
+    max-width: var(--song-meta-w);
+    height: calc(var(--chip-h) - 6px);
+    max-height: calc(var(--chip-h) - 6px);
+    align-self: center;
+    align-items: stretch;
+    gap: 4px;
+    margin: 0;
+    padding: 0 8px 0 0;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  body.sections-edit .song-meta-strip,
+  body.sections-play .song-meta-strip {
+    display: none !important;
+  }
+  .song-meta-bit {
+    flex: 1 1 0;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 6px;
+    border-radius: 8px;
+    background: #333;
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 400;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .song-meta-k {
+    flex: 0 0 auto;
+    opacity: 0.55;
+    letter-spacing: .08em;
+  }
+  .song-meta-v {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .chip-attachment { margin: 2px 0 12px; }
   .chip-paste-actions { display: flex; gap: 7px; margin-bottom: 8px; }
   .chip-paste-button { flex: 1; border: 0; border-radius: 8px; padding: 9px 12px; background: #7030a0; color: #fff; font-size: .78rem; font-weight: 800; cursor: pointer; }
@@ -2849,15 +2950,16 @@
   .sections-wrap {
     --row-g: 34px;
     --name-w: 236px;
+    --song-meta-w: 0px;
     --chip-w: 48px;
     --chip-h: 28px;
     --chip-gap: 1px;
     --cols: 10;
     --cover-rows: 6;
     --cover: calc(var(--chip-h) * var(--cover-rows));
-    --grid-left: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
+    --grid-left: calc(var(--row-g) + var(--name-w) + var(--song-meta-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
     width: 100%;
-    max-width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
+    max-width: calc(var(--row-g) + var(--name-w) + var(--song-meta-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -2887,10 +2989,10 @@
     padding: 0 10px;
   }
   .sec-head-label.song {
-    flex: 0 0 calc(var(--row-g) + var(--name-w));
-    width: calc(var(--row-g) + var(--name-w));
-    min-width: calc(var(--row-g) + var(--name-w));
-    max-width: calc(var(--row-g) + var(--name-w));
+    flex: 0 0 calc(var(--row-g) + var(--name-w) + var(--song-meta-w, 0px));
+    width: calc(var(--row-g) + var(--name-w) + var(--song-meta-w, 0px));
+    min-width: calc(var(--row-g) + var(--name-w) + var(--song-meta-w, 0px));
+    max-width: calc(var(--row-g) + var(--name-w) + var(--song-meta-w, 0px));
     justify-content: center;
   }
   .sec-head-label.section {
@@ -2943,10 +3045,10 @@
     display: none !important;
   }
   .sec-ruler .song-name-spacer {
-    flex: 0 0 var(--name-w);
-    width: var(--name-w);
-    min-width: var(--name-w);
-    max-width: var(--name-w);
+    flex: 0 0 calc(var(--name-w) + var(--song-meta-w, 0px));
+    width: calc(var(--name-w) + var(--song-meta-w, 0px));
+    min-width: calc(var(--name-w) + var(--song-meta-w, 0px));
+    max-width: calc(var(--name-w) + var(--song-meta-w, 0px));
     height: 20px;
     background: transparent !important;
     border: 0;
@@ -2987,7 +3089,9 @@
     width: var(--row-g); min-width: var(--row-g); max-width: var(--row-g);
   }
   .sec-outline .song-name-spacer {
-    width: var(--name-w); min-width: var(--name-w); max-width: var(--name-w);
+    width: calc(var(--name-w) + var(--song-meta-w, 0px));
+    min-width: calc(var(--name-w) + var(--song-meta-w, 0px));
+    max-width: calc(var(--name-w) + var(--song-meta-w, 0px));
   }
   .sec-outline .song-secs {
     display: flex;
@@ -3688,6 +3792,19 @@
       <button type="button" class="btn-cancel" id="chipEditCancel">Cancel</button>
       <button type="button" class="btn-copy" id="chipEditCopy">Copy</button>
       <button type="button" class="btn-del" id="chipEditDelete">Delete</button>
+    </div>
+  </div>
+  <div id="songMetaEditor" class="chip-editor song-meta-editor" aria-hidden="true">
+    <div class="song-meta-title" id="songMetaEditorTitle">Song</div>
+    <label>Key</label>
+    <div id="songMetaKeys" class="song-meta-multi"></div>
+    <label for="songMetaTuning">Tuning</label>
+    <input type="text" id="songMetaTuning" maxlength="32" placeholder="e.g. Eb" autocomplete="off">
+    <label>BPM</label>
+    <div id="songMetaBpms" class="song-meta-multi"></div>
+    <div class="editor-actions">
+      <button type="button" class="btn-save" id="songMetaSave">Save</button>
+      <button type="button" class="btn-cancel" id="songMetaCancel">Cancel</button>
     </div>
   </div>
   <section id="series" class="hidden">
@@ -5615,6 +5732,7 @@ function showSections(keepScroll) {
   var sheetSy = wrapEl ? wrapEl.scrollTop : 0;
   currentLetter = "";
   closeChipEditor();
+  if (typeof closeSongMetaEditor === "function") closeSongMetaEditor();
   ensureAllSongSlots(ALBUMS);
   if (!SOLO_MAP) SOLO_MAP = loadSoloMap();
   if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap();
@@ -5662,6 +5780,14 @@ function showSections(keepScroll) {
   var headLabel = arrangementMode ? "Arrange" : (soloMode ? "Lick" : "Section");
   var head = '<div class="sec-head"><div class="sec-head-label song">Song</div><div class="sec-head-label section">'+headLabel+'</div><div class="sec-head-label album">Album</div></div>';
   var ruler = '<div class="sec-ruler"><div class="row-num"></div><div class="song-name-spacer" aria-hidden="true"></div><div class="song-secs">'+colNums+'</div></div>';
+  var anySongMeta = false;
+  if (sectionsMode === "view") {
+    sourceAlbums.forEach(function(album){
+      (album.songs || []).forEach(function(s){
+        if (s && songHasVisibleMeta(s.song)) anySongMeta = true;
+      });
+    });
+  }
   var html = sourceAlbums.map(function(album, ai){
     var rows = (album.songs || []).map(function(s, si){
       rowN += 1;
@@ -5725,7 +5851,9 @@ function showSections(keepScroll) {
         var snEsc = String(s.song).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
         songsterrBtn = '<button type="button" class="song-songsterr" data-songsterr="'+stEsc+'" title="Songsterr: '+snEsc+'" aria-label="Open Songsterr tab for '+snEsc+'"><img src="covers/songsterr.png" alt=""></button>';
       }
-      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"><div class="song-name '+np+'">'+s.song+'</div></div><div class="song-secs">'+chips+'</div></div>';
+      var nameTitle = (sectionsMode === "edit") ? ' title="Edit key, tuning, and BPM"' : "";
+      var metaStrip = (sectionsMode === "view" && anySongMeta) ? songMetaStripHtml(s.song) : "";
+      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-secs">'+chips+'</div></div>';
     }).join("");
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
@@ -5743,7 +5871,8 @@ function showSections(keepScroll) {
       + '</div>'
       + '</aside>'
     : "";
-  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="sections-wrap">'+head+outline+ruler+html+'</div>'+nextCueHtml+'</div>';
+  var wrapCls = (sectionsMode === "view" && anySongMeta) ? "sections-wrap has-song-meta" : "sections-wrap";
+  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="'+wrapCls+'">'+head+outline+ruler+html+'</div>'+nextCueHtml+'</div>';
   if (arrangementMode && typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
   var wrapEl = document.querySelector("#sectionsSheet .sections-wrap");
   if (wrapEl) {
@@ -5826,7 +5955,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=217";
+  var url = base + "?playboard=1&v=218";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5855,7 +5984,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=22") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=218") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -8556,6 +8685,7 @@ function ensureChipEditResizeObserver() {
   chipEditResizeObs.observe(ed);
 }
 function openChipEditor(anchor, state) {
+  if (typeof closeSongMetaEditor === "function") closeSongMetaEditor();
   chipEditState = state;
   chipEditAnchor = anchor || null;
   var ed = document.getElementById("chipEditor");
@@ -8626,6 +8756,194 @@ function openChipEditor(anchor, state) {
   requestAnimationFrame(function(){ placeChipEditor(anchor); });
   idInput.focus();
   idInput.select();
+}
+var songMetaState = null;
+var songMetaAnchor = null;
+var songMetaDismissBlock = false;
+function closeSongMetaEditor() {
+  songMetaState = null;
+  songMetaAnchor = null;
+  var ed = document.getElementById("songMetaEditor");
+  if (!ed) return;
+  ed.classList.remove("open");
+  ed.setAttribute("aria-hidden", "true");
+}
+function placeSongMetaEditor(anchor) {
+  var ed = document.getElementById("songMetaEditor");
+  if (!ed || !ed.classList.contains("open")) return;
+  if (anchor) songMetaAnchor = anchor;
+  var a = songMetaAnchor;
+  var pad = CHIP_EDIT_PAD;
+  var gap = CHIP_EDIT_GAP;
+  var vh = window.innerHeight || 800;
+  var vw = window.innerWidth || 1200;
+  var maxH = Math.max(180, vh - 2 * pad);
+  ed.style.maxHeight = maxH + "px";
+  var editorWidth = ed.offsetWidth || 360;
+  var naturalH = ed.offsetHeight || 220;
+  var neededH = Math.min(maxH, naturalH + 40);
+  var left = pad;
+  var top = pad;
+  if (a && a.getBoundingClientRect) {
+    var r = a.getBoundingClientRect();
+    left = Math.min(vw - editorWidth - pad, Math.max(pad, r.left));
+    var belowTop = r.bottom + gap;
+    if (belowTop + neededH <= vh - pad) top = belowTop;
+    else if (r.top - gap - neededH >= pad) top = r.top - gap - neededH;
+    else top = Math.max(pad, vh - pad - neededH);
+  } else {
+    top = Math.max(pad, vh - pad - neededH);
+  }
+  ed.style.left = left + "px";
+  ed.style.top = top + "px";
+  var editorHeight = ed.offsetHeight || 0;
+  if (top + editorHeight > vh - pad) top = Math.max(pad, vh - pad - editorHeight);
+  if (top < pad) top = pad;
+  ed.style.left = left + "px";
+  ed.style.top = top + "px";
+}
+function songMetaEscapeAttr(value) {
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;");
+}
+function normalizeSongMetaList(value) {
+  var list = [];
+  if (Array.isArray(value)) list = value;
+  else if (value != null && String(value).trim()) list = [value];
+  var out = [];
+  list.forEach(function(item){
+    var text = String(item == null ? "" : item).trim();
+    if (text) out.push(text);
+  });
+  return out;
+}
+function readCanonicalSongMeta(songName) {
+  var song = findSongInAlbumsByName(ALBUMS, songName);
+  return {
+    keys: normalizeSongMetaList(song && song.keys),
+    tuning: String((song && song.tuning) || "").trim(),
+    bpms: normalizeSongMetaList(song && song.bpms)
+  };
+}
+function songHasVisibleMeta(songName) {
+  var meta = readCanonicalSongMeta(songName);
+  return !!(meta.keys.length || meta.tuning || meta.bpms.length);
+}
+function songMetaStripHtml(songName) {
+  var meta = readCanonicalSongMeta(songName);
+  var keyText = meta.keys.join(" · ");
+  var bpmText = meta.bpms.join(" · ");
+  var title = "Key " + (keyText || "—") + " · Tuning " + (meta.tuning || "—") + " · BPM " + (bpmText || "—");
+  function bit(label, value) {
+    return '<span class="song-meta-bit"><span class="song-meta-k">'+label+'</span><span class="song-meta-v">'+songMetaEscapeAttr(value || "—")+'</span></span>';
+  }
+  return '<div class="song-meta-strip" title="'+songMetaEscapeAttr(title)+'">'
+    + bit("Key", keyText)
+    + bit("Tuning", meta.tuning)
+    + bit("BPM", bpmText)
+    + '</div>';
+}
+function readSongMetaDraft(containerId) {
+  var box = document.getElementById(containerId);
+  var out = [];
+  if (!box) return [""];
+  box.querySelectorAll("input[type='text']").forEach(function(inp){
+    out.push(String(inp.value || ""));
+  });
+  if (!out.length) out.push("");
+  return out;
+}
+function fillSongMetaList(containerId, values, kind) {
+  var box = document.getElementById(containerId);
+  if (!box) return;
+  var list = (values && values.length) ? values.slice() : [""];
+  var html = "";
+  var placeholder = kind === "bpm" ? "e.g. 120" : "e.g. Em";
+  var maxLen = kind === "bpm" ? 16 : 32;
+  var addLabel = kind === "bpm" ? "Add BPM" : "Add key";
+  list.forEach(function(val, idx){
+    var extra = (idx === list.length - 1)
+      ? '<button type="button" class="song-meta-add" data-add="'+kind+'" title="'+addLabel+'" aria-label="'+addLabel+'">+</button>'
+      : '<span class="song-meta-add-spacer" aria-hidden="true"></span>';
+    html += '<div class="song-meta-line"><input type="text" maxlength="'+maxLen+'" placeholder="'+placeholder+'" autocomplete="off" value="'+songMetaEscapeAttr(val)+'">'+extra+'</div>';
+  });
+  box.innerHTML = html;
+}
+function addSongMetaField(kind) {
+  var containerId = kind === "bpm" ? "songMetaBpms" : "songMetaKeys";
+  var vals = readSongMetaDraft(containerId);
+  vals.push("");
+  fillSongMetaList(containerId, vals, kind === "bpm" ? "bpm" : "key");
+  var box = document.getElementById(containerId);
+  var inputs = box ? box.querySelectorAll("input[type='text']") : [];
+  if (inputs.length) inputs[inputs.length - 1].focus();
+  placeSongMetaEditor(songMetaAnchor);
+}
+function openSongMetaEditor(anchor, ai, si) {
+  if (sectionsMode !== "edit") return;
+  closeChipEditor();
+  var rowSong = getEditSong(ai, si);
+  if (!rowSong || !rowSong.song) return;
+  songMetaState = { ai: ai, si: si, song: rowSong.song };
+  songMetaAnchor = anchor || null;
+  var ed = document.getElementById("songMetaEditor");
+  var title = document.getElementById("songMetaEditorTitle");
+  if (title) title.textContent = rowSong.song;
+  var meta = readCanonicalSongMeta(rowSong.song);
+  fillSongMetaList("songMetaKeys", meta.keys, "key");
+  fillSongMetaList("songMetaBpms", meta.bpms, "bpm");
+  var tuning = document.getElementById("songMetaTuning");
+  if (tuning) tuning.value = meta.tuning || "";
+  if (!ed) return;
+  ed.classList.add("open");
+  ed.setAttribute("aria-hidden", "false");
+  placeSongMetaEditor(anchor);
+  requestAnimationFrame(function(){ placeSongMetaEditor(anchor); });
+  var firstKey = document.querySelector("#songMetaKeys input");
+  if (firstKey) firstKey.focus();
+}
+function songMetaStored(song) {
+  if (!song) return false;
+  return Object.prototype.hasOwnProperty.call(song, "keys")
+    || Object.prototype.hasOwnProperty.call(song, "tuning")
+    || Object.prototype.hasOwnProperty.call(song, "bpms");
+}
+function mergeSongMetaInto(targetAlbums, sourceAlbums) {
+  (targetAlbums || []).forEach(function(album){
+    (album.songs || []).forEach(function(song){
+      if (!song || !song.song || songMetaStored(song)) return;
+      var prev = findSongInAlbumsByName(sourceAlbums, song.song);
+      if (!prev || !songMetaStored(prev)) return;
+      song.keys = normalizeSongMetaList(prev.keys);
+      song.tuning = String(prev.tuning || "").trim();
+      song.bpms = normalizeSongMetaList(prev.bpms);
+    });
+  });
+}
+function saveSongMetaEditor() {
+  if (!songMetaState) {
+    closeSongMetaEditor();
+    return;
+  }
+  var name = songMetaState.song;
+  var keys = normalizeSongMetaList(readSongMetaDraft("songMetaKeys"));
+  var bpms = normalizeSongMetaList(readSongMetaDraft("songMetaBpms"));
+  var tuningEl = document.getElementById("songMetaTuning");
+  var tuning = tuningEl ? String(tuningEl.value || "").trim() : "";
+  var canon = findSongInAlbumsByName(ALBUMS, name);
+  if (canon) {
+    pushAlbumHistory();
+    canon.keys = keys;
+    canon.tuning = tuning;
+    canon.bpms = bpms;
+    saveAlbums();
+  }
+  closeSongMetaEditor();
+  if (document.body.classList.contains("sections-mode") && typeof showSections === "function") {
+    showSections(true);
+  }
 }
 function readChipEditPosList() {
   var posBases = [];
@@ -10385,17 +10703,49 @@ document.getElementById("secModes").onclick = function(e){
 };
 document.getElementById("chipEditSave").onclick = saveChipEditor;
 document.getElementById("chipEditCancel").onclick = closeChipEditor;
+document.getElementById("songMetaSave").onclick = function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  saveSongMetaEditor();
+};
+document.getElementById("songMetaCancel").onclick = function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  closeSongMetaEditor();
+};
+document.getElementById("songMetaEditor").addEventListener("click", function(e){
+  var add = e.target.closest("[data-add]");
+  if (!add) return;
+  e.preventDefault();
+  e.stopPropagation();
+  addSongMetaField(add.getAttribute("data-add"));
+});
+document.getElementById("songMetaEditor").addEventListener("keydown", function(e){
+  if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); saveSongMetaEditor(); }
+  if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); closeSongMetaEditor(); }
+});
 var smBlockSongPlayFromChipEditDismiss = false;
 document.addEventListener("pointerdown", function(e){
   var ed = document.getElementById("chipEditor");
-  if (!ed || !ed.classList.contains("open")) return;
-  if (ed.contains(e.target)) return;
+  var metaEd = document.getElementById("songMetaEditor");
+  var chipOpen = ed && ed.classList.contains("open");
+  var metaOpen = metaEd && metaEd.classList.contains("open");
+  if (!chipOpen && !metaOpen) return;
+  if (chipOpen && ed.contains(e.target)) return;
+  if (metaOpen && metaEd.contains(e.target)) return;
   /* Persist edits on outside click (Cancel still discards).
      Block the trailing click from changing the player song unless it is album art / row #. */
   smBlockSongPlayFromChipEditDismiss = !e.target.closest(".song-thumb, .row-num");
-  if (typeof saveChipEditor === "function") saveChipEditor();
-  else closeChipEditor();
-  setTimeout(function(){ smBlockSongPlayFromChipEditDismiss = false; }, 80);
+  songMetaDismissBlock = true;
+  if (chipOpen) {
+    if (typeof saveChipEditor === "function") saveChipEditor();
+    else closeChipEditor();
+  }
+  if (metaOpen) saveSongMetaEditor();
+  setTimeout(function(){
+    smBlockSongPlayFromChipEditDismiss = false;
+    songMetaDismissBlock = false;
+  }, 80);
 }, true);
 document.getElementById("chipEditDelete").onclick = deleteChipEditor;
 document.getElementById("chipEditCopy").onclick = function(){
@@ -10764,6 +11114,16 @@ document.getElementById("sectionsSheet").onclick = function(e){
   var playHit = e.target.closest(".song-name, .song-name-wrap, .song-thumb, .row-num");
   if (playHit && !e.target.closest(".sec-chip") && document.body.classList.contains("sections-mode")) {
     if (typeof smBlockSongPlayFromChipEditDismiss !== "undefined" && smBlockSongPlayFromChipEditDismiss) return;
+    var nameplate = e.target.closest(".song-name, .song-name-wrap");
+    if (nameplate && sectionsMode === "edit" && !songMetaDismissBlock) {
+      var rowEdit = nameplate.closest(".song-row");
+      if (rowEdit) {
+        e.preventDefault();
+        openSongMetaEditor(nameplate, parseInt(rowEdit.getAttribute("data-ai"), 10), parseInt(rowEdit.getAttribute("data-si"), 10));
+        return;
+      }
+    }
+    if (songMetaDismissBlock) return;
     var row = playHit.closest(".song-row");
     if (row) {
       var titleEl = row.querySelector(".song-name");
@@ -11021,6 +11381,9 @@ window.addEventListener("resize", function(){
   if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) {
     placeChipEditor(chipEditAnchor);
   }
+  if (document.getElementById("songMetaEditor") && document.getElementById("songMetaEditor").classList.contains("open")) {
+    placeSongMetaEditor(songMetaAnchor);
+  }
 });
 document.addEventListener("keydown", function(e){
   if ((e.metaKey || e.ctrlKey) && !e.altKey && document.body.classList.contains("sections-mode") && sectionsMode === "edit") {
@@ -11124,6 +11487,10 @@ document.addEventListener("keydown", function(e){
   }
   if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) {
     if (k === "escape") { e.preventDefault(); closeChipEditor(); return; }
+    return;
+  }
+  if (document.getElementById("songMetaEditor") && document.getElementById("songMetaEditor").classList.contains("open")) {
+    if (k === "escape") { e.preventDefault(); closeSongMetaEditor(); return; }
     return;
   }
   /* Player transport: Song Map + LL */
