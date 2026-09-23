@@ -8820,8 +8820,46 @@ function openSongMetaEditor(anchor, ai, si) {
   var firstKey = document.querySelector("#songMetaKeys input");
   if (firstKey) firstKey.focus();
 }
+function songMetaStored(song) {
+  if (!song) return false;
+  return Object.prototype.hasOwnProperty.call(song, "keys")
+    || Object.prototype.hasOwnProperty.call(song, "tuning")
+    || Object.prototype.hasOwnProperty.call(song, "bpms");
+}
+function mergeSongMetaInto(targetAlbums, sourceAlbums) {
+  (targetAlbums || []).forEach(function(album){
+    (album.songs || []).forEach(function(song){
+      if (!song || !song.song || songMetaStored(song)) return;
+      var prev = findSongInAlbumsByName(sourceAlbums, song.song);
+      if (!prev || !songMetaStored(prev)) return;
+      song.keys = normalizeSongMetaList(prev.keys);
+      song.tuning = String(prev.tuning || "").trim();
+      song.bpms = normalizeSongMetaList(prev.bpms);
+    });
+  });
+}
 function saveSongMetaEditor() {
+  if (!songMetaState) {
+    closeSongMetaEditor();
+    return;
+  }
+  var name = songMetaState.song;
+  var keys = normalizeSongMetaList(readSongMetaDraft("songMetaKeys"));
+  var bpms = normalizeSongMetaList(readSongMetaDraft("songMetaBpms"));
+  var tuningEl = document.getElementById("songMetaTuning");
+  var tuning = tuningEl ? String(tuningEl.value || "").trim() : "";
+  var canon = findSongInAlbumsByName(ALBUMS, name);
+  if (canon) {
+    pushAlbumHistory();
+    canon.keys = keys;
+    canon.tuning = tuning;
+    canon.bpms = bpms;
+    saveAlbums();
+  }
   closeSongMetaEditor();
+  if (document.body.classList.contains("sections-mode") && typeof showSections === "function") {
+    showSections(true);
+  }
 }
 function readChipEditPosList() {
   var posBases = [];
