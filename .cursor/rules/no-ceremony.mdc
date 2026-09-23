@@ -1,0 +1,12 @@
+---
+description: Ship the diff. Do not create videos, recordings, or walkthroughs unless the user asks in that turn.
+alwaysApply: true
+---
+
+# No ceremony
+
+1. Do NOT create videos, screen recordings, walkthroughs, or demo artifacts unless the user explicitly asks for one in that turn.
+2. Prefer shipping the code diff quickly: implement, bump cache `?v=` when UI changes need it, open or update the PR, and merge to `main` when ready so GitHub Pages updates.
+3. Avoid extraneous ceremony: no long unsolicited visual-proof loops, no inventing extra polish or tasks beyond the ask, and keep PRs tightly scoped.
+4. Screenshots are OK only if needed to verify a UI claim and the user did not forbid them. Still prefer finishing over demo theater.
+5. If the user asks for a video later, that overrides this rule for that request only.
