@@ -3070,17 +3070,6 @@
     color: var(--arr-fg, #fff) !important;
     text-shadow: none !important;
   }
-  body.sheet-mode #llArrangeBtn.sec-mode-btn {
-    border-color: #4a4e5a;
-    background: #1a1d26;
-    color: #c8c6c0;
-    margin-left: 4px;
-  }
-  body.sheet-mode #llArrangeBtn.sec-mode-btn.on {
-    background: #1a6b6b;
-    color: #fff;
-    border-color: #1a6b6b;
-  }
   body.sheet-mode.ll-arrange .phrase:not(.flipped) {
     /* neutralize tier neon differences on LL cover chips */
   }
@@ -3620,20 +3609,20 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 modes · Mode dropdown / 4 Solo · 5 Peek · 6 Arrangement · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Play · View menu: Arrangement / Solo / Riff · 4 toggles Solo · 5 Peek · 6 toggles Arrangement · .1 Riff · .2 Solo · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
       <button type="button" class="sec-mode-btn" data-sec-mode="edit">Edit</button>
       <button type="button" class="sec-mode-btn" data-sec-mode="play">Play</button>
-      <label class="map-mode-dd" title="Riff = section chips · Solo = lick chips">
-        <select id="mapModeSelect" aria-label="Mode">
-          <option value="riff">Riff mode</option>
+      <label class="map-mode-dd" title="View">
+        <select id="mapModeSelect" aria-label="View">
+          <option value="arrangement">Arrangement</option>
           <option value="solo">Solo mode</option>
+          <option value="riff" selected>Riff mode</option>
         </select>
       </label>
       <button type="button" class="sec-mode-btn" id="secPeekBtn" aria-pressed="false" title="Hover chips to peek tabs">Peek</button>
-      <button type="button" class="sec-mode-btn" id="secArrangeBtn" aria-pressed="false" title="Arrangement chip set">Arrangement</button>
       <span class="sec-edit-tools" id="secEditTools" hidden>
         <button type="button" class="sec-tool-btn" id="secUndoBtn" title="Undo (Ctrl+Z)">Undo</button>
         <button type="button" class="sec-tool-btn primary" id="secSaveBtn" title="Save (Ctrl+S)">Save</button>
@@ -3706,13 +3695,13 @@
       <button type="button" class="back" id="back">Back</button>
       <span class="badge" id="badge">A</span>
       <span class="count" id="count"></span>
-      <label class="board-mode-dd" title="Riff / Solo chip set">
-        <select id="llBoardMode" aria-label="Mode">
-          <option value="riff">Riff mode</option>
+      <label class="board-mode-dd" title="View">
+        <select id="llBoardMode" aria-label="View">
+          <option value="arrangement">Arrangement</option>
           <option value="solo">Solo mode</option>
+          <option value="riff" selected>Riff mode</option>
         </select>
       </label>
-      <button type="button" class="sec-mode-btn" id="llArrangeBtn" aria-pressed="false" title="Arrangement chip set">Arrangement</button>
       <div class="ll-filters" id="llFilters" aria-label="Filter lick library" hidden>
         <div class="sec-filter-group" id="llAlbumFilters"></div>
         <div class="sec-filter-group" id="llTypeFilters"></div>
@@ -3882,17 +3871,28 @@ try {
   if (_llm === "solo" || _llm === "riff") llMode = _llm;
 } catch (eLm) {}
 soloMode = (llMode === "solo");
+function songMapViewValue() {
+  if (typeof arrangementMode !== "undefined" && arrangementMode) return "arrangement";
+  return (llMode === "solo") ? "solo" : "riff";
+}
 function syncModeSelects() {
-  ["mapModeSelect", "llBoardMode", "boardModeSelect"].forEach(function(id){
+  var view = songMapViewValue();
+  ["mapModeSelect", "llBoardMode"].forEach(function(id){
     var el = document.getElementById(id);
-    if (el) el.value = llMode;
+    if (el) el.value = view;
   });
+  var board = document.getElementById("boardModeSelect");
+  if (board) board.value = (llMode === "solo") ? "solo" : "riff";
 }
 function bindModeSelect(el) {
   if (!el || el._modeBound) return;
   el._modeBound = true;
-  el.value = llMode;
-  el.addEventListener("change", function(){ setPracticeMode(el.value); });
+  var viewSelect = el.id === "mapModeSelect" || el.id === "llBoardMode";
+  el.value = viewSelect ? songMapViewValue() : ((llMode === "solo") ? "solo" : "riff");
+  el.addEventListener("change", function(){
+    if (viewSelect) setMapView(el.value);
+    else setPracticeMode(el.value);
+  });
 }
 function setPracticeMode(mode, opts) {
   opts = opts || {};
@@ -4417,12 +4417,38 @@ function arrangementMapSlotCount(map) {
   return n;
 }
 function syncArrangementButtons() {
-  ["secArrangeBtn", "llArrangeBtn"].forEach(function(id){
-    var btn = document.getElementById(id);
-    if (!btn) return;
-    btn.classList.toggle("on", !!arrangementMode);
-    btn.setAttribute("aria-pressed", arrangementMode ? "true" : "false");
-  });
+  syncModeSelects();
+}
+/* View menu: Arrangement, Solo, or Riff. Shortcuts still toggle via setSoloMode / setArrangementMode. */
+function setMapView(view) {
+  if (view !== "arrangement" && view !== "solo") view = "riff";
+  if (view === "arrangement") {
+    if (!arrangementMode) setArrangementMode(true);
+    else syncModeSelects();
+    return;
+  }
+  var mode = view;
+  var hadArr = !!arrangementMode;
+  if (hadArr) {
+    arrangementMode = false;
+    try { localStorage.setItem(ARRANGEMENT_MODE_KEY, "0"); } catch (eArrOff) {}
+    try { mirrorMissingSectionArrangementChips(); } catch (eMirrorView) {}
+  }
+  if (llMode !== mode) {
+    setPracticeMode(mode);
+    return;
+  }
+  if (!hadArr) {
+    syncModeSelects();
+    return;
+  }
+  closeChipEditor();
+  updateEditSaveUi();
+  updateSoloUi();
+  var secView = document.getElementById("sections");
+  if (secView && !secView.classList.contains("hidden")) showSections(true);
+  else if (document.body.classList.contains("sheet-mode") && currentLetter) showSeries(currentLetter);
+  else document.body.classList.remove("sections-arrange", "ll-arrange");
 }
 function setArrangementMode(on) {
   arrangementMode = !!on;
@@ -5795,7 +5821,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=215";
+  var url = base + "?playboard=1&v=216";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -10097,14 +10123,6 @@ function showSeries(letter) {
   document.getElementById("series").className = "";
   bindModeSelect(document.getElementById("llBoardMode"));
   syncModeSelects();
-  var llArrBtn = document.getElementById("llArrangeBtn");
-  if (llArrBtn && !llArrBtn._arrBound) {
-    llArrBtn._arrBound = true;
-    llArrBtn.addEventListener("click", function(e){
-      e.preventDefault();
-      setArrangementMode(!arrangementMode);
-    });
-  }
   var keysEl = document.querySelector("#series .keys");
   if (keysEl) {
     keysEl.textContent = (letter === "B")
@@ -10366,13 +10384,9 @@ document.getElementById("secModes").onclick = function(e){
     else saveAlbumsNow();
     return;
   }
-  /* Mode dropdown handles riff/solo; numpad 4 still toggles via setSoloMode */
+  /* View menu handles Arrangement / Solo / Riff. Numpad 4 still toggles Solo; numpad 6 still toggles Arrangement. */
   if (e.target.closest("#secPeekBtn")) {
     setHighlightMode(!highlightMode);
-    return;
-  }
-  if (e.target.closest("#secArrangeBtn")) {
-    setArrangementMode(!arrangementMode);
     return;
   }
   var btn = e.target.closest(".sec-mode-btn[data-sec-mode]");
