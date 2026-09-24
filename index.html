@@ -1843,10 +1843,10 @@
     max-width: var(--song-meta-w);
     height: calc(var(--chip-h) - 6px);
     max-height: calc(var(--chip-h) - 6px);
-    align-self: center;
+    align-self: flex-end;
     align-items: stretch;
     gap: 4px;
-    margin: 0;
+    margin: 0 0 3px 0;
     padding: 0 8px 0 0;
     box-sizing: border-box;
     overflow: hidden;
@@ -2713,8 +2713,8 @@
     min-width: calc(var(--chip-h) - 6px);
     max-width: calc(var(--chip-h) - 6px);
     flex: 0 0 calc(var(--chip-h) - 6px);
-    align-self: center;
-    margin-right: 6px;
+    align-self: flex-end;
+    margin: 0 6px 3px 0;
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
     font-size: 0.7rem;
     font-weight: 600;
@@ -2757,12 +2757,12 @@
     /* Shorter than chip row + side gaps so all 4 rounded corners stay clear of chips */
     height: calc(var(--chip-h) - 6px);
     max-height: calc(var(--chip-h) - 6px);
-    align-self: center;
+    align-self: flex-end;
     flex: 0 1 auto;
     width: auto;
     min-width: 0;
     max-width: calc(var(--name-w) - 2 * (var(--chip-h) - 4px) - 18px);
-    margin: 0 8px 0 2px;
+    margin: 0 8px 3px 2px;
     box-shadow: none;
     border: 0;
     position: relative;
@@ -2774,8 +2774,8 @@
     height: calc(var(--chip-h) - 4px);
     max-width: calc(var(--chip-h) - 4px);
     max-height: calc(var(--chip-h) - 4px);
-    margin: 0 4px 0 0;
-    align-self: center;
+    margin: 0 4px 2px 0;
+    align-self: flex-end;
     border-radius: 8px;
     object-fit: cover;
     background: transparent;
@@ -2791,10 +2791,10 @@
     height: calc(var(--chip-h) - 4px);
     max-width: calc(var(--chip-h) - 4px);
     max-height: calc(var(--chip-h) - 4px);
-    margin: 0 4px 0 0;
+    margin: 0 4px 2px 0;
     padding: 0;
     border: 0;
-    align-self: center;
+    align-self: flex-end;
     border-radius: 8px;
     background: #1a1a1a;
     overflow: hidden;
@@ -2833,6 +2833,99 @@
     position: relative;
     z-index: 1;
     margin-left: 0;
+  }
+  .song-chip-col {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 0 0 auto;
+    min-width: 0;
+    align-self: flex-end;
+  }
+  .song-sec-lane {
+    position: relative;
+    height: 16px;
+    margin: 0 0 2px;
+    user-select: none;
+    border-radius: 2px;
+  }
+  body.sections-edit .song-sec-lane {
+    cursor: crosshair;
+    background: rgba(255,255,255,.05);
+    touch-action: none;
+  }
+  .song-sec-ruler {
+    position: absolute;
+    top: 0;
+    left: calc(var(--sr-i) * var(--chip-w));
+    width: calc(var(--sr-n) * var(--chip-w) - var(--chip-gap, 0px));
+    height: 16px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: stretch;
+    background: rgba(232,230,225,.16);
+    color: #e8e6e1;
+    border: 1px solid rgba(232,230,225,.72);
+    border-bottom: 2px solid #e8e6e1;
+    border-radius: 3px 3px 0 0;
+    overflow: hidden;
+    font-family: "Vol4 Title", "Impact", sans-serif;
+    font-size: 0.58rem;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    z-index: 2;
+  }
+  .song-sec-ruler.is-draft {
+    background: rgba(163,101,209,.4);
+    border-color: #d4bbe3;
+    pointer-events: none;
+  }
+  .song-sec-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    padding: 0 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    cursor: inherit;
+  }
+  body.sections-edit .song-sec-name { cursor: text; }
+  .song-sec-ruler input.song-sec-name {
+    outline: none;
+    padding: 0 2px;
+  }
+  .song-sec-grip {
+    flex: 0 0 6px;
+    width: 6px;
+    border: 0;
+    padding: 0;
+    background: rgba(232,230,225,.4);
+    cursor: ew-resize;
+  }
+  .song-sec-x {
+    display: none;
+    flex: 0 0 14px;
+    width: 14px;
+    border: 0;
+    background: transparent;
+    color: #e8e6e1;
+    font-size: 0.8rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+  }
+  body.sections-edit .song-sec-ruler:hover .song-sec-x,
+  body.sections-edit .song-sec-ruler:focus-within .song-sec-x {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   body.sections-mode .song-name::after,
   body.sections-mode .song-name.np-paranoid::after,
@@ -3316,13 +3409,13 @@
   .song-row {
     display: flex;
     flex-wrap: nowrap;
-    align-items: center;
+    align-items: flex-end;
     gap: 0;
     margin: 0;
     padding: 0;
-    height: var(--chip-h);
+    height: auto;
     min-height: var(--chip-h);
-    max-height: var(--chip-h);
+    max-height: none;
     background: none;
     border: 0;
     border-radius: 0;
@@ -3510,13 +3603,13 @@
     }
     .song-row {
       flex-wrap: nowrap;
-      height: var(--chip-h);
+      height: auto;
       min-height: var(--chip-h);
-      max-height: var(--chip-h);
+      max-height: none;
       gap: 0;
       padding: 0;
       margin: 0;
-      overflow: hidden;
+      overflow: visible;
       line-height: var(--chip-h);
     }
     .song-name {
@@ -4097,9 +4190,17 @@ function normalizeSoloSong(song) {
   var src = song.licks || song.sections || [];
   var out = [];
   var i;
-  for (i = 0; i < src.length; i++) if (isChipPair(src[i])) out.push(src[i]);
+  /* Keep empty slots when section rulers exist so column spans stay put. */
+  var keepSlots = !!(song.sectionRulers && song.sectionRulers.length);
+  for (i = 0; i < src.length; i++) {
+    if (isChipPair(src[i])) out.push(src[i]);
+    else if (keepSlots) out.push(null);
+  }
   while (out.length < SONG_SLOTS) out.push(null);
-  return { song: song.song || "", licks: out };
+  var soloSong = { song: song.song || "", licks: out };
+  var soloRulers = copySectionRulersField(song);
+  if (soloRulers) soloSong.sectionRulers = soloRulers;
+  return soloSong;
 }
 function normalizeSoloMap(map, albumsFallback) {
   var base = blankSoloMapFromAlbums(albumsFallback || ALBUMS_DEFAULT);
@@ -4277,7 +4378,10 @@ function normalizeArrangementSong(song) {
   var i;
   for (i = 0; i < src.length; i++) out.push(isChipPair(src[i]) ? src[i] : null);
   while (out.length < SONG_SLOTS) out.push(null);
-  return { song: song.song || "", chips: out };
+  var arrSong = { song: song.song || "", chips: out };
+  var arrRulers = copySectionRulersField(song);
+  if (arrRulers) arrSong.sectionRulers = arrRulers;
+  return arrSong;
 }
 function normalizeArrangementMap(map, albumsFallback) {
   var base = blankArrangementMapFromAlbums(albumsFallback || ALBUMS_DEFAULT);
@@ -5756,6 +5860,446 @@ function forceTomorrowDreamSongMapChips(albums) {
     });
   });
 }
+/* Song-section rulers: inclusive chip columns on the song of the map on screen.
+   Overlaps clamp — a ruler never takes a chip another ruler already claims. */
+function readSectionRulers(song) {
+  var raw = (song && song.sectionRulers) || [];
+  if (!Array.isArray(raw)) return [];
+  var out = [];
+  var taken = {};
+  raw.forEach(function(r){
+    if (!r) return;
+    var start = parseInt(r.start, 10);
+    var end = parseInt(r.end, 10);
+    if (!isFinite(start) || !isFinite(end)) return;
+    if (start < 0) start = 0;
+    if (end < start) return;
+    while (start <= end && taken[start]) start++;
+    while (end >= start && taken[end]) end--;
+    if (end < start) return;
+    for (var c = start; c <= end; c++) {
+      if (taken[c]) { end = c - 1; break; }
+    }
+    if (end < start) return;
+    for (var c2 = start; c2 <= end; c2++) taken[c2] = true;
+    var name = String(r.name == null ? "" : r.name).replace(/\s+/g, " ").trim();
+    out.push({ name: name, start: start, end: end });
+  });
+  return out;
+}
+function copySectionRulersField(song) {
+  var list = readSectionRulers(song);
+  if (!list.length) return null;
+  return list.map(function(r){ return { name: r.name, start: r.start, end: r.end }; });
+}
+function storeSectionRulers(song, rulers) {
+  if (!song) return;
+  var clean = [];
+  (rulers || []).forEach(function(r){
+    if (!r) return;
+    var start = r.start | 0;
+    var end = r.end | 0;
+    if (end < start || start < 0) return;
+    clean.push({ name: String(r.name == null ? "" : r.name).replace(/\s+/g, " ").trim(), start: start, end: end });
+  });
+  clean.sort(function(a, b){ return a.start - b.start || a.end - b.end; });
+  if (clean.length) song.sectionRulers = clean;
+  else delete song.sectionRulers;
+}
+function sectionRulerCellsTaken(rulers, except) {
+  var taken = {};
+  (rulers || []).forEach(function(r, i){
+    if (i === except || !r) return;
+    for (var c = r.start; c <= r.end; c++) taken[c] = true;
+  });
+  return taken;
+}
+function clampSectionRulerCreate(rulers, anchor, other) {
+  var taken = sectionRulerCellsTaken(rulers, -1);
+  if (taken[anchor]) return null;
+  var a = Math.min(anchor, other);
+  var b = Math.max(anchor, other);
+  var start = anchor;
+  var end = anchor;
+  while (start > a && !taken[start - 1]) start--;
+  while (end < b && !taken[end + 1]) end++;
+  return { start: start, end: end };
+}
+function clampSectionRulerEdge(rulers, ri, edge, next) {
+  var r = rulers[ri];
+  if (!r) return null;
+  var taken = sectionRulerCellsTaken(rulers, ri);
+  var start = r.start;
+  var end = r.end;
+  if (edge === "start") {
+    if (next > end) next = end;
+    if (next < 0) next = 0;
+    if (next < start) {
+      var grown = start;
+      while (grown > next && !taken[grown - 1]) grown--;
+      next = grown;
+    }
+    start = next;
+  } else {
+    if (next < start) next = start;
+    if (next > end) {
+      for (var c2 = end + 1; c2 <= next; c2++) {
+        if (taken[c2]) { next = c2 - 1; break; }
+      }
+    }
+    end = next;
+  }
+  if (end < start) return { start: r.start, end: r.end };
+  return { start: start, end: end };
+}
+function sectionRulerDrawRange(start, end) {
+  var s = start;
+  var e = end;
+  if (!arrangementMode && soloMode && soloColsCollapsed) {
+    var last = SOLO_COL_GROUP_START - 2;
+    if (s > last) return null;
+    if (e > last) e = last;
+  }
+  if (e < s) return null;
+  return { start: s, end: e };
+}
+function sectionRulerLaneHtml(song, maxCols) {
+  var rulers = readSectionRulers(song);
+  var edit = sectionsMode === "edit";
+  var parts = [];
+  var visible = 0;
+  var i;
+  for (i = 0; i < rulers.length; i++) {
+    var draw = sectionRulerDrawRange(rulers[i].start, rulers[i].end);
+    if (!draw) continue;
+    visible++;
+    var label = rulers[i].name || "Section";
+    var esc = songMetaEscapeAttr(label);
+    var style = "--sr-i:"+draw.start+";--sr-n:"+(draw.end - draw.start + 1)+";";
+    if (edit) {
+      parts.push('<div class="song-sec-ruler" tabindex="0" data-ri="'+i+'" data-start="'+rulers[i].start+'" data-end="'+rulers[i].end+'" style="'+style+'">'
+        + '<button type="button" class="song-sec-grip" data-edge="start" aria-label="Resize section start"></button>'
+        + '<button type="button" class="song-sec-name">'+esc+'</button>'
+        + '<button type="button" class="song-sec-x" aria-label="Delete section ruler" title="Delete ruler">×</button>'
+        + '<button type="button" class="song-sec-grip" data-edge="end" aria-label="Resize section end"></button>'
+        + '</div>');
+    } else {
+      parts.push('<div class="song-sec-ruler" data-ri="'+i+'" style="'+style+'" title="'+esc+'"><span class="song-sec-name">'+esc+'</span></div>');
+    }
+  }
+  if (!edit && !visible) return "";
+  var tip = edit ? ' title="Drag across chips to add a section"' : "";
+  return '<div class="song-sec-lane" data-cols="'+maxCols+'"'+tip+'>'+parts.join("")+'</div>';
+}
+function pushSectionRulerHistory() {
+  if (arrangementMode) pushArrangementHistory();
+  else if (soloMode) pushSoloHistory();
+  else pushAlbumHistory();
+}
+function popSectionRulerHistory() {
+  if (arrangementMode) {
+    if (arrangementHistory.length) arrangementHistory.pop();
+    arrangementDirty = arrangementHistory.length > 0;
+  } else if (soloMode) {
+    if (soloHistory.length) soloHistory.pop();
+    soloDirty = soloHistory.length > 0;
+  } else {
+    if (albumHistory.length) albumHistory.pop();
+    albumsDirty = albumHistory.length > 0;
+  }
+  if (typeof updateEditSaveUi === "function") updateEditSaveUi();
+}
+function revertLastSectionRulerHistory() {
+  if (arrangementMode && arrangementHistory.length) {
+    ARRANGEMENT_MAP = arrangementHistory.pop();
+    saveArrangementMap();
+  } else if (soloMode && soloHistory.length) {
+    SOLO_MAP = soloHistory.pop();
+    saveSoloMap();
+  } else if (albumHistory.length) {
+    ALBUMS = albumHistory.pop();
+    saveAlbums();
+  }
+  showSections(true);
+}
+function saveSectionRulers(songName) {
+  var opts = { reason: "section-rulers", song: songName || "section rulers" };
+  if (arrangementMode) saveArrangementMap();
+  else if (soloMode) saveSoloMap();
+  else saveAlbums();
+  if (typeof window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES === "function") {
+    window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES(opts);
+  }
+}
+function sectionLaneMetrics(lane) {
+  var wrap = lane.closest(".sections-wrap") || document.querySelector("#sectionsSheet .sections-wrap");
+  var chipW = 48;
+  if (wrap) {
+    var parsed = parseFloat(getComputedStyle(wrap).getPropertyValue("--chip-w"));
+    if (parsed && isFinite(parsed)) chipW = parsed;
+  }
+  var rect = lane.getBoundingClientRect();
+  var cols = parseInt(lane.getAttribute("data-cols"), 10);
+  if (!cols || cols < 1) cols = 1;
+  return { chipW: chipW, left: rect.left, cols: cols };
+}
+function sectionIndexAt(metrics, clientX) {
+  var i = Math.floor((clientX - metrics.left) / metrics.chipW);
+  if (i < 0) i = 0;
+  if (i > metrics.cols - 1) i = metrics.cols - 1;
+  return i;
+}
+function paintSectionRulerEl(el, start, end) {
+  var draw = sectionRulerDrawRange(start, end) || { start: start, end: end };
+  el.style.setProperty("--sr-i", String(draw.start));
+  el.style.setProperty("--sr-n", String(draw.end - draw.start + 1));
+  el.setAttribute("data-start", String(start));
+  el.setAttribute("data-end", String(end));
+}
+var sectionRulerDrag = null;
+var suppressSectionRulerClick = false;
+function endSectionRulerDrag(e, cancelled) {
+  document.removeEventListener("pointermove", onSectionRulerPointerMove);
+  document.removeEventListener("pointerup", onSectionRulerPointerUp);
+  document.removeEventListener("pointercancel", onSectionRulerPointerUp);
+  var drag = sectionRulerDrag;
+  sectionRulerDrag = null;
+  if (!drag) return;
+  if (drag.el && drag.pointerId != null) {
+    try { drag.el.releasePointerCapture(drag.pointerId); } catch (errRel) {}
+  }
+  if (cancelled || !drag.armed) {
+    if (drag.draft && drag.draft.parentNode) drag.draft.parentNode.removeChild(drag.draft);
+    if (drag.type === "resize") {
+      var song0 = getEditSong(drag.ai, drag.si);
+      if (song0 && drag.before) song0.sectionRulers = drag.before;
+      popSectionRulerHistory();
+    }
+    return;
+  }
+  suppressSectionRulerClick = true;
+  setTimeout(function(){ suppressSectionRulerClick = false; }, 0);
+  if (drag.type === "create") {
+    if (drag.draft && drag.draft.parentNode) drag.draft.parentNode.removeChild(drag.draft);
+    var songC = getEditSong(drag.ai, drag.si);
+    if (!songC) return;
+    var rulersC = readSectionRulers(songC);
+    var span = clampSectionRulerCreate(rulersC, drag.anchor, drag.index);
+    if (!span) return;
+    pushSectionRulerHistory();
+    if (span.end >= 0) growSongSlotsTo(songC, span.end);
+    rulersC.push({ name: "Section", start: span.start, end: span.end });
+    storeSectionRulers(songC, rulersC);
+    saveSectionRulers(songC.song);
+    showSections(true);
+    openFreshSectionRulerRename(drag.ai, drag.si, span.start, span.end);
+    return;
+  }
+  var songR = getEditSong(drag.ai, drag.si);
+  if (!songR) return;
+  var changed = !drag.before || drag.before.length !== (songR.sectionRulers || []).length;
+  if (!changed && drag.before) {
+    var now = songR.sectionRulers || [];
+    for (var i = 0; i < drag.before.length; i++) {
+      if (!now[i] || now[i].start !== drag.before[i].start || now[i].end !== drag.before[i].end || now[i].name !== drag.before[i].name) {
+        changed = true;
+        break;
+      }
+    }
+  }
+  if (!changed) {
+    popSectionRulerHistory();
+    return;
+  }
+  var far = 0;
+  (songR.sectionRulers || []).forEach(function(r){ if (r && r.end > far) far = r.end; });
+  growSongSlotsTo(songR, far);
+  storeSectionRulers(songR, readSectionRulers(songR));
+  saveSectionRulers(songR.song);
+  showSections(true);
+}
+function onSectionRulerPointerMove(e) {
+  var drag = sectionRulerDrag;
+  if (!drag || e.pointerId !== drag.pointerId) return;
+  if (sectionsMode !== "edit") { endSectionRulerDrag(e, true); return; }
+  var index = sectionIndexAt(drag.metrics, e.clientX);
+  var dx = e.clientX - drag.startX;
+  if (!drag.armed && Math.abs(dx) < 4 && index === drag.anchor) return;
+  drag.armed = true;
+  drag.index = index;
+  e.preventDefault();
+  if (drag.type === "create") {
+    var song = getEditSong(drag.ai, drag.si);
+    var span = song ? clampSectionRulerCreate(readSectionRulers(song), drag.anchor, index) : null;
+    if (!span) {
+      if (drag.draft) drag.draft.style.display = "none";
+      drag.span = null;
+      return;
+    }
+    drag.span = span;
+    if (!drag.draft) {
+      drag.draft = document.createElement("div");
+      drag.draft.className = "song-sec-ruler is-draft";
+      drag.lane.appendChild(drag.draft);
+    }
+    drag.draft.style.display = "";
+    paintSectionRulerEl(drag.draft, span.start, span.end);
+    return;
+  }
+  var songE = getEditSong(drag.ai, drag.si);
+  if (!songE || !songE.sectionRulers || !songE.sectionRulers[drag.ri]) return;
+  var next = clampSectionRulerEdge(songE.sectionRulers, drag.ri, drag.edge, index);
+  if (!next) return;
+  songE.sectionRulers[drag.ri].start = next.start;
+  songE.sectionRulers[drag.ri].end = next.end;
+  if (drag.rulerEl) paintSectionRulerEl(drag.rulerEl, next.start, next.end);
+}
+function onSectionRulerPointerUp(e) {
+  if (!sectionRulerDrag || e.pointerId !== sectionRulerDrag.pointerId) return;
+  endSectionRulerDrag(e, e.type === "pointercancel");
+}
+function beginSectionRulerPointer(e, lane, kind) {
+  sectionRulerDrag = kind;
+  kind.startX = e.clientX;
+  kind.pointerId = e.pointerId;
+  kind.lane = lane;
+  kind.metrics = sectionLaneMetrics(lane);
+  kind.armed = false;
+  kind.el = lane;
+  try { lane.setPointerCapture(e.pointerId); } catch (errCap) {}
+  document.addEventListener("pointermove", onSectionRulerPointerMove, { passive: false });
+  document.addEventListener("pointerup", onSectionRulerPointerUp);
+  document.addEventListener("pointercancel", onSectionRulerPointerUp);
+}
+function openFreshSectionRulerRename(ai, si, start, end) {
+  var row = document.querySelector('#sectionsSheet .song-row[data-ai="'+ai+'"][data-si="'+si+'"]');
+  if (!row) return;
+  var target = null;
+  row.querySelectorAll(".song-sec-ruler").forEach(function(el){
+    if (el.getAttribute("data-start") === String(start) && el.getAttribute("data-end") === String(end)) target = el;
+  });
+  if (!target) return;
+  target.setAttribute("data-fresh", "1");
+  var nameBtn = target.querySelector(".song-sec-name");
+  if (nameBtn) beginSectionRulerRename(nameBtn);
+}
+function beginSectionRulerRename(nameBtn) {
+  var ruler = nameBtn.closest(".song-sec-ruler");
+  var row = nameBtn.closest(".song-row");
+  if (!ruler || !row || ruler.querySelector("input.song-sec-name")) return;
+  var fresh = ruler.getAttribute("data-fresh") === "1";
+  var ai = parseInt(row.getAttribute("data-ai"), 10);
+  var si = parseInt(row.getAttribute("data-si"), 10);
+  var ri = parseInt(ruler.getAttribute("data-ri"), 10);
+  var oldName = nameBtn.textContent || "";
+  var input = document.createElement("input");
+  input.className = "song-sec-name";
+  input.type = "text";
+  input.maxLength = 48;
+  input.value = oldName;
+  input.setAttribute("aria-label", "Section name");
+  nameBtn.replaceWith(input);
+  input.focus();
+  input.select();
+  var settled = false;
+  function finish(cancel) {
+    if (settled) return;
+    settled = true;
+    var song = getEditSong(ai, si);
+    var rulers = song ? readSectionRulers(song) : [];
+    var current = rulers[ri];
+    if (!song || !current) return;
+    if (cancel || !String(input.value || "").trim()) {
+      if (fresh) {
+        revertLastSectionRulerHistory();
+        return;
+      }
+      var keep = document.createElement("button");
+      keep.type = "button";
+      keep.className = "song-sec-name";
+      keep.textContent = current.name || "Section";
+      if (input.parentNode) input.replaceWith(keep);
+      return;
+    }
+    var nextName = String(input.value || "").replace(/\s+/g, " ").trim();
+    if (nextName === current.name) {
+      ruler.removeAttribute("data-fresh");
+      var same = document.createElement("button");
+      same.type = "button";
+      same.className = "song-sec-name";
+      same.textContent = current.name || "Section";
+      if (input.parentNode) input.replaceWith(same);
+      return;
+    }
+    pushSectionRulerHistory();
+    current.name = nextName;
+    storeSectionRulers(song, rulers);
+    saveSectionRulers(song.song);
+    showSections(true);
+  }
+  input.addEventListener("keydown", function(ev){
+    ev.stopPropagation();
+    if (ev.key === "Enter") { ev.preventDefault(); input.blur(); }
+    if (ev.key === "Escape") { ev.preventDefault(); finish(true); }
+  });
+  input.addEventListener("blur", function(){ finish(false); });
+  input.addEventListener("pointerdown", function(ev){ ev.stopPropagation(); });
+}
+function deleteSectionRulerAt(ai, si, ri) {
+  var song = getEditSong(ai, si);
+  if (!song) return;
+  var rulers = readSectionRulers(song);
+  if (!rulers[ri]) return;
+  pushSectionRulerHistory();
+  rulers.splice(ri, 1);
+  storeSectionRulers(song, rulers);
+  saveSectionRulers(song.song);
+  showSections(true);
+}
+function handleSectionRulerPointerDown(e) {
+  if (sectionsMode !== "edit") return false;
+  if (e.pointerType === "mouse" && e.button !== 0) return false;
+  if (e.target.closest(".song-sec-name") && e.target.tagName === "INPUT") return false;
+  var lane = e.target.closest(".song-sec-lane");
+  if (!lane) return false;
+  var editor = document.getElementById("chipEditor");
+  if (editor && editor.classList.contains("open")) return false;
+  var row = lane.closest(".song-row");
+  if (!row) return false;
+  var ai = parseInt(row.getAttribute("data-ai"), 10);
+  var si = parseInt(row.getAttribute("data-si"), 10);
+  var grip = e.target.closest(".song-sec-grip");
+  var ruler = e.target.closest(".song-sec-ruler");
+  if (grip && ruler) {
+    e.preventDefault();
+    e.stopPropagation();
+    var song = getEditSong(ai, si);
+    if (!song) return true;
+    var ri = parseInt(ruler.getAttribute("data-ri"), 10);
+    var rulers = readSectionRulers(song);
+    if (!rulers[ri]) return true;
+    song.sectionRulers = rulers;
+    pushSectionRulerHistory();
+    beginSectionRulerPointer(e, lane, {
+      type: "resize",
+      ai: ai,
+      si: si,
+      ri: ri,
+      edge: grip.getAttribute("data-edge") || "end",
+      anchor: sectionIndexAt(sectionLaneMetrics(lane), e.clientX),
+      rulerEl: ruler,
+      before: JSON.parse(JSON.stringify(rulers))
+    });
+    return true;
+  }
+  if (ruler) return false;
+  e.preventDefault();
+  e.stopPropagation();
+  var anchor = sectionIndexAt(sectionLaneMetrics(lane), e.clientX);
+  beginSectionRulerPointer(e, lane, { type: "create", ai: ai, si: si, anchor: anchor, index: anchor });
+  return true;
+}
+
 function showSections(keepScroll) {
   if (!albumsDirty) pullAlbumsFromStorage();
   /* Backfill Section↔Arrangement so chips like Cornucopia show in both modes */
@@ -5906,7 +6450,7 @@ function showSections(keepScroll) {
       }
       var nameTitle = (sectionsMode === "edit") ? ' title="Edit key, tuning, and BPM"' : "";
       var metaStrip = (sectionsMode === "view" && showMetaCols) ? songMetaStripHtml(s.song) : "";
-      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-secs">'+chips+'</div></div>';
+      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-chip-col">'+sectionRulerLaneHtml(s, maxCols)+'<div class="song-secs">'+chips+'</div></div></div>';
     }).join("");
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
@@ -6008,7 +6552,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=225";
+  var url = base + "?playboard=1&v=226";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6037,7 +6581,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=225") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=226") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -11145,7 +11689,46 @@ function onChipPointerUp(e) {
   endChipPointerDrag(false);
 }
 var sectionsSheetEl = document.getElementById("sectionsSheet");
+sectionsSheetEl.addEventListener("click", function(e){
+  if (suppressSectionRulerClick) {
+    suppressSectionRulerClick = false;
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+  if (sectionsMode !== "edit") return;
+  var xBtn = e.target.closest(".song-sec-x");
+  if (xBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    var xRuler = xBtn.closest(".song-sec-ruler");
+    var xRow = xBtn.closest(".song-row");
+    if (!xRuler || !xRow) return;
+    deleteSectionRulerAt(parseInt(xRow.getAttribute("data-ai"), 10), parseInt(xRow.getAttribute("data-si"), 10), parseInt(xRuler.getAttribute("data-ri"), 10));
+    return;
+  }
+  var nameBtn = e.target.closest(".song-sec-name");
+  if (nameBtn && nameBtn.tagName !== "INPUT") {
+    e.preventDefault();
+    e.stopPropagation();
+    beginSectionRulerRename(nameBtn);
+  }
+}, true);
+sectionsSheetEl.addEventListener("keydown", function(e){
+  if (sectionsMode !== "edit") return;
+  if (!e.target || !e.target.closest) return;
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+  var keyRuler = e.target.closest(".song-sec-ruler");
+  if (!keyRuler) return;
+  if (e.key !== "Delete" && e.key !== "Backspace") return;
+  e.preventDefault();
+  e.stopPropagation();
+  var keyRow = keyRuler.closest(".song-row");
+  if (!keyRow) return;
+  deleteSectionRulerAt(parseInt(keyRow.getAttribute("data-ai"), 10), parseInt(keyRow.getAttribute("data-si"), 10), parseInt(keyRuler.getAttribute("data-ri"), 10));
+});
 sectionsSheetEl.addEventListener("pointerdown", function(e){
+  if (handleSectionRulerPointerDown(e)) return;
   if (sectionsMode !== "edit") return;
   if (e.pointerType === "mouse" && e.button !== 0) return;
   var chip = e.target.closest(".sec-chip");

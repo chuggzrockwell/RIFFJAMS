@@ -365,7 +365,9 @@
     opts = opts || {};
     if (!TOKEN) {
       if (!opts.quiet && typeof window.setSaveStatus === "function") {
-        window.setSaveStatus("Times saved locally — connect GitHub in chip editor to sync to repo");
+        window.setSaveStatus(opts.reason === "section-rulers"
+          ? "Section rulers saved locally — connect GitHub in chip editor to sync to repo"
+          : "Times saved locally — connect GitHub in chip editor to sync to repo");
       }
       return { ok: false, reason: "no-token" };
     }
@@ -377,15 +379,21 @@
     try {
       var manifest = buildManifestWithArrangement();
       var songLabel = opts.song ? String(opts.song) : "arrangement";
-      var msg = "Sync arrangement times (" + songLabel + ")";
+      var isRulers = opts.reason === "section-rulers";
+      var msg = isRulers
+        ? "Sync song section rulers (" + songLabel + ")"
+        : "Sync arrangement times (" + songLabel + ")";
       if (!opts.quiet && typeof window.setSaveStatus === "function") {
-        window.setSaveStatus("Syncing start/stop times to GitHub…");
+        window.setSaveStatus(isRulers ? "Syncing section rulers to GitHub…" : "Syncing start/stop times to GitHub…");
       }
       await commitManifestOnly(manifest, msg);
       sharedData = manifest;
       if (!opts.quiet && typeof window.setSaveStatus === "function") {
-        var n = (manifest.arrangementTimings || []).length;
-        window.setSaveStatus("Times synced to repo (" + n + " timed song" + (n === 1 ? "" : "s") + ")");
+        if (isRulers) window.setSaveStatus("Section rulers synced to repo");
+        else {
+          var n = (manifest.arrangementTimings || []).length;
+          window.setSaveStatus("Times synced to repo (" + n + " timed song" + (n === 1 ? "" : "s") + ")");
+        }
       }
       return { ok: true, timings: manifest.arrangementTimings };
     } catch (error) {
