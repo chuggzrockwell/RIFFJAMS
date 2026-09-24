@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-24T01:53:33.337Z",
+  "updatedAt": "2026-09-24T01:54:34.457Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3550,6 +3550,16 @@
                 "name": "Verse 2",
                 "start": 2,
                 "end": 3
+              },
+              {
+                "name": "Solo",
+                "start": 4,
+                "end": 6
+              },
+              {
+                "name": "Section",
+                "start": 7,
+                "end": 7
               }
             ]
           },
