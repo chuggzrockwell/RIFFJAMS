@@ -6640,6 +6640,26 @@ function clearPlayQueue() {
     if (typeof syncPlayLibraryClasses === "function") syncPlayLibraryClasses();
   }
 }
+/** Remove every Board card whose lick class is kind (A–E). */
+function clearPlayQueueByKind(kind) {
+  var want = String(kind || "").toUpperCase();
+  if (!want) return;
+  var before = playQueue.length;
+  playQueue = playQueue.filter(function(item){
+    var id = (item && (item.lick || item.code)) || "";
+    return !(typeof lickKind === "function" ? lickKind(id) === want : false);
+  });
+  if (playQueue.length === before) return;
+  if (boardActiveKey && findPlayIndex(boardActiveKey) < 0) boardActiveKey = null;
+  publishPlayQueue();
+  if (typeof renderPlayBoard === "function") renderPlayBoard();
+  if (typeof syncAllPlaySelections === "function") syncAllPlaySelections();
+  else {
+    if (typeof syncPlayChipClasses === "function") syncPlayChipClasses();
+    if (typeof syncPlayLibraryClasses === "function") syncPlayLibraryClasses();
+  }
+  if (typeof updateBoardEntryMeta === "function") updateBoardEntryMeta();
+}
 function pullPlayQueue() {
   try {
     var raw = localStorage.getItem(PLAY_QUEUE_KEY);
@@ -6648,7 +6668,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=232";
+  var url = base + "?playboard=1&v=233";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6677,7 +6697,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=232") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=233") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -6811,6 +6831,14 @@ function initPlayboardPage() {
       e.preventDefault();
       e.stopImmediatePropagation();
       randomizePlayBoard();
+      return;
+    }
+    /* A–E: clear that lick class from the Board (A then B clears A, then B) */
+    if (!e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && /^[a-e]$/.test(k)) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      boardEntryBuf = "";
+      clearPlayQueueByKind(k.toUpperCase());
       return;
     }
     /* Escape clears buffer or closes — clear board with 0+Enter / Shift+C / Clear */
@@ -9054,8 +9082,8 @@ function renderPlayBoard() {
       meta.innerHTML = "Entry <strong>" + boardEntryBuf + "</strong> · " + boardEntryLabel(boardEntryBuf) + " · NP Enter to show";
     } else {
       meta.innerHTML = playQueue.length
-        ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · song[.class] + Enter · 0 clear")
-        : "Board — song[.class] + NP Enter · Z randomize · 0 / Shift+C clear · Esc close";
+        ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · A–E clear class · song[.class] + Enter · 0 clear")
+        : "Board — song[.class] + NP Enter · A–E clear class · Z randomize · 0 / Shift+C clear · Esc close";
     }
   }
   if (!visible.length) {
@@ -10776,8 +10804,8 @@ function updateBoardEntryMeta() {
     return;
   }
   meta.innerHTML = playQueue.length
-    ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · song[.class] + Enter · 0 clear")
-    : "Board — song[.class] + NP Enter · Z randomize · 0 / Shift+C clear · Esc close";
+    ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · A–E clear class · song[.class] + Enter · 0 clear")
+    : "Board — song[.class] + NP Enter · A–E clear class · Z randomize · 0 / Shift+C clear · Esc close";
 }
 /**
  * Board: queue Paranoid track licks. digit 1–8; optional classKind A–E.
