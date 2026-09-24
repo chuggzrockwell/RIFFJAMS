@@ -1832,7 +1832,7 @@
   }
   /* Song metadata sits between the nameplate and chips in View only. */
   body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta {
-    --song-meta-w: 300px;
+    --song-meta-w: 400px;
   }
   .song-meta-strip { display: none; }
   body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta .song-meta-strip {
@@ -5827,15 +5827,18 @@ function showSections(keepScroll) {
   var headLabel = arrangementMode ? "Arrange" : (soloMode ? "Lick" : "Section");
   var head = '<div class="sec-head"><div class="sec-head-label song">Song</div><div class="sec-head-label section">'+headLabel+'</div><div class="sec-head-label album">Album</div></div>';
   var anySongMeta = false;
+  var anySongRsi = false;
   if (sectionsMode === "view") {
+    anySongRsi = refreshSongRsiLabels();
     sourceAlbums.forEach(function(album){
       (album.songs || []).forEach(function(s){
         if (s && songHasVisibleMeta(s.song)) anySongMeta = true;
       });
     });
   }
-  var metaHeads = anySongMeta
-    ? '<span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-name" aria-hidden="true"></span><div class="song-meta-heads"><span>Key</span><span>Tuning</span><span>BPM</span></div>'
+  var showMetaCols = anySongMeta || anySongRsi;
+  var metaHeads = showMetaCols
+    ? '<span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-name" aria-hidden="true"></span><div class="song-meta-heads"><span>Key</span><span>Tuning</span><span>BPM</span><span>RSI</span></div>'
     : "";
   var ruler = '<div class="sec-ruler"><div class="row-num"></div>'+(metaHeads || '<div class="song-name-spacer" aria-hidden="true"></div>')+'<div class="song-secs">'+colNums+'</div></div>';
   var html = sourceAlbums.map(function(album, ai){
@@ -5902,7 +5905,7 @@ function showSections(keepScroll) {
         songsterrBtn = '<button type="button" class="song-songsterr" data-songsterr="'+stEsc+'" title="Songsterr: '+snEsc+'" aria-label="Open Songsterr tab for '+snEsc+'"><img src="covers/songsterr.png" alt=""></button>';
       }
       var nameTitle = (sectionsMode === "edit") ? ' title="Edit key, tuning, and BPM"' : "";
-      var metaStrip = (sectionsMode === "view" && anySongMeta) ? songMetaStripHtml(s.song) : "";
+      var metaStrip = (sectionsMode === "view" && showMetaCols) ? songMetaStripHtml(s.song) : "";
       return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-secs">'+chips+'</div></div>';
     }).join("");
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
@@ -5921,7 +5924,7 @@ function showSections(keepScroll) {
       + '</div>'
       + '</aside>'
     : "";
-  var wrapCls = (sectionsMode === "view" && anySongMeta) ? "sections-wrap has-song-meta" : "sections-wrap";
+  var wrapCls = (sectionsMode === "view" && showMetaCols) ? "sections-wrap has-song-meta" : "sections-wrap";
   document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="'+wrapCls+'">'+head+outline+ruler+html+'</div>'+nextCueHtml+'</div>';
   if (arrangementMode && typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
   var wrapEl = document.querySelector("#sectionsSheet .sections-wrap");
@@ -6005,7 +6008,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=223";
+  var url = base + "?playboard=1&v=224";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6034,7 +6037,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=223") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=224") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -8881,18 +8884,36 @@ function songHasVisibleMeta(songName) {
   var meta = readCanonicalSongMeta(songName);
   return !!(meta.keys.length || meta.tuning || meta.bpms.length);
 }
+var songRsiLabelByName = {};
+/** Scorable = every timed arrangement section has a duration. Uses buildArrangementTimings (tier points × duration / total duration). */
+function refreshSongRsiLabels() {
+  songRsiLabelByName = {};
+  var map = ARRANGEMENT_MAP;
+  if (!map) return false;
+  var any = false;
+  buildArrangementTimings(map).forEach(function(row){
+    if (!row || !row.song) return;
+    if (row.complete && row.riffSaturationIndex != null) {
+      songRsiLabelByName[row.song] = String(row.riffSaturationIndex);
+      any = true;
+    }
+  });
+  return any;
+}
 function songMetaStripHtml(songName) {
   var meta = readCanonicalSongMeta(songName);
   var keyText = meta.keys.join(" · ");
   var bpmText = meta.bpms.join(" · ");
+  var rsiText = songRsiLabelByName[songName] || "—";
   function bit(value) {
     return '<span class="song-meta-bit"><span class="song-meta-v">'+songMetaEscapeAttr(value || "—")+'</span></span>';
   }
-  var title = [keyText || "—", meta.tuning || "—", bpmText || "—"].join(" · ");
+  var title = [keyText || "—", meta.tuning || "—", bpmText || "—", rsiText].join(" · ");
   return '<div class="song-meta-strip" title="'+songMetaEscapeAttr(title)+'">'
     + bit(keyText)
     + bit(meta.tuning)
     + bit(bpmText)
+    + bit(rsiText)
     + '</div>';
 }
 function readSongMetaDraft(containerId) {
