@@ -1885,6 +1885,51 @@
     font-weight: 600;
     letter-spacing: 0;
   }
+  /* Column headers sit in the ruler, over the value plates — plates stay values-only.
+     Lead-in matches the row (number, cover, Songsterr, title) so the labels track those columns. */
+  .song-meta-heads { display: none; }
+  body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta .song-meta-head-gap {
+    flex: 0 0 calc(var(--chip-h) - 4px);
+    width: calc(var(--chip-h) - 4px);
+    min-width: calc(var(--chip-h) - 4px);
+    max-width: calc(var(--chip-h) - 4px);
+    margin: 0 4px 0 0;
+  }
+  body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta .song-meta-head-name {
+    flex: 0 1 auto;
+    width: calc(var(--name-w) - 2 * (var(--chip-h) - 4px) - 18px);
+    min-width: 0;
+    max-width: calc(var(--name-w) - 2 * (var(--chip-h) - 4px) - 18px);
+    margin: 0 8px 0 2px;
+  }
+  body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta .song-meta-heads {
+    display: flex;
+    box-sizing: border-box;
+    flex: 0 0 var(--song-meta-w);
+    width: var(--song-meta-w);
+    min-width: var(--song-meta-w);
+    max-width: var(--song-meta-w);
+    align-self: stretch;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0 8px 0 0;
+  }
+  .song-meta-heads span {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    white-space: nowrap;
+    color: #e8e6e1;
+    font-family: "Vol4 Title", "Impact", sans-serif;
+    font-size: 0.62rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
   .chip-attachment { margin: 2px 0 12px; }
   .chip-paste-actions { display: flex; gap: 7px; margin-bottom: 8px; }
   .chip-paste-button { flex: 1; border: 0; border-radius: 8px; padding: 9px 12px; background: #7030a0; color: #fff; font-size: .78rem; font-weight: 800; cursor: pointer; }
@@ -5781,7 +5826,6 @@ function showSections(keepScroll) {
   }
   var headLabel = arrangementMode ? "Arrange" : (soloMode ? "Lick" : "Section");
   var head = '<div class="sec-head"><div class="sec-head-label song">Song</div><div class="sec-head-label section">'+headLabel+'</div><div class="sec-head-label album">Album</div></div>';
-  var ruler = '<div class="sec-ruler"><div class="row-num"></div><div class="song-name-spacer" aria-hidden="true"></div><div class="song-secs">'+colNums+'</div></div>';
   var anySongMeta = false;
   if (sectionsMode === "view") {
     sourceAlbums.forEach(function(album){
@@ -5790,6 +5834,10 @@ function showSections(keepScroll) {
       });
     });
   }
+  var metaHeads = anySongMeta
+    ? '<span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-name" aria-hidden="true"></span><div class="song-meta-heads"><span>Key</span><span>Tuning</span><span>BPM</span></div>'
+    : "";
+  var ruler = '<div class="sec-ruler"><div class="row-num"></div>'+(metaHeads || '<div class="song-name-spacer" aria-hidden="true"></div>')+'<div class="song-secs">'+colNums+'</div></div>';
   var html = sourceAlbums.map(function(album, ai){
     var rows = (album.songs || []).map(function(s, si){
       rowN += 1;
@@ -5957,7 +6005,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=222";
+  var url = base + "?playboard=1&v=223";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -5986,7 +6034,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=222") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=223") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
