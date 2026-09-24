@@ -6668,7 +6668,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=233";
+  var url = base + "?playboard=1&v=234";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6697,7 +6697,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=233") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=234") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -9939,7 +9939,7 @@ var CATALOG = [
   ["LFT-1A","A"],["LFT-2A","A"],["LFT-3A","A"],["LFT-4A","A"],["LFT-5A","A"],
   ["KYTL-1A","A"],["KYTL-2A","A"],
   ["KYTL2-3A","A"],["KYTL2-4A","A"],["KYTL2-5A","A"],["KYTL2-6A","A"],["KYTL2-7A","A"],
-  ["IM-1-1A","B"],["IM-1-2A","B"],["IM-1-3A","B"],["IM-1-4A","B"],
+  ["IM-1-1A","B"],["IM-1-2A","B"],["IM-1-3A","B"],["IM-1-4A","B"],["IM-1-5A","B"],
   ["IM-1-1B","B"],["IM-1-2B","B"],
   ["IM-2-1B","B"],["IM-2-2B","B"],["IM-2-3B","B"],["IM-2-4B","B"],["IM-2-5B","B"],
   ["P-1A","B"],["P-1B","B"],["P-2B","B"],["P-3B","B"],["P-4B","B"],
