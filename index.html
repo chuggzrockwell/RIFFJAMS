@@ -6648,7 +6648,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=231";
+  var url = base + "?playboard=1&v=232";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6677,7 +6677,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=231") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=232") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -7399,6 +7399,9 @@ function smIsAudioLeader() {
   return !!smAudioLeaderTab && smAudioLeaderTab === smTabId;
 }
 function smClaimAudioLeader() {
+  /* Playboard is a cue board only — never steal audible leadership from Song Map
+     (focus/click on empty black space used to pause the Song Map player). */
+  if (typeof isPlayboardPage === "function" && isPlayboardPage()) return;
   smAudioLeaderTab = smTabId;
   var payload = { type: "sm-audio-leader", tab: smTabId, ts: Date.now() };
   try { localStorage.setItem(SM_AUDIO_LEADER_KEY, JSON.stringify(payload)); } catch (errL) {}
