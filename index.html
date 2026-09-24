@@ -6668,7 +6668,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=235";
+  var url = base + "?playboard=1&v=236";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6697,7 +6697,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=235") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=236") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -6775,7 +6775,7 @@ function initPlayboardPage() {
     + '<button type="button" class="sec-play-clear" id="secPlayRandomize" title="Shuffle Board order (Z)">Randomize</button>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or 0 then Enter)">Clear</button>'
     + '</div>'
-    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to press it in · click again to remove · song[.class]+Enter to add.</div></div>'
+    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to remove · song[.class]+Enter to add.</div></div>'
     + '</aside></div></div>';
   pullPlayQueue();
   trimPlayQueueToFit();
@@ -6788,16 +6788,11 @@ function initPlayboardPage() {
     if (!playCard) return;
     var key = playCard.getAttribute("data-key");
     if (!key) return;
-    /* First click activates (pressed); click active again to remove */
-    if (boardActiveKey === key) {
-      var idx = findPlayIndex(key);
-      if (idx >= 0) playQueue.splice(idx, 1);
-      boardActiveKey = null;
-      publishPlayQueue();
-      renderPlayBoard();
-      return;
-    }
-    boardActiveKey = key;
+    /* Single click removes the lick from the Board */
+    var idx = findPlayIndex(key);
+    if (idx >= 0) playQueue.splice(idx, 1);
+    if (boardActiveKey === key) boardActiveKey = null;
+    publishPlayQueue();
     renderPlayBoard();
   };
   var randBtn = document.getElementById("secPlayRandomize");
@@ -11985,17 +11980,13 @@ document.getElementById("sectionsSheet").onclick = function(e){
   if (playCard && sectionsMode === "play") {
     var key = playCard.getAttribute("data-key");
     if (!key) return;
-    if (boardActiveKey === key) {
-      var idx = findPlayIndex(key);
-      if (idx >= 0) playQueue.splice(idx, 1);
-      boardActiveKey = null;
-      publishPlayQueue();
-      renderPlayBoard();
-      syncPlayChipClasses();
-    } else {
-      boardActiveKey = key;
-      renderPlayBoard();
-    }
+    /* Single click removes the lick from the Board */
+    var idx = findPlayIndex(key);
+    if (idx >= 0) playQueue.splice(idx, 1);
+    if (boardActiveKey === key) boardActiveKey = null;
+    publishPlayQueue();
+    renderPlayBoard();
+    syncPlayChipClasses();
     return;
   }
   var chip = e.target.closest(".sec-chip");
