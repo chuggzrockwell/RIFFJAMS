@@ -6427,7 +6427,9 @@ function showSections(keepScroll) {
     + (sectionsMode === "edit" ? " sections-edit" : "")
     + (sectionsMode === "play" ? " sections-play" : "")
     + (arrangementMode ? " sections-arrange" : "")
-    + (!arrangementMode && soloMode ? " sections-solo" : "");
+    + (!arrangementMode && soloMode ? " sections-solo" : "")
+    + (!sectionRulersOn ? " section-rulers-off" : "")
+    + (highlightMode ? " sec-peek-on" : "");
   document.getElementById("home").className = "hidden";
   document.getElementById("series").className = "hidden";
   document.getElementById("sections").className = "";
