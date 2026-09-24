@@ -2865,7 +2865,7 @@
     align-items: stretch;
     background: #fff;
     color: #000;
-    border: 1px solid rgba(0,0,0,.35);
+    border: 1px solid #000;
     border-bottom: 2px solid #000;
     border-radius: 3px 3px 0 0;
     overflow: hidden;
@@ -2906,7 +2906,7 @@
     width: 6px;
     border: 0;
     padding: 0;
-    background: rgba(0,0,0,.18);
+    background: #fff;
     cursor: ew-resize;
   }
   .song-sec-x {
@@ -6552,7 +6552,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=227";
+  var url = base + "?playboard=1&v=228";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6581,7 +6581,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=227") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=228") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
