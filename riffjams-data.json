@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-24T01:45:54.486Z",
+  "updatedAt": "2026-09-24T01:49:47.820Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3770,9 +3770,19 @@
             ],
             "sectionRulers": [
               {
-                "name": "Section",
+                "name": "verse 1",
                 "start": 0,
                 "end": 2
+              },
+              {
+                "name": "verse 2",
+                "start": 3,
+                "end": 5
+              },
+              {
+                "name": "Bridge",
+                "start": 6,
+                "end": 11
               }
             ]
           },
