@@ -148,6 +148,8 @@
   body.sections-mode #sections > .bar .badge,
   body.sections-mode #secModes .sec-mode-btn,
   body.sections-mode #secModes .map-mode-dd > select,
+  body.sections-mode #secModes .map-tools-btn,
+  body.sections-mode #secModes .map-tools-item,
   body.sections-mode #secModes .sec-tool-btn,
   body.sections-mode #secFilters .filter-dd-toggle,
   body.sections-mode #secFilters .sec-filter-clear {
@@ -286,16 +288,59 @@
     background: #111; color: #fff; border-color: #111;
   }
   .map-mode-dd, .board-mode-dd { position: relative; flex: 0 0 auto; display: inline-flex; align-items: center; }
-  .map-mode-dd > select, .board-mode-dd > select {
+  .map-mode-dd > select, .board-mode-dd > select, .map-tools-btn {
     appearance: none; -webkit-appearance: none; margin: 0;
     padding: 5px 28px 5px 12px; border-radius: 999px;
     border: 1px solid #3a3f4d; background: #1a1d26;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ffffff' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 10px center;
     color: #e8e6e1; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+    font-family: inherit; line-height: normal;
   }
-  body.sections-mode .map-mode-dd > select {
+  body.sections-mode .map-mode-dd > select,
+  body.sections-mode .map-tools-btn {
     border-color: #2c3040; background-color: #12141a; color: #fff;
+  }
+  .map-tools-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 80;
+    min-width: 148px;
+    background: #161920;
+    border: 1px solid #2c3040;
+    border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(0,0,0,.55);
+    padding: 4px;
+  }
+  .map-tools-dd.open .map-tools-menu { display: flex; flex-direction: column; gap: 2px; }
+  .map-tools-item {
+    appearance: none;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border: 0;
+    background: transparent;
+    background-image: none;
+    color: #e8e6e1;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: left;
+    padding: 6px 12px 6px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    line-height: 1.2;
+  }
+  .map-tools-item:hover { background: rgba(255,255,255,.06); }
+  .map-tools-item.on { color: #fff; }
+  .map-tools-item.on::before {
+    content: "✓";
+    position: absolute;
+    left: 10px;
+    font-weight: 700;
   }
   #series .board-mode-dd > select {
     border-radius: 999px; padding: 5px 28px 5px 12px;
@@ -2854,6 +2899,12 @@
     background: rgba(255,255,255,.05);
     touch-action: none;
   }
+  /* Rulers off: no lane, so song chip rows pack the way they did before rulers. */
+  body.section-rulers-off .song-sec-lane {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+  }
   .song-sec-ruler {
     position: absolute;
     top: 0;
@@ -3853,7 +3904,7 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Play · 5 Peek · 6 cycles Arrangement → Riff → Solo · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Play · 5 Peek · 6 cycles Arrangement → Riff → Solo · 7 Rulers · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
@@ -3862,11 +3913,17 @@
       <label class="map-mode-dd" title="View">
         <select id="mapModeSelect" aria-label="View">
           <option value="arrangement">Arrangement</option>
-          <option value="solo">Solo mode</option>
-          <option value="riff" selected>Riff mode</option>
+          <option value="solo">Solo</option>
+          <option value="riff" selected>Riff</option>
         </select>
       </label>
-      <button type="button" class="sec-mode-btn" id="secPeekBtn" aria-pressed="false" title="Hover chips to peek tabs">Peek</button>
+      <div class="map-mode-dd map-tools-dd" id="mapToolsDd">
+        <button type="button" class="map-tools-btn" id="mapToolsBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="mapToolsMenu" title="Tools">Tools</button>
+        <div class="map-tools-menu" id="mapToolsMenu" role="menu">
+          <button type="button" class="map-tools-item" id="secPeekBtn" role="menuitemcheckbox" aria-checked="false" title="Hover chips to peek tabs">Peek</button>
+          <button type="button" class="map-tools-item" id="secRulersBtn" role="menuitemcheckbox" aria-checked="false" title="Show section rulers">Rulers</button>
+        </div>
+      </div>
       <span class="sec-edit-tools" id="secEditTools" hidden>
         <button type="button" class="sec-tool-btn" id="secUndoBtn" title="Undo (Ctrl+Z)">Undo</button>
         <button type="button" class="sec-tool-btn primary" id="secSaveBtn" title="Save (Ctrl+S)">Save</button>
@@ -3955,8 +4012,8 @@
       <label class="board-mode-dd" title="View">
         <select id="llBoardMode" aria-label="View">
           <option value="arrangement">Arrangement</option>
-          <option value="solo">Solo mode</option>
-          <option value="riff" selected>Riff mode</option>
+          <option value="solo">Solo</option>
+          <option value="riff" selected>Riff</option>
         </select>
       </label>
       <div class="ll-filters" id="llFilters" aria-label="Filter lick library" hidden>
@@ -5860,6 +5917,44 @@ function forceTomorrowDreamSongMapChips(albums) {
     });
   });
 }
+/* Song Map Tools → Rulers. Same localStorage on/off pattern as arrangement mode. Default on. */
+var SECTION_RULERS_KEY = "riffjams-section-rulers";
+var sectionRulersOn = true;
+try {
+  var _sru = localStorage.getItem(SECTION_RULERS_KEY);
+  if (_sru === "0") sectionRulersOn = false;
+} catch (eSr) {}
+function syncSectionRulersUi() {
+  document.body.classList.toggle("section-rulers-off", !sectionRulersOn);
+  var btn = document.getElementById("secRulersBtn");
+  if (!btn) return;
+  btn.classList.toggle("on", sectionRulersOn);
+  btn.setAttribute("aria-checked", sectionRulersOn ? "true" : "false");
+}
+function setSectionRulers(on) {
+  var next = !!on;
+  if (next === sectionRulersOn) {
+    syncSectionRulersUi();
+    return;
+  }
+  if (!next && sectionRulerDrag) endSectionRulerDrag(null, true);
+  sectionRulersOn = next;
+  try { localStorage.setItem(SECTION_RULERS_KEY, sectionRulersOn ? "1" : "0"); } catch (eSrSet) {}
+  syncSectionRulersUi();
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden")) showSections(true);
+}
+function setMapToolsOpen(open) {
+  var dd = document.getElementById("mapToolsDd");
+  var btn = document.getElementById("mapToolsBtn");
+  if (dd) dd.classList.toggle("open", !!open);
+  if (btn) btn.setAttribute("aria-expanded", open ? "true" : "false");
+}
+function mapToolsIsOpen() {
+  var dd = document.getElementById("mapToolsDd");
+  return !!(dd && dd.classList.contains("open"));
+}
+syncSectionRulersUi();
 /* Song-section rulers: inclusive chip columns on the song of the map on screen.
    Overlaps clamp — a ruler never takes a chip another ruler already claims. */
 function readSectionRulers(song) {
@@ -5964,6 +6059,7 @@ function sectionRulerDrawRange(start, end) {
   return { start: s, end: e };
 }
 function sectionRulerLaneHtml(song, maxCols) {
+  if (!sectionRulersOn) return "";
   var rulers = readSectionRulers(song);
   var edit = sectionsMode === "edit";
   var parts = [];
@@ -6331,7 +6427,9 @@ function showSections(keepScroll) {
     + (sectionsMode === "edit" ? " sections-edit" : "")
     + (sectionsMode === "play" ? " sections-play" : "")
     + (arrangementMode ? " sections-arrange" : "")
-    + (!arrangementMode && soloMode ? " sections-solo" : "");
+    + (!arrangementMode && soloMode ? " sections-solo" : "")
+    + (!sectionRulersOn ? " section-rulers-off" : "")
+    + (highlightMode ? " sec-peek-on" : "");
   document.getElementById("home").className = "hidden";
   document.getElementById("series").className = "hidden";
   document.getElementById("sections").className = "";
@@ -6552,7 +6650,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=228";
+  var url = base + "?playboard=1&v=229";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6581,7 +6679,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=228") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=229") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -6653,8 +6751,8 @@ function initPlayboardPage() {
     + '<div class="sec-play-toolbar">'
     + '<label class="board-mode-dd" title="Riff / Solo">'
     + '<select id="boardModeSelect" aria-label="Mode">'
-    + '<option value="riff">Riff mode</option>'
-    + '<option value="solo">Solo mode</option>'
+    + '<option value="riff">Riff</option>'
+    + '<option value="solo">Solo</option>'
     + '</select></label>'
     + '<button type="button" class="sec-play-clear" id="secPlayRandomize" title="Shuffle Board order (Z)">Randomize</button>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or 0 then Enter)">Clear</button>'
@@ -7085,14 +7183,14 @@ function setSectionsMode(mode) {
     if (arrangementMode) {
       if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
       else if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-      else keys.textContent = "Arrangement · Peek · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Arrangement · Peek · 7 Rulers · 0 clear filters · Esc closes chip edit · Backspace home";
     } else if (soloMode) {
-      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 5 Peek · 6 cycles View · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
-      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-      else keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 0 clear filters · Esc closes chip edit · Backspace home";
-    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
-    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-    else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
+      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 5 Peek · 6 cycles View · 7 Rulers · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
+      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 7 Rulers · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 7 Rulers · 0 clear filters · Esc closes chip edit · Backspace home";
+    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · 7 Rulers · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · 7 Rulers · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+    else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · 7 Rulers · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
   }
   if (sectionsMode === "play") {
     /* Stay on Song Map. Next/Current cues are the playalong UI; Playboard is a separate entry. */
@@ -8791,6 +8889,7 @@ function setHighlightMode(on) {
   if (btn) {
     btn.classList.toggle("on", highlightMode);
     btn.setAttribute("aria-pressed", highlightMode ? "true" : "false");
+    btn.setAttribute("aria-checked", highlightMode ? "true" : "false");
   }
   if (!highlightMode) hideHighlightTip();
 }
@@ -11316,6 +11415,10 @@ document.addEventListener("click", function(e){
   if (e.target.closest(".filter-dd")) return;
   document.querySelectorAll(".filter-dd.open").forEach(function(el){ el.classList.remove("open"); });
 });
+document.addEventListener("click", function(e){
+  if (e.target.closest && e.target.closest("#mapToolsDd")) return;
+  setMapToolsOpen(false);
+});
 
 document.getElementById("secModes").onclick = function(e){
   if (e.target.closest("#secUndoBtn")) {
@@ -11331,8 +11434,19 @@ document.getElementById("secModes").onclick = function(e){
     return;
   }
   /* View menu handles Arrangement / Solo / Riff. Numpad 6 cycles that menu. */
+  if (e.target.closest("#mapToolsBtn")) {
+    e.preventDefault();
+    setMapToolsOpen(!mapToolsIsOpen());
+    return;
+  }
   if (e.target.closest("#secPeekBtn")) {
     setHighlightMode(!highlightMode);
+    setMapToolsOpen(false);
+    return;
+  }
+  if (e.target.closest("#secRulersBtn")) {
+    setSectionRulers(!sectionRulersOn);
+    setMapToolsOpen(false);
     return;
   }
   var btn = e.target.closest(".sec-mode-btn[data-sec-mode]");
@@ -12194,6 +12308,7 @@ document.addEventListener("keydown", function(e){
     if (isNumpadKey(e, "3")) { setSectionsMode("play"); return; }
     if (isNumpadKey(e, "5")) { setHighlightMode(!highlightMode); return; }
     if (isNumpadKey(e, "6")) { cycleMapView(); return; }
+    if (isNumpadKey(e, "7")) { setSectionRulers(!sectionRulersOn); return; }
     if (e.shiftKey && k === "v") { setSectionsMode("view"); return; }
     if (e.shiftKey && k === "e") { setSectionsMode("edit"); return; }
     if (e.shiftKey && k === "p") { setSectionsMode("play"); return; }
@@ -12212,6 +12327,7 @@ document.addEventListener("keydown", function(e){
       return;
     }
     if (k === "escape" || e.key === "Escape") {
+      if (mapToolsIsOpen()) { setMapToolsOpen(false); return; }
       // Chip edit popup already handled above; Esc does nothing else on Song Map
       return;
     }
