@@ -6650,7 +6650,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=229";
+  var url = base + "?playboard=1&v=230";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6679,7 +6679,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=229") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=230") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -7463,6 +7463,10 @@ function smPlayerSyncSnapshot(tOverride) {
 function smPublishPlayerSync(force, tOverride) {
   if (smSyncApplying) return;
   if (typeof isPlayboardPage === "function" && isPlayboardPage()) return;
+  /* Only the audio-leader tab advertises play state. Followers that kept
+     smPlaying=true and re-published playing:true after a local pause were
+     forcing the pausing tab to auto-resume. */
+  if (!smIsAudioLeader()) return;
   var snap = smPlayerSyncSnapshot(tOverride);
   var sig = [snap.song, snap.playalong ? 1 : 0, snap.playing ? 1 : 0, snap.shuffle ? 1 : 0, snap.repeat ? 1 : 0, Math.floor(snap.t)].join("|");
   if (!force && sig === smLastSyncSig) return;
@@ -7577,26 +7581,35 @@ function smApplyRemotePlayerSync(msg) {
           }
         }
         if (wantPlay) {
-          smUserPaused = false;
-          smPlaying = true;
-          if (smPlayerMode === "player") smSetPlayIcon(true);
-          smStartTick();
-          /* Only the audio-leader tab actually makes sound */
-          if (smIsAudioLeader()) {
-            try { smYtPlayer.unMute(); smYtPlayer.playVideo(); } catch (errP) {}
+          /* Local intentional pause on the audio leader must stick — peer
+             playing:true echoes must not clear smUserPaused / force resume.
+             A real Play on another tab claims leadership first, so we follow. */
+          if (smUserPaused && smIsAudioLeader()) {
+            smPlaying = false;
+            if (smPlayerMode === "player") smSetPlayIcon(false);
+            smStopTick();
+            try { smYtPlayer.pauseVideo(); } catch (errHold) {}
           } else {
-            try { smYtPlayer.mute(); smYtPlayer.pauseVideo(); } catch (errPf) {}
+            smUserPaused = false;
+            smPlaying = true;
+            if (smPlayerMode === "player") smSetPlayIcon(true);
+            smStartTick();
+            /* Only the audio-leader tab actually makes sound */
+            if (smIsAudioLeader()) {
+              try { smYtPlayer.unMute(); smYtPlayer.playVideo(); } catch (errP) {}
+            } else {
+              try { smYtPlayer.mute(); smYtPlayer.pauseVideo(); } catch (errPf) {}
+            }
           }
         } else {
-          /* Never pause local audio from peer sync on the leader — was random pauses.
-             Followers stay silent. */
-          if (smUserPaused || !smIsAudioLeader()) {
+          /* Remote pause: followers always mirror stopped state so they stop
+             advertising playing:true. Leader only honors remote pause when
+             this tab already user-paused (avoids random peer pause blips). */
+          if (!smIsAudioLeader() || smUserPaused) {
+            smPlaying = false;
+            if (smPlayerMode === "player") smSetPlayIcon(false);
+            smStopTick();
             try { smYtPlayer.pauseVideo(); } catch (errPa) {}
-            if (smUserPaused) {
-              smPlaying = false;
-              if (smPlayerMode === "player") smSetPlayIcon(false);
-              smStopTick();
-            }
           }
         }
         smApplyAudioRole();
@@ -7864,6 +7877,11 @@ function smEnsureApi(cb) {
             return;
           }
           if (e.data === YT.PlayerState.PLAYING) {
+            /* Intentional pause must win over YT auto-start / peer blips */
+            if (smUserPaused) {
+              try { smYtPlayer.pauseVideo(); } catch (errKeepPaused) {}
+              return;
+            }
             smPlaying = true;
             if (smPlayerMode === "player") smSetPlayIcon(true);
             smStartTick(); smApplyPlaybackRate(); smSchedulePublishPlayerSync();
@@ -8032,14 +8050,25 @@ function smTogglePlay() {
       smBuildPlaylist();
       if (!smCurrent()) return;
     }
-    smMarkLocalPlayerAction();
     var st = smYtPlayer.getPlayerState && smYtPlayer.getPlayerState();
-    if (st === YT.PlayerState.PLAYING) {
+    /* Pause when UI/YT say we are playing — BUFFERING used to miss the pause
+       branch and call playVideo() instead. Publish stopped state immediately
+       so peer tabs cannot echo playing:true before YT fires PAUSED. */
+    var shouldPause = !!smPlaying
+      || st === YT.PlayerState.PLAYING
+      || st === YT.PlayerState.BUFFERING;
+    if (shouldPause) {
       smUserPaused = true;
-      smYtPlayer.pauseVideo();
+      smPlaying = false;
+      if (smPlayerMode === "player") smSetPlayIcon(false);
+      smStopTick();
+      smMarkLocalPlayerAction();
+      try { smYtPlayer.pauseVideo(); } catch (errPauseToggle) {}
+      smPublishPlayerSync(true);
       return;
     }
     smUserPaused = false;
+    smMarkLocalPlayerAction();
     /* Guard against peer sync pausing us during the load/start blip */
     smTrackChangeGraceUntil = Math.max(smTrackChangeGraceUntil, Date.now() + 2500);
     /* Fresh load: meta shows War Pigs but nothing is cued yet — load & play */
