@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-24T01:52:29.795Z",
+  "updatedAt": "2026-09-24T01:53:33.337Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3539,6 +3539,18 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "Verse 1",
+                "start": 0,
+                "end": 1
+              },
+              {
+                "name": "Verse 2",
+                "start": 2,
+                "end": 3
+              }
             ]
           },
           {
@@ -3667,9 +3679,19 @@
                 "end": 9
               },
               {
-                "name": "Section",
+                "name": "Bridge",
                 "start": 10,
                 "end": 11
+              },
+              {
+                "name": "v4",
+                "start": 12,
+                "end": 12
+              },
+              {
+                "name": "s2",
+                "start": 13,
+                "end": 13
               }
             ]
           },
