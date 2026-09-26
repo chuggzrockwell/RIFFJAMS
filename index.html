@@ -6702,7 +6702,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=244";
+  var url = base + "?playboard=1&v=245";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6731,7 +6731,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=244") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=245") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -10955,11 +10955,12 @@ function boardFindAlbumSongs(albumName) {
     }
     return null;
   }
-  var hit = fromList(typeof ALBUMS !== "undefined" ? ALBUMS : null);
+  /* Prefer Solo Map song order for keypad (matches Solo edit rows), then Song Map */
+  var hit = fromList((typeof SOLO_MAP !== "undefined" && SOLO_MAP) ? SOLO_MAP.albums : null);
+  if (hit) return hit;
+  hit = fromList(typeof ALBUMS !== "undefined" ? ALBUMS : null);
   if (hit) return hit;
   hit = fromList(typeof ALBUMS_DEFAULT !== "undefined" ? ALBUMS_DEFAULT : null);
-  if (hit) return hit;
-  hit = fromList((typeof SOLO_MAP !== "undefined" && SOLO_MAP) ? SOLO_MAP.albums : null);
   if (hit) return hit;
   hit = fromList((typeof ARRANGEMENT_MAP !== "undefined" && ARRANGEMENT_MAP) ? ARRANGEMENT_MAP.albums : null);
   return hit || [];
@@ -10978,8 +10979,9 @@ function boardEntryPositions(pair) {
     if (pair[3] === "") return [];
     return parsePosList(pair[3]);
   }
-  /* Solo-style codes "1-1A" / "2-1B": leading digit is the position group when unset */
-  var m = String(pair[0] || "").match(/^(\d+)[-–]/);
+  /* Solo labels: "1-1A" / "2-1B" OR "1A" / "3B" — leading digit is fretting group when unset */
+  var code = String(pair[0] || "");
+  var m = code.match(/^(\d+)(?:[-–]|$|[A-Za-z])/);
   if (m) {
     var n = parseInt(m[1], 10);
     if (n >= 1 && n <= 5) return [n];
@@ -11038,7 +11040,12 @@ function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
     var lick = String((pair[2] != null && pair[2] !== "") ? pair[2] : pair[0]).trim();
     if (!lick) return;
     var positions = boardEntryPositions(pair);
-    if (wantPos != null && positions.indexOf(wantPos) < 0) return;
+    if (wantPos != null) {
+      var hitPos = positions.some(function(p){
+        return (typeof slotBase === "function" ? slotBase(p) : p) === wantPos;
+      });
+      if (!hitPos) return;
+    }
     if (seen[lick]) return;
     seen[lick] = true;
     var letter = (typeof lickLetter === "function") ? lickLetter(lick) : "B";
@@ -12660,6 +12667,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=244"></script>
+<script src="riffjams-admin.js?v=245"></script>
 </body>
 </html>
