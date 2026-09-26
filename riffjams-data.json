@@ -2248,42 +2248,50 @@
             "song": "Killing Yourself to Live",
             "licks": [
               [
-                "1A",
+                "1-1A",
                 1,
-                "KYTL-1A"
+                "KYTL-1-1A"
               ],
               [
-                "2A",
+                "1-2A",
                 1,
-                "KYTL-2A"
+                "KYTL-1-2A"
               ],
               [
-                "3A",
+                "1-3A",
                 1,
-                "KYTL2-3A"
+                "KYTL-1-3A"
               ],
               [
-                "4A",
+                "1-4A",
                 1,
-                "KYTL2-4A"
+                "KYTL-1-4A"
               ],
               [
-                "5A",
+                "1-5A",
                 1,
-                "KYTL2-5A"
+                "KYTL-1-5A"
               ],
               [
-                "6A",
+                "1-6A",
                 1,
-                "KYTL2-6A"
+                "KYTL-1-6A"
               ],
               [
-                "7A",
+                "1-7A",
                 1,
-                "KYTL2-7A"
+                "KYTL-1-7A"
               ],
-              null,
-              null,
+              [
+                "1-8A",
+                1,
+                "KYTL-1-8A"
+              ],
+              [
+                "1-9A",
+                1,
+                "KYTL-1-9A"
+              ],
               null
             ]
           },
