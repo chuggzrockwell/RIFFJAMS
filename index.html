@@ -4898,18 +4898,24 @@ function loadAlbums() {
             var snbWant = [["I1",1,"SNB-I1","4S"],["V1",3,"SNB-V1",4],["V2",2,"SNB-V2",["3O","1O"]],["B1",1,"SNB-B1","1S"],["S1",1,"SNB-S1",[1,3]],["B2",3,"SNB-B2",3],["S2",1,"SNB-S2",1]];
             s.sections = snbWant.map(function(x){ return x.slice(); });
           } else {
-            /* Jacob tab crops: I1 T1/4S, V1 T3/pos4, V2 T2/3O+1O */
+            /* Seed lick/tier/pos only when missing — never clobber chip-editor position saves */
+            var snbSeed = {
+              "I1": [1, "SNB-I1", "4S"],
+              "V1": [3, "SNB-V1", 4],
+              "V2": [2, "SNB-V2", ["3O","1O"]],
+              "B1": [1, "SNB-B1", "1S"],
+              "S1": [1, "SNB-S1", [1,3]],
+              "B2": [3, "SNB-B2", 3],
+              "S2": [1, "SNB-S2", 1]
+            };
             (s.sections || []).forEach(function(p){
-              if (!p || !p[0]) return;
+              if (!p || !p[0] || !snbSeed[p[0]]) return;
               var lick = String(p[2] || "");
               if (lick && lick.indexOf("SNB-") !== 0) return;
-              if (p[0] === "I1") { p[1] = 1; p[2] = "SNB-I1"; p[3] = "4S"; }
-              else if (p[0] === "V1") { p[1] = 3; p[2] = "SNB-V1"; p[3] = 4; }
-              else if (p[0] === "V2") { p[1] = 2; p[2] = "SNB-V2"; p[3] = ["3O","1O"]; }
-              else if (p[0] === "B1") { p[1] = 1; p[2] = "SNB-B1"; p[3] = "1S"; }
-              else if (p[0] === "S1") { p[1] = 1; p[2] = "SNB-S1"; p[3] = [1,3]; }
-              else if (p[0] === "B2") { p[1] = 3; p[2] = "SNB-B2"; p[3] = 3; }
-              else if (p[0] === "S2") { p[1] = 1; p[2] = "SNB-S2"; p[3] = 1; }
+              var seed = snbSeed[p[0]];
+              if (p[1] == null) p[1] = seed[0];
+              if (!lick) p[2] = seed[1];
+              if (p.length <= 3) p[3] = seed[2];
             });
           }
         }
@@ -6696,7 +6702,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=243";
+  var url = base + "?playboard=1&v=244";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6725,7 +6731,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=243") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=244") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -9934,6 +9940,9 @@ function saveChipEditor() {
     if (!song) return;
     song.licks[ci] = entry;
     saveSoloMap();
+    if (typeof window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES === "function") {
+      window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES({ reason: "chip-save", song: song.song });
+    }
   } else {
     pushAlbumHistory();
     ensureAllSongSlots(ALBUMS, ci + 1);
@@ -9942,6 +9951,9 @@ function saveChipEditor() {
     song.sections[ci] = entry;
     saveAlbums();
     syncMirrorSectionArrangement(song.song, entry, false);
+    if (typeof window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES === "function") {
+      window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES({ reason: "chip-save", song: song.song });
+    }
   }
   var typ = (soloMode && !arrangementMode) ? "S" : secType(code);
   if (Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; })) secTypeFilter[typ] = true;
@@ -12648,6 +12660,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js"></script>
+<script src="riffjams-admin.js?v=244"></script>
 </body>
 </html>

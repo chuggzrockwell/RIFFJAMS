@@ -380,16 +380,22 @@
       var manifest = buildManifestWithArrangement();
       var songLabel = opts.song ? String(opts.song) : "arrangement";
       var isRulers = opts.reason === "section-rulers";
+      var isChip = opts.reason === "chip-save" || opts.reason === "chip-delete";
       var msg = isRulers
         ? "Sync song section rulers (" + songLabel + ")"
-        : "Sync arrangement times (" + songLabel + ")";
+        : (isChip
+          ? "Sync chip map (" + songLabel + ")"
+          : "Sync arrangement times (" + songLabel + ")");
       if (!opts.quiet && typeof window.setSaveStatus === "function") {
-        window.setSaveStatus(isRulers ? "Syncing section rulers to GitHub…" : "Syncing start/stop times to GitHub…");
+        window.setSaveStatus(isRulers
+          ? "Syncing section rulers to GitHub…"
+          : (isChip ? "Syncing chip positions to GitHub…" : "Syncing start/stop times to GitHub…"));
       }
       await commitManifestOnly(manifest, msg);
       sharedData = manifest;
       if (!opts.quiet && typeof window.setSaveStatus === "function") {
         if (isRulers) window.setSaveStatus("Section rulers synced to repo");
+        else if (isChip) window.setSaveStatus("Chip positions synced to repo");
         else {
           var n = (manifest.arrangementTimings || []).length;
           window.setSaveStatus("Times synced to repo (" + n + " timed song" + (n === 1 ? "" : "s") + ")");
@@ -495,6 +501,49 @@
     });
   }
 
+  /** Prefer local chip rows that already store an explicit position (pair[3]), so a refresh
+   *  of riffjams-data.json does not wipe chip-editor saves that have not been pushed yet. */
+  function mergeChipsPreferLocalPos(remoteAlbums, localAlbums, field) {
+    if (!Array.isArray(remoteAlbums) || !remoteAlbums.length) return localAlbums || remoteAlbums;
+    if (!Array.isArray(localAlbums) || !localAlbums.length) return remoteAlbums;
+    var localBySong = {};
+    localAlbums.forEach(function (a) {
+      (a.songs || []).forEach(function (s) {
+        if (s && s.song) localBySong[s.song] = s;
+      });
+    });
+    remoteAlbums.forEach(function (a) {
+      (a.songs || []).forEach(function (s) {
+        if (!s || !s.song) return;
+        var loc = localBySong[s.song];
+        if (!loc) return;
+        var localField = loc[field] || [];
+        var remoteField = s[field] || (s[field] = []);
+        var byCode = {};
+        localField.forEach(function (p) {
+          if (p && p[0]) byCode[String(p[0])] = p;
+        });
+        remoteField.forEach(function (p, i) {
+          if (!p || !p[0]) return;
+          var lp = byCode[String(p[0])];
+          if (!lp) return;
+          if (lp.length > 3) remoteField[i] = clone(lp);
+        });
+        /* Also keep local-only chips that only exist locally with an explicit pos */
+        localField.forEach(function (lp, i) {
+          if (!lp || !lp[0] || lp.length <= 3) return;
+          var code = String(lp[0]);
+          var found = remoteField.some(function (p) { return p && String(p[0]) === code; });
+          if (!found) {
+            if (i < remoteField.length && !remoteField[i]) remoteField[i] = clone(lp);
+            else remoteField.push(clone(lp));
+          }
+        });
+      });
+    });
+    return remoteAlbums;
+  }
+
   async function loadSharedData() {
     try {
       var response = await fetch(DATA_PATH + "?v=" + Date.now(), { cache: "no-store" });
@@ -504,16 +553,23 @@
       sharedData = data;
       window.RIFFJAMS_ASSETS = Object.assign({}, data.assets || {});
       if (Array.isArray(data.albums) && data.albums.length) {
+        var localAlbums = window.ALBUMS;
         var nextAlbums = clone(data.albums);
         if (typeof window.mergeSongMetaInto === "function") {
-          window.mergeSongMetaInto(nextAlbums, window.ALBUMS);
+          window.mergeSongMetaInto(nextAlbums, localAlbums);
         }
+        mergeChipsPreferLocalPos(nextAlbums, localAlbums, "sections");
         window.ALBUMS = nextAlbums;
         window.ensureAllSongSlots(window.ALBUMS);
         window.saveAlbums();
       }
       if (data.soloMap && Array.isArray(data.soloMap.albums)) {
-        window.SOLO_MAP = clone(data.soloMap);
+        var localSolo = window.SOLO_MAP;
+        var nextSolo = clone(data.soloMap);
+        if (nextSolo && nextSolo.albums) {
+          mergeChipsPreferLocalPos(nextSolo.albums, (localSolo && localSolo.albums) || [], "licks");
+        }
+        window.SOLO_MAP = nextSolo;
         window.saveSoloMap();
       }
       if (data.arrangementMap && data.arrangementMap.albums) {
