@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-26T20:32:40.053Z",
+  "updatedAt": "2026-09-26T20:36:04.600Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -2143,7 +2143,11 @@
           {
             "song": "Sabbath Bloody Sabbath",
             "licks": [
-              null,
+              [
+                "1-1B",
+                2,
+                "SBS-1-1B"
+              ],
               null,
               null,
               null,
