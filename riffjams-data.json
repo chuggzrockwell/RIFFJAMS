@@ -2153,7 +2153,11 @@
                 2,
                 "SBS-1-1B"
               ],
-              null,
+              [
+                "1-2A",
+                1,
+                "SBS-1-2A"
+              ],
               null,
               null,
               null,
