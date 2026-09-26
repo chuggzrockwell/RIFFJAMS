@@ -6704,7 +6704,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=252";
+  var url = base + "?playboard=1&v=253";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6733,7 +6733,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=252") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=253") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -10276,9 +10276,17 @@ function lickKind(name) {
   return "A";
 }
 function buildDefaultSoloMapFromParanoid() {
-  var buckets = { "Iron Man": [], "Paranoid": [], "Planet Caravan": [], "War Pigs": [], "Hand of Doom": [], "Rat Salad": [], "Fairies Wear Boots": [] };
+  var buckets = {
+    "Iron Man": [], "Paranoid": [], "Planet Caravan": [], "War Pigs": [],
+    "Hand of Doom": [], "Rat Salad": [], "Fairies Wear Boots": [],
+    "Sabbath Bloody Sabbath": [], "A National Acrobat": [],
+    "Killing Yourself to Live": [], "Looking for Today": []
+  };
   (CATALOG || []).forEach(function(x){
-    if (!x || x[1] !== "B") return;
+    if (!x) return;
+    var letter = x[1];
+    // Letter B: Paranoid-era + SBS/ANA. Letter A/C/D: KYTL/LFT (and LFT C/D).
+    if (letter !== "B" && letter !== "A" && letter !== "C" && letter !== "D") return;
     var id = x[0];
     var song = null;
     if (id.indexOf("IM-") === 0) song = "Iron Man";
@@ -10288,11 +10296,15 @@ function buildDefaultSoloMapFromParanoid() {
     else if (id.indexOf("FOB-") === 0) song = "Fairies Wear Boots";
     else if (id.indexOf("PC-") === 0) song = "Planet Caravan";
     else if (id.indexOf("P-") === 0) song = "Paranoid";
+    else if (id.indexOf("SBS-") === 0) song = "Sabbath Bloody Sabbath";
+    else if (id.indexOf("ANA-") === 0) song = "A National Acrobat";
+    else if (id.indexOf("KYTL2-") === 0 || id.indexOf("KYTL-") === 0) song = "Killing Yourself to Live";
+    else if (id.indexOf("LFT-") === 0) song = "Looking for Today";
     if (!song || !buckets[song]) return;
     var k = lickKind(id);
     var tier = (k === "A") ? 1 : (k === "B") ? 2 : (k === "E") ? 1 : 1;
     // Chip text: drop song prefix; keep full id for Play
-    var label = id.replace(/^(IM|WP|PC|HOD|RS|FOB|P)-/, "");
+    var label = id.replace(/^(IM|WP|PC|HOD|RS|FOB|P|SBS|ANA|KYTL2|KYTL|LFT)-/, "");
     buckets[song].push([label, tier, id]);
   });
   var albums = blankSoloMapFromAlbums(ALBUMS_DEFAULT);
@@ -12758,6 +12770,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=252"></script>
+<script src="riffjams-admin.js?v=253"></script>
 </body>
 </html>
