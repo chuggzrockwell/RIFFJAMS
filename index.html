@@ -1050,7 +1050,21 @@
     margin: 0 0 8px;
     flex: 0 0 auto;
   }
-  .sec-play-toolbar .sec-play-meta { display: none !important; }
+  .sec-play-toolbar .sec-play-meta {
+    display: block;
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255,255,255,.72);
+    letter-spacing: .02em;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  body:not(.playboard-mode) .sec-play-toolbar .sec-play-meta { display: none !important; }
   .sec-play-clear {
     appearance: none;
     flex: 0 0 auto;
@@ -6682,7 +6696,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=241";
+  var url = base + "?playboard=1&v=242";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6711,7 +6725,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=241") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=242") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -6788,6 +6802,7 @@ function initPlayboardPage() {
     + '</select></label>'
     + '<button type="button" class="sec-play-clear" id="secPlayRandomize" title="Shuffle Board order (Z)">Randomize</button>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or 0 then Enter)">Clear</button>'
+    + '<div class="sec-play-meta" id="secPlayMeta">Board — album+song[.pos] + NP Enter</div>'
     + '</div>'
     + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to remove · drag to reorder · album+song[.pos]+Enter to add.</div></div>'
     + '</aside></div></div>';
@@ -6891,6 +6906,9 @@ function initPlayboardPage() {
       if (typeof isNumpadKey === "function" && isNumpadKey(e, String(ti))) { digit = String(ti); break; }
     }
     if (!digit && e.location === 3 && /^[0-9]$/.test(String(e.key))) digit = String(e.key);
+    /* Top-row Digits0–9 also count (Enter still preferably NP Enter). */
+    if (!digit && e.code && /^Digit([0-9])$/.test(e.code) && !e.shiftKey) digit = e.code.slice(5);
+    if (!digit && e.location !== 3 && /^[0-9]$/.test(String(e.key)) && !e.shiftKey) digit = String(e.key);
     if (!digit) return;
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -6914,10 +6932,9 @@ function initPlayboardPage() {
     }
     updateBoardEntryMeta();
   }
+  /* One listener only — document+window both in capture double-fired every digit. */
   document.addEventListener("keydown", onPlayboardKey, true);
   document.addEventListener("keyup", onPlayboardKey, true);
-  window.addEventListener("keydown", onPlayboardKey, true);
-  window.addEventListener("keyup", onPlayboardKey, true);
   try {
     document.body.tabIndex = -1;
     document.body.focus();
@@ -10988,7 +11005,7 @@ function updateBoardEntryMeta() {
 function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
   var albumName = boardAlbumName(albumDigit);
   var songName = boardSongNameAt(albumName, songDigit);
-  if (!albumName || !songName) return;
+  if (!albumName || !songName) return -1;
   var wantPos = (posDigit != null && posDigit !== "") ? parseInt(posDigit, 10) : null;
   var pairs = [];
   var useSolo = (typeof llMode !== "undefined" && llMode === "solo");
@@ -10998,8 +11015,14 @@ function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
       if (!a || a.name !== albumName) return;
       (a.songs || []).forEach(function(s){
         if (!s || s.song !== songName) return;
-        pairs = s.licks || [];
+        pairs = (s.licks || []).slice();
       });
+    });
+    /* Also include Song Map section chips so fretting .pos (e.g. 24.3) works in Solo mode */
+    var songsR = boardFindAlbumSongs(albumName);
+    songsR.forEach(function(s){
+      if (!s || (s.song || s.name) !== songName) return;
+      (s.sections || s.chips || []).forEach(function(pair){ pairs.push(pair); });
     });
   } else {
     var songs = boardFindAlbumSongs(albumName);
@@ -11036,7 +11059,7 @@ function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
     if (meta) {
       meta.innerHTML = "<strong>" + boardEntryLabel(String(albumDigit) + String(songDigit) + (wantPos != null ? ("." + wantPos) : "")) + "</strong> — no matching licks";
     }
-    return;
+    return 0;
   }
   var allIn = items.every(function(it){ return findPlayIndex(it.key) >= 0; });
   if (allIn) {
@@ -11053,6 +11076,7 @@ function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
   publishPlayQueue();
   if (typeof renderPlayBoard === "function") renderPlayBoard();
   if (typeof syncAllPlaySelections === "function") syncAllPlaySelections();
+  return items.length;
 }
 function commitBoardEntry() {
   var buf = String(boardEntryBuf || "").trim();
@@ -11061,8 +11085,9 @@ function commitBoardEntry() {
   if (buf === "0") { clearPlayQueue(); updateBoardEntryMeta(); return; }
   var m = buf.match(/^([1-8])([1-9]|10)(?:\.([1-5]))?$/);
   if (!m) { updateBoardEntryMeta(); return; }
-  queueAlbumSongPosForBoard(m[1], m[2], m[3] || null);
-  updateBoardEntryMeta();
+  var n = queueAlbumSongPosForBoard(m[1], m[2], m[3] || null);
+  if (n !== 0) updateBoardEntryMeta();
+  /* n===0: keep the "no matching licks" line from queue */
 }
 function revealSong(prefix) {
   if (enqueueLibraryByFilter(function(n){ return lickMatchesPrefix(n, prefix); })) return;
