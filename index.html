@@ -6682,7 +6682,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=240";
+  var url = base + "?playboard=1&v=241";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6711,7 +6711,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=240") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=241") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -6789,7 +6789,7 @@ function initPlayboardPage() {
     + '<button type="button" class="sec-play-clear" id="secPlayRandomize" title="Shuffle Board order (Z)">Randomize</button>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or 0 then Enter)">Clear</button>'
     + '</div>'
-    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to remove · drag to reorder · song[.class]+Enter to add.</div></div>'
+    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to remove · drag to reorder · album+song[.pos]+Enter to add.</div></div>'
     + '</aside></div></div>';
   pullPlayQueue();
   trimPlayQueueToFit();
@@ -6867,7 +6867,7 @@ function initPlayboardPage() {
       updateBoardEntryMeta();
       return;
     }
-    /* NP Enter (or Enter): commit song[.class] and display matching licks */
+    /* NP Enter: commit album+song[.pos] and display matching licks */
     var isNpEnter = e.code === "NumpadEnter" || (e.key === "Enter" && e.location === 3);
     var isEnter = e.key === "Enter" || e.code === "Enter" || isNpEnter;
     if (isEnter) {
@@ -6876,10 +6876,10 @@ function initPlayboardPage() {
       commitBoardEntry();
       return;
     }
-    /* Decimal: song.class (1.3 …) */
+    /* Decimal: album+song.pos (24.3 …) */
     var isDot = e.code === "NumpadDecimal" || e.key === "." || e.key === "," || e.code === "Period";
     if (isDot) {
-      if (!/^[1-8]$/.test(boardEntryBuf)) return;
+      if (!/^[1-8]([1-9]|10)$/.test(boardEntryBuf)) return;
       e.preventDefault();
       e.stopImmediatePropagation();
       boardEntryBuf += ".";
@@ -6894,14 +6894,22 @@ function initPlayboardPage() {
     if (!digit) return;
     e.preventDefault();
     e.stopImmediatePropagation();
+    /* Buffer: album(1-8) + song(1-10) + optional .pos(1-5). 0 alone = clear. */
     if (!boardEntryBuf) {
       if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
+    } else if (boardEntryBuf === "0") {
+      if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
     } else if (/^[1-8]$/.test(boardEntryBuf)) {
-      if (digit >= "1" && digit <= "8") boardEntryBuf = digit;
+      if (digit >= "1" && digit <= "9") boardEntryBuf += digit;
       else if (digit === "0") boardEntryBuf = "0";
-    } else if (/^[1-8]\.$/.test(boardEntryBuf)) {
+    } else if (/^[1-8]1$/.test(boardEntryBuf)) {
+      if (digit === "0") boardEntryBuf += "0"; /* song 10 */
+      else if (digit >= "1" && digit <= "8") boardEntryBuf = digit;
+    } else if (/^[1-8][2-9]$/.test(boardEntryBuf) || /^[1-8]10$/.test(boardEntryBuf)) {
+      if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
+    } else if (/^[1-8]([1-9]|10)\.$/.test(boardEntryBuf)) {
       if (digit >= "1" && digit <= "5") boardEntryBuf += digit;
-    } else if (/^[1-8]\.[1-5]$/.test(boardEntryBuf)) {
+    } else if (/^[1-8]([1-9]|10)\.[1-5]$/.test(boardEntryBuf)) {
       if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
     }
     updateBoardEntryMeta();
@@ -9190,8 +9198,8 @@ function renderPlayBoard() {
       meta.innerHTML = "Entry <strong>" + boardEntryBuf + "</strong> · " + boardEntryLabel(boardEntryBuf) + " · NP Enter to show";
     } else {
       meta.innerHTML = playQueue.length
-        ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · A–E clear class · song[.class] + Enter · 0 clear")
-        : "Board — song[.class] + NP Enter · A–E clear class · Z randomize · 0 / Shift+C clear · Esc close";
+        ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · A–E clear class · album+song[.pos] + Enter · 0 clear")
+        : "Board — album+song[.pos] + NP Enter · A–E clear class · Z randomize · 0 / Shift+C clear · Esc close";
     }
   }
   if (!visible.length) {
@@ -10892,17 +10900,74 @@ function revealParanoidTrack(digit) {
   if (!prefix) return;
   revealSong(prefix);
 }
-/** Board entry buffer: type song[.class] on numpad, Enter to display. */
+/** Board entry: album(1-8 chrono) + song(1-10) + optional .pos(1-5), NP Enter to show. */
 var boardEntryBuf = "";
-var BOARD_CLASS_BY_DIGIT = { "1": "A", "2": "B", "3": "C", "4": "D", "5": "E" };
+/** Chronological studio albums for Board numpad (1–8). */
+var BOARD_ALBUM_CHRONO = [
+  "Black Sabbath",
+  "Paranoid",
+  "Master of Reality",
+  "Vol. 4",
+  "Sabbath Bloody Sabbath",
+  "Sabotage",
+  "Technical Ecstasy",
+  "Never Say Die!"
+];
+function boardAlbumName(digit) {
+  var i = parseInt(digit, 10) - 1;
+  return (i >= 0 && i < BOARD_ALBUM_CHRONO.length) ? BOARD_ALBUM_CHRONO[i] : "";
+}
+function boardFindAlbumSongs(albumName) {
+  if (!albumName) return [];
+  function fromList(list) {
+    if (!list || !list.length) return null;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i] && list[i].name === albumName) return list[i].songs || [];
+    }
+    return null;
+  }
+  var hit = fromList(typeof ALBUMS !== "undefined" ? ALBUMS : null);
+  if (hit) return hit;
+  hit = fromList(typeof ALBUMS_DEFAULT !== "undefined" ? ALBUMS_DEFAULT : null);
+  if (hit) return hit;
+  hit = fromList((typeof SOLO_MAP !== "undefined" && SOLO_MAP) ? SOLO_MAP.albums : null);
+  if (hit) return hit;
+  hit = fromList((typeof ARRANGEMENT_MAP !== "undefined" && ARRANGEMENT_MAP) ? ARRANGEMENT_MAP.albums : null);
+  return hit || [];
+}
+function boardSongNameAt(albumName, songDigit) {
+  var songs = boardFindAlbumSongs(albumName);
+  var si = parseInt(songDigit, 10) - 1;
+  if (si < 0 || si >= songs.length) return "";
+  var s = songs[si];
+  return (s && (s.song || s.name)) || "";
+}
+function boardEntryPositions(pair) {
+  if (!pair) return [];
+  if (pair.length > 3) {
+    if (Array.isArray(pair[3]) && pair[3].length === 0) return [];
+    if (pair[3] === "") return [];
+    return parsePosList(pair[3]);
+  }
+  /* Solo-style codes "1-1A" / "2-1B": leading digit is the position group when unset */
+  var m = String(pair[0] || "").match(/^(\d+)[-–]/);
+  if (m) {
+    var n = parseInt(m[1], 10);
+    if (n >= 1 && n <= 5) return [n];
+  }
+  return [1];
+}
 function boardEntryLabel(buf) {
   if (!buf) return "";
   if (buf === "0") return "Clear board";
-  var parts = String(buf).split(".");
-  var song = PARANOID_TRACK_NAME[parts[0]] || ("#" + parts[0]);
-  if (parts.length === 1 || parts[1] === "") return song + " (all classes)";
-  var cls = BOARD_CLASS_BY_DIGIT[parts[1]] || ("?" + parts[1]);
-  return song + " class " + cls;
+  var m = String(buf).match(/^([1-8])([1-9]|10)?(?:\.([1-5])?)?$/);
+  if (!m) return "…";
+  var album = boardAlbumName(m[1]) || ("Album " + m[1]);
+  if (!m[2]) return album + " · song…";
+  var song = boardSongNameAt(album, m[2]) || ("Song " + m[2]);
+  if (m[3] === "") return album + " · " + song + " · pos…";
+  if (m[3]) return album + " · " + song + " · pos " + m[3];
+  return album + " · " + song + " (all positions)";
 }
 function updateBoardEntryMeta() {
   var meta = document.getElementById("secPlayMeta");
@@ -10912,47 +10977,77 @@ function updateBoardEntryMeta() {
     return;
   }
   meta.innerHTML = playQueue.length
-    ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · A–E clear class · song[.class] + Enter · 0 clear")
-    : "Board — song[.class] + NP Enter · A–E clear class · Z randomize · 0 / Shift+C clear · Esc close";
+    ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · A–E clear class · album+song[.pos] + Enter · 0 clear")
+    : "Board — album+song[.pos] + NP Enter · A–E clear class · Z randomize · 0 / Shift+C clear · Esc close";
 }
 /**
- * Board: queue Paranoid track licks. digit 1–8; optional classKind A–E.
- * Toggle: if every matching lick is already queued, remove them; else add missing.
+ * Board: queue licks for album+song, optional fretting position 1–5.
+ * Uses Solo map when Board mode is Solo; else section chips from Song Map albums.
+ * Toggle: if every match is already queued, remove them; else add missing.
  */
-function queueParanoidTrackForBoard(digit, classKind) {
-  var d = String(digit);
-  var prefix = PARANOID_TRACK_PREFIX[d];
-  if (!prefix) return;
-  var songName = PARANOID_TRACK_NAME[d] || "Paranoid";
-  var wantKind = classKind ? String(classKind).toUpperCase() : null;
-  var ids = [];
-  (CATALOG || []).forEach(function(x){
-    if (!x || x[1] !== "B") return;
-    var id = x[0];
-    if (!(typeof lickMatchesPrefix === "function" ? lickMatchesPrefix(id, prefix) : (id.indexOf(prefix) === 0))) return;
-    if (wantKind && lickKind(id) !== wantKind) return;
-    ids.push(id);
+function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
+  var albumName = boardAlbumName(albumDigit);
+  var songName = boardSongNameAt(albumName, songDigit);
+  if (!albumName || !songName) return;
+  var wantPos = (posDigit != null && posDigit !== "") ? parseInt(posDigit, 10) : null;
+  var pairs = [];
+  var useSolo = (typeof llMode !== "undefined" && llMode === "solo");
+  if (useSolo) {
+    var soloAlbums = (typeof SOLO_MAP !== "undefined" && SOLO_MAP && SOLO_MAP.albums) ? SOLO_MAP.albums : [];
+    soloAlbums.forEach(function(a){
+      if (!a || a.name !== albumName) return;
+      (a.songs || []).forEach(function(s){
+        if (!s || s.song !== songName) return;
+        pairs = s.licks || [];
+      });
+    });
+  } else {
+    var songs = boardFindAlbumSongs(albumName);
+    songs.forEach(function(s){
+      if (!s || (s.song || s.name) !== songName) return;
+      pairs = s.sections || s.chips || s.licks || [];
+    });
+  }
+  var items = [];
+  var seen = {};
+  (pairs || []).forEach(function(pair){
+    if (typeof isChipPair === "function" && !isChipPair(pair)) return;
+    if (!pair || !pair[0]) return;
+    var code = String(pair[0]);
+    var lick = String((pair[2] != null && pair[2] !== "") ? pair[2] : (useSolo ? pair[0] : "")).trim();
+    if (!lick && typeof sectionLickId === "function") lick = sectionLickId(songName, code, pair[2]);
+    if (!lick) return;
+    var positions = boardEntryPositions(pair);
+    if (wantPos != null && positions.indexOf(wantPos) < 0) return;
+    if (seen[lick]) return;
+    seen[lick] = true;
+    var letter = (typeof lickLetter === "function") ? lickLetter(lick) : "B";
+    items.push({
+      key: "lib|" + letter + "|" + lick,
+      code: code,
+      song: songName,
+      lick: lick,
+      tier: (typeof chipTier === "function") ? chipTier(pair) : 2,
+      src: lickSrc(lick)
+    });
   });
-  if (!ids.length) return;
-  var keys = ids.map(function(id){ return "lib|B|" + id; });
-  var allIn = keys.every(function(key){ return findPlayIndex(key) >= 0; });
+  if (!items.length) {
+    var meta = document.getElementById("secPlayMeta");
+    if (meta) {
+      meta.innerHTML = "<strong>" + boardEntryLabel(String(albumDigit) + String(songDigit) + (wantPos != null ? ("." + wantPos) : "")) + "</strong> — no matching licks";
+    }
+    return;
+  }
+  var allIn = items.every(function(it){ return findPlayIndex(it.key) >= 0; });
   if (allIn) {
-    keys.forEach(function(key){
-      var i = findPlayIndex(key);
+    items.forEach(function(it){
+      var i = findPlayIndex(it.key);
       if (i >= 0) playQueue.splice(i, 1);
     });
   } else {
-    ids.forEach(function(id){
-      var key = "lib|B|" + id;
-      if (findPlayIndex(key) >= 0) return;
-      playQueue.push({
-        key: key,
-        code: id,
-        song: songName,
-        lick: id,
-        tier: 2,
-        src: lickSrc(id)
-      });
+    items.forEach(function(it){
+      if (findPlayIndex(it.key) >= 0) return;
+      playQueue.push(it);
     });
   }
   publishPlayQueue();
@@ -10964,10 +11059,9 @@ function commitBoardEntry() {
   boardEntryBuf = "";
   if (!buf) return;
   if (buf === "0") { clearPlayQueue(); updateBoardEntryMeta(); return; }
-  var m = buf.match(/^([1-8])(?:\.([1-5]))?$/);
+  var m = buf.match(/^([1-8])([1-9]|10)(?:\.([1-5]))?$/);
   if (!m) { updateBoardEntryMeta(); return; }
-  var kind = m[2] ? BOARD_CLASS_BY_DIGIT[m[2]] : null;
-  queueParanoidTrackForBoard(m[1], kind);
+  queueAlbumSongPosForBoard(m[1], m[2], m[3] || null);
   updateBoardEntryMeta();
 }
 function revealSong(prefix) {
