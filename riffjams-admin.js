@@ -201,6 +201,24 @@
       while ((song.sections || (song.sections = [])).length <= state.ci) song.sections.push(null);
       previousEntry = song.sections[state.ci];
       song.sections[state.ci] = entry;
+      /* Attach Song Map fretting onto Solo licks that share this lick id */
+      if (entry && entry.length > 3 && song.song) {
+        var lickId = String(entry[2] || "").trim();
+        if (lickId) {
+          (nextSolo.albums || []).forEach(function (a) {
+            (a.songs || []).forEach(function (ss) {
+              if (!ss || ss.song !== song.song) return;
+              (ss.licks || []).forEach(function (lp, i) {
+                if (!lp || !lp[0]) return;
+                var sl = String((lp[2] != null && lp[2] !== "") ? lp[2] : lp[0]).trim();
+                if (sl !== lickId) return;
+                ss.licks[i] = window.makeChipEntry(lp[0], window.chipTier(lp), sl,
+                  (Array.isArray(entry[3]) && entry[3].length === 0) ? [] : window.chipPositions(entry));
+              });
+            });
+          });
+        }
+      }
     }
     return {
       albums: nextAlbums,

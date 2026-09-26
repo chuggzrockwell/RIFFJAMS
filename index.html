@@ -4660,6 +4660,7 @@ function syncMirrorSectionArrangement(songName, pair, fromArrangement) {
     var sidx = findChipIndexByCode(secSong.sections, secCode);
     if (sidx >= 0) secSong.sections[sidx] = secEntry;
     else placeChipInSparseList(secSong.sections, secEntry);
+    if (typeof syncSoloFrettingFromSongChip === "function") syncSoloFrettingFromSongChip(songName, secEntry);
     try {
       var rawMirror = JSON.stringify(ALBUMS);
       localStorage.setItem(ALBUMS_KEY, rawMirror);
@@ -6547,7 +6548,7 @@ function showSections(keepScroll) {
             var gEmpty = (hasSoloGroup && (ci + 1) >= groupStart) ? " col-group-member" : "";
             chipArr.push('<button type="button" class="sec-chip empty'+gEmpty+'" data-solo="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty solo slot"></button>');
           } else {
-            var lcode = lp[0], ltier = chipTier(lp), llick = lp[2] || lp[0] || "", lpos = posListAttr(chipPositions(lp));
+            var lcode = lp[0], ltier = chipTier(lp), llick = lp[2] || lp[0] || "", lpos = posListAttr(boardEntryPositions(lp, s.song));
             var ltyp = "S";
             n++;
             var gMem = (hasSoloGroup && (ci + 1) >= groupStart) ? " col-group-member" : "";
@@ -6702,7 +6703,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=245";
+  var url = base + "?playboard=1&v=246";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6731,7 +6732,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=245") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=246") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -9950,6 +9951,7 @@ function saveChipEditor() {
     if (!song) return;
     song.sections[ci] = entry;
     saveAlbums();
+    syncSoloFrettingFromSongChip(song.song, entry);
     syncMirrorSectionArrangement(song.song, entry, false);
     if (typeof window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES === "function") {
       window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES({ reason: "chip-save", song: song.song });
@@ -10972,21 +10974,107 @@ function boardSongNameAt(albumName, songDigit) {
   var s = songs[si];
   return (s && (s.song || s.name)) || "";
 }
-function boardEntryPositions(pair) {
+/** Leading group from Solo codes: "1-1A" / "2-1B" (dash) or "1A" / "3B" (digit+letter). */
+function soloCodePosGroup(code) {
+  var m = String(code || "").match(/^(\d+)(?:[-–]|$|[A-Za-z])/);
+  if (!m) return null;
+  var n = parseInt(m[1], 10);
+  return (n >= 1 && n <= 5) ? n : null;
+}
+/** Unique fretting bases 1–5 from raw pair[3]; null if unset; [] if explicit none. */
+function posBasesFromRaw(raw) {
+  if (Array.isArray(raw) && raw.length === 0) return [];
+  if (raw === "") return [];
+  if (raw == null) return null;
+  var list = parsePosList(raw);
+  var out = [];
+  var seen = {};
+  list.forEach(function(p){
+    var b = typeof slotBase === "function" ? slotBase(p) : parseInt(p, 10);
+    if (!(b >= 1 && b <= 5) || seen[b]) return;
+    seen[b] = true;
+    out.push(b);
+  });
+  return out;
+}
+/** Song Map section fretting for a lick id. null if no section explicitly stores pair[3] for that lick. */
+function songMapPosBasesForLick(songName, lickId) {
+  if (!songName || !lickId) return null;
+  var want = String(lickId).trim();
+  if (!want) return null;
+  var albums = (typeof ALBUMS !== "undefined" && ALBUMS) ? ALBUMS : [];
+  var out = [];
+  var seen = {};
+  var foundExplicit = false;
+  albums.forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      if (!s || s.song !== songName) return;
+      (s.sections || []).forEach(function(pair){
+        if (typeof isChipPair === "function" && !isChipPair(pair)) return;
+        if (!pair || String(pair[2] || "").trim() !== want) return;
+        if (!(pair.length > 3)) return;
+        foundExplicit = true;
+        if (Array.isArray(pair[3]) && pair[3].length === 0) return;
+        if (pair[3] === "") return;
+        (posBasesFromRaw(pair[3]) || []).forEach(function(b){
+          if (seen[b]) return;
+          seen[b] = true;
+          out.push(b);
+        });
+      });
+    });
+  });
+  return foundExplicit ? out : null;
+}
+/**
+ * Fretting positions for Playboard album+song[.pos].
+ * 1) Explicit Solo/section pair[3]
+ * 2) Else Song Map fretting for the same lick id (Jacob's Song Map Position edits)
+ * 3) Else leading digit on Solo codes ("2-1B", "3B")
+ * 4) Else default [1]
+ */
+function boardEntryPositions(pair, songName) {
   if (!pair) return [];
   if (pair.length > 3) {
     if (Array.isArray(pair[3]) && pair[3].length === 0) return [];
     if (pair[3] === "") return [];
-    return parsePosList(pair[3]);
+    return posBasesFromRaw(pair[3]) || [];
   }
-  /* Solo labels: "1-1A" / "2-1B" OR "1A" / "3B" — leading digit is fretting group when unset */
-  var code = String(pair[0] || "");
-  var m = code.match(/^(\d+)(?:[-–]|$|[A-Za-z])/);
-  if (m) {
-    var n = parseInt(m[1], 10);
-    if (n >= 1 && n <= 5) return [n];
+  var lick = String((pair[2] != null && pair[2] !== "") ? pair[2] : "").trim();
+  if (songName && lick) {
+    var inherited = songMapPosBasesForLick(songName, lick);
+    if (inherited) return inherited;
   }
+  var g = soloCodePosGroup(pair[0]);
+  if (g != null) return [g];
   return [1];
+}
+/** Copy Song Map fretting onto Solo licks that share the same lick id. */
+function syncSoloFrettingFromSongChip(songName, pair) {
+  if (!songName || typeof isChipPair !== "function" || !isChipPair(pair)) return false;
+  if (!(pair.length > 3)) return false;
+  var lick = String(pair[2] || "").trim();
+  if (!lick) return false;
+  if (typeof SOLO_MAP === "undefined" || !SOLO_MAP) {
+    if (typeof loadSoloMap === "function") SOLO_MAP = loadSoloMap();
+  }
+  if (!SOLO_MAP) return false;
+  var posArg = (Array.isArray(pair[3]) && pair[3].length === 0) ? [] : chipPositions(pair);
+  var touched = false;
+  (SOLO_MAP.albums || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      if (!s || s.song !== songName) return;
+      (s.licks || []).forEach(function(lp, i){
+        if (!isChipPair(lp)) return;
+        var sl = String((lp[2] != null && lp[2] !== "") ? lp[2] : (lp[0] || "")).trim();
+        if (sl !== lick) return;
+        s.licks[i] = makeChipEntry(lp[0], chipTier(lp), sl, posArg);
+        touched = true;
+      });
+    });
+  });
+  if (touched && typeof saveSoloMap === "function") saveSoloMap();
+  return touched;
 }
 function boardEntryLabel(buf) {
   if (!buf) return "";
@@ -11012,8 +11100,8 @@ function updateBoardEntryMeta() {
     : "Board — album+song[.pos] + NP Enter · A–E clear class · Z randomize · 0 / Shift+C clear · Esc close";
 }
 /**
- * Board: queue licks for album+song, optional fretting position 1–5.
- * Uses Solo map when Board mode is Solo; else section chips from Song Map albums.
+ * Board: queue Solo Map licks for album+song, optional fretting position 1–5.
+ * .pos = Solo pair[3], else Song Map fretting for same lick id, else code leading digit.
  * Toggle: if every match is already queued, remove them; else add missing.
  */
 function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
@@ -11039,7 +11127,7 @@ function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
     var code = String(pair[0]);
     var lick = String((pair[2] != null && pair[2] !== "") ? pair[2] : pair[0]).trim();
     if (!lick) return;
-    var positions = boardEntryPositions(pair);
+    var positions = boardEntryPositions(pair, songName);
     if (wantPos != null) {
       var hitPos = positions.some(function(p){
         return (typeof slotBase === "function" ? slotBase(p) : p) === wantPos;
@@ -12667,6 +12755,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=245"></script>
+<script src="riffjams-admin.js?v=246"></script>
 </body>
 </html>
