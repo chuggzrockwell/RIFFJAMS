@@ -2162,7 +2162,7 @@
     overflow-y: auto;
   }
   .cover-board.song-cols.ll-b .ll-albums-stack {
-    /* 2-col grid so right-column albums (SBS / Vol. 4) share one vertical title line */
+    /* 2-col grid so right-column albums (Master / SBS) share one vertical title line */
     display: grid;
     grid-template-columns: max-content max-content;
     column-gap: var(--ll-gap, 20px);
@@ -4146,16 +4146,6 @@ var ALBUMS_DEFAULT = [
     { song: "Rat Salad", sections: [["I1",3,"RS-I1"],["V2",3],["S1",1]] },
     { song: "Fairies Wear Boots", sections: [["I1",2,"FOB-I1"],["I2",2,"FOB-I2"],["I3",2,"FOB-I3"],["I4",2,"FOB-I4"],["S1",1,"FOB-S1"],["V1",3,"FOB-V1"],["B1",3,"FOB-B1"],["L1",2,"FOB-L1"],["S2",1,"FOB-S2"],["F1",3]] },
   ]},
-  { name: "Sabbath Bloody Sabbath", cover: "covers/sbs.png?v=5", font: "font-sbs", songs: [
-    { song: "Sabbath Bloody Sabbath", sections: [["V1",1],["PC1",2],["PC2",2],["S1",1],["B1",3],["B2",2],["B3",2],["B4",2],["S2",2]] },
-    { song: "A National Acrobat", sections: [["I1",1],["V1",3],["B1",1],["S1",1],["B2",3],["B3",3],["B4",3],["B5",3],["B6",3],["S3",3]] },
-    { song: "Fluff", sections: [] },
-    { song: "Sabbra Cadabra", sections: [["I1",1],["L1",1],["L2",1],["V1",2],["B1",3],["B2",3],["B3",3]] },
-    { song: "Killing Yourself to Live", sections: [["I1",2,"KYTL-I1"],["V1",2,"KYTL-V1"],["C1",2,"KYTL-C1"],["S1",1,"KYTL-S1"],["B1",2,"KYTL-B1"],["B2",2,"KYTL-B2"],["S2",1,"KYTL-S2"],["B3",2,"KYTL-B3"],["S3",1,"KYTL-S3"],["B4",2,"KYTL-B4"]] },
-    { song: "Who Are You?", sections: [] },
-    { song: "Looking for Today", sections: [["V1",2,"LFT-V1"],["PC1",2,"LFT-PC1"],["C1",1,"LFT-C1"],["S1",1,"LFT-S1"]] },
-    { song: "Spiral Architect", sections: [["I1",1],["L1",2],["I2",3],["V1",3],["C1",3]] },
-  ]},
   { name: "Master of Reality", cover: "covers/mor.png", font: "font-mor", songs: [
     { song: "Sweet Leaf", sections: [] },
     { song: "After Forever", sections: [["I1",1],["V1",3],["B1",3],["B2",2],["S1",1]] },
@@ -4178,6 +4168,17 @@ var ALBUMS_DEFAULT = [
     { song: "St. Vitus Dance", sections: [["I1",2,"SVD-I1"],["V1",2,"SVD-V1"],["PC1",3,"SVD-PC1"]] },
     { song: "Under the Sun", sections: [] },
   ]},
+  { name: "Sabbath Bloody Sabbath", cover: "covers/sbs.png?v=5", font: "font-sbs", songs: [
+    { song: "Sabbath Bloody Sabbath", sections: [["V1",1],["PC1",2],["PC2",2],["S1",1],["B1",3],["B2",2],["B3",2],["B4",2],["S2",2]] },
+    { song: "A National Acrobat", sections: [["I1",1],["V1",3],["B1",1],["S1",1],["B2",3],["B3",3],["B4",3],["B5",3],["B6",3],["S3",3]] },
+    { song: "Fluff", sections: [] },
+    { song: "Sabbra Cadabra", sections: [["I1",1],["L1",1],["L2",1],["V1",2],["B1",3],["B2",3],["B3",3]] },
+    { song: "Killing Yourself to Live", sections: [["I1",2,"KYTL-I1"],["V1",2,"KYTL-V1"],["C1",2,"KYTL-C1"],["S1",1,"KYTL-S1"],["B1",2,"KYTL-B1"],["B2",2,"KYTL-B2"],["S2",1,"KYTL-S2"],["B3",2,"KYTL-B3"],["S3",1,"KYTL-S3"],["B4",2,"KYTL-B4"]] },
+    { song: "Who Are You?", sections: [] },
+    { song: "Looking for Today", sections: [["V1",2,"LFT-V1"],["PC1",2,"LFT-PC1"],["C1",1,"LFT-C1"],["S1",1,"LFT-S1"]] },
+    { song: "Spiral Architect", sections: [["I1",1],["L1",2],["I2",3],["V1",3],["C1",3]] },
+  ]},
+
 ];
 var ALBUMS_KEY = "lick-sections-albums-v3";
 var ALBUMS = null; // filled after slot helpers exist (SONG_SLOTS must be defined first)
@@ -6703,7 +6704,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=246";
+  var url = base + "?playboard=1&v=247";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6732,7 +6733,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=246") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=247") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -10107,7 +10108,7 @@ var COVER_BY_TIER = {
   5: "covers/paranoid-tier2.png?v=45"
 };
 /* Albums included in Paranoid LL (letter B) multi-album grid */
-var LL_LIBRARY_ALBUMS = ["Paranoid", "Sabbath Bloody Sabbath", "Master of Reality", "Vol. 4"];
+var LL_LIBRARY_ALBUMS = ["Paranoid", "Master of Reality", "Vol. 4", "Sabbath Bloody Sabbath"];
 function llCoverForAlbumTier(album, tier) {
   tier = parseInt(tier, 10);
   if (!(tier >= 1 && tier <= 2)) tier = 3;
@@ -12755,6 +12756,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=246"></script>
+<script src="riffjams-admin.js?v=247"></script>
 </body>
 </html>
