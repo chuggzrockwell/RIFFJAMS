@@ -6704,7 +6704,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=248";
+  var url = base + "?playboard=1&v=249";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6733,7 +6733,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=248") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=249") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -10093,7 +10093,7 @@ var CATALOG = [
   ["P-1A","B"],["P-1B","B"],["P-2B","B"],["P-3B","B"],["P-4B","B"],
   ["WP-1-1A","B"],["WP-1-2A","B"],["WP-1-3A","B"],["WP-1-4A","B"],["WP-1-1B","B"],["WP-1-1D","B"],
   ["WP-2-1B","B"],["WP-2-2B","B"],["WP-2-3B","B"],["WP-2-4B","B"],
-  ["SBS-1-1B","B"],
+  ["SBS-1-1A","B"],["SBS-1-1B","B"],
   ["HOD-1","B"],["HOD-2E","B"],["HOD-3E","B"],["HOD-4E","B"],["HOD-5E","B"],["HOD-6E","B"],
   ["RS-1","B"],["RS-2E","B"],["RS-3E","B"],["RS-4E","B"],["RS-5E","B"],
   ["FOB-1-1A","B"],["FOB-1-2A","B"],["FOB-1-3A","B"],["FOB-1-4A","B"],["FOB-2-1A","B"],["FOB-2-2A","B"],["FOB-2-3A","B"],["PC-1B","B"],["PC-2B","B"],["PC-3B","B"],["PC-4B","B"],["PC-5B","B"],["PC-6B","B"],["PC-7B","B"],["PC-8B","B"],["PC-9B","B"],["PC-10B","B"],["PC-11B","B"],["PC-1E","B"],["PC-2E","B"],["PC-3E","B"],["PC-4E","B"],["PC-5E","B"],["PC-6E","B"],["PC-7E","B"],["PC-8E","B"],["PC-9E","B"],["PC-10E","B"],["PC-11E","B"],["PC-12E","B"],["PC-13E","B"],["PC-14E","B"],["PC-15E","B"],["PC-16E","B"],["PC-17E","B"],
@@ -12757,6 +12757,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=248"></script>
+<script src="riffjams-admin.js?v=249"></script>
 </body>
 </html>

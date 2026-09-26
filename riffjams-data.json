@@ -2144,11 +2144,15 @@
             "song": "Sabbath Bloody Sabbath",
             "licks": [
               [
+                "1-1A",
+                1,
+                "SBS-1-1A"
+              ],
+              [
                 "1-1B",
                 2,
                 "SBS-1-1B"
               ],
-              null,
               null,
               null,
               null,
