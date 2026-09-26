@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-26T20:57:03.040Z",
+  "updatedAt": "2026-09-26T21:03:30.555Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -2182,11 +2182,31 @@
           {
             "song": "A National Acrobat",
             "licks": [
-              null,
-              null,
-              null,
-              null,
-              null,
+              [
+                "1-1A",
+                1,
+                "ANA-1-1A"
+              ],
+              [
+                "1-2A",
+                1,
+                "ANA-1-2A"
+              ],
+              [
+                "1-3A",
+                1,
+                "ANA-1-3A"
+              ],
+              [
+                "1-4A",
+                1,
+                "ANA-1-4A"
+              ],
+              [
+                "1-5A",
+                1,
+                "ANA-1-5A"
+              ],
               null,
               null,
               null,
