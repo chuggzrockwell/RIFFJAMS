@@ -6696,7 +6696,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=242";
+  var url = base + "?playboard=1&v=243";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6725,7 +6725,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=242") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=243") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -6802,7 +6802,7 @@ function initPlayboardPage() {
     + '</select></label>'
     + '<button type="button" class="sec-play-clear" id="secPlayRandomize" title="Shuffle Board order (Z)">Randomize</button>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or 0 then Enter)">Clear</button>'
-    + '<div class="sec-play-meta" id="secPlayMeta">Board — album+song[.pos] + NP Enter</div>'
+    + '<div class="sec-play-meta" id="secPlayMeta">Solo — album+song[.pos] + NP Enter</div>'
     + '</div>'
     + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to remove · drag to reorder · album+song[.pos]+Enter to add.</div></div>'
     + '</aside></div></div>';
@@ -11007,38 +11007,23 @@ function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
   var songName = boardSongNameAt(albumName, songDigit);
   if (!albumName || !songName) return -1;
   var wantPos = (posDigit != null && posDigit !== "") ? parseInt(posDigit, 10) : null;
+  /* Keypad entry always pulls Solo Map licks (never Song Map riff sections). */
   var pairs = [];
-  var useSolo = (typeof llMode !== "undefined" && llMode === "solo");
-  if (useSolo) {
-    var soloAlbums = (typeof SOLO_MAP !== "undefined" && SOLO_MAP && SOLO_MAP.albums) ? SOLO_MAP.albums : [];
-    soloAlbums.forEach(function(a){
-      if (!a || a.name !== albumName) return;
-      (a.songs || []).forEach(function(s){
-        if (!s || s.song !== songName) return;
-        pairs = (s.licks || []).slice();
-      });
+  var soloAlbums = (typeof SOLO_MAP !== "undefined" && SOLO_MAP && SOLO_MAP.albums) ? SOLO_MAP.albums : [];
+  soloAlbums.forEach(function(a){
+    if (!a || a.name !== albumName) return;
+    (a.songs || []).forEach(function(s){
+      if (!s || s.song !== songName) return;
+      pairs = (s.licks || []).slice();
     });
-    /* Also include Song Map section chips so fretting .pos (e.g. 24.3) works in Solo mode */
-    var songsR = boardFindAlbumSongs(albumName);
-    songsR.forEach(function(s){
-      if (!s || (s.song || s.name) !== songName) return;
-      (s.sections || s.chips || []).forEach(function(pair){ pairs.push(pair); });
-    });
-  } else {
-    var songs = boardFindAlbumSongs(albumName);
-    songs.forEach(function(s){
-      if (!s || (s.song || s.name) !== songName) return;
-      pairs = s.sections || s.chips || s.licks || [];
-    });
-  }
+  });
   var items = [];
   var seen = {};
   (pairs || []).forEach(function(pair){
     if (typeof isChipPair === "function" && !isChipPair(pair)) return;
     if (!pair || !pair[0]) return;
     var code = String(pair[0]);
-    var lick = String((pair[2] != null && pair[2] !== "") ? pair[2] : (useSolo ? pair[0] : "")).trim();
-    if (!lick && typeof sectionLickId === "function") lick = sectionLickId(songName, code, pair[2]);
+    var lick = String((pair[2] != null && pair[2] !== "") ? pair[2] : pair[0]).trim();
     if (!lick) return;
     var positions = boardEntryPositions(pair);
     if (wantPos != null && positions.indexOf(wantPos) < 0) return;
