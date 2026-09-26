@@ -1098,7 +1098,19 @@
     flex-direction: column;
     padding: 1px 8px; /* 1px above/below glow */
     box-sizing: border-box;
-    cursor: pointer;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .sec-play-card.is-dragging {
+    opacity: 0.72;
+    cursor: grabbing;
+    z-index: 6;
+  }
+  .sec-play-card.is-dragging .face {
+    transform: translateY(0) scale(1.03);
+    filter: brightness(1.05);
   }
   .sec-play-card .face {
     position: relative;
@@ -1198,6 +1210,8 @@
     display: block;
     border-radius: 10px;
     image-rendering: crisp-edges;
+    -webkit-user-drag: none;
+    pointer-events: none;
   }
   .sec-play-card .ref {
     position: absolute;
@@ -6668,7 +6682,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=237";
+  var url = base + "?playboard=1&v=238";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6697,7 +6711,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=237") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=238") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -6775,7 +6789,7 @@ function initPlayboardPage() {
     + '<button type="button" class="sec-play-clear" id="secPlayRandomize" title="Shuffle Board order (Z)">Randomize</button>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or 0 then Enter)">Clear</button>'
     + '</div>'
-    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to remove · song[.class]+Enter to add.</div></div>'
+    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to remove · drag to reorder · song[.class]+Enter to add.</div></div>'
     + '</aside></div></div>';
   pullPlayQueue();
   trimPlayQueueToFit();
@@ -6784,6 +6798,7 @@ function initPlayboardPage() {
   syncModeSelects();
   renderPlayBoard();
   document.getElementById("secPlayBoard").onclick = function(e){
+    if (didBoardDrag) { didBoardDrag = false; return; }
     var playCard = e.target.closest(".sec-play-card");
     if (!playCard) return;
     var key = playCard.getAttribute("data-key");
@@ -9030,6 +9045,104 @@ function findPlayIndex(key) {
   for (var i = 0; i < playQueue.length; i++) if (playQueue[i].key === key) return i;
   return -1;
 }
+/** Playboard drag-reorder: click removes; drag past threshold reorders. */
+var didBoardDrag = false;
+var boardDrag = null;
+function syncPlayQueueFromBoardDom() {
+  var board = document.getElementById("secPlayBoard");
+  if (!board) return false;
+  var keys = [].map.call(board.querySelectorAll(".sec-play-card"), function(c){
+    return c.getAttribute("data-key");
+  });
+  if (!keys.length) return false;
+  var byKey = {};
+  playQueue.forEach(function(item){ byKey[item.key] = item; });
+  var next = [];
+  keys.forEach(function(k){ if (byKey[k]) next.push(byKey[k]); });
+  playQueue.forEach(function(item){
+    if (keys.indexOf(item.key) < 0) next.push(item);
+  });
+  var changed = next.length !== playQueue.length;
+  if (!changed) {
+    for (var i = 0; i < next.length; i++) {
+      if (next[i].key !== playQueue[i].key) { changed = true; break; }
+    }
+  }
+  if (!changed) return false;
+  playQueue = next;
+  return true;
+}
+function onBoardCardPointerDown(e) {
+  if (e.button !== 0 && e.pointerType !== "touch") return;
+  var card = e.target.closest(".sec-play-card");
+  if (!card) return;
+  var board = card.closest("#secPlayBoard");
+  if (!board) return;
+  didBoardDrag = false;
+  boardDrag = {
+    el: card,
+    key: card.getAttribute("data-key") || "",
+    pointerId: e.pointerId,
+    startX: e.clientX,
+    startY: e.clientY,
+    moved: false
+  };
+}
+function onBoardCardPointerMove(e) {
+  if (!boardDrag || e.pointerId !== boardDrag.pointerId) return;
+  var dx = e.clientX - boardDrag.startX;
+  var dy = e.clientY - boardDrag.startY;
+  if (!boardDrag.moved) {
+    if ((dx * dx + dy * dy) < 36) return;
+    boardDrag.moved = true;
+    didBoardDrag = true;
+    boardDrag.el.classList.add("is-dragging");
+    try { boardDrag.el.setPointerCapture(e.pointerId); } catch (errCap) {}
+  }
+  e.preventDefault();
+  var board = document.getElementById("secPlayBoard");
+  if (!board) return;
+  var cards = [].slice.call(board.querySelectorAll(".sec-play-card"));
+  var over = null;
+  for (var i = 0; i < cards.length; i++) {
+    if (cards[i] === boardDrag.el) continue;
+    var r = cards[i].getBoundingClientRect();
+    if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) {
+      over = cards[i];
+      break;
+    }
+  }
+  if (!over) return;
+  var midX = over.getBoundingClientRect().left + over.getBoundingClientRect().width / 2;
+  if (e.clientX < midX) {
+    if (over.previousElementSibling !== boardDrag.el) board.insertBefore(boardDrag.el, over);
+  } else {
+    if (over.nextElementSibling !== boardDrag.el) board.insertBefore(boardDrag.el, over.nextElementSibling);
+  }
+}
+function onBoardCardPointerUp(e) {
+  if (!boardDrag || e.pointerId !== boardDrag.pointerId) return;
+  var moved = boardDrag.moved;
+  var el = boardDrag.el;
+  el.classList.remove("is-dragging");
+  try { el.releasePointerCapture(e.pointerId); } catch (errRel) {}
+  boardDrag = null;
+  if (!moved) return;
+  didBoardDrag = true;
+  if (syncPlayQueueFromBoardDom()) {
+    publishPlayQueue();
+    if (typeof syncPlayChipClasses === "function") syncPlayChipClasses();
+  }
+}
+function bindPlayBoardDrag() {
+  if (window._playBoardDragBound) return;
+  window._playBoardDragBound = true;
+  document.addEventListener("pointerdown", onBoardCardPointerDown, true);
+  document.addEventListener("pointermove", onBoardCardPointerMove, true);
+  document.addEventListener("pointerup", onBoardCardPointerUp, true);
+  document.addEventListener("pointercancel", onBoardCardPointerUp, true);
+}
+bindPlayBoardDrag();
 function playBoardReady() {
   var board = document.getElementById("secPlayBoard");
   return !!(board && board.clientWidth >= 40 && board.clientHeight >= 40);
@@ -11978,6 +12091,7 @@ document.getElementById("sectionsSheet").onclick = function(e){
   }
   var playCard = e.target.closest(".sec-play-card");
   if (playCard && sectionsMode === "play") {
+    if (didBoardDrag) { didBoardDrag = false; return; }
     var key = playCard.getAttribute("data-key");
     if (!key) return;
     /* Single click removes the lick from the Board */
