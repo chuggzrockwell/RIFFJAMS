@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-27T13:11:30.862Z",
+  "updatedAt": "2026-09-27T13:17:15.570Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1985,15 +1985,36 @@
           {
             "song": "Lord of This World",
             "licks": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              [
+                "3-1B",
+                1,
+                "LOTW-3-1B"
+              ],
+              [
+                "3-2B",
+                1,
+                "LOTW-3-2B"
+              ],
+              [
+                "3-3B",
+                1,
+                "LOTW-3-3B"
+              ],
+              [
+                "4-1B",
+                1,
+                "LOTW-4-1B"
+              ],
+              [
+                "4-2B",
+                1,
+                "LOTW-4-2B"
+              ],
+              [
+                "4-3B",
+                1,
+                "LOTW-4-3B"
+              ],
               null
             ]
           },
