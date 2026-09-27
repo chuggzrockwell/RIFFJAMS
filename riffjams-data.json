@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-27T13:33:06.000Z",
+  "updatedAt": "2026-09-27T13:36:40.000Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -642,6 +642,26 @@
             null,
             null,
             null
+          ],
+          "licks": [
+            [
+              "1-1B",
+              1,
+              "ITV-1-1B",
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              "1-2B",
+              1,
+              "ITV-1-2B",
+              [
+                3,
+                4
+              ]
+            ]
           ]
         }
       ]
@@ -2081,16 +2101,24 @@
           {
             "song": "Into the Void",
             "licks": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
+              [
+                "1-1B",
+                1,
+                "ITV-1-1B",
+                [
+                  3,
+                  4
+                ]
+              ],
+              [
+                "1-2B",
+                1,
+                "ITV-1-2B",
+                [
+                  3,
+                  4
+                ]
+              ]
             ]
           }
         ]
