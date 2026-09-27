@@ -10096,7 +10096,7 @@ var CATALOG = [
   ["LFT-1A","B"],["LFT-2A","B"],["LFT-3A","B"],["LFT-4A","B"],["LFT-5A","B"],["LFT-6A","B"],["LFT-7A","B"],["LFT-8A","B"],["LFT-9A","B"],["LFT-10A","B"],["LFT-11A","B"],["LFT-12A","B"],["LFT-13A","B"],
   ["AF-1A","B"],["AF-1B","B"],["AF-2B","B"],["AF-3B","B"],["AF-4B","B"],
   ["COTG-1A","B"],["COTG-1B","B"],["COTG-2A","B"],["COTG-2B","B"],["COTG-3A","B"],["COTG-4A","B"],["COTG-5A","B"],["COTG-6A","B"],
-  ["LOTW-1-1A","B"],["LOTW-1-2A","B"],["LOTW-1-3A","B"],["LOTW-1-2-2A","B"],["LOTW-1-2-3A","B"],["LOTW-1-2-4A","B"],["LOTW-1-2-5A","B"],["LOTW-3-1B","B"],["LOTW-3-2B","B"],["LOTW-3-3B","B"],["LOTW-4-1B","B"],["LOTW-4-2B","B"],["LOTW-4-3B","B"],["LOTW-4-2-1A","B"],
+  ["LOTW-1-1A","B"],["LOTW-1-2A","B"],["LOTW-1-3A","B"],["LOTW-2-2A","B"],["LOTW-2-3A","B"],["LOTW-2-4A","B"],["LOTW-2-5A","B"],["LOTW-3-1B","B"],["LOTW-3-2B","B"],["LOTW-3-3B","B"],["LOTW-4-1B","B"],["LOTW-4-2B","B"],["LOTW-4-3B","B"],["LOTW-2-1A","B"],
   ["HOD-1","B"],["HOD-2E","B"],["HOD-3E","B"],["HOD-4E","B"],["HOD-5E","B"],["HOD-6E","B"],
   ["RS-1","B"],["RS-2E","B"],["RS-3E","B"],["RS-4E","B"],["RS-5E","B"],
   ["FOB-1-1A","B"],["FOB-1-2A","B"],["FOB-1-3A","B"],["FOB-1-4A","B"],["FOB-2-1A","B"],["FOB-2-2A","B"],["FOB-2-3A","B"],["PC-1B","B"],["PC-2B","B"],["PC-3B","B"],["PC-4B","B"],["PC-5B","B"],["PC-6B","B"],["PC-7B","B"],["PC-8B","B"],["PC-9B","B"],["PC-10B","B"],["PC-11B","B"],["PC-1E","B"],["PC-2E","B"],["PC-3E","B"],["PC-4E","B"],["PC-5E","B"],["PC-6E","B"],["PC-7E","B"],["PC-8E","B"],["PC-9E","B"],["PC-10E","B"],["PC-11E","B"],["PC-12E","B"],["PC-13E","B"],["PC-14E","B"],["PC-15E","B"],["PC-16E","B"],["PC-17E","B"],
@@ -12505,6 +12505,9 @@ function isNumpadKey(e, digit) {
   var codes = codeMap[digit] || [];
   if (codes.indexOf(e.code) >= 0) return true;
   if (e.location === 3 && String(e.key) === digit) return true;
+  /* Some Linux/browser combinations expose numpad navigation by keyCode only. */
+  var keyCodes = { "0": 96, "1": 97, "2": 98, "3": 99, "4": 100, "5": 101, "6": 102, "7": 103, "8": 104, "9": 105 };
+  if (e.keyCode === keyCodes[digit]) return true;
   // NumLock off: Numpad0 often reports as Insert
   if (digit === "0" && e.location === 3 && (e.key === "Insert" || e.code === "Insert")) return true;
   if (digit === "0" && e.code === "Numpad0") return true;
@@ -12637,6 +12640,16 @@ document.addEventListener("keydown", function(e){
     }
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
+  /* Handle this before the 0+Enter mode-entry buffer so Numpad 7 always
+     remains the Song Map ruler shortcut, even after a pending 0. */
+  if (document.body.classList.contains("sections-mode")) {
+    var tagRulerKey = (e.target && e.target.tagName) || "";
+    if (tagRulerKey !== "INPUT" && tagRulerKey !== "TEXTAREA" && isNumpadKey(e, "7")) {
+      e.preventDefault();
+      setSectionRulers(!sectionRulersOn);
+      return;
+    }
+  }
   if (handleModeEntryKey(e)) return;
   /* Shift+C: clear Board queue / Song Map filters / LL filters */
   if (e.shiftKey && ((e.key || "").toLowerCase() === "c" || e.code === "KeyC")) {
@@ -12706,7 +12719,6 @@ document.addEventListener("keydown", function(e){
     if (isNumpadKey(e, "3")) { setSectionsMode("play"); openPlayWindow(); return; }
     if (isNumpadKey(e, "5")) { setHighlightMode(!highlightMode); return; }
     if (isNumpadKey(e, "6")) { cycleMapView(); return; }
-    if (isNumpadKey(e, "7")) { setSectionRulers(!sectionRulersOn); return; }
     if (e.shiftKey && k === "v") { setSectionsMode("view"); return; }
     if (e.shiftKey && k === "e") { setSectionsMode("edit"); return; }
     if (e.shiftKey && k === "p") { setSectionsMode("play"); return; }
@@ -12779,6 +12791,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=260"></script>
+<script src="riffjams-admin.js?v=262"></script>
 </body>
 </html>
