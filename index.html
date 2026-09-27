@@ -4710,6 +4710,16 @@ function removeMirrorSectionArrangement(songName, code, fromArrangement) {
 /** Fill any codes present in one mode but missing in the other. */
 function mirrorMissingSectionArrangementChips() {
   /* Prefer fresh arrangement map from storage (chips saved in Arrange may not be in a stale in-memory copy). */
+  var rulerKeep = {};
+  try {
+    ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).forEach(function(a){
+      if (!a || !a.name) return;
+      (a.songs || []).forEach(function(s){
+        if (!s || !s.song || !s.sectionRulers || !s.sectionRulers.length) return;
+        rulerKeep[a.name + "\0" + s.song] = s.sectionRulers;
+      });
+    });
+  } catch (eKeepR) {}
   try {
     var rawArr = localStorage.getItem(ARRANGEMENT_MAP_KEY);
     if (rawArr) {
@@ -4718,6 +4728,18 @@ function mirrorMissingSectionArrangementChips() {
     }
   } catch (eReloadArr) {}
   if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap();
+  /* Storage reload must not drop in-memory sectionRulers (toggle/render depends on them). */
+  try {
+    ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).forEach(function(a){
+      if (!a || !a.name) return;
+      (a.songs || []).forEach(function(s){
+        if (!s || !s.song) return;
+        if (s.sectionRulers && s.sectionRulers.length) return;
+        var kept = rulerKeep[a.name + "\0" + s.song];
+        if (kept) s.sectionRulers = kept.map(function(r){ return { name: r.name, start: r.start, end: r.end }; });
+      });
+    });
+  } catch (eRestR) {}
   var touchedSec = false, touchedArr = false;
   (ALBUMS || []).forEach(function(a){
     (a.songs || []).forEach(function(ss){
@@ -5874,10 +5896,15 @@ ARRANGEMENT_MAP = loadArrangementMap();
 try {
   if (ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) {
     collapseAlbumTiers(ARRANGEMENT_MAP.albums);
-    localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP));
+    /* Only re-persist when a local map already existed (tier collapse).
+       Do NOT write a blank seed into localStorage — that made loadSharedData
+       think arrangement was hydrated and skipped riffjams-data.json, so
+       sectionRulers never reached the Song Map (menu toggled, nothing drew). */
+    var hadLocalArr = false;
+    try { hadLocalArr = !!localStorage.getItem(ARRANGEMENT_MAP_KEY); } catch (eHadArr) {}
+    if (hadLocalArr) localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP));
   }
 } catch (eTierArr) {}
-try { if (!localStorage.getItem(ARRANGEMENT_MAP_KEY)) localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP)); } catch (eArrPersist) {}
 syncArrangementButtons();
 
 var SOLO_COL_GROUP_START = 12; // 1-based; collapse 12..end in Solo
@@ -5969,18 +5996,35 @@ function setSectionRulers(on) {
   var next = !!on;
   if (next === sectionRulersOn) {
     syncSectionRulersUi();
+    /* Still refresh map so checkbox and lane HTML cannot drift. */
+    var secSame = document.getElementById("sections");
+    if (secSame && !secSame.classList.contains("hidden") && typeof showSections === "function") {
+      showSections(true);
+    }
     return;
   }
   if (!next && sectionRulerDrag) endSectionRulerDrag(null, true);
   sectionRulersOn = next;
   try { localStorage.setItem(SECTION_RULERS_KEY, sectionRulersOn ? "1" : "0"); } catch (eSrSet) {}
   syncSectionRulersUi();
+  /* Rebuild Song Map so lanes render (on) or omit+collapse gap (off).
+     CSS body.section-rulers-off is a backup if DOM still has lanes. */
   var sec = document.getElementById("sections");
-  if (sec && !sec.classList.contains("hidden")) showSections(true);
+  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") {
+    showSections(true);
+  }
 }
-/* Tools → Rulers and Numpad 7 share this exact toggle. */
+/* Tools → Rulers and Numpad 7 share this exact toggle.
+   Always flips flag + menu, then rebuilds the map so lanes paint/hide. */
 function toggleSectionRulersUi() {
   setSectionRulers(!sectionRulersOn);
+  /* Belt-and-suspenders: if Song Map is open, force the same paint path
+     even when setSectionRulers early-returned or sections visibility raced. */
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") {
+    syncSectionRulersUi();
+    showSections(true);
+  }
 }
 function sectionRulersShortcutTargetOk(t) {
   /* Same gate as Numpad 1–6 on Song Map: only block real text entry.
@@ -6059,6 +6103,34 @@ function copySectionRulersField(song) {
   var list = readSectionRulers(song);
   if (!list.length) return null;
   return list.map(function(r){ return { name: r.name, start: r.start, end: r.end }; });
+}
+/* Copy sectionRulers from shared/repo map onto local songs that lack them.
+   Keeps local rulers when present. Returns true if anything changed. */
+function mergeArrangementSectionRulers(targetMap, sourceMap) {
+  if (!targetMap || !sourceMap) return false;
+  var byAlbum = {};
+  ((sourceMap && sourceMap.albums) || []).forEach(function(a){
+    if (!a || !a.name) return;
+    var songs = {};
+    (a.songs || []).forEach(function(s){
+      if (s && s.song) songs[s.song] = s;
+    });
+    byAlbum[a.name] = songs;
+  });
+  var changed = false;
+  ((targetMap && targetMap.albums) || []).forEach(function(a){
+    if (!a || !a.name || !byAlbum[a.name]) return;
+    (a.songs || []).forEach(function(s){
+      if (!s || !s.song) return;
+      if (s.sectionRulers && s.sectionRulers.length) return;
+      var src = byAlbum[a.name][s.song];
+      var copied = copySectionRulersField(src);
+      if (!copied) return;
+      s.sectionRulers = copied;
+      changed = true;
+    });
+  });
+  return changed;
 }
 function storeSectionRulers(song, rulers) {
   if (!song) return;
@@ -12871,6 +12943,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=273"></script>
+<script src="riffjams-admin.js?v=274"></script>
 </body>
 </html>

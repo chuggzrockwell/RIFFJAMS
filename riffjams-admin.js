@@ -596,9 +596,18 @@
         try {
           var localRaw = localStorage.getItem("lick-arrangement-map-v1");
           var localEmpty = !localRaw || localRaw === "null";
-          if (localEmpty && typeof window.normalizeArrangementMap === "function") {
-            window.ARRANGEMENT_MAP = window.normalizeArrangementMap(clone(data.arrangementMap), window.ALBUMS_DEFAULT || window.ALBUMS);
-            if (typeof window.saveArrangementMap === "function") window.saveArrangementMap();
+          if (typeof window.normalizeArrangementMap === "function") {
+            var remoteArr = window.normalizeArrangementMap(clone(data.arrangementMap), window.ALBUMS_DEFAULT || window.ALBUMS);
+            if (localEmpty) {
+              /* Fresh browser: take full shared arrangement (chips + sectionRulers). */
+              window.ARRANGEMENT_MAP = remoteArr;
+              if (typeof window.saveArrangementMap === "function") window.saveArrangementMap();
+            } else if (window.ARRANGEMENT_MAP && typeof window.mergeArrangementSectionRulers === "function") {
+              /* Stale local map: keep chips, fill missing sectionRulers from repo. */
+              if (window.mergeArrangementSectionRulers(window.ARRANGEMENT_MAP, remoteArr)) {
+                if (typeof window.saveArrangementMap === "function") window.saveArrangementMap();
+              }
+            }
           }
         } catch (eArrHydrate) {}
       }
