@@ -12505,6 +12505,9 @@ function isNumpadKey(e, digit) {
   var codes = codeMap[digit] || [];
   if (codes.indexOf(e.code) >= 0) return true;
   if (e.location === 3 && String(e.key) === digit) return true;
+  /* Some Linux/browser combinations expose numpad navigation by keyCode only. */
+  var keyCodes = { "0": 96, "1": 97, "2": 98, "3": 99, "4": 100, "5": 101, "6": 102, "7": 103, "8": 104, "9": 105 };
+  if (e.keyCode === keyCodes[digit]) return true;
   // NumLock off: Numpad0 often reports as Insert
   if (digit === "0" && e.location === 3 && (e.key === "Insert" || e.code === "Insert")) return true;
   if (digit === "0" && e.code === "Numpad0") return true;
@@ -12637,6 +12640,16 @@ document.addEventListener("keydown", function(e){
     }
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
+  /* Handle this before the 0+Enter mode-entry buffer so Numpad 7 always
+     remains the Song Map ruler shortcut, even after a pending 0. */
+  if (document.body.classList.contains("sections-mode")) {
+    var tagRulerKey = (e.target && e.target.tagName) || "";
+    if (tagRulerKey !== "INPUT" && tagRulerKey !== "TEXTAREA" && isNumpadKey(e, "7")) {
+      e.preventDefault();
+      setSectionRulers(!sectionRulersOn);
+      return;
+    }
+  }
   if (handleModeEntryKey(e)) return;
   /* Shift+C: clear Board queue / Song Map filters / LL filters */
   if (e.shiftKey && ((e.key || "").toLowerCase() === "c" || e.code === "KeyC")) {
@@ -12706,7 +12719,6 @@ document.addEventListener("keydown", function(e){
     if (isNumpadKey(e, "3")) { setSectionsMode("play"); openPlayWindow(); return; }
     if (isNumpadKey(e, "5")) { setHighlightMode(!highlightMode); return; }
     if (isNumpadKey(e, "6")) { cycleMapView(); return; }
-    if (isNumpadKey(e, "7")) { setSectionRulers(!sectionRulersOn); return; }
     if (e.shiftKey && k === "v") { setSectionsMode("view"); return; }
     if (e.shiftKey && k === "e") { setSectionsMode("edit"); return; }
     if (e.shiftKey && k === "p") { setSectionsMode("play"); return; }
@@ -12779,6 +12791,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=261"></script>
+<script src="riffjams-admin.js?v=262"></script>
 </body>
 </html>
