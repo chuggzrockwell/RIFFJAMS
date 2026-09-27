@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-27T13:17:15.570Z",
+  "updatedAt": "2026-09-27T13:17:41.760Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1985,6 +1985,11 @@
           {
             "song": "Lord of This World",
             "licks": [
+              [
+                "1-1A",
+                1,
+                "LOTW-1-1A"
+              ],
               [
                 "3-1B",
                 1,
