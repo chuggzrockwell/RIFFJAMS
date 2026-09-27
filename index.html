@@ -5983,20 +5983,37 @@ function toggleSectionRulersUi() {
   setSectionRulers(!sectionRulersOn);
 }
 function sectionRulersShortcutTargetOk(t) {
+  /* Same gate as Numpad 1–6 on Song Map: only block real text entry.
+     Do NOT block SELECT — #mapModeSelect keeps focus after View changes,
+     and rejecting it made Numpad 7 silently no-op while 1–6 still worked. */
   if (!t) return true;
   var tag = (t.tagName || "").toUpperCase();
-  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return false;
+  if (tag === "INPUT" || tag === "TEXTAREA") return false;
   if (t.isContentEditable) return false;
   return true;
+}
+/* Dedicated Numpad 7 match — do not rely on isNumpadKey alone for rulers. */
+function isSectionRulersNumpad7(e) {
+  if (!e) return false;
+  var code = String(e.code || "");
+  var key = String(e.key || "");
+  if (code === "Numpad7") return true;
+  if (e.location === 3 && key === "7") return true;
+  /* NumLock off: physical Numpad 7 reports as Home (location NUMPAD). */
+  if (e.location === 3 && (key === "Home" || code === "Home" || e.keyCode === 36 || e.which === 36)) return true;
+  /* Legacy NumLock-on keyCode (103) when code is missing. */
+  if (e.keyCode === 103 || e.which === 103) return true;
+  return false;
 }
 function handleSectionRulersShortcut(e) {
   if (!e || e.type !== "keydown") return false;
   if (e.metaKey || e.ctrlKey || e.altKey) return false;
   if (!document.body.classList.contains("sections-mode")) return false;
   if (!sectionRulersShortcutTargetOk(e.target)) return false;
-  if (!isNumpadKey(e, "7")) return false;
+  if (!isSectionRulersNumpad7(e)) return false;
   e.preventDefault();
   try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
+  /* Same path as Tools → Rulers. Single window-capture listener only (no doc duplicate). */
   toggleSectionRulersUi();
   return true;
 }
@@ -12624,15 +12641,16 @@ window.addEventListener("resize", function(){
   }
 });
 
-/* Song Map: after pointer interaction, pull focus back from iframes/buttons so numpad shortcuts work. */
+/* Song Map: after pointer interaction, pull focus back from iframes/selects so numpad shortcuts work. */
 document.addEventListener("pointerdown", function(e){
   if (!document.body.classList.contains("sections-mode")) return;
   if (!sectionRulersShortcutTargetOk(e.target)) return;
   try {
     if (document.body.tabIndex < 0) document.body.tabIndex = -1;
-    /* Do not steal focus from real buttons mid-click; blur only cross-origin iframes. */
     var ae = document.activeElement;
-    if (ae && ae.tagName === "IFRAME") {
+    var tag = ae && (ae.tagName || "").toUpperCase();
+    /* Blur iframe / View <select> when clicking the map so Numpad 7 is not stranded. */
+    if (ae && (tag === "IFRAME" || tag === "SELECT") && ae !== e.target && !ae.contains(e.target)) {
       try { ae.blur(); } catch (errBlur) {}
       document.body.focus({ preventScroll: true });
     }
@@ -12853,6 +12871,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=272"></script>
+<script src="riffjams-admin.js?v=273"></script>
 </body>
 </html>
