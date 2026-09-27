@@ -1907,6 +1907,23 @@
   body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta {
     --song-meta-w: 400px;
   }
+  /* Meta cols off: collapse Key/Tuning/BPM/RSI so chips hug the nameplate (no gap). */
+  body.song-meta-cols-off .sections-wrap {
+    --song-meta-w: 0px !important;
+  }
+  body.song-meta-cols-off .song-meta-strip,
+  body.song-meta-cols-off .song-meta-heads,
+  body.song-meta-cols-off .song-meta-head-gap,
+  body.song-meta-cols-off .song-meta-head-name {
+    display: none !important;
+    flex: 0 0 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
   .song-meta-strip { display: none; }
   body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta .song-meta-strip {
     display: flex;
@@ -3930,7 +3947,7 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles Arrangement → Riff → Solo · 7 Rulers · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles Arrangement → Riff → Solo · 7 Rulers · 8 Meta · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
@@ -3948,6 +3965,7 @@
         <div class="map-tools-menu" id="mapToolsMenu" role="menu">
           <button type="button" class="map-tools-item" id="secPeekBtn" role="menuitemcheckbox" aria-checked="false" title="Hover chips to peek tabs">Peek</button>
           <button type="button" class="map-tools-item" id="secRulersBtn" role="menuitemcheckbox" aria-checked="false" title="Show section rulers">Rulers</button>
+          <button type="button" class="map-tools-item" id="secMetaColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show Key, Tuning, BPM, RSI columns">Meta</button>
         </div>
       </div>
       <span class="sec-edit-tools" id="secEditTools" hidden>
@@ -6061,6 +6079,84 @@ function handleSectionRulersShortcut(e) {
   toggleSectionRulersUi();
   return true;
 }
+/* Song Map Tools → Meta (Key/Tuning/BPM/RSI). Same localStorage on/off pattern as Rulers. Default on. */
+var SONG_META_COLS_KEY = "riffjams-song-meta-cols";
+var songMetaColsOn = true;
+try {
+  var _smc = localStorage.getItem(SONG_META_COLS_KEY);
+  if (_smc === "0") songMetaColsOn = false;
+} catch (eSmc) {}
+function syncSongMetaColsUi() {
+  document.body.classList.toggle("song-meta-cols-off", !songMetaColsOn);
+  var btn = document.getElementById("secMetaColsBtn");
+  if (!btn) return;
+  btn.classList.toggle("on", songMetaColsOn);
+  btn.setAttribute("aria-checked", songMetaColsOn ? "true" : "false");
+}
+function setSongMetaCols(on) {
+  var next = !!on;
+  if (next === songMetaColsOn) {
+    syncSongMetaColsUi();
+    var secSame = document.getElementById("sections");
+    if (secSame && !secSame.classList.contains("hidden") && typeof showSections === "function") {
+      showSections(true);
+    }
+    return;
+  }
+  songMetaColsOn = next;
+  try { localStorage.setItem(SONG_META_COLS_KEY, songMetaColsOn ? "1" : "0"); } catch (eSmcSet) {}
+  syncSongMetaColsUi();
+  /* Rebuild Song Map so meta headers/plates render (on) or omit+collapse gap (off). */
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") {
+    showSections(true);
+  }
+}
+/* Tools → Meta and Numpad 8 share this exact toggle. */
+function toggleSongMetaColsUi() {
+  setSongMetaCols(!songMetaColsOn);
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") {
+    syncSongMetaColsUi();
+    showSections(true);
+  }
+}
+function songMetaColsShortcutTargetOk(t) {
+  /* Same gate as Numpad 7 / 1–6 on Song Map: only block real text entry.
+     Do NOT block SELECT — #mapModeSelect keeps focus after View changes. */
+  if (!t) return true;
+  var tag = (t.tagName || "").toUpperCase();
+  if (tag === "INPUT" || tag === "TEXTAREA") return false;
+  if (t.isContentEditable) return false;
+  return true;
+}
+/* Dedicated Numpad 8 match — same robustness as isSectionRulersNumpad7. */
+function isSongMetaColsNumpad8(e) {
+  if (!e) return false;
+  var code = String(e.code || "");
+  var key = String(e.key || "");
+  if (code === "Numpad8") return true;
+  if (e.location === 3 && key === "8") return true;
+  /* NumLock off: physical Numpad 8 reports as ArrowUp (location NUMPAD). */
+  if (e.location === 3 && (key === "ArrowUp" || code === "ArrowUp" || e.keyCode === 38 || e.which === 38)) return true;
+  /* Legacy NumLock-on keyCode (104) when code is missing. */
+  if (e.keyCode === 104 || e.which === 104) return true;
+  /* Prefer isNumpadKey when available (covers NumLock-off nav map). */
+  if (typeof isNumpadKey === "function" && isNumpadKey(e, "8")) return true;
+  return false;
+}
+function handleSongMetaColsShortcut(e) {
+  if (!e || e.type !== "keydown") return false;
+  if (e.metaKey || e.ctrlKey || e.altKey) return false;
+  if (!document.body.classList.contains("sections-mode")) return false;
+  if (!songMetaColsShortcutTargetOk(e.target)) return false;
+  if (!isSongMetaColsNumpad8(e)) return false;
+  e.preventDefault();
+  try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
+  /* Same path as Tools → Meta. Single window-capture listener only (no doc duplicate). */
+  toggleSongMetaColsUi();
+  return true;
+}
 function setMapToolsOpen(open) {
   var dd = document.getElementById("mapToolsDd");
   var btn = document.getElementById("mapToolsBtn");
@@ -6072,6 +6168,7 @@ function mapToolsIsOpen() {
   return !!(dd && dd.classList.contains("open"));
 }
 syncSectionRulersUi();
+syncSongMetaColsUi();
 /* Song-section rulers: inclusive chip columns on the song of the map on screen.
    Overlaps clamp — a ruler never takes a chip another ruler already claims. */
 function readSectionRulers(song) {
@@ -6623,7 +6720,7 @@ function showSections(keepScroll) {
       });
     });
   }
-  var showMetaCols = anySongMeta || anySongRsi;
+  var showMetaCols = songMetaColsOn && (anySongMeta || anySongRsi);
   var metaHeads = showMetaCols
     ? '<span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-name" aria-hidden="true"></span><div class="song-meta-heads"><span>Key</span><span>Tuning</span><span>BPM</span><span>RSI</span></div>'
     : "";
@@ -7363,14 +7460,14 @@ function setSectionsMode(mode) {
     if (arrangementMode) {
       if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
       else if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-      else keys.textContent = "Arrangement · Peek · 7 Rulers · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Arrangement · Peek · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
     } else if (soloMode) {
-      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 5 Peek · 6 cycles View · 7 Rulers · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
-      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 7 Rulers · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-      else keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 7 Rulers · 0 clear filters · Esc closes chip edit · Backspace home";
-    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · 7 Rulers · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
-    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles View · 7 Rulers · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-    else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · 7 Rulers · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
+      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
+      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
+    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+    else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
   }
   if (sectionsMode === "play") {
     /* Stay on Song Map. Next/Current cues are the playalong UI; Playboard is a separate entry. */
@@ -11964,6 +12061,11 @@ document.getElementById("secModes").onclick = function(e){
     setMapToolsOpen(false);
     return;
   }
+  if (e.target.closest("#secMetaColsBtn")) {
+    toggleSongMetaColsUi();
+    setMapToolsOpen(false);
+    return;
+  }
   var btn = e.target.closest(".sec-mode-btn[data-sec-mode]");
   if (!btn) return;
   setSectionsMode(btn.getAttribute("data-sec-mode"));
@@ -12721,7 +12823,7 @@ document.addEventListener("pointerdown", function(e){
     if (document.body.tabIndex < 0) document.body.tabIndex = -1;
     var ae = document.activeElement;
     var tag = ae && (ae.tagName || "").toUpperCase();
-    /* Blur iframe / View <select> when clicking the map so Numpad 7 is not stranded. */
+    /* Blur iframe / View <select> when clicking the map so Numpad 7/8 are not stranded. */
     if (ae && (tag === "IFRAME" || tag === "SELECT") && ae !== e.target && !ae.contains(e.target)) {
       try { ae.blur(); } catch (errBlur) {}
       document.body.focus({ preventScroll: true });
@@ -12738,6 +12840,16 @@ function bindSectionRulersShortcut() {
   }, true);
 }
 bindSectionRulersShortcut();
+function bindSongMetaColsShortcut() {
+  if (window.__riffjamsMetaColsKeyBound) return;
+  window.__riffjamsMetaColsKeyBound = true;
+  /* Capture on window so Playboard/document bubble listeners and focus traps
+     cannot swallow Numpad 8 before Song Map toggles meta columns. */
+  window.addEventListener("keydown", function(e){
+    handleSongMetaColsShortcut(e);
+  }, true);
+}
+bindSongMetaColsShortcut();
 document.addEventListener("keydown", function(e){
   if ((e.metaKey || e.ctrlKey) && !e.altKey && document.body.classList.contains("sections-mode") && sectionsMode === "edit") {
     var tag0 = (e.target && e.target.tagName) || "";
@@ -12801,7 +12913,7 @@ document.addEventListener("keydown", function(e){
     }
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
-  /* Numpad 7 rulers: handled in capture on window (see bindSectionRulersShortcut). */
+  /* Numpad 7 rulers / Numpad 8 meta: handled in capture on window (see bindSectionRulersShortcut / bindSongMetaColsShortcut). */
   if (handleModeEntryKey(e)) return;
   /* Shift+C: clear Board queue / Song Map filters / LL filters */
   if (e.shiftKey && ((e.key || "").toLowerCase() === "c" || e.code === "KeyC")) {
@@ -12943,6 +13055,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=274"></script>
+<script src="riffjams-admin.js?v=275"></script>
 </body>
 </html>
