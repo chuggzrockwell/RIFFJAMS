@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-27T13:17:41.760Z",
+  "updatedAt": "2026-09-27T13:18:48.600Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1989,6 +1989,16 @@
                 "1-1A",
                 1,
                 "LOTW-1-1A"
+              ],
+              [
+                "1-2A",
+                1,
+                "LOTW-1-2A"
+              ],
+              [
+                "1-3A",
+                1,
+                "LOTW-1-3A"
               ],
               [
                 "3-1B",
