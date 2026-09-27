@@ -5978,6 +5978,28 @@ function setSectionRulers(on) {
   var sec = document.getElementById("sections");
   if (sec && !sec.classList.contains("hidden")) showSections(true);
 }
+/* Tools → Rulers and Numpad 7 share this exact toggle. */
+function toggleSectionRulersUi() {
+  setSectionRulers(!sectionRulersOn);
+}
+function sectionRulersShortcutTargetOk(t) {
+  if (!t) return true;
+  var tag = (t.tagName || "").toUpperCase();
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return false;
+  if (t.isContentEditable) return false;
+  return true;
+}
+function handleSectionRulersShortcut(e) {
+  if (!e || e.type !== "keydown") return false;
+  if (e.metaKey || e.ctrlKey || e.altKey) return false;
+  if (!document.body.classList.contains("sections-mode")) return false;
+  if (!sectionRulersShortcutTargetOk(e.target)) return false;
+  if (!isNumpadKey(e, "7")) return false;
+  e.preventDefault();
+  try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
+  toggleSectionRulersUi();
+  return true;
+}
 function setMapToolsOpen(open) {
   var dd = document.getElementById("mapToolsDd");
   var btn = document.getElementById("mapToolsBtn");
@@ -10097,7 +10119,7 @@ var CATALOG = [
   ["AF-1A","B"],["AF-1B","B"],["AF-2B","B"],["AF-3B","B"],["AF-4B","B"],
   ["COTG-1A","B"],["COTG-1B","B"],["COTG-2A","B"],["COTG-2B","B"],["COTG-3A","B"],["COTG-4A","B"],["COTG-5A","B"],["COTG-6A","B"],
   ["LOTW-1-1A","B"],["LOTW-1-2A","B"],["LOTW-1-3A","B"],["LOTW-2-2A","B"],["LOTW-2-3A","B"],["LOTW-2-4A","B"],["LOTW-2-5A","B"],["LOTW-3-1B","B"],["LOTW-3-2B","B"],["LOTW-3-3B","B"],["LOTW-4-1B","B"],["LOTW-4-2B","B"],["LOTW-4-3B","B"],["LOTW-2-1A","B"],
-  ["ITV-1-1B","B"],["ITV-1-2B","B"],["ITV-1-4B","B"],
+  ["ITV-1-1B","B"],["ITV-1-2B","B"],["ITV-1-4B","B"],["ITV-2-1B","B"],["ITV-2-2B","B"],
   ["HOD-1","B"],["HOD-2E","B"],["HOD-3E","B"],["HOD-4E","B"],["HOD-5E","B"],["HOD-6E","B"],
   ["RS-1","B"],["RS-2E","B"],["RS-3E","B"],["RS-4E","B"],["RS-5E","B"],
   ["FOB-1-1A","B"],["FOB-1-2A","B"],["FOB-1-3A","B"],["FOB-1-4A","B"],["FOB-2-1A","B"],["FOB-2-2A","B"],["FOB-2-3A","B"],["PC-1B","B"],["PC-2B","B"],["PC-3B","B"],["PC-4B","B"],["PC-5B","B"],["PC-6B","B"],["PC-7B","B"],["PC-8B","B"],["PC-9B","B"],["PC-10B","B"],["PC-11B","B"],["PC-1E","B"],["PC-2E","B"],["PC-3E","B"],["PC-4E","B"],["PC-5E","B"],["PC-6E","B"],["PC-7E","B"],["PC-8E","B"],["PC-9E","B"],["PC-10E","B"],["PC-11E","B"],["PC-12E","B"],["PC-13E","B"],["PC-14E","B"],["PC-15E","B"],["PC-16E","B"],["PC-17E","B"],
@@ -11849,7 +11871,7 @@ document.getElementById("secModes").onclick = function(e){
     return;
   }
   if (e.target.closest("#secRulersBtn")) {
-    setSectionRulers(!sectionRulersOn);
+    toggleSectionRulersUi();
     setMapToolsOpen(false);
     return;
   }
@@ -12492,7 +12514,8 @@ document.getElementById("libPreviewBoard").onclick = function(e){
 document.getElementById("lb").onclick = function(){ this.className = "lightbox hidden"; };
 
 function isNumpadKey(e, digit) {
-  // digit: "0"-"9". Handles NumLock on/off and location=NUMPAD.
+  // digit: "0"-"9". Handles NumLock on/off, location=NUMPAD, code/key/keyCode.
+  if (!e) return false;
   var codeMap = {
     "0": ["Numpad0"],
     "1": ["Numpad1"],
@@ -12506,14 +12529,34 @@ function isNumpadKey(e, digit) {
     "9": ["Numpad9"]
   };
   var codes = codeMap[digit] || [];
-  if (codes.indexOf(e.code) >= 0) return true;
-  if (e.location === 3 && String(e.key) === digit) return true;
-  /* Some Linux/browser combinations expose numpad navigation by keyCode only. */
+  var code = String(e.code || "");
+  var key = String(e.key || "");
+  if (codes.indexOf(code) >= 0) return true;
+  if (e.location === 3 && key === digit) return true;
+  /* NumLock on: keyCode 96-105. */
   var keyCodes = { "0": 96, "1": 97, "2": 98, "3": 99, "4": 100, "5": 101, "6": 102, "7": 103, "8": 104, "9": 105 };
-  if (e.keyCode === keyCodes[digit]) return true;
-  // NumLock off: Numpad0 often reports as Insert
-  if (digit === "0" && e.location === 3 && (e.key === "Insert" || e.code === "Insert")) return true;
-  if (digit === "0" && e.code === "Numpad0") return true;
+  if (e.keyCode === keyCodes[digit] || e.which === keyCodes[digit]) return true;
+  /* NumLock off: numpad reports as nav keys. Prefer location=NUMPAD (3);
+     also accept when code is still Numpad* (already handled above). */
+  var navKey = {
+    "0": ["Insert"],
+    "1": ["End"],
+    "2": ["ArrowDown"],
+    "3": ["PageDown"],
+    "4": ["ArrowLeft"],
+    "5": ["Clear", "Unidentified"],
+    "6": ["ArrowRight"],
+    "7": ["Home"],
+    "8": ["ArrowUp"],
+    "9": ["PageUp"]
+  };
+  var nav = navKey[digit] || [];
+  if (e.location === 3 && (nav.indexOf(key) >= 0 || nav.indexOf(code) >= 0)) return true;
+  /* Legacy keyCodes for NumLock-off nav (Home=36, etc.) on the numpad only. */
+  var navKeyCodes = { "0": 45, "1": 35, "2": 40, "3": 34, "4": 37, "5": 12, "6": 39, "7": 36, "8": 38, "9": 33 };
+  if (e.location === 3 && (e.keyCode === navKeyCodes[digit] || e.which === navKeyCodes[digit])) return true;
+  if (digit === "0" && e.location === 3 && (key === "Insert" || code === "Insert")) return true;
+  if (digit === "0" && code === "Numpad0") return true;
   return false;
 }
 function goHomeKey(e) {
@@ -12580,6 +12623,31 @@ window.addEventListener("resize", function(){
     placeSongMetaEditor(songMetaAnchor);
   }
 });
+
+/* Song Map: after pointer interaction, pull focus back from iframes/buttons so numpad shortcuts work. */
+document.addEventListener("pointerdown", function(e){
+  if (!document.body.classList.contains("sections-mode")) return;
+  if (!sectionRulersShortcutTargetOk(e.target)) return;
+  try {
+    if (document.body.tabIndex < 0) document.body.tabIndex = -1;
+    /* Do not steal focus from real buttons mid-click; blur only cross-origin iframes. */
+    var ae = document.activeElement;
+    if (ae && ae.tagName === "IFRAME") {
+      try { ae.blur(); } catch (errBlur) {}
+      document.body.focus({ preventScroll: true });
+    }
+  } catch (errFocus) {}
+}, true);
+function bindSectionRulersShortcut() {
+  if (window.__riffjamsRulersKeyBound) return;
+  window.__riffjamsRulersKeyBound = true;
+  /* Capture on window so Playboard/document bubble listeners and focus traps
+     cannot swallow Numpad 7 before Song Map toggles rulers. */
+  window.addEventListener("keydown", function(e){
+    handleSectionRulersShortcut(e);
+  }, true);
+}
+bindSectionRulersShortcut();
 document.addEventListener("keydown", function(e){
   if ((e.metaKey || e.ctrlKey) && !e.altKey && document.body.classList.contains("sections-mode") && sectionsMode === "edit") {
     var tag0 = (e.target && e.target.tagName) || "";
@@ -12643,16 +12711,7 @@ document.addEventListener("keydown", function(e){
     }
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
-  /* Handle this before the 0+Enter mode-entry buffer so Numpad 7 always
-     remains the Song Map ruler shortcut, even after a pending 0. */
-  if (document.body.classList.contains("sections-mode")) {
-    var tagRulerKey = (e.target && e.target.tagName) || "";
-    if (tagRulerKey !== "INPUT" && tagRulerKey !== "TEXTAREA" && isNumpadKey(e, "7")) {
-      e.preventDefault();
-      setSectionRulers(!sectionRulersOn);
-      return;
-    }
-  }
+  /* Numpad 7 rulers: handled in capture on window (see bindSectionRulersShortcut). */
   if (handleModeEntryKey(e)) return;
   /* Shift+C: clear Board queue / Song Map filters / LL filters */
   if (e.shiftKey && ((e.key || "").toLowerCase() === "c" || e.code === "KeyC")) {
@@ -12794,6 +12853,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=266"></script>
+<script src="riffjams-admin.js?v=268"></script>
 </body>
 </html>
