@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-27T13:52:00.000Z",
+  "updatedAt": "2026-09-27T13:52:41.429Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -688,12 +688,6 @@
                 3,
                 4
               ]
-            ],
-            [
-              "2-1A",
-              1,
-              "ITV-2-1A",
-              1
             ]
           ]
         }
@@ -2179,12 +2173,7 @@
                   4
                 ]
               ],
-              [
-                "2-1A",
-                1,
-                "ITV-2-1A",
-                1
-              ],
+              null,
               null,
               null,
               null,
