@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-27T13:09:33.686Z",
+  "updatedAt": "2026-09-27T13:11:30.862Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1878,15 +1878,31 @@
           {
             "song": "After Forever",
             "licks": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              [
+                "1A",
+                1,
+                "AF-1A"
+              ],
+              [
+                "1B",
+                2,
+                "AF-1B"
+              ],
+              [
+                "2B",
+                2,
+                "AF-2B"
+              ],
+              [
+                "3B",
+                2,
+                "AF-3B"
+              ],
+              [
+                "4B",
+                2,
+                "AF-4B"
+              ],
               null
             ]
           },
@@ -1908,15 +1924,46 @@
           {
             "song": "Children of the Grave",
             "licks": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              [
+                "1A",
+                1,
+                "COTG-1A"
+              ],
+              [
+                "1B",
+                2,
+                "COTG-1B"
+              ],
+              [
+                "2A",
+                1,
+                "COTG-2A"
+              ],
+              [
+                "2B",
+                2,
+                "COTG-2B"
+              ],
+              [
+                "3A",
+                1,
+                "COTG-3A"
+              ],
+              [
+                "4A",
+                1,
+                "COTG-4A"
+              ],
+              [
+                "5A",
+                1,
+                "COTG-5A"
+              ],
+              [
+                "6A",
+                1,
+                "COTG-6A"
+              ],
               null
             ]
           },
