@@ -4287,6 +4287,27 @@ function blankSoloMapFromAlbums(albums) {
     };
   });
 }
+/** Retired Solo lick ids — strip from maps so localStorage/sync cannot resurrect them. */
+function isRetiredSoloLick(pair) {
+  if (!pair || pair[2] == null) return false;
+  return String(pair[2]) === "ITV-2-1B";
+}
+function purgeRetiredSoloLicksFromAlbums(albums) {
+  (albums || []).forEach(function(a){
+    (a && a.songs || []).forEach(function(s){
+      if (!s || !s.licks) return;
+      var out = [];
+      var i;
+      for (i = 0; i < s.licks.length; i++) {
+        if (isRetiredSoloLick(s.licks[i])) out.push(null);
+        else out.push(s.licks[i]);
+      }
+      while (out.length && out[out.length - 1] == null) out.pop();
+      s.licks = out;
+    });
+  });
+  return albums;
+}
 function normalizeSoloSong(song) {
   if (!song) return { song: "", licks: [] };
   var src = song.licks || song.sections || [];
@@ -4295,7 +4316,10 @@ function normalizeSoloSong(song) {
   /* Keep empty slots when section rulers exist so column spans stay put. */
   var keepSlots = !!(song.sectionRulers && song.sectionRulers.length);
   for (i = 0; i < src.length; i++) {
-    if (isChipPair(src[i])) out.push(src[i]);
+    if (isChipPair(src[i])) {
+      if (isRetiredSoloLick(src[i])) { if (keepSlots) out.push(null); }
+      else out.push(src[i]);
+    }
     else if (keepSlots) out.push(null);
   }
   while (out.length < SONG_SLOTS) out.push(null);
@@ -4349,6 +4373,7 @@ function normalizeSoloMap(map, albumsFallback) {
       songs: (a.songs || []).map(normalizeSoloSong)
     });
   });
+  purgeRetiredSoloLicksFromAlbums(albums);
   return { albums: albums };
 }
 function loadSoloMap() {
@@ -6912,7 +6937,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=277";
+  var url = base + "?playboard=1&v=278";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6941,7 +6966,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=277") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=278") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -13065,6 +13090,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=277"></script>
+<script src="riffjams-admin.js?v=278"></script>
 </body>
 </html>

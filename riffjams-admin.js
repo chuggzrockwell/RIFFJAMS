@@ -368,12 +368,16 @@
     var arrPack = (typeof window.exportArrangementForRepo === "function")
       ? window.exportArrangementForRepo()
       : { arrangementMap: null, arrangementTimings: [] };
+    var soloOut = clone(window.SOLO_MAP || sharedData.soloMap || { albums: [] });
+    if (typeof window.purgeRetiredSoloLicksFromAlbums === "function" && soloOut && soloOut.albums) {
+      window.purgeRetiredSoloLicksFromAlbums(soloOut.albums);
+    }
     return {
       version: 1,
       updatedAt: new Date().toISOString(),
       assets: Object.assign({}, sharedData.assets || {}, window.RIFFJAMS_ASSETS || {}),
       albums: clone(window.ALBUMS || sharedData.albums || []),
-      soloMap: clone(window.SOLO_MAP || sharedData.soloMap || { albums: [] }),
+      soloMap: soloOut,
       arrangementMap: arrPack.arrangementMap || null,
       arrangementTimings: arrPack.arrangementTimings || []
     };
@@ -550,6 +554,7 @@
         /* Also keep local-only chips that only exist locally with an explicit pos */
         localField.forEach(function (lp, i) {
           if (!lp || !lp[0] || lp.length <= 3) return;
+          if (typeof window.isRetiredSoloLick === "function" && window.isRetiredSoloLick(lp)) return;
           var code = String(lp[0]);
           var found = remoteField.some(function (p) { return p && String(p[0]) === code; });
           if (!found) {
