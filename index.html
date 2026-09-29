@@ -982,6 +982,96 @@
     flex: 1 1 auto;
     border-radius: 12px;
   }
+  /* Board window: compact YT playalong chrome (independent of Song Map player) */
+  .board-player {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 8px;
+    padding: 8px 12px;
+    background: #000;
+    border: 1px solid #222;
+    border-radius: 10px;
+    box-sizing: border-box;
+    color: #fff;
+    font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    min-width: 0;
+  }
+  #boardYtHost {
+    position: absolute;
+    width: 1px; height: 1px;
+    left: -9999px; top: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .board-player-btn {
+    appearance: none;
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .board-player-btn:hover { transform: scale(1.04); }
+  .board-player-btn svg { display: block; }
+  .board-player-meta {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 220px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.72);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .board-player-meta strong { color: #fff; font-weight: 800; }
+  .board-player-progress {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .board-player-time {
+    flex: 0 0 auto;
+    font-size: 0.68rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255,255,255,.55);
+    min-width: 2.4em;
+  }
+  .board-player-time.end { text-align: right; }
+  .board-player-scrub {
+    flex: 1 1 auto;
+    height: 6px;
+    min-width: 48px;
+    border-radius: 999px;
+    background: #2a2a2e;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .board-player-scrub-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0%;
+    background: #1db954;
+    border-radius: 999px;
+    pointer-events: none;
+  }
   .album-art-cell { display: none !important; }
   .sec-head-label.album { display: none !important; }
   body.sections-play #sectionsSheet {
@@ -6937,7 +7027,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=278";
+  var url = base + "?playboard=1&v=279";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -6966,7 +7056,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=278") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=279") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -7031,6 +7121,189 @@ function bindPlaySync() {
     } else syncAllPlaySelections();
   });
 }
+
+/* —— Playboard local YT player (defaults to Snowblind playalong; no SM audio leadership) —— */
+var BOARD_DEFAULT_SONG = "Snowblind";
+var boardYtPlayer = null;
+var boardYtApiLoading = false;
+var boardPlaying = false;
+var boardSeeking = false;
+var boardTickTimer = null;
+function boardDefaultYtId() {
+  return (typeof SM_YT_PLAYALONG !== "undefined" && SM_YT_PLAYALONG[BOARD_DEFAULT_SONG]) || "";
+}
+function boardSetPlayIcon(playing) {
+  var btn = document.getElementById("boardPlay");
+  var icon = document.getElementById("boardPlayIcon");
+  if (!btn || !icon) return;
+  boardPlaying = !!playing;
+  if (playing) {
+    icon.innerHTML = '<path d="M6 5h4v14H6V5zm8 0h4v14h-4V5z"/>';
+    btn.title = "Pause";
+    btn.setAttribute("aria-label", "Pause");
+  } else {
+    icon.innerHTML = '<path d="M8 5v14l11-7L8 5z"/>';
+    btn.title = "Play";
+    btn.setAttribute("aria-label", "Play");
+  }
+}
+function boardTick() {
+  if (boardSeeking || !boardYtPlayer || !boardYtPlayer.getCurrentTime) return;
+  var cur = boardYtPlayer.getCurrentTime() || 0;
+  var dur = boardYtPlayer.getDuration() || 0;
+  var pct = dur ? (cur / dur) * 100 : 0;
+  var fill = document.getElementById("boardScrubFill");
+  var tc = document.getElementById("boardTimeCur");
+  var td = document.getElementById("boardTimeDur");
+  var scrub = document.getElementById("boardScrub");
+  if (fill) fill.style.width = pct + "%";
+  if (tc) tc.textContent = (typeof smFmtTime === "function") ? smFmtTime(cur) : String(Math.floor(cur));
+  if (td) td.textContent = (typeof smFmtTime === "function") ? smFmtTime(dur) : String(Math.floor(dur));
+  if (scrub) {
+    scrub.setAttribute("aria-valuenow", String(Math.round(pct)));
+    scrub.setAttribute("aria-valuemax", "100");
+  }
+}
+function boardStartTick() {
+  boardStopTick();
+  boardTickTimer = setInterval(boardTick, 250);
+  boardTick();
+}
+function boardStopTick() {
+  if (boardTickTimer) { clearInterval(boardTickTimer); boardTickTimer = null; }
+}
+function boardEnsureYt(cb) {
+  function make() {
+    if (boardYtPlayer) { cb && cb(); return; }
+    if (!document.getElementById("boardYtHost") || !window.YT || !window.YT.Player) return;
+    var vid = boardDefaultYtId();
+    boardYtPlayer = new YT.Player("boardYtHost", {
+      height: "1",
+      width: "1",
+      videoId: vid || undefined,
+      playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1, playsinline: 1 },
+      events: {
+        onReady: function(){
+          if (vid) {
+            try { boardYtPlayer.cueVideoById(vid); } catch (errCue) {}
+          }
+          boardTick();
+          cb && cb();
+        },
+        onStateChange: function(e){
+          if (!window.YT || !YT.PlayerState) return;
+          if (e.data === YT.PlayerState.PLAYING) {
+            boardSetPlayIcon(true);
+            boardStartTick();
+          } else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.CUED) {
+            boardSetPlayIcon(false);
+            boardStopTick();
+            boardTick();
+          } else if (e.data === YT.PlayerState.ENDED) {
+            boardSetPlayIcon(false);
+            boardStopTick();
+            try { boardYtPlayer.seekTo(0, true); boardYtPlayer.pauseVideo(); } catch (errEnd) {}
+            boardTick();
+          }
+        }
+      }
+    });
+  }
+  if (window.YT && window.YT.Player) { make(); return; }
+  var prev = window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady = function(){
+    if (typeof prev === "function") {
+      try { prev(); } catch (errPrev) {}
+    }
+    make();
+  };
+  if (boardYtApiLoading) return;
+  boardYtApiLoading = true;
+  var tag = document.createElement("script");
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(tag);
+}
+function boardTogglePlay() {
+  boardEnsureYt(function(){
+    if (!boardYtPlayer) return;
+    var st = boardYtPlayer.getPlayerState && boardYtPlayer.getPlayerState();
+    var playing = (window.YT && (
+      st === YT.PlayerState.PLAYING || st === YT.PlayerState.BUFFERING
+    ));
+    if (playing) {
+      try { boardYtPlayer.pauseVideo(); } catch (errP) {}
+      boardSetPlayIcon(false);
+    } else {
+      var vid = boardDefaultYtId();
+      /* Ensure default track is loaded (cue may be empty if API raced) */
+      try {
+        var data = boardYtPlayer.getVideoData && boardYtPlayer.getVideoData();
+        if (vid && (!data || !data.video_id)) boardYtPlayer.cueVideoById(vid);
+      } catch (errVid) {}
+      try { boardYtPlayer.playVideo(); } catch (errPlay) {}
+      boardSetPlayIcon(true);
+      boardStartTick();
+    }
+  });
+}
+function boardSeekFromClientX(clientX) {
+  if (!boardYtPlayer || !boardYtPlayer.getDuration) return;
+  var scrub = document.getElementById("boardScrub");
+  if (!scrub) return;
+  var rect = scrub.getBoundingClientRect();
+  var pct = rect.width ? Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) : 0;
+  var dur = boardYtPlayer.getDuration() || 0;
+  if (!dur) return;
+  try { boardYtPlayer.seekTo(dur * pct, true); } catch (errSeek) {}
+  var fill = document.getElementById("boardScrubFill");
+  if (fill) fill.style.width = (pct * 100) + "%";
+  boardTick();
+}
+function initBoardPlayer() {
+  var meta = document.getElementById("boardPlayerMeta");
+  if (meta) meta.innerHTML = "<strong>"+BOARD_DEFAULT_SONG+"</strong> · playalong";
+  var play = document.getElementById("boardPlay");
+  if (play) {
+    play.onclick = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      boardTogglePlay();
+    };
+  }
+  var scrub = document.getElementById("boardScrub");
+  if (scrub) {
+    scrub.addEventListener("pointerdown", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      boardSeeking = true;
+      boardEnsureYt(function(){
+        boardSeekFromClientX(e.clientX);
+      });
+      function move(ev){ boardSeekFromClientX(ev.clientX); }
+      function up(ev){
+        boardSeekFromClientX(ev.clientX);
+        boardSeeking = false;
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+      }
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+    });
+  }
+  var chrome = document.getElementById("boardPlayer");
+  if (chrome) {
+    chrome.addEventListener("click", function(e){ e.stopPropagation(); });
+  }
+  boardSetPlayIcon(false);
+  /* Cue Snowblind playalong on Board open — same SM_YT_PLAYALONG source as Song Map */
+  boardEnsureYt(function(){
+    var vid = boardDefaultYtId();
+    if (!vid || !boardYtPlayer) return;
+    try { boardYtPlayer.cueVideoById(vid); } catch (errBoot) {}
+    boardTick();
+  });
+}
+
 function initPlayboardPage() {
   document.body.className = "playboard-mode";
   document.body.innerHTML = '<div class="wrap"><div id="playboardRoot">'
@@ -7044,6 +7317,20 @@ function initPlayboardPage() {
     + '<button type="button" class="sec-play-clear" id="secPlayRandomize" title="Shuffle Board order (Z)">Randomize</button>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or 0 then Enter)">Clear</button>'
     + '<div class="sec-play-meta" id="secPlayMeta">Solo — album+song|0[.pos] + NP Enter</div>'
+    + '</div>'
+    + '<div class="board-player" id="boardPlayer" aria-label="Board player">'
+    + '<div id="boardYtHost" aria-hidden="true"></div>'
+    + '<button type="button" class="board-player-btn" id="boardPlay" title="Play" aria-label="Play">'
+    + '<svg id="boardPlayIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg>'
+    + '</button>'
+    + '<div class="board-player-meta" id="boardPlayerMeta"><strong>Snowblind</strong> · playalong</div>'
+    + '<div class="board-player-progress">'
+    + '<span class="board-player-time" id="boardTimeCur">0:00</span>'
+    + '<div class="board-player-scrub" id="boardScrub" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">'
+    + '<div class="board-player-scrub-fill" id="boardScrubFill"></div>'
+    + '</div>'
+    + '<span class="board-player-time end" id="boardTimeDur">0:00</span>'
+    + '</div>'
     + '</div>'
     + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to remove · drag to reorder · album+song|0[.pos]+Enter to add.</div></div>'
     + '</aside></div></div>';
@@ -7076,6 +7363,8 @@ function initPlayboardPage() {
     e.preventDefault();
     clearPlayQueue();
   };
+  /* Explicit Board player only — empty board clicks must not pause / claim SM leadership */
+  if (typeof initBoardPlayer === "function") initBoardPlayer();
   window.addEventListener("resize", function(){
     if (trimPlayQueueToFit()) publishPlayQueue();
     renderPlayBoard();
@@ -9213,7 +9502,7 @@ function smInitPlayerUi() {
   else smApplyAudioRole();
   smBindPlayerZoomLock();
 }
-smInitPlayerUi();
+if (!isPlayboardPage()) smInitPlayerUi();
 
 var highlightMode = false;
 function setHighlightMode(on) {
@@ -13090,6 +13379,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=278"></script>
+<script src="riffjams-admin.js?v=279"></script>
 </body>
 </html>
