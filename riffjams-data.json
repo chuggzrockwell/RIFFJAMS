@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-01T20:44:42.803Z",
+  "updatedAt": "2026-10-01T20:49:30.122Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -71,7 +71,8 @@
             [
               "C1",
               2,
-              "TW-C1"
+              "TW-C1",
+              []
             ],
             [
               "S2",
@@ -2766,7 +2767,7 @@
     "albums": [
       {
         "name": "Black Sabbath",
-        "cover": "covers/sabbath-hp.png?v=284",
+        "cover": "covers/sabbath-hp.png?v=287",
         "font": "font-paranoid",
         "songs": [
           {
@@ -2884,9 +2885,29 @@
             ],
             "sectionRulers": [
               {
-                "name": "Section",
+                "name": "Intro",
                 "start": 0,
                 "end": 2
+              },
+              {
+                "name": "verse 1",
+                "start": 3,
+                "end": 4
+              },
+              {
+                "name": "verse 2",
+                "start": 5,
+                "end": 7
+              },
+              {
+                "name": "Solo",
+                "start": 8,
+                "end": 8
+              },
+              {
+                "name": "verse 3",
+                "start": 9,
+                "end": 11
               }
             ]
           },
