@@ -1729,13 +1729,19 @@
     z-index: 5;
     pointer-events: none;
   }
-  /* Next/Current cues: Edit and Play only. View hides them so song metadata can use the row. */
-  body.sections-mode.sections-arrange.sections-edit .sm-arr-next-panel,
-  body.sections-mode.sections-arrange.sections-play .sm-arr-next-panel {
+  /* Arrangement (not Single Song): always show NEXT megachip + countdown (+ Current)
+     in View/Edit/Play. View previously hid the panel (display:none) → blank col-15. */
+  body.sections-mode.sections-arrange:not(.sections-single-song) .sm-arr-next-panel {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 14px;
+  }
+  /* Pin grid width so the cue panel sits just past chip column 15 in every mode. */
+  body.sections-mode.sections-arrange:not(.sections-single-song) .sections-wrap {
+    width: calc(var(--row-g) + var(--name-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
+    max-width: none;
+    flex: 0 0 auto;
   }
   .sm-arr-cue-col {
     display: flex;
@@ -4904,7 +4910,7 @@ function totalSoloChips(map) {
 function updateSoloUi() {
   document.body.classList.toggle("sections-solo", !!soloMode && !arrangementMode);
   if (!soloMode || arrangementMode) document.body.classList.remove("solo-cols-collapsed");
-  document.body.classList.toggle("sections-arrange", !!arrangementMode && document.body.classList.contains("sections-mode"));
+  document.body.classList.toggle("sections-arrange", !!arrangementMode && !singleSongMode && document.body.classList.contains("sections-mode"));
   syncModeSelects();
   syncArrangementButtons();
 }
@@ -7540,8 +7546,8 @@ function showSections(keepScroll) {
   document.body.className = "sections-mode"
     + (sectionsMode === "edit" ? " sections-edit" : "")
     + (sectionsMode === "play" ? " sections-play" : "")
-    + (arrangementMode ? " sections-arrange" : "")
-    + (!arrangementMode && soloMode ? " sections-solo" : "")
+    + (arrangementMode && !singleSongMode ? " sections-arrange" : "")
+    + (!arrangementMode && !singleSongMode && soloMode ? " sections-solo" : "")
     + (singleSongMode ? " sections-single-song" : "")
     + (!sectionRulersOn ? " section-rulers-off" : "")
     + (!songMetaColsOn ? " song-meta-cols-off" : "")
@@ -7674,25 +7680,26 @@ function showSections(keepScroll) {
     if (singleSongMode && !rows) return "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
   }).join("");
-  /* Keep Arrangement's original cue panel separate from Single Song's focused layout. */
-  var nextCueHtml = arrangementMode
+  /* Single Song: NEXT megachip + countdown only. Arrangement: + Current Section chip.
+     Prefer singleSongMode — arrangementMode can stay true underneath Single Song. */
+  var nextCueHtml = singleSongMode
     ? '<aside class="sm-arr-next-panel" id="smArrNextPanel" aria-live="polite">'
       + '<div class="sm-arr-cue-col sm-arr-cue-next">'
       + '<div class="sm-arr-next-label">Next section</div>'
       + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
       + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
       + '</div>'
-      + '<div class="sm-arr-cue-col sm-arr-cue-current">'
-      + '<div class="sm-arr-next-label">Current section</div>'
-      + '<div class="sm-arr-next-chip sm-arr-cur-chip is-empty" id="smArrCurChip">—</div>'
-      + '</div>'
       + '</aside>'
-    : (singleSongMode
+    : (arrangementMode
       ? '<aside class="sm-arr-next-panel" id="smArrNextPanel" aria-live="polite">'
         + '<div class="sm-arr-cue-col sm-arr-cue-next">'
         + '<div class="sm-arr-next-label">Next section</div>'
         + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
         + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
+        + '</div>'
+        + '<div class="sm-arr-cue-col sm-arr-cue-current">'
+        + '<div class="sm-arr-next-label">Current section</div>'
+        + '<div class="sm-arr-next-chip sm-arr-cur-chip is-empty" id="smArrCurChip">—</div>'
         + '</div>'
         + '</aside>'
       : "");
@@ -14293,6 +14300,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=298"></script>
+<script src="riffjams-admin.js?v=299"></script>
 </body>
 </html>
