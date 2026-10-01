@@ -4170,7 +4170,7 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
@@ -5084,8 +5084,8 @@ function arrangementMapSlotCount(map) {
 function syncArrangementButtons() {
   syncModeSelects();
 }
-/* View menu: Arrangement, Solo, Riff, or Single Song.
-   Numpad 6 toggles Single Song (capture handler, same pattern as 7/8). */
+/* View menu: Arrangement, Riff, Solo, or Single Song.
+   Numpad 6 cycles the same order as the Views dropdown. */
 function setMapView(view) {
   if (view === "single") {
     setSingleSongMode(true);
@@ -5132,8 +5132,8 @@ function setMapView(view) {
   else document.body.classList.remove("sections-arrange", "ll-arrange");
 }
 function cycleMapView() {
-  var order = ["arrangement", "riff", "solo"];
-  var cur = songMapBaseViewValue();
+  var order = ["arrangement", "riff", "solo", "single"];
+  var cur = songMapViewValue();
   var i = order.indexOf(cur);
   setMapView(order[(i + 1) % order.length]);
 }
@@ -5953,11 +5953,11 @@ function updateEditSaveUi() {
     if (arrangementMode) {
       if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · Esc/0 home";
       else if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Undo/Save · Esc/0 home";
-      else keys.textContent = "Arrangement · 6 Single Song · Esc/0 home";
+      else keys.textContent = "Arrangement · 6 cycles Views · Esc/0 home";
     } else if (soloMode) {
       if (sectionsMode === "play") keys.textContent = "Solo · lick clicks queue · Esc/0 home";
       else if (sectionsMode === "edit") keys.textContent = "Solo · Edit · drag · Undo/Save · Esc/0 home";
-      else keys.textContent = "Solo · 6 Single Song · Esc/0 home";
+      else keys.textContent = "Solo · 6 cycles Views · Esc/0 home";
     }
   }
 }
@@ -8213,14 +8213,14 @@ function setSectionsMode(mode) {
     if (arrangementMode) {
       if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
       else if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-      else keys.textContent = "Arrangement · Peek · 6 Single Song · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Arrangement · Peek · 6 cycles Views · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
     } else if (soloMode) {
-      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
-      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-      else keys.textContent = "Solo · Numpad 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
-    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
-    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-    else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
+      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
+      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Solo · Numpad 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
+    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+    else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
   }
   if (sectionsMode === "play") {
     /* Stay on Song Map. Next/Current cues are the playalong UI; Playboard is a separate entry. */
@@ -12828,7 +12828,7 @@ document.getElementById("secModes").onclick = function(e){
     else saveAlbumsNow();
     return;
   }
-  /* View menu handles Arrangement / Solo / Riff. Numpad 6 cycles that menu. */
+  /* View menu handles Arrangement / Riff / Solo / Single Song. Numpad 6 cycles that menu. */
   if (e.target.closest("#mapToolsBtn")) {
     e.preventDefault();
     setMapToolsOpen(!mapToolsIsOpen());
@@ -13633,7 +13633,7 @@ function bindSongMetaColsShortcut() {
   }, true);
 }
 bindSongMetaColsShortcut();
-/* Song Map → Single Song. Numpad 6 toggles; same capture pattern as Rulers (7) / Meta (8). */
+/* Song Map views. Numpad 6 cycles the Views dropdown; use capture like Rulers (7) / Meta (8). */
 function singleSongShortcutTargetOk(t) {
   if (!t) return true;
   var tag = (t.tagName || "").toUpperCase();
@@ -13662,7 +13662,7 @@ function handleSingleSongShortcut(e) {
   if (!isSingleSongNumpad6(e)) return false;
   e.preventDefault();
   try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
-  toggleSingleSongModeUi();
+  cycleMapView();
   return true;
 }
 function bindSingleSongShortcut() {
@@ -13884,6 +13884,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=290"></script>
+<script src="riffjams-admin.js?v=291"></script>
 </body>
 </html>
