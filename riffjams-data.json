@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-01T20:09:33.252Z",
+  "updatedAt": "2026-10-01T20:15:04.049Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -24,7 +24,7 @@
   "albums": [
     {
       "name": "Black Sabbath",
-      "cover": "covers/sabbath-hp.png",
+      "cover": "covers/sabbath-hp.png?v=282",
       "font": "font-paranoid",
       "songs": [
         {
@@ -1643,7 +1643,7 @@
     "albums": [
       {
         "name": "Black Sabbath",
-        "cover": "covers/sabbath-hp.png",
+        "cover": "covers/sabbath-hp.png?v=282",
         "font": "font-paranoid",
         "songs": [
           {
@@ -1653,6 +1653,55 @@
           {
             "song": "The Wizard",
             "licks": [
+              [
+                "1-1A",
+                1,
+                "TW-1-1A",
+                [
+                  1
+                ]
+              ],
+              [
+                "1-1B",
+                2,
+                "TW-1-1B",
+                [
+                  4,
+                  5
+                ]
+              ],
+              [
+                "1-2B",
+                2,
+                "TW-1-2B",
+                [
+                  1
+                ]
+              ],
+              [
+                "1-3B",
+                2,
+                "TW-1-3B",
+                [
+                  1
+                ]
+              ],
+              [
+                "2-1A",
+                1,
+                "TW-2-1A",
+                [
+                  1
+                ]
+              ],
+              [
+                "2-2B",
+                2,
+                "TW-2-2B",
+                [
+                  1
+                ]
+              ],
               [
                 "S1",
                 1,
@@ -2698,7 +2747,7 @@
     "albums": [
       {
         "name": "Black Sabbath",
-        "cover": "covers/sabbath-hp.png",
+        "cover": "covers/sabbath-hp.png?v=282",
         "font": "font-paranoid",
         "songs": [
           {
