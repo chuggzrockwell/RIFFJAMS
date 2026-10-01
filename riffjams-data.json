@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-01T20:29:25.038Z",
+  "updatedAt": "2026-10-01T20:31:48.772Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -24,7 +24,7 @@
   "albums": [
     {
       "name": "Black Sabbath",
-      "cover": "covers/sabbath-hp.png?v=285",
+      "cover": "covers/sabbath-hp.png?v=284",
       "font": "font-paranoid",
       "songs": [
         {
@@ -54,6 +54,15 @@
               "1S"
             ],
             [
+              "S1",
+              1,
+              "TW-S1",
+              [
+                5,
+                1
+              ]
+            ],
+            [
               "V1",
               3,
               "TW-V1",
@@ -64,15 +73,6 @@
               2,
               "TW-C1",
               []
-            ],
-            [
-              "S1",
-              1,
-              "TW-S1",
-              [
-                5,
-                1
-              ]
             ],
             [
               "S2",
@@ -1643,7 +1643,7 @@
     "albums": [
       {
         "name": "Black Sabbath",
-        "cover": "covers/sabbath-hp.png?v=285",
+        "cover": "covers/sabbath-hp.png?v=284",
         "font": "font-paranoid",
         "songs": [
           {
@@ -1712,14 +1712,6 @@
                 ]
               ],
               [
-                "2-3A",
-                1,
-                "TW-2-3A",
-                [
-                  1
-                ]
-              ],
-              [
                 "2-2B",
                 2,
                 "TW-2-2B",
@@ -1738,15 +1730,7 @@
                 2,
                 "TW-2-4B"
               ],
-              [
-                "S1",
-                1,
-                "TW-S1",
-                [
-                  5,
-                  1
-                ]
-              ],
+              null,
               [
                 "S2",
                 1,
@@ -2783,7 +2767,7 @@
     "albums": [
       {
         "name": "Black Sabbath",
-        "cover": "covers/sabbath-hp.png?v=285",
+        "cover": "covers/sabbath-hp.png?v=284",
         "font": "font-paranoid",
         "songs": [
           {
@@ -2814,7 +2798,8 @@
                 "V1",
                 3,
                 "TW-V1",
-                "1S"
+                "1S",
+                20.5
               ],
               [
                 "C1",
@@ -4747,6 +4732,23 @@
     ]
   },
   "arrangementTimings": [
+    {
+      "album": "Black Sabbath",
+      "song": "The Wizard",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 20.5,
+          "stop": null,
+          "duration": null,
+          "lick": "TW-V1"
+        }
+      ]
+    },
     {
       "album": "Vol. 4",
       "song": "Tomorrow's Dream",
