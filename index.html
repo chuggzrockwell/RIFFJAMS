@@ -3357,10 +3357,15 @@
     background: transparent;
     border: 0;
   }
-  .sec-ruler .row-num {
+  .sec-ruler .row-num,
+  body.sections-mode .sec-ruler .row-num,
+  .sec-outline .row-num,
+  body.sections-mode .sec-outline .row-num {
     height: 20px;
-    background: transparent;
-    color: transparent;
+    background: transparent !important;
+    color: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
   }
   .sec-ruler .song-name,
   .sec-ruler .song-name-wrap,
@@ -4244,7 +4249,7 @@
 <script>
 
 var ALBUMS_DEFAULT = [
-  { name: "Black Sabbath", cover: "covers/sabbath-hp.png", font: "font-paranoid", songs: [
+  { name: "Black Sabbath", cover: "covers/sabbath-hp.png?v=282", font: "font-paranoid", songs: [
     { song: "Black Sabbath", sections: [] },
     { song: "The Wizard", sections: [["I1",2,"TW-I1","1S"],["V1",3,"TW-V1","1S"],["C1",2,"TW-C1"],["S1",1,"TW-S1",[5,1]],["S2",1,"TW-S2",[5,1]]] },
     { song: "Behind the Wall of Sleep", sections: [] },
@@ -7038,7 +7043,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=281";
+  var url = base + "?playboard=1&v=282";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -7067,7 +7072,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=281") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=282") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -7876,7 +7881,13 @@ var SM_YT_PLAYALONG = {
   "Iron Man": "z5lj36TFJYc"
 };
 var SM_SONGSTERR = {
+  "Black Sabbath": "https://www.songsterr.com/a/wsa/black-sabbath-black-sabbath-tab-s2752",
   "The Wizard": "https://www.songsterr.com/a/wsa/black-sabbath-the-wizard-tab-s24245",
+  "Behind the Wall of Sleep": "https://www.songsterr.com/a/wsa/black-sabbath-behind-the-wall-of-sleep-tab-s26937",
+  "N.I.B.": "https://www.songsterr.com/a/wsa/black-sabbath-nib-tab-s2661",
+  "Evil Woman": "https://www.songsterr.com/a/wsa/black-sabbath-evil-woman-tab-s26929",
+  "Sleeping Village": "https://www.songsterr.com/a/wsa/black-sabbath-sleeping-village-tab-s1414963",
+  "Warning": "https://www.songsterr.com/a/wsa/black-sabbath-warning-tab-s32030",
   "War Pigs": "https://www.songsterr.com/a/wsa/black-sabbath-war-pigs-tab-s10137",
   "Paranoid": "https://www.songsterr.com/a/wsa/black-sabbath-paranoid-tab-s296",
   "Planet Caravan": "https://www.songsterr.com/a/wsa/black-sabbath-planet-caravan-tab-s23731",
@@ -10633,6 +10644,7 @@ var CATALOG = [
   ["COTG-1A","B"],["COTG-1B","B"],["COTG-2A","B"],["COTG-2B","B"],["COTG-3A","B"],["COTG-4A","B"],["COTG-5A","B"],["COTG-6A","B"],
   ["LOTW-1-1A","B"],["LOTW-1-2A","B"],["LOTW-1-3A","B"],["LOTW-2-2A","B"],["LOTW-2-3A","B"],["LOTW-2-4A","B"],["LOTW-2-5A","B"],["LOTW-3-1B","B"],["LOTW-3-2B","B"],["LOTW-3-3B","B"],["LOTW-4-1B","B"],["LOTW-4-2B","B"],["LOTW-4-3B","B"],["LOTW-2-1A","B"],
   ["ITV-1-1B","B"],["ITV-1-2B","B"],["ITV-1-3B","B"],["ITV-1-4B","B"],["ITV-2-2B","B"],["ITV-2-1A","B"],["ITV-2-2A","B"],["ITV-B-1A","B"],["ITV-B-2A","B"],["ITV-B-3A","B"],
+  ["TW-1-1A","B"],["TW-1-1B","B"],["TW-1-2B","B"],["TW-1-3B","B"],["TW-2-1A","B"],["TW-2-2B","B"],
   ["HOD-1","B"],["HOD-2E","B"],["HOD-3E","B"],["HOD-4E","B"],["HOD-5E","B"],["HOD-6E","B"],
   ["RS-1","B"],["RS-2E","B"],["RS-3E","B"],["RS-4E","B"],["RS-5E","B"],
   ["FOB-1-1A","B"],["FOB-1-2A","B"],["FOB-1-3A","B"],["FOB-1-4A","B"],["FOB-2-1A","B"],["FOB-2-2A","B"],["FOB-2-3A","B"],["PC-1B","B"],["PC-2B","B"],["PC-3B","B"],["PC-4B","B"],["PC-5B","B"],["PC-6B","B"],["PC-7B","B"],["PC-8B","B"],["PC-9B","B"],["PC-10B","B"],["PC-11B","B"],["PC-1E","B"],["PC-2E","B"],["PC-3E","B"],["PC-4E","B"],["PC-5E","B"],["PC-6E","B"],["PC-7E","B"],["PC-8E","B"],["PC-9E","B"],["PC-10E","B"],["PC-11E","B"],["PC-12E","B"],["PC-13E","B"],["PC-14E","B"],["PC-15E","B"],["PC-16E","B"],["PC-17E","B"],
@@ -10651,7 +10663,7 @@ var LL_LIBRARY_ALBUMS = ["Paranoid", "Master of Reality", "Vol. 4", "Sabbath Blo
 function llCoverForAlbumTier(album, tier) {
   tier = parseInt(tier, 10);
   if (!(tier >= 1 && tier <= 2)) tier = 3;
-  if (album === "Black Sabbath") return "covers/sabbath-hp.png";
+  if (album === "Black Sabbath") return "covers/sabbath-hp.png?v=282";
   if (album === "Sabbath Bloody Sabbath") {
     return (tier >= 3) ? "covers/sbs-tier3.png?v=5" : "covers/sbs-ll.png?v=5";
   }
@@ -13396,6 +13408,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=281"></script>
+<script src="riffjams-admin.js?v=282"></script>
 </body>
 </html>
