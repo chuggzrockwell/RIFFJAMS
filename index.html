@@ -3707,48 +3707,24 @@
     z-index: 5;
     position: relative;
   }
-  /* Tab plates for every arrangement section, below the chip strip. */
+  /* Live section tab under the chip strip; only the playing section is mounted. */
   .ss-section-tab {
     flex: 1 1 auto;
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
     justify-content: flex-start;
-    gap: 14px;
     padding: 8px 4px 16px;
     min-height: 180px;
-    max-width: 100%;
+    max-width: min(100%, calc(100vw - 420px));
     box-sizing: border-box;
   }
-  .ss-section-tab-card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-    border: 1px solid rgba(255,255,255,.1);
-    border-radius: 10px;
-    background: #080808;
-  }
-  .ss-section-tab-card.is-current {
-    border-color: rgba(255,255,255,.8);
-    box-shadow: 0 0 0 2px rgba(255,255,255,.32), 0 0 24px rgba(255,255,255,.18);
-  }
-  .ss-section-tab-card .ss-tab-label {
-    color: rgba(255,255,255,.72);
-    font: 700 .7rem/1.2 "Segoe UI", system-ui, sans-serif;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-  }
-  .ss-section-tab-card img.ss-tab-img {
+  .ss-section-tab img.ss-tab-img {
     display: block;
     width: auto;
     height: auto;
     max-width: 100%;
     max-height: min(70vh, 720px);
-    border-radius: 8px;
+    border-radius: 10px;
     box-shadow: 0 10px 32px rgba(0,0,0,.28);
     background: #111;
   }
@@ -5572,58 +5548,42 @@ function buildSingleSongArrRowHtml(focusName) {
     + '<div class="song-chip-col"><div class="song-secs">'+chipArr.join("")+'</div></div>'
     + '</div></div>';
 }
-function buildSingleSongTabGalleryHtml(focusName) {
-  var song = smFindArrangementSongByName(focusName);
-  var chips = song && song.chips ? song.chips : [];
-  var cards = [];
-  chips.forEach(function(pair, ci){
-    if (!isChipPair(pair)) return;
-    var code = String(pair[0] || "").trim();
-    if (!code) return;
-    var lick = String(pair[2] || "").trim();
-    if (!lick) {
-      try { lick = sectionLickId(focusName, code, "") || code; }
-      catch (eLick) { lick = code; }
-    }
-    var src = lickSrc(lick);
-    cards.push('<article class="ss-section-tab-card" data-ci="'+ci+'" data-code="'+ssEscAttr(code)+'">'
-      + '<div class="ss-tab-label">'+ssEscText(String(ci + 1) + " · " + code)+'</div>'
-      + (src ? '<img class="ss-tab-img" alt="'+ssEscAttr(code)+' tab" src="'+ssEscAttr(src)+'">'
-             : '<div class="ss-tab-empty">No tab linked</div>')
-      + '</article>');
-  });
-  if (!cards.length) return '<div class="ss-tab-empty">No tab plates for this song</div>';
-  return cards.join("");
-}
-function bindSingleSongTabGallery() {
-  var el = document.getElementById("ssSectionTab");
-  if (!el) return;
-  el.querySelectorAll("img.ss-tab-img").forEach(function(img){
-    if (img._ssTabBound) return;
-    img._ssTabBound = true;
-    img.addEventListener("error", function(){
-      var card = img.closest ? img.closest(".ss-section-tab-card") : null;
-      if (card) img.replaceWith((function(){
-        var empty = document.createElement("div");
-        empty.className = "ss-tab-empty";
-        empty.textContent = "Tab missing";
-        return empty;
-      })());
-    });
-  });
-}
 function ssUpdateSectionTab(songName, pick) {
   var el = document.getElementById("ssSectionTab");
   if (!el) return;
-  el.querySelectorAll(".ss-section-tab-card.is-current").forEach(function(card){
-    card.classList.remove("is-current");
-  });
   var item = pick && pick.current ? pick.current : null;
-  if (item && item.ci != null) {
-    var current = el.querySelector('.ss-section-tab-card[data-ci="'+String(item.ci).replace(/"/g, "")+'"]');
-    if (current) current.classList.add("is-current");
+  if (!item || !item.code) {
+    if (el.getAttribute("data-ss-tab") !== "") {
+      el.innerHTML = '<div class="ss-tab-empty">Play to show tab</div>';
+      el.setAttribute("data-ss-tab", "");
+    }
+    return;
   }
-  bindSingleSongTabGallery();
+  var lick = "";
+  try {
+    lick = sectionLickId(songName, item.code, item.pair && item.pair[2]);
+  } catch (eLick) {
+    lick = String((item.pair && item.pair[2]) || item.code || "").trim();
+  }
+  if (!lick) {
+    if (el.getAttribute("data-ss-tab") !== item.code) {
+      el.innerHTML = '<div class="ss-tab-empty">No tab linked</div>';
+      el.setAttribute("data-ss-tab", item.code || "");
+    }
+    return;
+  }
+  var key = String(item.ci) + "|" + String(item.code || "") + "|" + lick;
+  if (el.getAttribute("data-ss-tab") === key && el.querySelector("img.ss-tab-img")) return;
+  var src = lickSrc(lick);
+  el.setAttribute("data-ss-tab", key);
+  el.innerHTML = '<img class="ss-tab-img" alt="'+ssEscAttr(item.code)+' tab" src="'+ssEscAttr(src)+'">';
+  var img = el.querySelector("img.ss-tab-img");
+  if (img) {
+    img.onerror = function(){
+      if (el.getAttribute("data-ss-tab") !== key) return;
+      el.innerHTML = '<div class="ss-tab-empty">Tab missing</div>';
+    };
+  }
 }
 
 function closeSingleSongPicker() {
@@ -7673,8 +7633,8 @@ function showSections(keepScroll) {
     document.getElementById("sectionsSheet").innerHTML =
       '<div class="sections-layout ss-layout">'
       + arrRowHtml
-      + '<div class="ss-section-tab" id="ssSectionTab" aria-live="polite">'
-      + buildSingleSongTabGalleryHtml(singleFocus)
+      + '<div class="ss-section-tab" id="ssSectionTab" data-ss-tab="" aria-live="polite">'
+      + '<div class="ss-tab-empty">Play to show tab</div>'
       + '</div>'
       + nextCueHtml
       + '</div>';
@@ -14207,6 +14167,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=293"></script>
+<script src="riffjams-admin.js?v=294"></script>
 </body>
 </html>
