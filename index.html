@@ -3684,6 +3684,9 @@
     text-transform: uppercase;
     border-radius: 4px;
   }
+  body.sections-single-song:not(.sections-edit) .ss-arr-wrap .sec-chip:not(.empty) {
+    cursor: pointer;
+  }
   body.sections-single-song .ss-arr-empty {
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
     font-size: 0.9rem;
@@ -3826,7 +3829,7 @@
     letter-spacing: 0.04em;
     line-height: 1;
     text-transform: uppercase;
-    /* No neon on chips — glow lives on tab images / X marks below */
+    /* Plain chip chrome (no neon) */
     box-shadow:
       inset -1px 0 0 rgba(0,0,0,.25),
       inset 0 -1px 0 rgba(0,0,0,.25),
@@ -3863,11 +3866,7 @@
     object-fit: contain;
     background: #fff;
     border-radius: 10px;
-    /* Playboard / Board green neon (phrase.d) — on white tab crops */
-    box-shadow:
-      0 0 6px 1px rgba(46,180,90,.95),
-      0 0 18px 4px rgba(46,180,90,.7),
-      0 0 40px 10px rgba(46,180,90,.4);
+    box-shadow: none;
   }
   .ss-note-mark {
     display: flex;
@@ -3884,12 +3883,7 @@
     line-height: 1;
     color: rgba(255,255,255,.92);
     letter-spacing: 0.02em;
-    /* Playboard green neon on X marks */
-    text-shadow:
-      0 0 6px rgba(46,180,90,.95),
-      0 0 18px rgba(46,180,90,.7),
-      0 0 40px rgba(46,180,90,.4),
-      0 1px 0 rgba(0,0,0,.45);
+    text-shadow: 0 1px 0 rgba(0,0,0,.45);
   }
   .ss-note-slot[data-ss-note-slot="4"] {
     justify-content: center;
@@ -9754,7 +9748,14 @@ function smSelectSingleSongArrangementChip(chip) {
     if (isFinite(attrStart) && attrStart >= 0) start = attrStart;
   }
   var item = { code: pair[0], start: start, ci: ci, pair: pair };
-  ssSelectedArrangementSection = { song: songName, item: item };
+  /* Pin until seek lands — otherwise smTick/smUpdateArrNextCue overwrites the tab
+     from the pre-seek clock (~250ms), which feels like the first click was swallowed. */
+  ssSelectedArrangementSection = {
+    song: songName,
+    item: item,
+    pinnedAt: Date.now(),
+    seekTo: start
+  };
   if (typeof ssUpdateSectionTab === "function") {
     ssUpdateSectionTab(songName, { current: item, next: null, empty: false });
   }
@@ -10038,9 +10039,21 @@ function smUpdateArrNextCue(force) {
     });
   }
   if (inSingle && typeof ssUpdateSectionTab === "function") {
-    /* Songs without timing data still need a clicked chip's tab to stay visible. */
-    if (ssSelectedArrangementSection && ssSelectedArrangementSection.song === songName && pick.empty) {
-      ssUpdateSectionTab(songName, { current: ssSelectedArrangementSection.item, next: null, empty: false });
+    var sel = ssSelectedArrangementSection;
+    var holdSel = false;
+    if (sel && sel.song === songName && sel.item) {
+      var age = Date.now() - (sel.pinnedAt || 0);
+      var playingSel = !pick.empty && pick.current && pick.current.ci === sel.item.ci;
+      var nearTarget = sel.seekTo != null && isFinite(sel.seekTo) && Math.abs(t - sel.seekTo) < 0.75;
+      /* Hold clicked tab until seek lands (or ~2.5s), so the first click sticks. */
+      if (pick.empty || (!playingSel && !nearTarget && age < 2500)) {
+        holdSel = true;
+      } else {
+        ssSelectedArrangementSection = null;
+      }
+    }
+    if (holdSel) {
+      ssUpdateSectionTab(songName, { current: sel.item, next: null, empty: false });
     } else {
       /* Show upcoming section tab 2s before it begins; replace previous at that moment. */
       var tabPick = pick;
@@ -14652,6 +14665,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=312"></script>
+<script src="riffjams-admin.js?v=313"></script>
 </body>
 </html>
