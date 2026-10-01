@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-01T20:41:11.118Z",
+  "updatedAt": "2026-10-01T20:42:02.223Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -24,7 +24,7 @@
   "albums": [
     {
       "name": "Black Sabbath",
-      "cover": "covers/sabbath-hp.png?v=285",
+      "cover": "covers/sabbath-hp.png?v=284",
       "font": "font-paranoid",
       "songs": [
         {
@@ -54,6 +54,15 @@
               "1S"
             ],
             [
+              "S1",
+              1,
+              "TW-S1",
+              [
+                1,
+                5
+              ]
+            ],
+            [
               "V1",
               3,
               "TW-V1",
@@ -62,25 +71,15 @@
             [
               "C1",
               2,
-              "TW-C1",
-              []
-            ],
-            [
-              "S1",
-              1,
-              "TW-S1",
-              [
-                5,
-                1
-              ]
+              "TW-C1"
             ],
             [
               "S2",
               1,
               "TW-S2",
               [
-                5,
-                1
+                1,
+                5
               ]
             ],
             [
@@ -1647,7 +1646,7 @@
     "albums": [
       {
         "name": "Black Sabbath",
-        "cover": "covers/sabbath-hp.png?v=285",
+        "cover": "covers/sabbath-hp.png?v=284",
         "font": "font-paranoid",
         "songs": [
           {
@@ -1716,14 +1715,6 @@
                 ]
               ],
               [
-                "2-3A",
-                1,
-                "TW-2-3A",
-                [
-                  1
-                ]
-              ],
-              [
                 "2-2B",
                 2,
                 "TW-2-2B",
@@ -1742,22 +1733,14 @@
                 2,
                 "TW-2-4B"
               ],
-              [
-                "S1",
-                1,
-                "TW-S1",
-                [
-                  5,
-                  1
-                ]
-              ],
+              null,
               [
                 "S2",
                 1,
                 "TW-S2",
                 [
-                  5,
-                  1
+                  1,
+                  5
                 ]
               ]
             ]
@@ -2787,12 +2770,15 @@
     "albums": [
       {
         "name": "Black Sabbath",
-        "cover": "covers/sabbath-hp.png?v=285",
+        "cover": "covers/sabbath-hp.png?v=284",
         "font": "font-paranoid",
         "songs": [
           {
             "song": "Black Sabbath",
             "chips": [
+              null,
+              null,
+              null,
               null,
               null,
               null,
@@ -2812,51 +2798,86 @@
                 "I1",
                 2,
                 "TW-I1",
-                "1S"
-              ],
-              [
-                "V1",
-                3,
-                "TW-V1",
-                "1S"
-              ],
-              [
-                "C1",
-                2,
-                "TW-C1"
+                "1S",
+                20.5
               ],
               [
                 "S1",
                 1,
                 "TW-S1",
                 [
-                  5,
-                  1
-                ]
+                  1,
+                  5
+                ],
+                42.9
+              ],
+              [
+                "I1",
+                2,
+                "TW-I1",
+                "1S",
+                54.1
+              ],
+              [
+                "V1",
+                3,
+                "TW-V1",
+                "1S",
+                64.5
+              ],
+              [
+                "C1",
+                2,
+                "TW-C1",
+                1,
+                95.8
+              ],
+              [
+                "I1",
+                2,
+                "TW-I1",
+                "1S",
+                105.6
+              ],
+              [
+                "V1",
+                3,
+                "TW-V1",
+                "1S",
+                127.4
+              ],
+              [
+                "C1",
+                2,
+                "TW-C1",
+                1,
+                156
               ],
               [
                 "S2",
                 1,
                 "TW-S2",
                 [
-                  5,
-                  1
-                ]
+                  1,
+                  5
+                ],
+                165.8
               ],
               [
-                "O1",
-                null,
-                "TW-O1"
-              ],
-              null,
-              null,
-              null,
-              null
+                "V1",
+                3,
+                "TW-V1",
+                "1S",
+                185.2
+              ]
             ]
           },
           {
             "song": "Behind the Wall of Sleep",
             "chips": [
+              null,
+              null,
+              null,
               null,
               null,
               null,
@@ -2881,12 +2902,18 @@
               null,
               null,
               null,
+              null,
+              null,
+              null,
               null
             ]
           },
           {
             "song": "Evil Woman",
             "chips": [
+              null,
+              null,
+              null,
               null,
               null,
               null,
@@ -2911,12 +2938,18 @@
               null,
               null,
               null,
+              null,
+              null,
+              null,
               null
             ]
           },
           {
             "song": "Warning",
             "chips": [
+              null,
+              null,
+              null,
               null,
               null,
               null,
@@ -4755,6 +4788,111 @@
     ]
   },
   "arrangementTimings": [
+    {
+      "album": "Black Sabbath",
+      "song": "The Wizard",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1.682,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 20.5,
+          "stop": 42.9,
+          "duration": 22.4,
+          "lick": "TW-I1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 42.9,
+          "stop": 54.1,
+          "duration": 11.2,
+          "lick": "TW-S1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 54.1,
+          "stop": 64.5,
+          "duration": 10.4,
+          "lick": "TW-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 64.5,
+          "stop": 95.8,
+          "duration": 31.3,
+          "lick": "TW-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 2,
+          "start": 95.8,
+          "stop": 105.6,
+          "duration": 9.8,
+          "lick": "TW-C1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 105.6,
+          "stop": 127.4,
+          "duration": 21.8,
+          "lick": "TW-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 127.4,
+          "stop": 156,
+          "duration": 28.6,
+          "lick": "TW-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 2,
+          "start": 156,
+          "stop": 165.8,
+          "duration": 9.8,
+          "lick": "TW-C1"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 165.8,
+          "stop": 185.2,
+          "duration": 19.4,
+          "lick": "TW-S2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 185.2,
+          "stop": 223.6,
+          "duration": 38.4,
+          "lick": "TW-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 2,
+          "start": 223.6,
+          "stop": 233.3,
+          "duration": 9.7,
+          "lick": "TW-C1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 233.3,
+          "stop": null,
+          "duration": null,
+          "lick": "TW-I1"
+        }
+      ]
+    },
     {
       "album": "Vol. 4",
       "song": "Tomorrow's Dream",
