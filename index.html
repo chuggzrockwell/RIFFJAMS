@@ -3718,6 +3718,12 @@
     max-width: min(100%, calc(100vw - 420px));
     box-sizing: border-box;
   }
+  /* Keep an inline crop entirely inside columns 1–15, before the megachip. */
+  body.sections-mode.sections-single-song .ss-section-tab {
+    flex: 0 0 auto;
+    width: min(calc(15 * var(--ss-chip-w)), 100%);
+    max-width: calc(15 * var(--ss-chip-w));
+  }
   .ss-section-tab img.ss-tab-img {
     display: block;
     width: auto;
@@ -3727,6 +3733,18 @@
     border-radius: 10px;
     box-shadow: 0 10px 32px rgba(0,0,0,.28);
     background: #111;
+  }
+  /* Wide crops are moved into the cue panel, after the countdown. */
+  body.sections-mode.sections-single-song .ss-section-tab.ss-tab-below-cue {
+    flex: 0 0 auto;
+    width: min(1100px, calc(100vw - 15 * var(--ss-chip-w) - 24px));
+    max-width: min(1100px, calc(100vw - 15 * var(--ss-chip-w) - 24px));
+    min-height: 0;
+    padding: 0 4px 16px;
+    align-self: flex-start;
+  }
+  body.sections-mode.sections-single-song .ss-section-tab.ss-tab-below-cue img.ss-tab-img {
+    max-width: 100%;
   }
   .ss-section-tab .ss-tab-empty {
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
@@ -5548,6 +5566,29 @@ function buildSingleSongArrRowHtml(focusName) {
     + '<div class="song-chip-col"><div class="song-secs">'+chipArr.join("")+'</div></div>'
     + '</div></div>';
 }
+function ssPlaceSectionTab() {
+  var el = document.getElementById("ssSectionTab");
+  var layout = document.querySelector("#sectionsSheet .ss-layout");
+  var panel = document.getElementById("smArrNextPanel");
+  var img = el && el.querySelector("img.ss-tab-img");
+  if (!el || !layout || !panel || !img || !img.complete || !img.naturalWidth) return;
+  /* Measure the inline slot before deciding whether the native crop fits. */
+  if (el.parentNode !== layout) {
+    layout.insertBefore(el, panel);
+    el.classList.remove("ss-tab-below-cue");
+  }
+  var rootRect = layout.getBoundingClientRect();
+  var elRect = el.getBoundingClientRect();
+  var chipW = parseFloat(getComputedStyle(layout).getPropertyValue("--ss-chip-w")) || 72;
+  var inlineLimit = Math.max(0, rootRect.left + (15 * chipW) - elRect.left - 8);
+  var isWide = img.naturalWidth > inlineLimit + 1;
+  if (isWide) {
+    panel.appendChild(el);
+    el.classList.add("ss-tab-below-cue");
+  } else {
+    el.classList.remove("ss-tab-below-cue");
+  }
+}
 function ssUpdateSectionTab(songName, pick) {
   var el = document.getElementById("ssSectionTab");
   if (!el) return;
@@ -5556,6 +5597,10 @@ function ssUpdateSectionTab(songName, pick) {
     if (el.getAttribute("data-ss-tab") !== "") {
       el.innerHTML = '<div class="ss-tab-empty">Play to show tab</div>';
       el.setAttribute("data-ss-tab", "");
+      el.classList.remove("ss-tab-below-cue");
+      var emptyLayout = document.querySelector("#sectionsSheet .ss-layout");
+      var emptyPanel = document.getElementById("smArrNextPanel");
+      if (emptyLayout && emptyPanel && el.parentNode !== emptyLayout) emptyLayout.insertBefore(el, emptyPanel);
     }
     return;
   }
@@ -5579,10 +5624,16 @@ function ssUpdateSectionTab(songName, pick) {
   el.innerHTML = '<img class="ss-tab-img" alt="'+ssEscAttr(item.code)+' tab" src="'+ssEscAttr(src)+'">';
   var img = el.querySelector("img.ss-tab-img");
   if (img) {
+    img.onload = function(){
+      if (el.getAttribute("data-ss-tab") !== key) return;
+      ssPlaceSectionTab();
+    };
     img.onerror = function(){
       if (el.getAttribute("data-ss-tab") !== key) return;
+      el.classList.remove("ss-tab-below-cue");
       el.innerHTML = '<div class="ss-tab-empty">Tab missing</div>';
     };
+    if (img.complete) ssPlaceSectionTab();
   }
 }
 
@@ -7620,10 +7671,10 @@ function showSections(keepScroll) {
       + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
       + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
       + '</div>'
-      + '<div class="sm-arr-cue-col sm-arr-cue-current">'
+      + (singleSongMode ? "" : '<div class="sm-arr-cue-col sm-arr-cue-current">'
       + '<div class="sm-arr-next-label">Current section</div>'
       + '<div class="sm-arr-next-chip sm-arr-cur-chip is-empty" id="smArrCurChip">—</div>'
-      + '</div>'
+      + '</div>')
       + '</aside>'
     : "";
   var wrapCls = (sectionsMode === "view" && showMetaCols) ? "sections-wrap has-song-meta" : "sections-wrap";
@@ -14167,6 +14218,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=294"></script>
+<script src="riffjams-admin.js?v=295"></script>
 </body>
 </html>
