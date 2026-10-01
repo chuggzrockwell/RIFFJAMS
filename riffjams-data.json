@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-01T20:23:33.908Z",
+  "updatedAt": "2026-10-01T20:29:25.038Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -24,7 +24,7 @@
   "albums": [
     {
       "name": "Black Sabbath",
-      "cover": "covers/sabbath-hp.png?v=284",
+      "cover": "covers/sabbath-hp.png?v=285",
       "font": "font-paranoid",
       "songs": [
         {
@@ -1643,7 +1643,7 @@
     "albums": [
       {
         "name": "Black Sabbath",
-        "cover": "covers/sabbath-hp.png?v=284",
+        "cover": "covers/sabbath-hp.png?v=285",
         "font": "font-paranoid",
         "songs": [
           {
@@ -1707,6 +1707,14 @@
                 "2-2A",
                 1,
                 "TW-2-2A",
+                [
+                  1
+                ]
+              ],
+              [
+                "2-3A",
+                1,
+                "TW-2-3A",
                 [
                   1
                 ]
@@ -2775,7 +2783,7 @@
     "albums": [
       {
         "name": "Black Sabbath",
-        "cover": "covers/sabbath-hp.png?v=284",
+        "cover": "covers/sabbath-hp.png?v=285",
         "font": "font-paranoid",
         "songs": [
           {
