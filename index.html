@@ -3612,16 +3612,133 @@
     overflow: visible;
   }
   .song-row:hover { background: rgba(112,48,160,.04); }
-  /* Single Song mode: one focused row, a bit more breathing room. */
+  /* Single Song mode: no chip map — song dropdown + Next/Current cues + player. */
+  body.sections-single-song .sec-filters,
+  body.sections-single-song .sec-edit-tools {
+    display: none !important;
+  }
   body.sections-single-song #sectionsSheet .sections-wrap {
-    padding-top: 8px;
+    display: none !important;
   }
-  body.sections-single-song .song-row {
-    padding-top: 10px;
-    padding-bottom: 10px;
+  body.sections-single-song .sections-layout.ss-layout {
+    align-items: flex-start;
+    gap: 20px;
+    padding: 8px 4px 24px;
+    min-height: calc(100vh - 160px);
   }
-  body.sections-single-song .album-block {
+  body.sections-mode.sections-single-song .sm-arr-next-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-top: 0;
+    position: sticky;
+    top: 12px;
+  }
+  .ss-song-picker {
+    position: relative;
+    flex: 0 0 auto;
+    width: min(420px, 100%);
+    z-index: 6;
+    pointer-events: auto;
+  }
+  .ss-song-btn {
+    appearance: none;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     margin: 0;
+    padding: 10px 14px;
+    border: 1px solid rgba(0,0,0,.18);
+    border-radius: 12px;
+    background: #fff;
+    color: #111;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,.08);
+    font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    text-align: left;
+  }
+  .ss-song-btn:hover { filter: brightness(1.02); border-color: rgba(112,48,160,.45); }
+  .ss-song-btn[aria-expanded="true"] {
+    border-color: #7030a0;
+    box-shadow: 0 0 0 2px rgba(112,48,160,.2);
+  }
+  .ss-song-art {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex: 0 0 auto;
+    background: #111;
+  }
+  .ss-song-art.empty {
+    display: inline-block;
+    background: #ddd;
+  }
+  .ss-song-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: .02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ss-song-caret {
+    flex: 0 0 auto;
+    font-size: 0.85rem;
+    opacity: .55;
+  }
+  .ss-song-menu {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    max-height: min(420px, 55vh);
+    overflow: auto;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,.16);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0,0,0,.18);
+    z-index: 8;
+  }
+  .ss-song-picker.is-open .ss-song-menu { display: block; }
+  .ss-song-opt {
+    appearance: none;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #111;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-align: left;
+  }
+  .ss-song-opt:hover,
+  .ss-song-opt:focus {
+    background: rgba(112,48,160,.1);
+    outline: none;
+  }
+  .ss-song-opt.is-on {
+    background: rgba(112,48,160,.16);
+    color: #4a1a70;
+  }
+  .ss-song-opt .ss-song-art {
+    width: 32px;
+    height: 32px;
   }
   .song-secs {
     display: flex; flex-wrap: nowrap; gap: var(--chip-gap, 0px); align-items: stretch;
@@ -5021,6 +5138,10 @@ function cycleMapView() {
   setMapView(order[(i + 1) % order.length]);
 }
 function singleSongSourceAlbums() {
+  /* Single Song picker + cues share Arrangement catalog when present. */
+  if (ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums && ARRANGEMENT_MAP.albums.length) {
+    return ARRANGEMENT_MAP.albums;
+  }
   if (arrangementMode) return (ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || [];
   if (soloMode) return (SOLO_MAP && SOLO_MAP.albums) || [];
   return ALBUMS || [];
@@ -5061,6 +5182,7 @@ function syncSingleSongUi() {
 function setSingleSongMode(on) {
   var next = !!on;
   if (next) {
+    try { if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap(); } catch (eLoad) {}
     var focus = resolveSingleSongName(singleSongSourceAlbums());
     if (focus) setSingleSongFocus(focus);
   }
@@ -5123,6 +5245,144 @@ function syncSingleSongFocusFromPlayer() {
   setSingleSongFocus(cur.song);
   var sec = document.getElementById("sections");
   if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") showSections(true);
+}
+function singleSongPickerAlbums() {
+  if (ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums && ARRANGEMENT_MAP.albums.length) {
+    return ARRANGEMENT_MAP.albums;
+  }
+  return singleSongSourceAlbums();
+}
+function listSingleSongEntries(albums) {
+  var out = [];
+  (albums || []).forEach(function(a){
+    (a && a.songs || []).forEach(function(s){
+      if (!s || !s.song) return;
+      out.push({
+        song: s.song,
+        cover: (a && a.cover) || "",
+        album: (a && a.name) || ""
+      });
+    });
+  });
+  return out;
+}
+function ssEscAttr(s) {
+  return String(s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+function ssEscText(s) {
+  return String(s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+function buildSingleSongPickerHtml(focusName) {
+  var entries = listSingleSongEntries(singleSongPickerAlbums());
+  if (!entries.length) {
+    return '<div class="ss-song-picker" id="ssSongPicker"><button type="button" class="ss-song-btn" id="ssSongBtn" disabled>'
+      + '<span class="ss-song-art empty" aria-hidden="true"></span>'
+      + '<span class="ss-song-label">No songs</span></button></div>';
+  }
+  var focus = focusName || (entries[0] && entries[0].song) || "";
+  var focusEntry = null;
+  var i;
+  for (i = 0; i < entries.length; i++) {
+    if (entries[i].song === focus) { focusEntry = entries[i]; break; }
+  }
+  if (!focusEntry) focusEntry = entries[0];
+  var art = focusEntry.cover
+    ? '<img class="ss-song-art" src="'+ssEscAttr(focusEntry.cover)+'" alt="">'
+    : '<span class="ss-song-art empty" aria-hidden="true"></span>';
+  var opts = entries.map(function(e){
+    var on = (e.song === focusEntry.song) ? " is-on" : "";
+    var img = e.cover
+      ? '<img class="ss-song-art" src="'+ssEscAttr(e.cover)+'" alt="">'
+      : '<span class="ss-song-art empty" aria-hidden="true"></span>';
+    return '<button type="button" class="ss-song-opt'+on+'" role="option" data-song="'+ssEscAttr(e.song)+'" aria-selected="'+(on ? "true" : "false")+'">'
+      + img + '<span class="ss-song-label">'+ssEscText(e.song)+'</span></button>';
+  }).join("");
+  return '<div class="ss-song-picker" id="ssSongPicker">'
+    + '<button type="button" class="ss-song-btn" id="ssSongBtn" aria-haspopup="listbox" aria-expanded="false" aria-controls="ssSongMenu" title="Select song">'
+    + art
+    + '<span class="ss-song-label" id="ssSongLabel">'+ssEscText(focusEntry.song)+'</span>'
+    + '<span class="ss-song-caret" aria-hidden="true">▾</span>'
+    + '</button>'
+    + '<div class="ss-song-menu" id="ssSongMenu" role="listbox" hidden>'+opts+'</div>'
+    + '</div>';
+}
+function closeSingleSongPicker() {
+  var picker = document.getElementById("ssSongPicker");
+  var btn = document.getElementById("ssSongBtn");
+  var menu = document.getElementById("ssSongMenu");
+  if (picker) picker.classList.remove("is-open");
+  if (btn) btn.setAttribute("aria-expanded", "false");
+  if (menu) menu.setAttribute("hidden", "");
+}
+function openSingleSongPicker() {
+  var picker = document.getElementById("ssSongPicker");
+  var btn = document.getElementById("ssSongBtn");
+  var menu = document.getElementById("ssSongMenu");
+  if (picker) picker.classList.add("is-open");
+  if (btn) btn.setAttribute("aria-expanded", "true");
+  if (menu) menu.removeAttribute("hidden");
+}
+function bindSingleSongPicker() {
+  var picker = document.getElementById("ssSongPicker");
+  var btn = document.getElementById("ssSongBtn");
+  var menu = document.getElementById("ssSongMenu");
+  if (!picker || !btn || !menu || picker._ssBound) return;
+  picker._ssBound = true;
+  btn.addEventListener("click", function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if (picker.classList.contains("is-open")) closeSingleSongPicker();
+    else openSingleSongPicker();
+  });
+  menu.addEventListener("click", function(e){
+    var opt = e.target && e.target.closest ? e.target.closest(".ss-song-opt") : null;
+    if (!opt) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var name = opt.getAttribute("data-song") || "";
+    closeSingleSongPicker();
+    if (!name || name === singleSongName) return;
+    setSingleSongFocus(name);
+    try {
+      if (typeof smPlaylist !== "undefined" && smPlaylist && smPlaylist.length && typeof smPlayIndex === "function") {
+        var pi = -1;
+        for (var j = 0; j < smPlaylist.length; j++) {
+          if (smPlaylist[j] && smPlaylist[j].song === name) { pi = j; break; }
+        }
+        if (pi >= 0 && typeof smOrder !== "undefined" && smOrder && smOrder.length) {
+          var oi = smOrder.indexOf(pi);
+          if (oi >= 0) smPlayIndex(oi, false);
+        }
+      }
+    } catch (ePlay) {}
+    var sec = document.getElementById("sections");
+    if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") showSections(true);
+  });
+  if (!document._ssPickerDocBound) {
+    document._ssPickerDocBound = true;
+    document.addEventListener("click", function(e){
+      if (!singleSongMode) return;
+      var p = document.getElementById("ssSongPicker");
+      if (!p || !p.classList.contains("is-open")) return;
+      if (e.target && p.contains(e.target)) return;
+      closeSingleSongPicker();
+    });
+    document.addEventListener("keydown", function(e){
+      if (!singleSongMode) return;
+      if (e.key !== "Escape") return;
+      var p = document.getElementById("ssSongPicker");
+      if (!p || !p.classList.contains("is-open")) return;
+      closeSingleSongPicker();
+      e.preventDefault();
+    }, true);
+  }
 }
 function setArrangementMode(on) {
   arrangementMode = !!on;
@@ -7005,9 +7265,10 @@ function showSections(keepScroll) {
     ? '<span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-name" aria-hidden="true"></span><div class="song-meta-heads"><span>Key</span><span>Tuning</span><span>BPM</span><span>RSI</span></div>'
     : "";
   var ruler = '<div class="sec-ruler"><div class="row-num"></div>'+(metaHeads || '<div class="song-name-spacer" aria-hidden="true"></div>')+'<div class="song-secs">'+colNums+'</div></div>';
-  var singleFocus = singleSongMode ? resolveSingleSongName(sourceAlbums) : "";
+  var singleFocus = singleSongMode ? resolveSingleSongName(singleSongPickerAlbums()) : "";
   if (singleSongMode && singleFocus) setSingleSongFocus(singleFocus);
-  var html = sourceAlbums.map(function(album, ai){
+  var html = "";
+  if (!singleSongMode) html = sourceAlbums.map(function(album, ai){
     var rows = (album.songs || []).map(function(s, si){
       if (singleSongMode && singleFocus && s.song !== singleFocus) return "";
       rowN += 1;
@@ -7079,7 +7340,7 @@ function showSections(keepScroll) {
     if (singleSongMode && !rows) return "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
   }).join("");
-  var nextCueHtml = arrangementMode
+  var nextCueHtml = (arrangementMode || singleSongMode)
     ? '<aside class="sm-arr-next-panel" id="smArrNextPanel" aria-live="polite">'
       + '<div class="sm-arr-cue-col sm-arr-cue-next">'
       + '<div class="sm-arr-next-label">Next section</div>'
@@ -7093,8 +7354,15 @@ function showSections(keepScroll) {
       + '</aside>'
     : "";
   var wrapCls = (sectionsMode === "view" && showMetaCols) ? "sections-wrap has-song-meta" : "sections-wrap";
-  document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="'+wrapCls+'">'+head+outline+ruler+html+'</div>'+nextCueHtml+'</div>';
-  if (arrangementMode && typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
+  if (singleSongMode) {
+    var pickerHtml = buildSingleSongPickerHtml(singleFocus);
+    document.getElementById("sectionsSheet").innerHTML =
+      '<div class="sections-layout ss-layout">'+pickerHtml+nextCueHtml+'</div>';
+    bindSingleSongPicker();
+  } else {
+    document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="'+wrapCls+'">'+head+outline+ruler+html+'</div>'+nextCueHtml+'</div>';
+  }
+  if ((arrangementMode || singleSongMode) && typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
   var wrapEl = document.querySelector("#sectionsSheet .sections-wrap");
   if (wrapEl) {
     wrapEl.style.setProperty("--cols", String(displayCols));
@@ -7109,9 +7377,11 @@ function showSections(keepScroll) {
       toggleSoloColsCollapsed();
     });
   }
-  document.getElementById("sectionsCount").textContent = arrangementMode
-    ? (n + (n === 1 ? " arrangement" : " arrangements"))
-    : (soloMode ? (n + " licks") : (n + " sections"));
+  document.getElementById("sectionsCount").textContent = singleSongMode
+    ? (singleFocus || "Single Song")
+    : (arrangementMode
+      ? (n + (n === 1 ? " arrangement" : " arrangements"))
+      : (soloMode ? (n + " licks") : (n + " sections")));
   buildSecFilters();
   applySecFilters();
   updateSoloUi();
@@ -7196,7 +7466,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=288";
+  var url = base + "?playboard=1&v=290";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -7225,7 +7495,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=288") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=290") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -8932,7 +9202,9 @@ function smUpdateArrNextCue(force) {
   var chipEl = document.getElementById("smArrNextChip");
   var cdEl = document.getElementById("smArrNextCountdown");
   if (!panel || !chipEl) return;
-  if (!arrangementMode || !document.body.classList.contains("sections-arrange")) {
+  var inSingle = !!singleSongMode && document.body.classList.contains("sections-single-song");
+  var inArrange = !!arrangementMode && document.body.classList.contains("sections-arrange");
+  if (!inArrange && !inSingle) {
     if (cdEl) {
       cdEl.textContent = "";
       cdEl.classList.remove("is-on", "is-urgent", "is-end");
@@ -8941,7 +9213,11 @@ function smUpdateArrNextCue(force) {
     return;
   }
   var curTrack = (typeof smCurrent === "function") ? smCurrent() : null;
-  var songName = curTrack && curTrack.song ? curTrack.song : "";
+  var songName = "";
+  if (inSingle) {
+    songName = resolveSingleSongName(singleSongPickerAlbums()) || singleSongName || "";
+  }
+  if (!songName) songName = curTrack && curTrack.song ? curTrack.song : "";
   var song = smFindArrangementSongByName(songName);
   var timed = smCollectTimedArrChips(song);
   var t = 0;
@@ -13608,6 +13884,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=289"></script>
+<script src="riffjams-admin.js?v=290"></script>
 </body>
 </html>
