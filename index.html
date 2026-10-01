@@ -5582,7 +5582,7 @@ function buildSingleSongArrRowHtml(focusName) {
     : "np-paranoid";
   return '<div class="ss-arr-wrap sections-wrap" id="ssArrWrap" style="--cols:'+maxCols+'">'
     + '<div class="song-row '+np+' ss-arr-row" data-ai="'+ai+'" data-si="'+si+'">'
-    + '<div class="song-chip-col"><div class="song-secs">'+chipArr.join("")+'</div></div>'
+    + '<div class="song-chip-col">'+sectionRulerLaneHtml(song, maxCols)+'<div class="song-secs">'+chipArr.join("")+'</div></div>'
     + '</div></div>';
 }
 function ssPlaceSectionTab() {
@@ -14305,6 +14305,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=300"></script>
+<script src="riffjams-admin.js?v=301"></script>
 </body>
 </html>
