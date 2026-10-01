@@ -3612,7 +3612,7 @@
     overflow: visible;
   }
   .song-row:hover { background: rgba(112,48,160,.04); }
-  /* Single Song mode (v292+): nav song picker, arr chip strip 1.5×, cues top-right, live tab. */
+  /* Single Song mode (v296): nav picker, 1.5× chips, megachip at col 15, tab under chips. */
   body.sections-single-song .sec-filters,
   body.sections-single-song .sec-edit-tools {
     display: none !important;
@@ -3627,19 +3627,23 @@
     min-height: calc(100vh - 160px);
     position: relative;
   }
-  /* Keep the megachip in the content area, aligned with the chip row after col 15. */
+  /* NEXT SECTION megachip + countdown: top-right, pinned at arrangement col 15. */
   body.sections-mode.sections-single-song .sm-arr-next-panel {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: center;
     gap: 14px;
     position: absolute;
-    top: 10px;
+    top: 4px;
     left: calc(15 * var(--ss-chip-w) + 12px);
     right: auto;
+    width: 360px;
+    min-width: 360px;
+    max-width: 360px;
     margin: 0;
     z-index: 55;
     pointer-events: none;
+    box-sizing: border-box;
   }
   /* Arrangement chip strip directly under nav — 1.5× Song Map chip size */
   body.sections-single-song .ss-arr-wrap {
@@ -3707,22 +3711,23 @@
     z-index: 5;
     position: relative;
   }
-  /* Live section tab under the chip strip; only the playing section is mounted. */
+  /* Playing section tab: left under the arrangement chips; only current tab. */
   .ss-section-tab {
     flex: 1 1 auto;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
     padding: 8px 4px 16px;
-    min-height: 180px;
+    min-height: 120px;
     max-width: min(100%, calc(100vw - 420px));
     box-sizing: border-box;
   }
-  /* Keep an inline crop entirely inside columns 1–15, before the megachip. */
+  /* Stay in columns 1–15 (before megachip). Wide crops scale down to fit. */
   body.sections-mode.sections-single-song .ss-section-tab {
     flex: 0 0 auto;
     width: min(calc(15 * var(--ss-chip-w)), 100%);
     max-width: calc(15 * var(--ss-chip-w));
+    align-self: flex-start;
   }
   .ss-section-tab img.ss-tab-img {
     display: block;
@@ -3734,17 +3739,22 @@
     box-shadow: 0 10px 32px rgba(0,0,0,.28);
     background: #111;
   }
-  /* Wide crops are moved into the cue panel, after the countdown. */
+  /* Ultra-wide crops that stay unreadably short in cols 1–15 go under the countdown. */
   body.sections-mode.sections-single-song .ss-section-tab.ss-tab-below-cue {
+    position: absolute;
+    top: calc(4px + 2.2rem + 280px + 14px + 4.5rem + 18px);
+    left: calc(15 * var(--ss-chip-w) + 12px);
+    right: 8px;
     flex: 0 0 auto;
-    width: min(1100px, calc(100vw - 15 * var(--ss-chip-w) - 24px));
-    max-width: min(1100px, calc(100vw - 15 * var(--ss-chip-w) - 24px));
+    width: auto;
+    max-width: none;
     min-height: 0;
-    padding: 0 4px 16px;
-    align-self: flex-start;
+    padding: 0;
+    z-index: 54;
   }
   body.sections-mode.sections-single-song .ss-section-tab.ss-tab-below-cue img.ss-tab-img {
     max-width: 100%;
+    max-height: min(50vh, 480px);
   }
   .ss-section-tab .ss-tab-empty {
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
@@ -5571,23 +5581,20 @@ function ssPlaceSectionTab() {
   var layout = document.querySelector("#sectionsSheet .ss-layout");
   var panel = document.getElementById("smArrNextPanel");
   var img = el && el.querySelector("img.ss-tab-img");
-  if (!el || !layout || !panel || !img || !img.complete || !img.naturalWidth) return;
-  /* Measure the inline slot before deciding whether the native crop fits. */
-  if (el.parentNode !== layout) {
+  if (!el || !layout || !img || !img.complete || !img.naturalWidth) return;
+  /* Keep tab under the chip strip; never nest it inside the cue panel (that shoved the megachip right). */
+  if (panel && el.parentNode !== layout) {
     layout.insertBefore(el, panel);
-    el.classList.remove("ss-tab-below-cue");
+  } else if (!panel && el.parentNode !== layout) {
+    layout.appendChild(el);
   }
-  var rootRect = layout.getBoundingClientRect();
-  var elRect = el.getBoundingClientRect();
   var chipW = parseFloat(getComputedStyle(layout).getPropertyValue("--ss-chip-w")) || 72;
-  var inlineLimit = Math.max(0, rootRect.left + (15 * chipW) - elRect.left - 8);
-  var isWide = img.naturalWidth > inlineLimit + 1;
-  if (isWide) {
-    panel.appendChild(el);
-    el.classList.add("ss-tab-below-cue");
-  } else {
-    el.classList.remove("ss-tab-below-cue");
-  }
+  var inlineLimit = 15 * chipW;
+  /* Fit-to-15-cols height; only park under countdown when that would be unreadably short. */
+  var fitH = inlineLimit * (img.naturalHeight / img.naturalWidth);
+  var isUltraWide = fitH < 90;
+  if (isUltraWide) el.classList.add("ss-tab-below-cue");
+  else el.classList.remove("ss-tab-below-cue");
 }
 function ssUpdateSectionTab(songName, pick) {
   var el = document.getElementById("ssSectionTab");
@@ -14218,6 +14225,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=295"></script>
+<script src="riffjams-admin.js?v=296"></script>
 </body>
 </html>
