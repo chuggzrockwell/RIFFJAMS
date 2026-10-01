@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-01T23:02:21.942Z",
+  "updatedAt": "2026-10-01T23:18:36.694Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -2921,7 +2921,23 @@
                 "start": 9,
                 "end": 11
               }
-            ]
+            ],
+            "sectionNotes": {
+              "V1": [
+                {
+                  "image": "notes/vib5.png"
+                },
+                {
+                  "image": "notes/slur-5-7.png"
+                },
+                {
+                  "image": "notes/vib5.png"
+                },
+                {
+                  "mark": "X"
+                }
+              ]
+            }
           },
           {
             "song": "Behind the Wall of Sleep",

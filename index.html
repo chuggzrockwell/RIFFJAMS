@@ -3769,15 +3769,18 @@
     color: rgba(255,255,255,.42);
     padding: 12px 2px;
   }
-  /* Single Song notes — under the section tab */
+  /* Single Song notes — under the section tab (per-section slots) */
   .ss-notes {
     flex: 0 0 auto;
     width: min(calc(15 * var(--ss-chip-w)), 100%);
     max-width: calc(15 * var(--ss-chip-w));
     align-self: flex-start;
     box-sizing: border-box;
-    padding: 0 4px 8px;
+    padding: 0 4px 10px;
     z-index: 2;
+  }
+  .ss-notes[hidden] {
+    display: none !important;
   }
   .ss-notes-label {
     display: block;
@@ -3789,37 +3792,73 @@
     color: rgba(255,255,255,.55);
     margin: 0 0 6px;
   }
-  .ss-notes-text {
-    display: block;
-    width: 100%;
-    min-height: 5.5rem;
-    box-sizing: border-box;
-    resize: vertical;
-    margin: 0;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,.14);
-    background: rgba(0,0,0,.42);
-    color: rgba(255,255,255,.88);
+  .ss-notes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px 10px;
+    align-items: start;
+  }
+  .ss-note-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 4px 6px;
+    border-radius: 3px;
+    background: #18d060;
+    color: #fff;
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
-    font-size: 0.92rem;
-    font-weight: 500;
-    line-height: 1.45;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    box-shadow:
+      inset -1px 0 0 rgba(0,0,0,.25),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 0 1px rgba(0,0,0,.35);
+    user-select: none;
   }
-  .ss-notes-text:focus {
-    outline: none;
-    border-color: rgba(160,90,220,.65);
-    box-shadow: 0 0 0 2px rgba(112,48,160,.35);
-  }
-  .ss-notes-text[readonly] {
-    cursor: default;
-    color: rgba(255,255,255,.72);
+  .ss-note-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 64px;
+    padding: 6px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,.10);
     background: rgba(0,0,0,.28);
-    border-color: rgba(255,255,255,.08);
   }
-  .ss-notes-text::placeholder {
-    color: rgba(255,255,255,.32);
+  .ss-note-slot.is-empty {
+    border-style: dashed;
+    border-color: rgba(255,255,255,.12);
+    background: rgba(0,0,0,.16);
+    min-height: 48px;
+  }
+  .ss-note-slot img.ss-note-img {
+    display: block;
+    max-width: 100%;
+    max-height: 110px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    background: #fff;
+    border-radius: 4px;
+  }
+  .ss-note-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 52px;
+    font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+    color: rgba(255,255,255,.88);
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 0 rgba(0,0,0,.45);
   }
   /* Song picker lives in the Song Map nav bar (next to Tools) */
   .ss-nav-picker-host {
@@ -5019,7 +5058,36 @@ function normalizeArrangementSong(song) {
   if (arrRulers) arrSong.sectionRulers = arrRulers;
   var notesText = String(song.notes == null ? "" : song.notes);
   if (notesText) arrSong.notes = notesText;
+  var sectionNotes = normalizeSectionNotesField(song.sectionNotes);
+  if (sectionNotes) arrSong.sectionNotes = sectionNotes;
   return arrSong;
+}
+function normalizeSectionNotesField(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  var out = {};
+  Object.keys(raw).forEach(function(sec){
+    var slots = normalizeNoteSlots(raw[sec]);
+    if (slots) out[sec] = slots;
+  });
+  return Object.keys(out).length ? out : null;
+}
+function normalizeNoteSlots(raw) {
+  if (!Array.isArray(raw)) return null;
+  var out = [];
+  var i, slot, image, mark;
+  for (i = 0; i < 4; i++) {
+    slot = raw[i];
+    if (!slot || typeof slot !== "object") {
+      out.push({});
+      continue;
+    }
+    image = String(slot.image || slot.src || "").trim();
+    mark = String(slot.mark == null ? "" : slot.mark).trim();
+    if (image) out.push({ image: image });
+    else if (mark) out.push({ mark: mark });
+    else out.push({});
+  }
+  return out;
 }
 function normalizeArrangementMap(map, albumsFallback) {
   var base = blankArrangementMapFromAlbums(albumsFallback || ALBUMS_DEFAULT);
@@ -5682,6 +5750,7 @@ function ssUpdateSectionTab(songName, pick) {
       var emptyBefore = emptyNotes || emptyPanel;
       if (emptyLayout && emptyBefore && el.parentNode !== emptyLayout) emptyLayout.insertBefore(el, emptyBefore);
     }
+    if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, "");
     return;
   }
   var lick = "";
@@ -5695,13 +5764,18 @@ function ssUpdateSectionTab(songName, pick) {
       el.innerHTML = '<div class="ss-tab-empty">No tab linked</div>';
       el.setAttribute("data-ss-tab", item.code || "");
     }
+    if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, item.code);
     return;
   }
   var key = String(item.ci) + "|" + String(item.code || "") + "|" + lick;
-  if (el.getAttribute("data-ss-tab") === key && el.querySelector("img.ss-tab-img")) return;
+  if (el.getAttribute("data-ss-tab") === key && el.querySelector("img.ss-tab-img")) {
+    if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, item.code);
+    return;
+  }
   var src = lickSrc(lick);
   el.setAttribute("data-ss-tab", key);
   el.innerHTML = '<img class="ss-tab-img" alt="'+ssEscAttr(item.code)+' tab" src="'+ssEscAttr(src)+'">';
+  if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, item.code);
   var img = el.querySelector("img.ss-tab-img");
   if (img) {
     img.onload = function(){
@@ -5732,52 +5806,85 @@ function ssFindArrangementSong(songName) {
   }
   return null;
 }
-function ssReadSongNotes(songName) {
-  var song = ssFindArrangementSong(songName);
-  return song ? String(song.notes == null ? "" : song.notes) : "";
+/* Per-section Single Song notes (4 green chips + content under each). */
+var SS_DEFAULT_SECTION_NOTES = {
+  "The Wizard": {
+    "V1": [
+      { image: "notes/vib5.png" },
+      { image: "notes/slur-5-7.png" },
+      { image: "notes/vib5.png" },
+      { mark: "X" }
+    ]
+  }
+};
+function ssNoteSlotsHaveContent(slots) {
+  if (!slots || !slots.length) return false;
+  var i, s;
+  for (i = 0; i < slots.length; i++) {
+    s = slots[i];
+    if (!s) continue;
+    if (s.image || s.src || s.mark) return true;
+  }
+  return false;
 }
-function ssWriteSongNotes(songName, notes) {
-  if (!songName) return;
+function ssReadSectionNoteSlots(songName, secCode) {
+  var code = String(secCode || "").trim();
+  if (!songName || !code) return null;
   var song = ssFindArrangementSong(songName);
-  if (!song) return;
-  var next = String(notes == null ? "" : notes);
-  var prev = String(song.notes == null ? "" : song.notes);
-  if (next === prev) return;
-  try { pushArrangementHistory(); } catch (eHist) {}
-  if (next) song.notes = next;
-  else delete song.notes;
-  try { saveArrangementMap(); } catch (eSave) {}
+  var fromSong = song && song.sectionNotes && normalizeNoteSlots(song.sectionNotes[code]);
+  if (ssNoteSlotsHaveContent(fromSong)) return fromSong;
+  var defMap = SS_DEFAULT_SECTION_NOTES[songName];
+  var fromDef = defMap && normalizeNoteSlots(defMap[code]);
+  if (ssNoteSlotsHaveContent(fromDef)) return fromDef;
+  return null;
 }
 function ssNotesPanelHtml(songName) {
-  var notes = ssReadSongNotes(songName);
-  var edit = sectionsMode === "edit";
-  var ro = edit ? "" : " readonly";
-  var ph = edit ? "Add notes for this song…" : "No notes";
-  return '<div class="ss-notes" id="ssNotesPanel" data-ss-notes-song="'+ssEscAttr(songName || "")+'">'
-    + '<label class="ss-notes-label" for="ssNotesText">Notes</label>'
-    + '<textarea id="ssNotesText" class="ss-notes-text" rows="4" spellcheck="true" placeholder="'+ssEscAttr(ph)+'"'+ro+'>'
-    + ssEscText(notes)
-    + '</textarea></div>';
+  return '<div class="ss-notes" id="ssNotesPanel" hidden data-ss-notes-song="'+ssEscAttr(songName || "")+'" data-ss-notes-sec="" aria-live="polite">'
+    + '<div class="ss-notes-label">Notes</div>'
+    + '<div class="ss-notes-grid" id="ssNotesGrid"></div>'
+    + '</div>';
+}
+function ssUpdateNotesPanel(songName, secCode) {
+  var panel = document.getElementById("ssNotesPanel");
+  if (!panel) return;
+  var code = String(secCode || "").trim();
+  var key = String(songName || "") + "|" + code;
+  if (panel.getAttribute("data-ss-notes-key") === key) return;
+  panel.setAttribute("data-ss-notes-song", songName || "");
+  panel.setAttribute("data-ss-notes-sec", code);
+  panel.setAttribute("data-ss-notes-key", key);
+  var slots = ssReadSectionNoteSlots(songName, code);
+  var grid = document.getElementById("ssNotesGrid");
+  if (!slots || !ssNoteSlotsHaveContent(slots)) {
+    panel.hidden = true;
+    if (grid) grid.innerHTML = "";
+    return;
+  }
+  var chips = [];
+  var bodies = [];
+  var i, slot, n, body, emptyCls;
+  for (i = 0; i < 4; i++) {
+    slot = slots[i] || {};
+    n = i + 1;
+    chips.push('<div class="ss-note-chip" aria-hidden="true">'+n+'</div>');
+    if (slot.image) {
+      body = '<img class="ss-note-img" alt="Note '+n+'" src="'+ssEscAttr(slot.image)+'">';
+      emptyCls = '';
+    } else if (slot.mark) {
+      body = '<div class="ss-note-mark" aria-label="'+ssEscAttr(slot.mark)+'">'+ssEscText(slot.mark)+'</div>';
+      emptyCls = '';
+    } else {
+      body = '';
+      emptyCls = ' is-empty';
+    }
+    bodies.push('<div class="ss-note-slot'+emptyCls+'" data-ss-note-slot="'+n+'">'+body+'</div>');
+  }
+  /* Row 1: chips 1–4; Row 2: content under each chip (CSS grid row-flows: chips then slots). */
+  if (grid) grid.innerHTML = chips.join("") + bodies.join("");
+  panel.hidden = false;
 }
 function ssBindNotesPanel() {
-  var ta = document.getElementById("ssNotesText");
-  var panel = document.getElementById("ssNotesPanel");
-  if (!ta || !panel || panel.getAttribute("data-ss-notes-bound") === "1") return;
-  panel.setAttribute("data-ss-notes-bound", "1");
-  function persist() {
-    var song = panel.getAttribute("data-ss-notes-song") || "";
-    if (!song) return;
-    ssWriteSongNotes(song, ta.value);
-  }
-  ta.addEventListener("blur", persist);
-  ta.addEventListener("change", persist);
-  /* Avoid clobbering while typing: debounce soft-save in Edit */
-  var timer = null;
-  ta.addEventListener("input", function(){
-    if (sectionsMode !== "edit") return;
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(persist, 500);
-  });
+  /* Structured notes are driven by the active section tab; nothing to bind. */
 }
 
 function closeSingleSongPicker() {
@@ -14434,6 +14541,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=302"></script>
+<script src="riffjams-admin.js?v=303"></script>
 </body>
 </html>
