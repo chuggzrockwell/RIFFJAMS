@@ -7671,19 +7671,28 @@ function showSections(keepScroll) {
     if (singleSongMode && !rows) return "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
   }).join("");
-  var nextCueHtml = (arrangementMode || singleSongMode)
+  /* Keep Arrangement's original cue panel separate from Single Song's focused layout. */
+  var nextCueHtml = arrangementMode
     ? '<aside class="sm-arr-next-panel" id="smArrNextPanel" aria-live="polite">'
       + '<div class="sm-arr-cue-col sm-arr-cue-next">'
       + '<div class="sm-arr-next-label">Next section</div>'
       + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
       + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
       + '</div>'
-      + (singleSongMode ? "" : '<div class="sm-arr-cue-col sm-arr-cue-current">'
+      + '<div class="sm-arr-cue-col sm-arr-cue-current">'
       + '<div class="sm-arr-next-label">Current section</div>'
       + '<div class="sm-arr-next-chip sm-arr-cur-chip is-empty" id="smArrCurChip">—</div>'
-      + '</div>')
+      + '</div>'
       + '</aside>'
-    : "";
+    : (singleSongMode
+      ? '<aside class="sm-arr-next-panel" id="smArrNextPanel" aria-live="polite">'
+        + '<div class="sm-arr-cue-col sm-arr-cue-next">'
+        + '<div class="sm-arr-next-label">Next section</div>'
+        + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
+        + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
+        + '</div>'
+        + '</aside>'
+      : "");
   var wrapCls = (sectionsMode === "view" && showMetaCols) ? "sections-wrap has-song-meta" : "sections-wrap";
   if (singleSongMode) {
     mountSingleSongNavPicker(singleFocus);
@@ -14225,6 +14234,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=296"></script>
+<script src="riffjams-admin.js?v=297"></script>
 </body>
 </html>
