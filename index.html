@@ -3802,8 +3802,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    justify-self: center;
+    width: 33.333%;
+    min-width: 0;
+    box-sizing: border-box;
     min-height: 28px;
-    padding: 4px 6px;
+    padding: 4px 2px;
     border-radius: 3px;
     background: #18d060;
     color: #fff;
@@ -3823,18 +3827,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 64px;
-    padding: 6px;
+    min-height: 0;
+    padding: 0;
     box-sizing: border-box;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,.10);
-    background: rgba(0,0,0,.28);
+    border: none;
+    background: transparent;
   }
   .ss-note-slot.is-empty {
-    border-style: dashed;
-    border-color: rgba(255,255,255,.12);
-    background: rgba(0,0,0,.16);
-    min-height: 48px;
+    min-height: 0;
+    border: none;
+    background: transparent;
   }
   .ss-note-slot img.ss-note-img {
     display: block;
@@ -3843,15 +3845,17 @@
     width: auto;
     height: auto;
     object-fit: contain;
-    background: #fff;
-    border-radius: 4px;
+    background: transparent;
   }
   .ss-note-mark {
     display: flex;
     align-items: center;
     justify-content: center;
+    justify-self: center;
     width: 100%;
     min-height: 52px;
+    margin: 0 auto;
+    text-align: center;
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
     font-size: 2.4rem;
     font-weight: 800;
@@ -3859,6 +3863,10 @@
     color: rgba(255,255,255,.88);
     letter-spacing: 0.02em;
     text-shadow: 0 1px 0 rgba(0,0,0,.45);
+  }
+  .ss-note-slot[data-ss-note-slot="4"] {
+    justify-content: center;
+    text-align: center;
   }
   /* Song picker lives in the Song Map nav bar (next to Tools) */
   .ss-nav-picker-host {
@@ -14557,6 +14565,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=304"></script>
+<script src="riffjams-admin.js?v=305"></script>
 </body>
 </html>
