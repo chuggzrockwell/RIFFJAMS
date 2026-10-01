@@ -3612,36 +3612,203 @@
     overflow: visible;
   }
   .song-row:hover { background: rgba(112,48,160,.04); }
-  /* Single Song mode: no chip map — song dropdown + Next/Current cues + player. */
+  /* Single Song mode (v292+): nav song picker, arr chip strip 1.5×, cues top-right, live tab. */
   body.sections-single-song .sec-filters,
   body.sections-single-song .sec-edit-tools {
     display: none !important;
   }
-  body.sections-single-song #sectionsSheet .sections-wrap {
-    display: none !important;
-  }
   body.sections-single-song .sections-layout.ss-layout {
-    align-items: flex-start;
-    gap: 20px;
-    padding: 8px 4px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 4px 8px 24px;
     min-height: calc(100vh - 160px);
+    position: relative;
   }
   body.sections-mode.sections-single-song .sm-arr-next-panel {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-end;
     gap: 14px;
-    margin-top: 0;
-    position: sticky;
-    top: 12px;
+    position: fixed;
+    top: 10px;
+    right: 12px;
+    margin: 0;
+    z-index: 55;
+    pointer-events: none;
+  }
+  /* Arrangement chip strip directly under nav — 1.5× Song Map chip size */
+  body.sections-single-song .ss-arr-wrap {
+    --row-g: 0px;
+    --name-w: 0px;
+    --song-meta-w: 0px;
+    --chip-w: 72px; /* 48 × 1.5 */
+    --chip-h: 42px; /* 28 × 1.5 */
+    --chip-gap: 2px;
+    --cover-rows: 1;
+    --cover: calc(var(--chip-h) * var(--cover-rows));
+    display: flex !important;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    padding: 6px 4px 2px;
+    box-sizing: border-box;
+    overflow-x: auto;
+  }
+  body.sections-single-song .ss-arr-wrap .ss-arr-row {
+    align-items: center;
+    min-height: var(--chip-h);
+  }
+  body.sections-single-song .ss-arr-wrap .song-chip-col {
+    align-self: center;
+  }
+  body.sections-single-song .ss-arr-wrap .sec-chip {
+    font-size: 1.05rem !important; /* ~0.7 × 1.5 */
+    font-weight: 400 !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1 !important;
+    text-transform: uppercase;
+    border-radius: 4px;
+  }
+  body.sections-single-song .ss-arr-empty {
+    font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(0,0,0,.45);
+    padding: 10px 4px;
+  }
+  /* Arrangement chip colors + now-glow also apply in Single Song (may not have sections-arrange) */
+  body.sections-single-song .sec-chip[data-arrange="1"]:not(.empty):not(.filtered-out) {
+    background: var(--arr-bg, #e6b800) !important;
+    color: var(--arr-fg, #fff) !important;
+    text-shadow: none !important;
+    box-shadow:
+      inset -1px 0 0 rgba(0,0,0,.25),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 0 1px rgba(0,0,0,.35) !important;
+  }
+  body.sections-single-song .sec-chip.S:not(.filtered-out),
+  body.sections-single-song .sec-chip.L:not(.filtered-out) {
+    color: var(--arr-fg, #fff) !important;
+    text-shadow: none !important;
+  }
+  body.sections-single-song .sec-chip.is-arr-now:not(.empty):not(.filtered-out) {
+    outline: none !important;
+    border: 4px solid #ffffff !important;
+    box-shadow:
+      0 0 0 3px #ffffff,
+      0 0 14px 5px rgba(255,255,255,1),
+      0 0 32px 12px rgba(255,255,255,.85),
+      0 0 56px 20px rgba(255,255,255,.5) !important;
+    z-index: 5;
+    position: relative;
+  }
+  /* Live section tab under the chip strip */
+  .ss-section-tab {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 8px 4px 16px;
+    min-height: 180px;
+    max-width: min(100%, calc(100vw - 420px));
+    box-sizing: border-box;
+  }
+  .ss-section-tab img.ss-tab-img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: min(70vh, 720px);
+    border-radius: 10px;
+    box-shadow: 0 10px 32px rgba(0,0,0,.28);
+    background: #111;
+  }
+  .ss-section-tab .ss-tab-empty {
+    font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 650;
+    color: rgba(0,0,0,.4);
+    padding: 12px 2px;
+  }
+  /* Song picker lives in the Song Map nav bar (next to Tools) */
+  .ss-nav-picker-host {
+    position: relative;
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: min(340px, 42vw);
+    z-index: 70;
+  }
+  body.sections-mode:not(.sections-single-song) .ss-nav-picker-host {
+    display: none !important;
+  }
+  body.sections-mode.sections-single-song .ss-nav-picker-host {
+    display: block;
   }
   .ss-song-picker {
     position: relative;
     flex: 0 0 auto;
-    width: min(420px, 100%);
+    width: 100%;
     z-index: 6;
     pointer-events: auto;
   }
+  .ss-nav-picker-host .ss-song-btn {
+    appearance: none;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 4px 12px 4px 8px;
+    border: 1px solid #2c3040;
+    border-radius: 999px;
+    background: #12141a;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: none;
+    font-family: inherit;
+    text-align: left;
+    line-height: normal;
+  }
+  .ss-nav-picker-host .ss-song-btn:hover {
+    filter: brightness(1.08);
+    border-color: #4a5166;
+  }
+  .ss-nav-picker-host .ss-song-btn[aria-expanded="true"] {
+    border-color: #7030a0;
+    box-shadow: 0 0 0 2px rgba(112,48,160,.35);
+  }
+  .ss-nav-picker-host .ss-song-art {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    object-fit: cover;
+    flex: 0 0 auto;
+    background: #111;
+  }
+  .ss-nav-picker-host .ss-song-art.empty {
+    display: inline-block;
+    background: #2a2e3a;
+  }
+  .ss-nav-picker-host .ss-song-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #fff;
+  }
+  .ss-nav-picker-host .ss-song-caret {
+    flex: 0 0 auto;
+    font-size: 0.7rem;
+    opacity: .55;
+    color: #fff;
+  }
+  /* Fallback styles if picker is ever rendered outside nav */
   .ss-song-btn {
     appearance: none;
     width: 100%;
@@ -3702,11 +3869,11 @@
     margin: 0;
     padding: 6px;
     list-style: none;
-    background: #fff;
-    border: 1px solid rgba(0,0,0,.16);
+    background: #161920;
+    border: 1px solid #2c3040;
     border-radius: 12px;
-    box-shadow: 0 12px 32px rgba(0,0,0,.18);
-    z-index: 8;
+    box-shadow: 0 12px 32px rgba(0,0,0,.45);
+    z-index: 90;
   }
   .ss-song-picker.is-open .ss-song-menu { display: block; }
   .ss-song-opt {
@@ -3720,25 +3887,25 @@
     border: 0;
     border-radius: 8px;
     background: transparent;
-    color: #111;
+    color: #e8e6e1;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.92rem;
+    font-size: 0.85rem;
     font-weight: 700;
     text-align: left;
   }
   .ss-song-opt:hover,
   .ss-song-opt:focus {
-    background: rgba(112,48,160,.1);
+    background: rgba(255,255,255,.08);
     outline: none;
   }
   .ss-song-opt.is-on {
-    background: rgba(112,48,160,.16);
-    color: #4a1a70;
+    background: rgba(112,48,160,.35);
+    color: #fff;
   }
   .ss-song-opt .ss-song-art {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
   }
   .song-secs {
     display: flex; flex-wrap: nowrap; gap: var(--chip-gap, 0px); align-items: stretch;
@@ -4192,6 +4359,7 @@
           <button type="button" class="map-tools-item" id="secMetaColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show Key, Tuning, BPM, RSI columns">Meta</button>
         </div>
       </div>
+      <div class="ss-nav-picker-host" id="ssSongPickerHost" hidden></div>
       <span class="sec-edit-tools" id="secEditTools" hidden>
         <button type="button" class="sec-tool-btn" id="secUndoBtn" title="Undo (Ctrl+Z)">Undo</button>
         <button type="button" class="sec-tool-btn primary" id="secSaveBtn" title="Save (Ctrl+S)">Save</button>
@@ -5173,10 +5341,9 @@ function setSingleSongFocus(name) {
   try { localStorage.setItem(SINGLE_SONG_NAME_KEY, singleSongName); } catch (eFocus) {}
 }
 function syncSingleSongUi() {
-  document.body.classList.toggle(
-    "sections-single-song",
-    !!singleSongMode && document.body.classList.contains("sections-mode")
-  );
+  var on = !!singleSongMode && document.body.classList.contains("sections-mode");
+  document.body.classList.toggle("sections-single-song", on);
+  if (!on && typeof clearSingleSongNavPicker === "function") clearSingleSongNavPicker();
   syncModeSelects();
 }
 function setSingleSongMode(on) {
@@ -5313,6 +5480,105 @@ function buildSingleSongPickerHtml(focusName) {
     + '<div class="ss-song-menu" id="ssSongMenu" role="listbox" hidden>'+opts+'</div>'
     + '</div>';
 }
+function clearSingleSongNavPicker() {
+  var host = document.getElementById("ssSongPickerHost");
+  if (!host) return;
+  host.innerHTML = "";
+  host.setAttribute("hidden", "");
+}
+function mountSingleSongNavPicker(focusName) {
+  var host = document.getElementById("ssSongPickerHost");
+  if (!host) return;
+  host.innerHTML = buildSingleSongPickerHtml(focusName);
+  host.removeAttribute("hidden");
+  bindSingleSongPicker();
+}
+function buildSingleSongArrRowHtml(focusName) {
+  var albums = singleSongPickerAlbums();
+  var album = null, song = null, ai = -1, si = -1;
+  var a, s, songs;
+  for (a = 0; a < (albums || []).length; a++) {
+    songs = (albums[a] && albums[a].songs) || [];
+    for (s = 0; s < songs.length; s++) {
+      if (songs[s] && songs[s].song === focusName) {
+        album = albums[a];
+        song = songs[s];
+        ai = a;
+        si = s;
+        break;
+      }
+    }
+    if (song) break;
+  }
+  if (!song) {
+    return '<div class="ss-arr-wrap sections-wrap" id="ssArrWrap"><div class="ss-arr-empty">No arrangement chips</div></div>';
+  }
+  try { ensureArrangementSlots(song); } catch (eSlots) {}
+  var chips = song.chips || [];
+  var last = -1;
+  var ci;
+  for (ci = 0; ci < chips.length; ci++) {
+    if (isChipPair(chips[ci])) last = ci;
+  }
+  var maxCols = Math.max(last + 1, 1);
+  var chipArr = [];
+  for (ci = 0; ci < maxCols; ci++) {
+    var ap = (ci < chips.length) ? chips[ci] : null;
+    if (!isChipPair(ap)) {
+      chipArr.push('<button type="button" class="sec-chip empty" data-arrange="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty arrangement slot"></button>');
+    } else {
+      var acode = ap[0], atier = chipTier(ap), alick = ap[2] || "", apos = posListAttr(chipPositions(ap));
+      var atyp = secType(acode) || "S";
+      var arrTone = arrChipColors(acode);
+      var aStart = chipStartSec(ap);
+      var aStartAttr = (aStart != null) ? String(aStart) : "";
+      var arrStyle = "--arr-bg:"+arrTone.bg+";--arr-fg:"+arrTone.fg;
+      chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" style="'+arrStyle+'" data-arrange="1" data-song="'+ssEscAttr(song.song)+'" data-sec="'+ssEscAttr(acode)+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+ssEscAttr(alick)+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+ssEscText(acode)+'</button>');
+    }
+  }
+  var np = (album && album.font === "font-sbs") ? "np-sbs"
+    : (album && album.font === "font-mor") ? "np-mor"
+    : (album && album.font === "font-vol4") ? "np-vol4"
+    : "np-paranoid";
+  return '<div class="ss-arr-wrap sections-wrap" id="ssArrWrap" style="--cols:'+maxCols+'">'
+    + '<div class="song-row '+np+' ss-arr-row" data-ai="'+ai+'" data-si="'+si+'">'
+    + '<div class="song-chip-col"><div class="song-secs">'+chipArr.join("")+'</div></div>'
+    + '</div></div>';
+}
+function ssUpdateSectionTab(songName, pick) {
+  var el = document.getElementById("ssSectionTab");
+  if (!el) return;
+  var item = pick && pick.current ? pick.current : null;
+  if (!item || !item.code) {
+    el.innerHTML = '<div class="ss-tab-empty">Play to show tab</div>';
+    el.setAttribute("data-ss-tab", "");
+    return;
+  }
+  var lick = "";
+  try {
+    lick = sectionLickId(songName, item.code, item.pair && item.pair[2]);
+  } catch (eLick) {
+    lick = String((item.pair && item.pair[2]) || item.code || "").trim();
+  }
+  if (!lick) {
+    el.innerHTML = '<div class="ss-tab-empty">No tab linked</div>';
+    el.setAttribute("data-ss-tab", item.code || "");
+    return;
+  }
+  var key = String(item.code || "") + "|" + lick;
+  if (el.getAttribute("data-ss-tab") === key && el.querySelector("img.ss-tab-img")) return;
+  var src = lickSrc(lick);
+  el.setAttribute("data-ss-tab", key);
+  el.innerHTML = '<img class="ss-tab-img" alt="'+ssEscAttr(item.code)+' tab" src="'+ssEscAttr(src)+'">';
+  var img = el.querySelector("img.ss-tab-img");
+  if (img) {
+    img.onerror = function(){
+      if (el.getAttribute("data-ss-tab") !== key) return;
+      el.innerHTML = '<div class="ss-tab-empty">Tab missing</div>';
+    };
+  }
+}
+
 function closeSingleSongPicker() {
   var picker = document.getElementById("ssSongPicker");
   var btn = document.getElementById("ssSongBtn");
@@ -7355,11 +7621,16 @@ function showSections(keepScroll) {
     : "";
   var wrapCls = (sectionsMode === "view" && showMetaCols) ? "sections-wrap has-song-meta" : "sections-wrap";
   if (singleSongMode) {
-    var pickerHtml = buildSingleSongPickerHtml(singleFocus);
+    mountSingleSongNavPicker(singleFocus);
+    var arrRowHtml = buildSingleSongArrRowHtml(singleFocus);
     document.getElementById("sectionsSheet").innerHTML =
-      '<div class="sections-layout ss-layout">'+pickerHtml+nextCueHtml+'</div>';
-    bindSingleSongPicker();
+      '<div class="sections-layout ss-layout">'
+      + arrRowHtml
+      + '<div class="ss-section-tab" id="ssSectionTab" aria-live="polite"><div class="ss-tab-empty">Play to show tab</div></div>'
+      + nextCueHtml
+      + '</div>';
   } else {
+    clearSingleSongNavPicker();
     document.getElementById("sectionsSheet").innerHTML = '<div class="sections-layout"><div class="'+wrapCls+'">'+head+outline+ruler+html+'</div>'+nextCueHtml+'</div>';
   }
   if ((arrangementMode || singleSongMode) && typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
@@ -9286,6 +9557,9 @@ function smUpdateArrNextCue(force) {
       var ci = parseInt(el.getAttribute("data-ci"), 10);
       if (ci === nowCi) el.classList.add("is-arr-now");
     });
+  }
+  if (inSingle && typeof ssUpdateSectionTab === "function") {
+    ssUpdateSectionTab(songName, pick);
   }
 }
 function smTick() {
@@ -13884,6 +14158,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=291"></script>
+<script src="riffjams-admin.js?v=292"></script>
 </body>
 </html>
