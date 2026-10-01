@@ -3795,11 +3795,11 @@
   }
   .ss-notes-grid {
     display: grid;
-    /* Pack chip+tab columns like arrangement chips (~1–2px gaps) */
+    /* Wider gap between tab crops; chips stay centered over each crop */
     grid-template-columns: repeat(4, max-content);
-    column-gap: 2px;
+    column-gap: 12px;
     row-gap: 8px;
-    align-items: start;
+    align-items: stretch;
     justify-content: start;
     width: max-content;
     max-width: 100%;
@@ -3809,7 +3809,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    justify-self: stretch;
+    justify-self: center;
+    align-self: start;
     width: calc(var(--ss-chip-w) - 2px); /* match SS arrangement chip */
     min-width: calc(var(--ss-chip-w) - 2px);
     max-width: calc(var(--ss-chip-w) - 2px);
@@ -3834,14 +3835,19 @@
   }
   .ss-note-slot {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     min-height: 0;
+    height: 100%;
     padding: 0;
     box-sizing: border-box;
     border: none;
     background: transparent;
     overflow: visible;
+  }
+  /* X marks: vertical-center against sibling tab crop row height */
+  .ss-note-slot:has(.ss-note-mark) {
+    align-items: center;
   }
   .ss-note-slot.is-empty {
     min-height: 0;
@@ -14646,6 +14652,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=310"></script>
+<script src="riffjams-admin.js?v=311"></script>
 </body>
 </html>
