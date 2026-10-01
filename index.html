@@ -4246,7 +4246,7 @@
 var ALBUMS_DEFAULT = [
   { name: "Black Sabbath", cover: "covers/sabbath-hp.png", font: "font-paranoid", songs: [
     { song: "Black Sabbath", sections: [] },
-    { song: "The Wizard", sections: [["I1",2,"TW-I1","1S"],["V1",3,"TW-V1","1S"],["C1",2,"TW-C1"],["S1",1,"TW-S1",[5,1]]] },
+    { song: "The Wizard", sections: [["I1",2,"TW-I1","1S"],["V1",3,"TW-V1","1S"],["C1",2,"TW-C1"],["S1",1,"TW-S1",[5,1]],["S2",1,"TW-S2",[5,1]]] },
     { song: "Behind the Wall of Sleep", sections: [] },
     { song: "N.I.B.", sections: [] },
     { song: "Evil Woman", sections: [] },
@@ -7038,7 +7038,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=280";
+  var url = base + "?playboard=1&v=281";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -7067,7 +7067,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=280") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=281") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -13396,6 +13396,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=280"></script>
+<script src="riffjams-admin.js?v=281"></script>
 </body>
 </html>
