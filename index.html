@@ -5840,7 +5840,8 @@ function ssFindArrangementSong(songName) {
 /* Per-section Single Song notes (4 green chips + content under each). */
 var SS_DEFAULT_SECTION_NOTES = {
   "The Wizard": {
-    "V1": [
+    /* Occurrence index in arrangement chip sequence (1-based). No bare V1 — each V1#N is explicit. */
+    "V1#1": [
       { image: "notes/vib5.png" },
       { image: "notes/slur-5-7.png" },
       { image: "notes/vib5.png" },
@@ -5853,7 +5854,7 @@ var SS_DEFAULT_SECTION_NOTES = {
       { image: "notes/slur-5-7.png" },
       { image: "notes/vib5.png" }
     ],
-    /* 3rd V1: same as generic V1 cols 1–2; cols 3–4 centered X. */
+    /* 3rd V1: same as V1#1 cols 1–2; cols 3–4 centered X. */
     "V1#3": [
       { image: "notes/vib5.png" },
       { image: "notes/slur-5-7.png" },
@@ -5895,6 +5896,7 @@ function ssSectionNoteLookupKeys(secCode, occurIdx) {
   var code = String(secCode || "").trim();
   if (!code) return [];
   var keys = [];
+  /* Prefer Code#N (occurrence) over bare Code so generic V1 cannot shadow V1#2/#3. */
   if (occurIdx != null && isFinite(occurIdx) && occurIdx > 0) keys.push(code + "#" + occurIdx);
   keys.push(code);
   return keys;
@@ -5906,11 +5908,10 @@ function ssReadSectionNoteSlots(songName, secCode, occurIdx) {
   var defMap = SS_DEFAULT_SECTION_NOTES[songName];
   var keys = ssSectionNoteLookupKeys(code, occurIdx);
   var k, fromSong, fromDef;
+  /* Per key: song override then defaults. Exhaust V1#N before trying bare V1. */
   for (k = 0; k < keys.length; k++) {
     fromSong = song && song.sectionNotes && normalizeNoteSlots(song.sectionNotes[keys[k]]);
     if (ssNoteSlotsHaveContent(fromSong)) return fromSong;
-  }
-  for (k = 0; k < keys.length; k++) {
     fromDef = defMap && normalizeNoteSlots(defMap[keys[k]]);
     if (ssNoteSlotsHaveContent(fromDef)) return fromDef;
   }
@@ -14621,6 +14622,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=308"></script>
+<script src="riffjams-admin.js?v=309"></script>
 </body>
 </html>
