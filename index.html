@@ -3863,9 +3863,10 @@
   /* Song picker lives in the Song Map nav bar (next to Tools) */
   .ss-nav-picker-host {
     position: relative;
-    flex: 0 1 auto;
-    min-width: 0;
-    max-width: min(340px, 42vw);
+    flex: 0 0 auto;
+    min-width: 280px;
+    max-width: min(560px, 90vw);
+    width: max-content;
     z-index: 70;
   }
   body.sections-mode:not(.sections-single-song) .ss-nav-picker-host {
@@ -3877,13 +3878,15 @@
   .ss-song-picker {
     position: relative;
     flex: 0 0 auto;
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
     z-index: 6;
     pointer-events: auto;
   }
   .ss-nav-picker-host .ss-song-btn {
     appearance: none;
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -3895,7 +3898,7 @@
     color: #fff;
     cursor: pointer;
     box-shadow: none;
-    font-family: inherit;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     text-align: left;
     line-height: normal;
   }
@@ -3920,15 +3923,16 @@
     background: #2a2e3a;
   }
   .ss-nav-picker-host .ss-song-label {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: .02em;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: .01em;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
+    text-overflow: clip;
     color: #fff;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .ss-nav-picker-host .ss-song-caret {
     flex: 0 0 auto;
@@ -3972,14 +3976,15 @@
     background: #ddd;
   }
   .ss-song-label {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
     font-size: 1rem;
-    font-weight: 800;
-    letter-spacing: .02em;
+    font-weight: 600;
+    letter-spacing: .01em;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow: visible;
+    text-overflow: clip;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .ss-song-caret {
     flex: 0 0 auto;
@@ -3990,8 +3995,11 @@
     display: none;
     position: absolute;
     left: 0;
-    right: 0;
+    right: auto;
     top: calc(100% + 6px);
+    min-width: 100%;
+    width: max-content;
+    max-width: min(560px, 90vw);
     max-height: min(420px, 55vh);
     overflow: auto;
     margin: 0;
@@ -4002,6 +4010,7 @@
     border-radius: 12px;
     box-shadow: 0 12px 32px rgba(0,0,0,.45);
     z-index: 90;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .ss-song-picker.is-open .ss-song-menu { display: block; }
   .ss-song-opt {
@@ -4017,9 +4026,9 @@
     background: transparent;
     color: #e8e6e1;
     cursor: pointer;
-    font-family: inherit;
-    font-size: 0.85rem;
-    font-weight: 700;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
     text-align: left;
   }
   .ss-song-opt:hover,
@@ -4034,6 +4043,13 @@
   .ss-song-opt .ss-song-art {
     width: 28px;
     height: 28px;
+  }
+  .ss-song-opt .ss-song-label {
+    flex: 0 1 auto;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
   .song-secs {
     display: flex; flex-wrap: nowrap; gap: var(--chip-gap, 0px); align-items: stretch;
@@ -14541,6 +14557,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=303"></script>
+<script src="riffjams-admin.js?v=304"></script>
 </body>
 </html>
