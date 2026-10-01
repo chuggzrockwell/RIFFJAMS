@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-01T20:57:49.557Z",
+  "updatedAt": "2026-10-01T20:59:11.524Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -83,7 +83,11 @@
                 5
               ]
             ],
-            null,
+            [
+              "O1",
+              2,
+              "O1"
+            ],
             null,
             null,
             null,
@@ -2881,7 +2885,14 @@
                 "1S",
                 233.3
               ],
-              null
+              [
+                "O1",
+                2,
+                "O1",
+                [],
+                252.6,
+                257.3
+              ]
             ],
             "sectionRulers": [
               {
@@ -4830,9 +4841,9 @@
     {
       "album": "Black Sabbath",
       "song": "The Wizard",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.682,
+      "endSec": 257.3,
+      "complete": true,
+      "riffSaturationIndex": 1.714,
       "chips": [
         {
           "code": "I1",
@@ -4926,9 +4937,17 @@
           "code": "I1",
           "tier": 2,
           "start": 233.3,
-          "stop": null,
-          "duration": null,
+          "stop": 252.6,
+          "duration": 19.3,
           "lick": "TW-I1"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 252.6,
+          "stop": 257.3,
+          "duration": 4.7,
+          "lick": "O1"
         }
       ]
     },
