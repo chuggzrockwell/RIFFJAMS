@@ -3612,6 +3612,17 @@
     overflow: visible;
   }
   .song-row:hover { background: rgba(112,48,160,.04); }
+  /* Single Song mode: one focused row, a bit more breathing room. */
+  body.sections-single-song #sectionsSheet .sections-wrap {
+    padding-top: 8px;
+  }
+  body.sections-single-song .song-row {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  body.sections-single-song .album-block {
+    margin: 0;
+  }
   .song-secs {
     display: flex; flex-wrap: nowrap; gap: var(--chip-gap, 0px); align-items: stretch;
     flex: 0 0 auto;
@@ -4042,7 +4053,7 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles Arrangement → Riff → Solo · 7 Rulers · 8 Meta · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
@@ -4053,6 +4064,7 @@
           <option value="arrangement">Arrangement</option>
           <option value="solo">Solo</option>
           <option value="riff" selected>Riff</option>
+          <option value="single">Single Song</option>
         </select>
       </label>
       <div class="map-mode-dd map-tools-dd" id="mapToolsDd">
@@ -4335,15 +4347,20 @@ try {
 } catch (eLm) {}
 soloMode = (llMode === "solo");
 function songMapViewValue() {
+  if (typeof singleSongMode !== "undefined" && singleSongMode) return "single";
+  if (typeof arrangementMode !== "undefined" && arrangementMode) return "arrangement";
+  return (llMode === "solo") ? "solo" : "riff";
+}
+function songMapBaseViewValue() {
   if (typeof arrangementMode !== "undefined" && arrangementMode) return "arrangement";
   return (llMode === "solo") ? "solo" : "riff";
 }
 function syncModeSelects() {
-  var view = songMapViewValue();
-  ["mapModeSelect", "llBoardMode"].forEach(function(id){
-    var el = document.getElementById(id);
-    if (el) el.value = view;
-  });
+  var mapEl = document.getElementById("mapModeSelect");
+  if (mapEl) mapEl.value = songMapViewValue();
+  /* LL board has Arrangement/Riff/Solo only — never Single Song. */
+  var llEl = document.getElementById("llBoardMode");
+  if (llEl) llEl.value = songMapBaseViewValue();
   var board = document.getElementById("boardModeSelect");
   if (board) board.value = (llMode === "solo") ? "solo" : "riff";
 }
@@ -4586,6 +4603,15 @@ var ARRANGEMENT_MAP_KEY = "lick-arrangement-map-v1";
 var ARRANGEMENT_MODE_KEY = "riffjams-arrangement-mode";
 var arrangementMode = false;
 try { arrangementMode = localStorage.getItem(ARRANGEMENT_MODE_KEY) === "1"; } catch (eArrM) {}
+/* Single Song: focus one song row on the Song Map. Persists like Arrangement. */
+var SINGLE_SONG_MODE_KEY = "riffjams-single-song-mode";
+var SINGLE_SONG_NAME_KEY = "riffjams-single-song-name";
+var singleSongMode = false;
+var singleSongName = "";
+try {
+  singleSongMode = localStorage.getItem(SINGLE_SONG_MODE_KEY) === "1";
+  singleSongName = localStorage.getItem(SINGLE_SONG_NAME_KEY) || "";
+} catch (eSingleM) {}
 var ARRANGEMENT_MAP = null;
 var arrangementHistory = [];
 var arrangementDirty = false;
@@ -4941,12 +4967,26 @@ function arrangementMapSlotCount(map) {
 function syncArrangementButtons() {
   syncModeSelects();
 }
-/* View menu: Arrangement, Solo, or Riff. Numpad 6 cycles the same setter. */
+/* View menu: Arrangement, Solo, Riff, or Single Song.
+   Numpad 6 toggles Single Song (capture handler, same pattern as 7/8). */
 function setMapView(view) {
+  if (view === "single") {
+    setSingleSongMode(true);
+    return;
+  }
+  if (typeof singleSongMode !== "undefined" && singleSongMode) {
+    singleSongMode = false;
+    try { localStorage.setItem(SINGLE_SONG_MODE_KEY, "0"); } catch (eSingleOff) {}
+    try { document.body.classList.remove("sections-single-song"); } catch (eCls) {}
+  }
   if (view !== "arrangement" && view !== "solo") view = "riff";
   if (view === "arrangement") {
     if (!arrangementMode) setArrangementMode(true);
-    else syncModeSelects();
+    else {
+      syncModeSelects();
+      var secArr = document.getElementById("sections");
+      if (secArr && !secArr.classList.contains("hidden") && typeof showSections === "function") showSections(true);
+    }
     return;
   }
   var mode = view;
@@ -4962,6 +5002,8 @@ function setMapView(view) {
   }
   if (!hadArr) {
     syncModeSelects();
+    var secSame = document.getElementById("sections");
+    if (secSame && !secSame.classList.contains("hidden") && typeof showSections === "function") showSections(true);
     return;
   }
   closeChipEditor();
@@ -4974,8 +5016,113 @@ function setMapView(view) {
 }
 function cycleMapView() {
   var order = ["arrangement", "riff", "solo"];
-  var i = order.indexOf(songMapViewValue());
+  var cur = songMapBaseViewValue();
+  var i = order.indexOf(cur);
   setMapView(order[(i + 1) % order.length]);
+}
+function singleSongSourceAlbums() {
+  if (arrangementMode) return (ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || [];
+  if (soloMode) return (SOLO_MAP && SOLO_MAP.albums) || [];
+  return ALBUMS || [];
+}
+function listSongMapSongNames(albums) {
+  var out = [];
+  (albums || []).forEach(function(a){
+    (a && a.songs || []).forEach(function(s){
+      if (s && s.song) out.push(s.song);
+    });
+  });
+  return out;
+}
+function resolveSingleSongName(albums) {
+  var names = listSongMapSongNames(albums);
+  if (!names.length) return "";
+  if (singleSongName && names.indexOf(singleSongName) >= 0) return singleSongName;
+  var cur = (typeof smCurrent === "function") ? smCurrent() : null;
+  if (cur && cur.song && names.indexOf(cur.song) >= 0) return cur.song;
+  if (lastSectionFocus && typeof lastSectionFocus.ai === "number") {
+    var alb = albums[lastSectionFocus.ai];
+    var song = alb && alb.songs && alb.songs[lastSectionFocus.si];
+    if (song && song.song && names.indexOf(song.song) >= 0) return song.song;
+  }
+  return names[0];
+}
+function setSingleSongFocus(name) {
+  singleSongName = name ? String(name) : "";
+  try { localStorage.setItem(SINGLE_SONG_NAME_KEY, singleSongName); } catch (eFocus) {}
+}
+function syncSingleSongUi() {
+  document.body.classList.toggle(
+    "sections-single-song",
+    !!singleSongMode && document.body.classList.contains("sections-mode")
+  );
+  syncModeSelects();
+}
+function setSingleSongMode(on) {
+  var next = !!on;
+  if (next) {
+    var focus = resolveSingleSongName(singleSongSourceAlbums());
+    if (focus) setSingleSongFocus(focus);
+  }
+  if (next === singleSongMode) {
+    syncSingleSongUi();
+    var secSame = document.getElementById("sections");
+    if (secSame && !secSame.classList.contains("hidden") && typeof showSections === "function") {
+      showSections(true);
+    }
+    return;
+  }
+  singleSongMode = next;
+  try { localStorage.setItem(SINGLE_SONG_MODE_KEY, singleSongMode ? "1" : "0"); } catch (eSet) {}
+  syncSingleSongUi();
+  closeChipEditor();
+  updateEditSaveUi();
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") {
+    showSections(true);
+  }
+}
+function toggleSingleSongModeUi() {
+  setSingleSongMode(!singleSongMode);
+}
+function stepSingleSongFocus(delta) {
+  if (!singleSongMode) return false;
+  var names = listSongMapSongNames(singleSongSourceAlbums());
+  if (!names.length) return false;
+  var cur = resolveSingleSongName(singleSongSourceAlbums());
+  var i = names.indexOf(cur);
+  if (i < 0) i = 0;
+  var next = names[(i + delta + names.length * 8) % names.length];
+  if (next === singleSongName) return true;
+  setSingleSongFocus(next);
+  /* Keep player on the same song when possible. */
+  try {
+    if (typeof smPlaylist !== "undefined" && smPlaylist && smPlaylist.length && typeof smPlayIndex === "function") {
+      var pi = -1;
+      for (var j = 0; j < smPlaylist.length; j++) {
+        if (smPlaylist[j] && smPlaylist[j].song === next) { pi = j; break; }
+      }
+      if (pi >= 0 && typeof smOrder !== "undefined" && smOrder && smOrder.length) {
+        var oi = smOrder.indexOf(pi);
+        if (oi >= 0) smPlayIndex(oi, false);
+      }
+    }
+  } catch (ePlay) {}
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") showSections(true);
+  return true;
+}
+function syncSingleSongFocusFromPlayer() {
+  if (!singleSongMode) return;
+  if (!document.body.classList.contains("sections-mode")) return;
+  var cur = (typeof smCurrent === "function") ? smCurrent() : null;
+  if (!cur || !cur.song) return;
+  if (cur.song === singleSongName) return;
+  var names = listSongMapSongNames(singleSongSourceAlbums());
+  if (names.indexOf(cur.song) < 0) return;
+  setSingleSongFocus(cur.song);
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") showSections(true);
 }
 function setArrangementMode(on) {
   arrangementMode = !!on;
@@ -5546,11 +5693,11 @@ function updateEditSaveUi() {
     if (arrangementMode) {
       if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · Esc/0 home";
       else if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Undo/Save · Esc/0 home";
-      else keys.textContent = "Arrangement · Esc/0 home";
+      else keys.textContent = "Arrangement · 6 Single Song · Esc/0 home";
     } else if (soloMode) {
       if (sectionsMode === "play") keys.textContent = "Solo · lick clicks queue · Esc/0 home";
       else if (sectionsMode === "edit") keys.textContent = "Solo · Edit · drag · Undo/Save · Esc/0 home";
-      else keys.textContent = "Solo · Esc/0 home";
+      else keys.textContent = "Solo · 6 Single Song · Esc/0 home";
     }
   }
 }
@@ -6801,7 +6948,9 @@ function showSections(keepScroll) {
     + (sectionsMode === "play" ? " sections-play" : "")
     + (arrangementMode ? " sections-arrange" : "")
     + (!arrangementMode && soloMode ? " sections-solo" : "")
+    + (singleSongMode ? " sections-single-song" : "")
     + (!sectionRulersOn ? " section-rulers-off" : "")
+    + (!songMetaColsOn ? " song-meta-cols-off" : "")
     + (highlightMode ? " sec-peek-on" : "");
   document.getElementById("home").className = "hidden";
   document.getElementById("series").className = "hidden";
@@ -6856,8 +7005,11 @@ function showSections(keepScroll) {
     ? '<span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-name" aria-hidden="true"></span><div class="song-meta-heads"><span>Key</span><span>Tuning</span><span>BPM</span><span>RSI</span></div>'
     : "";
   var ruler = '<div class="sec-ruler"><div class="row-num"></div>'+(metaHeads || '<div class="song-name-spacer" aria-hidden="true"></div>')+'<div class="song-secs">'+colNums+'</div></div>';
+  var singleFocus = singleSongMode ? resolveSingleSongName(sourceAlbums) : "";
+  if (singleSongMode && singleFocus) setSingleSongFocus(singleFocus);
   var html = sourceAlbums.map(function(album, ai){
     var rows = (album.songs || []).map(function(s, si){
+      if (singleSongMode && singleFocus && s.song !== singleFocus) return "";
       rowN += 1;
       var chipArr = [];
       var ci;
@@ -6924,6 +7076,7 @@ function showSections(keepScroll) {
       return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-chip-col">'+sectionRulerLaneHtml(s, maxCols)+'<div class="song-secs">'+chips+'</div></div></div>';
     }).join("");
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
+    if (singleSongMode && !rows) return "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
   }).join("");
   var nextCueHtml = arrangementMode
@@ -7790,14 +7943,14 @@ function setSectionsMode(mode) {
     if (arrangementMode) {
       if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
       else if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-      else keys.textContent = "Arrangement · Peek · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Arrangement · Peek · 6 Single Song · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
     } else if (soloMode) {
-      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
-      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-      else keys.textContent = "Solo · Numpad 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
-    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
-    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-    else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles View · 7 Rulers · 8 Meta · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
+      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
+      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Solo · Numpad 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
+    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+    else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 Single Song · 7 Rulers · 8 Meta · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
   }
   if (sectionsMode === "play") {
     /* Stay on Song Map. Next/Current cues are the playalong UI; Playboard is a separate entry. */
@@ -8563,6 +8716,7 @@ function smLoadCurrent(autoplay) {
   smPlayalongActive = false;
   if (autoplay) smUserPaused = false;
   smUpdateMeta();
+  try { syncSingleSongFocusFromPlayer(); } catch (eSingleSync) {}
   /* Force t=0 — YT player still reports previous video's getCurrentTime() */
   smPublishTrackChangeSync();
   if (!cur) return;
@@ -13203,6 +13357,46 @@ function bindSongMetaColsShortcut() {
   }, true);
 }
 bindSongMetaColsShortcut();
+/* Song Map → Single Song. Numpad 6 toggles; same capture pattern as Rulers (7) / Meta (8). */
+function singleSongShortcutTargetOk(t) {
+  if (!t) return true;
+  var tag = (t.tagName || "").toUpperCase();
+  if (tag === "INPUT" || tag === "TEXTAREA") return false;
+  if (t.isContentEditable) return false;
+  return true;
+}
+function isSingleSongNumpad6(e) {
+  if (!e) return false;
+  var code = String(e.code || "");
+  var key = String(e.key || "");
+  if (code === "Numpad6") return true;
+  if (e.location === 3 && key === "6") return true;
+  /* NumLock off: physical Numpad 6 reports as ArrowRight (location NUMPAD). */
+  if (e.location === 3 && (key === "ArrowRight" || code === "ArrowRight" || e.keyCode === 39 || e.which === 39)) return true;
+  /* Legacy NumLock-on keyCode (102) when code is missing. */
+  if (e.keyCode === 102 || e.which === 102) return true;
+  if (typeof isNumpadKey === "function" && isNumpadKey(e, "6")) return true;
+  return false;
+}
+function handleSingleSongShortcut(e) {
+  if (!e || e.type !== "keydown") return false;
+  if (e.metaKey || e.ctrlKey || e.altKey) return false;
+  if (!document.body.classList.contains("sections-mode")) return false;
+  if (!singleSongShortcutTargetOk(e.target)) return false;
+  if (!isSingleSongNumpad6(e)) return false;
+  e.preventDefault();
+  try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
+  toggleSingleSongModeUi();
+  return true;
+}
+function bindSingleSongShortcut() {
+  if (window.__riffjamsSingleSongKeyBound) return;
+  window.__riffjamsSingleSongKeyBound = true;
+  window.addEventListener("keydown", function(e){
+    handleSingleSongShortcut(e);
+  }, true);
+}
+bindSingleSongShortcut();
 document.addEventListener("keydown", function(e){
   if ((e.metaKey || e.ctrlKey) && !e.altKey && document.body.classList.contains("sections-mode") && sectionsMode === "edit") {
     var tag0 = (e.target && e.target.tagName) || "";
@@ -13335,7 +13529,13 @@ document.addEventListener("keydown", function(e){
     if (isNumpadKey(e, "2")) { setSectionsMode("edit"); return; }
     if (isNumpadKey(e, "3")) { setSectionsMode("play"); openPlayWindow(); return; }
     if (isNumpadKey(e, "5")) { setHighlightMode(!highlightMode); return; }
-    if (isNumpadKey(e, "6")) { cycleMapView(); return; }
+    /* Numpad 6 = Single Song — handled in capture (bindSingleSongShortcut), like 7/8. */
+    if (singleSongMode && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey
+        && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+      e.preventDefault();
+      stepSingleSongFocus(e.key === "ArrowUp" ? -1 : 1);
+      return;
+    }
     if (e.shiftKey && k === "v") { setSectionsMode("view"); return; }
     if (e.shiftKey && k === "e") { setSectionsMode("edit"); return; }
     if (e.shiftKey && k === "p") { setSectionsMode("play"); return; }
@@ -13408,6 +13608,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=288"></script>
+<script src="riffjams-admin.js?v=289"></script>
 </body>
 </html>
