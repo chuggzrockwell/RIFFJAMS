@@ -3772,8 +3772,8 @@
   /* Single Song notes — under the section tab (per-section slots) */
   .ss-notes {
     flex: 0 0 auto;
-    width: min(calc(15 * var(--ss-chip-w)), 100%);
-    max-width: calc(15 * var(--ss-chip-w));
+    width: auto;
+    max-width: min(calc(15 * var(--ss-chip-w)), 100%);
     align-self: flex-start;
     box-sizing: border-box;
     padding: 6px 4px 10px;
@@ -3795,23 +3795,28 @@
   }
   .ss-notes-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    column-gap: 1px;
+    /* Pack chip+tab columns like arrangement chips (~1–2px gaps) */
+    grid-template-columns: repeat(4, max-content);
+    column-gap: 2px;
     row-gap: 8px;
     align-items: start;
+    justify-content: start;
+    width: max-content;
+    max-width: 100%;
     overflow: visible;
   }
   .ss-note-chip {
     display: flex;
     align-items: center;
     justify-content: center;
-    justify-self: center;
-    width: 33.333%;
-    min-width: 0;
+    justify-self: stretch;
+    width: calc(var(--ss-chip-w) - 2px); /* match SS arrangement chip */
+    min-width: calc(var(--ss-chip-w) - 2px);
+    max-width: calc(var(--ss-chip-w) - 2px);
     box-sizing: border-box;
     min-height: 28px;
     padding: 4px 2px;
-    border-radius: 10px;
+    border-radius: 4px;
     background: #18d060;
     color: #fff;
     font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
@@ -3820,11 +3825,11 @@
     letter-spacing: 0.04em;
     line-height: 1;
     text-transform: uppercase;
-    /* Playboard / Board green neon (phrase.d / lib-preview-card.d) */
+    /* No neon on chips — glow lives on tab images / X marks below */
     box-shadow:
-      0 0 6px 1px rgba(46,180,90,.95),
-      0 0 18px 4px rgba(46,180,90,.7),
-      0 0 40px 10px rgba(46,180,90,.4);
+      inset -1px 0 0 rgba(0,0,0,.25),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 0 1px rgba(0,0,0,.35);
     user-select: none;
   }
   .ss-note-slot {
@@ -3836,6 +3841,7 @@
     box-sizing: border-box;
     border: none;
     background: transparent;
+    overflow: visible;
   }
   .ss-note-slot.is-empty {
     min-height: 0;
@@ -3849,14 +3855,20 @@
     width: auto;
     height: auto;
     object-fit: contain;
-    background: transparent;
+    background: #fff;
+    border-radius: 10px;
+    /* Playboard / Board green neon (phrase.d) — on white tab crops */
+    box-shadow:
+      0 0 6px 1px rgba(46,180,90,.95),
+      0 0 18px 4px rgba(46,180,90,.7),
+      0 0 40px 10px rgba(46,180,90,.4);
   }
   .ss-note-mark {
     display: flex;
     align-items: center;
     justify-content: center;
     justify-self: center;
-    width: 100%;
+    width: calc(var(--ss-chip-w) - 2px);
     min-height: 52px;
     margin: 0 auto;
     text-align: center;
@@ -3864,9 +3876,14 @@
     font-size: 2.4rem;
     font-weight: 800;
     line-height: 1;
-    color: rgba(255,255,255,.88);
+    color: rgba(255,255,255,.92);
     letter-spacing: 0.02em;
-    text-shadow: 0 1px 0 rgba(0,0,0,.45);
+    /* Playboard green neon on X marks */
+    text-shadow:
+      0 0 6px rgba(46,180,90,.95),
+      0 0 18px rgba(46,180,90,.7),
+      0 0 40px rgba(46,180,90,.4),
+      0 1px 0 rgba(0,0,0,.45);
   }
   .ss-note-slot[data-ss-note-slot="4"] {
     justify-content: center;
@@ -5866,6 +5883,13 @@ var SS_DEFAULT_SECTION_NOTES = {
       { mark: "X" },
       { mark: "X" },
       { image: "notes/vib5.png" },
+      { mark: "X" }
+    ],
+    /* Last I1 in The Wizard arrangement (4 I1s → I1#4). */
+    "I1#4": [
+      { mark: "X" },
+      { image: "notes/vib5.png" },
+      { image: "notes/slur-5-7.png" },
       { mark: "X" }
     ]
   }
@@ -14622,6 +14646,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=309"></script>
+<script src="riffjams-admin.js?v=310"></script>
 </body>
 </html>
