@@ -4249,9 +4249,9 @@
 <script>
 
 var ALBUMS_DEFAULT = [
-  { name: "Black Sabbath", cover: "covers/sabbath-hp.png?v=285", font: "font-paranoid", songs: [
+  { name: "Black Sabbath", cover: "covers/sabbath-hp.png?v=286", font: "font-paranoid", songs: [
     { song: "Black Sabbath", sections: [] },
-    { song: "The Wizard", sections: [["I1",2,"TW-I1","1S"],["V1",3,"TW-V1","1S"],["C1",2,"TW-C1"],["S1",1,"TW-S1",[5,1]],["S2",1,"TW-S2",[5,1]]] },
+    { song: "The Wizard", sections: [["I1",2,"TW-I1","1S"],["V1",3,"TW-V1","1S"],["C1",2,"TW-C1"],["S1",1,"TW-S1",[5,1]],["S2",1,"TW-S2",[5,1]],["O1",null,"TW-O1"]] },
     { song: "Behind the Wall of Sleep", sections: [] },
     { song: "N.I.B.", sections: [] },
     { song: "Evil Woman", sections: [] },
@@ -7043,7 +7043,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=285";
+  var url = base + "?playboard=1&v=286";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -7072,7 +7072,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=285") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=286") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -10663,7 +10663,7 @@ var LL_LIBRARY_ALBUMS = ["Paranoid", "Master of Reality", "Vol. 4", "Sabbath Blo
 function llCoverForAlbumTier(album, tier) {
   tier = parseInt(tier, 10);
   if (!(tier >= 1 && tier <= 2)) tier = 3;
-  if (album === "Black Sabbath") return "covers/sabbath-hp.png?v=285";
+  if (album === "Black Sabbath") return "covers/sabbath-hp.png?v=286";
   if (album === "Sabbath Bloody Sabbath") {
     return (tier >= 3) ? "covers/sbs-tier3.png?v=5" : "covers/sbs-ll.png?v=5";
   }
@@ -13408,6 +13408,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=285"></script>
+<script src="riffjams-admin.js?v=286"></script>
 </body>
 </html>
