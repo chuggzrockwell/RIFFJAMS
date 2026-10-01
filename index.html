@@ -9695,7 +9695,12 @@ function smUpdateArrNextCue(force) {
     if (ssSelectedArrangementSection && ssSelectedArrangementSection.song === songName && pick.empty) {
       ssUpdateSectionTab(songName, { current: ssSelectedArrangementSection.item, next: null, empty: false });
     } else {
-      ssUpdateSectionTab(songName, pick);
+      /* Show upcoming section tab 1s before it begins; replace previous at that moment. */
+      var tabPick = pick;
+      if (!pick.empty && pick.next && (pick.next.start - t) <= 1) {
+        tabPick = { current: pick.next, next: pick.next, empty: false };
+      }
+      ssUpdateSectionTab(songName, tabPick);
     }
   }
 }
@@ -14300,6 +14305,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=299"></script>
+<script src="riffjams-admin.js?v=300"></script>
 </body>
 </html>
