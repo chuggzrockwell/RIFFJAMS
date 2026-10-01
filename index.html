@@ -4924,6 +4924,7 @@ var SINGLE_SONG_MODE_KEY = "riffjams-single-song-mode";
 var SINGLE_SONG_NAME_KEY = "riffjams-single-song-name";
 var singleSongMode = false;
 var singleSongName = "";
+var ssSelectedArrangementSection = null;
 try {
   singleSongMode = localStorage.getItem(SINGLE_SONG_MODE_KEY) === "1";
   singleSongName = localStorage.getItem(SINGLE_SONG_NAME_KEY) || "";
@@ -5368,7 +5369,9 @@ function resolveSingleSongName(albums) {
   return names[0];
 }
 function setSingleSongFocus(name) {
-  singleSongName = name ? String(name) : "";
+  var nextName = name ? String(name) : "";
+  if (nextName !== singleSongName) ssSelectedArrangementSection = null;
+  singleSongName = nextName;
   try { localStorage.setItem(SINGLE_SONG_NAME_KEY, singleSongName); } catch (eFocus) {}
 }
 function syncSingleSongUi() {
@@ -9362,6 +9365,52 @@ function smSeekBy(deltaSec) {
     smSchedulePublishPlayerSync();
   });
 }
+function smSeekSingleSongSection(songName, sec, attempt) {
+  attempt = attempt || 0;
+  smEnsureApi(function(){
+    if (!smYtPlayer || !smYtPlayer.seekTo) return;
+    var cur = smCurrent();
+    if (!cur || cur.song !== songName) {
+      if (attempt < 30) setTimeout(function(){ smSeekSingleSongSection(songName, sec, attempt + 1); }, 100);
+      return;
+    }
+    var expected = cur.yt || "";
+    var videoId = "";
+    try { videoId = (smYtPlayer.getVideoData && smYtPlayer.getVideoData().video_id) || ""; } catch (eVideo) {}
+    if (expected && videoId && videoId !== expected && attempt < 30) {
+      setTimeout(function(){ smSeekSingleSongSection(songName, sec, attempt + 1); }, 100);
+      return;
+    }
+    smMarkLocalPlayerAction();
+    try { smYtPlayer.seekTo(sec, true); } catch (eSeek) { return; }
+    smTick();
+    smSchedulePublishPlayerSync();
+  });
+}
+function smSelectSingleSongArrangementChip(chip) {
+  if (!chip || chip.classList.contains("empty")) return;
+  var songName = chip.getAttribute("data-song") || "";
+  var ci = parseInt(chip.getAttribute("data-ci"), 10);
+  var song = smFindArrangementSongByName(songName);
+  var pair = song && song.chips && song.chips[ci];
+  if (!song || !isChipPair(pair)) return;
+  var start = chipStartSec(pair);
+  if (start == null) {
+    var attrStart = parseFloat(chip.getAttribute("data-start") || "");
+    if (isFinite(attrStart) && attrStart >= 0) start = attrStart;
+  }
+  var item = { code: pair[0], start: start, ci: ci, pair: pair };
+  ssSelectedArrangementSection = { song: songName, item: item };
+  if (typeof ssUpdateSectionTab === "function") {
+    ssUpdateSectionTab(songName, { current: item, next: null, empty: false });
+  }
+  var current = smCurrent();
+  var wasPlaying = !!smPlaying;
+  if (!current || current.song !== songName) {
+    smPlaySongName(songName, wasPlaying);
+  }
+  if (start != null) smSeekSingleSongSection(songName, start, 0);
+}
 /* Ctrl+Left: ≥3s into track → restart; <3s → previous song */
 function smCtrlLeftArrow() {
   smEnsureApi(function(){
@@ -9635,7 +9684,12 @@ function smUpdateArrNextCue(force) {
     });
   }
   if (inSingle && typeof ssUpdateSectionTab === "function") {
-    ssUpdateSectionTab(songName, pick);
+    /* Songs without timing data still need a clicked chip's tab to stay visible. */
+    if (ssSelectedArrangementSection && ssSelectedArrangementSection.song === songName && pick.empty) {
+      ssUpdateSectionTab(songName, { current: ssSelectedArrangementSection.item, next: null, empty: false });
+    } else {
+      ssUpdateSectionTab(songName, pick);
+    }
   }
 }
 function smTick() {
@@ -13691,6 +13745,11 @@ document.getElementById("sectionsSheet").onclick = function(e){
   if (!chip) return;
   if (didChipDrag) { didChipDrag = false; return; }
   if (chip.classList.contains("filtered-out") && sectionsMode !== "edit") return;
+  if (singleSongMode && chip.getAttribute("data-arrange") === "1") {
+    if (chip.classList.contains("empty")) return;
+    smSelectSingleSongArrangementChip(chip);
+    return;
+  }
   if (sectionsMode === "edit") {
     var ai = parseInt(chip.getAttribute("data-ai"),10);
     var si = parseInt(chip.getAttribute("data-si"),10);
@@ -14234,6 +14293,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=297"></script>
+<script src="riffjams-admin.js?v=298"></script>
 </body>
 </html>
