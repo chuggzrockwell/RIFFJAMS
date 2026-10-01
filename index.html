@@ -4244,6 +4244,15 @@
 <script>
 
 var ALBUMS_DEFAULT = [
+  { name: "Black Sabbath", cover: "covers/sabbath-hp.png", font: "font-paranoid", songs: [
+    { song: "Black Sabbath", sections: [] },
+    { song: "The Wizard", sections: [["I1",2,"TW-I1","1S"],["V1",3,"TW-V1","1S"],["C1",2,"TW-C1"],["S1",1,"TW-S1",[5,1]]] },
+    { song: "Behind the Wall of Sleep", sections: [] },
+    { song: "N.I.B.", sections: [] },
+    { song: "Evil Woman", sections: [] },
+    { song: "Sleeping Village", sections: [] },
+    { song: "Warning", sections: [] },
+  ]},
   { name: "Paranoid", cover: "covers/paranoid.png", font: "font-paranoid", songs: [
     { song: "War Pigs", sections: [["I1",2,"WP-I1",3],["V1",3,"WP-V1"],["V2",2,"WP-V2"],["V3",2,"WP-V3"],["V4",2,"WP-V4"],["S1",1,"WP-S1"],["O1",2,"WP-O1"],["O2",1,"WP-O2"],["S2",1,"WP-S2"]] },
     { song: "Paranoid", sections: [["I1",2,"P-I1"],["V1",3,"P-V1"],["V2",3,"P-V2"],["S1",1]] },
@@ -5869,6 +5878,8 @@ function isDefaultPosList(list) {
   return p.length === 1 && p[0] === 1;
 }
 var SECTION_SONG_PREFIX = {
+  "Black Sabbath": "BS-", "The Wizard": "TW-", "Behind the Wall of Sleep": "BWS-", "N.I.B.": "NIB-",
+  "Evil Woman": "EW-", "Sleeping Village": "SV-", "Warning": "WRN-",
   "War Pigs": "WP-", "Paranoid": "P-", "Planet Caravan": "PC-", "Iron Man": "IM-",
   "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-",
   "Sabbath Bloody Sabbath": "SBS-", "A National Acrobat": "ANA-", "Fluff": "FLU-",
@@ -7027,7 +7038,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=279";
+  var url = base + "?playboard=1&v=280";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -7056,7 +7067,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=279") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=280") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -7815,6 +7826,7 @@ function lickLetter(id) {
 /* —— Song Map YouTube player (custom UI; audio via YT IFrame API) —— */
 /* Repeat ON = loop whole playlist. Verified Topic/official embeds only. */
 var SM_YT_IDS = {
+  "The Wizard": "xWeRNU4mqjw",
   "War Pigs": "bc5Nk1DXyEY",
   "Paranoid": "xpM59e6lyws",
   "Planet Caravan": "bm2N2nHqITY",
@@ -7864,6 +7876,7 @@ var SM_YT_PLAYALONG = {
   "Iron Man": "z5lj36TFJYc"
 };
 var SM_SONGSTERR = {
+  "The Wizard": "https://www.songsterr.com/a/wsa/black-sabbath-the-wizard-tab-s24245",
   "War Pigs": "https://www.songsterr.com/a/wsa/black-sabbath-war-pigs-tab-s10137",
   "Paranoid": "https://www.songsterr.com/a/wsa/black-sabbath-paranoid-tab-s296",
   "Planet Caravan": "https://www.songsterr.com/a/wsa/black-sabbath-planet-caravan-tab-s23731",
@@ -10638,6 +10651,7 @@ var LL_LIBRARY_ALBUMS = ["Paranoid", "Master of Reality", "Vol. 4", "Sabbath Blo
 function llCoverForAlbumTier(album, tier) {
   tier = parseInt(tier, 10);
   if (!(tier >= 1 && tier <= 2)) tier = 3;
+  if (album === "Black Sabbath") return "covers/sabbath-hp.png";
   if (album === "Sabbath Bloody Sabbath") {
     return (tier >= 3) ? "covers/sbs-tier3.png?v=5" : "covers/sbs-ll.png?v=5";
   }
@@ -10806,7 +10820,8 @@ function buildDefaultSoloMapFromParanoid() {
     "Sabbath Bloody Sabbath": [], "A National Acrobat": [],
     "Killing Yourself to Live": [], "Looking for Today": [],
     "After Forever": [], "Children of the Grave": [],
-    "Lord of This World": [], "Into the Void": []
+    "Lord of This World": [], "Into the Void": [],
+    "The Wizard": []
   };
   (CATALOG || []).forEach(function(x){
     if (!x) return;
@@ -10830,11 +10845,12 @@ function buildDefaultSoloMapFromParanoid() {
     else if (id.indexOf("COTG-") === 0) song = "Children of the Grave";
     else if (id.indexOf("LOTW-") === 0) song = "Lord of This World";
     else if (id.indexOf("ITV-") === 0) song = "Into the Void";
+    else if (id.indexOf("TW-") === 0) song = "The Wizard";
     if (!song || !buckets[song]) return;
     var k = lickKind(id);
     var tier = (k === "A") ? 1 : (k === "B") ? 2 : (k === "E") ? 1 : 1;
     // Chip text: drop song prefix; keep full id for Play
-    var label = id.replace(/^(IM|WP|PC|HOD|RS|FOB|P|SBS|ANA|KYTL2|KYTL|LFT|AF|COTG|LOTW|ITV)-/, "");
+    var label = id.replace(/^(IM|WP|PC|HOD|RS|FOB|P|SBS|ANA|KYTL2|KYTL|LFT|AF|COTG|LOTW|ITV|TW)-/, "");
     buckets[song].push([label, tier, id]);
   });
   var albums = blankSoloMapFromAlbums(ALBUMS_DEFAULT);
@@ -11083,6 +11099,7 @@ function llSongRowsForLibrary() {
   return rows;
 }
 function llAlbumCoverUrl(albumName) {
+  if (albumName === "Black Sabbath") return "covers/sabbath-hp.png";
   if (albumName === "Sabbath Bloody Sabbath") return "covers/sbs-ll.png?v=5";
   if (albumName === "Master of Reality") return "covers/mor-ll.png?v=1";
   if (albumName === "Vol. 4") return "covers/vol4.png";
@@ -13379,6 +13396,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=279"></script>
+<script src="riffjams-admin.js?v=280"></script>
 </body>
 </html>
