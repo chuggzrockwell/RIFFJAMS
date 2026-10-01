@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-01T20:33:58.303Z",
+  "updatedAt": "2026-10-01T20:34:59.421Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -78,8 +78,8 @@
               1,
               "TW-S2",
               [
-                5,
-                1
+                1,
+                5
               ]
             ],
             null,
@@ -1735,8 +1735,8 @@
                 1,
                 "TW-S2",
                 [
-                  5,
-                  1
+                  1,
+                  5
                 ]
               ]
             ]
@@ -2849,17 +2849,30 @@
                 1,
                 156
               ],
-              null,
               [
                 "S2",
                 1,
                 "TW-S2",
                 [
-                  5,
-                  1
-                ]
+                  1,
+                  5
+                ],
+                165.8
               ],
-              null,
+              [
+                "V1",
+                3,
+                "TW-V1",
+                "1S",
+                185.2
+              ],
+              [
+                "I1",
+                2,
+                "TW-I1",
+                "1S",
+                105.6
+              ],
               null,
               null
             ]
@@ -4785,7 +4798,7 @@
       "song": "The Wizard",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.658,
+      "riffSaturationIndex": 1.837,
       "chips": [
         {
           "code": "I1",
@@ -4831,6 +4844,14 @@
           "code": "I1",
           "tier": 2,
           "start": 105.6,
+          "stop": 105.6,
+          "duration": null,
+          "lick": "TW-I1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 105.6,
           "stop": 127.4,
           "duration": 21.8,
           "lick": "TW-I1"
@@ -4847,9 +4868,25 @@
           "code": "C1",
           "tier": 2,
           "start": 156,
+          "stop": 165.8,
+          "duration": 9.8,
+          "lick": "TW-C1"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 165.8,
+          "stop": 185.2,
+          "duration": 19.4,
+          "lick": "TW-S2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 185.2,
           "stop": null,
           "duration": null,
-          "lick": "TW-C1"
+          "lick": "TW-V1"
         }
       ]
     },
