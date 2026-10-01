@@ -5777,6 +5777,9 @@ function ssUpdateSectionTab(songName, pick) {
     if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, "");
     return;
   }
+  var noteOccur = (typeof ssSectionOccurrenceIndex === "function")
+    ? ssSectionOccurrenceIndex(songName, item.code, item.ci)
+    : null;
   var lick = "";
   try {
     lick = sectionLickId(songName, item.code, item.pair && item.pair[2]);
@@ -5788,18 +5791,18 @@ function ssUpdateSectionTab(songName, pick) {
       el.innerHTML = '<div class="ss-tab-empty">No tab linked</div>';
       el.setAttribute("data-ss-tab", item.code || "");
     }
-    if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, item.code);
+    if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, item.code, noteOccur);
     return;
   }
   var key = String(item.ci) + "|" + String(item.code || "") + "|" + lick;
   if (el.getAttribute("data-ss-tab") === key && el.querySelector("img.ss-tab-img")) {
-    if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, item.code);
+    if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, item.code, noteOccur);
     return;
   }
   var src = lickSrc(lick);
   el.setAttribute("data-ss-tab", key);
   el.innerHTML = '<img class="ss-tab-img" alt="'+ssEscAttr(item.code)+' tab" src="'+ssEscAttr(src)+'">';
-  if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, item.code);
+  if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, item.code, noteOccur);
   var img = el.querySelector("img.ss-tab-img");
   if (img) {
     img.onload = function(){
@@ -5838,6 +5841,13 @@ var SS_DEFAULT_SECTION_NOTES = {
       { image: "notes/slur-5-7.png" },
       { image: "notes/vib5.png" },
       { mark: "X" }
+    ],
+    /* Occurrence index in arrangement chip sequence (1-based), not every I1. */
+    "I1#3": [
+      { mark: "X" },
+      { mark: "X" },
+      { image: "notes/vib5.png" },
+      { mark: "X" }
     ]
   }
 };
@@ -5851,15 +5861,41 @@ function ssNoteSlotsHaveContent(slots) {
   }
   return false;
 }
-function ssReadSectionNoteSlots(songName, secCode) {
+function ssSectionOccurrenceIndex(songName, secCode, ci) {
+  var code = String(secCode || "").trim();
+  if (!songName || !code || ci == null || !isFinite(ci) || ci < 0) return null;
+  var song = ssFindArrangementSong(songName);
+  if (!song || !song.chips) return null;
+  var n = 0;
+  var i;
+  for (i = 0; i <= ci && i < song.chips.length; i++) {
+    if (isChipPair(song.chips[i]) && String(song.chips[i][0] || "") === code) n++;
+  }
+  return n > 0 ? n : null;
+}
+function ssSectionNoteLookupKeys(secCode, occurIdx) {
+  var code = String(secCode || "").trim();
+  if (!code) return [];
+  var keys = [];
+  if (occurIdx != null && isFinite(occurIdx) && occurIdx > 0) keys.push(code + "#" + occurIdx);
+  keys.push(code);
+  return keys;
+}
+function ssReadSectionNoteSlots(songName, secCode, occurIdx) {
   var code = String(secCode || "").trim();
   if (!songName || !code) return null;
   var song = ssFindArrangementSong(songName);
-  var fromSong = song && song.sectionNotes && normalizeNoteSlots(song.sectionNotes[code]);
-  if (ssNoteSlotsHaveContent(fromSong)) return fromSong;
   var defMap = SS_DEFAULT_SECTION_NOTES[songName];
-  var fromDef = defMap && normalizeNoteSlots(defMap[code]);
-  if (ssNoteSlotsHaveContent(fromDef)) return fromDef;
+  var keys = ssSectionNoteLookupKeys(code, occurIdx);
+  var k, fromSong, fromDef;
+  for (k = 0; k < keys.length; k++) {
+    fromSong = song && song.sectionNotes && normalizeNoteSlots(song.sectionNotes[keys[k]]);
+    if (ssNoteSlotsHaveContent(fromSong)) return fromSong;
+  }
+  for (k = 0; k < keys.length; k++) {
+    fromDef = defMap && normalizeNoteSlots(defMap[keys[k]]);
+    if (ssNoteSlotsHaveContent(fromDef)) return fromDef;
+  }
   return null;
 }
 function ssNotesPanelHtml(songName) {
@@ -5868,16 +5904,18 @@ function ssNotesPanelHtml(songName) {
     + '<div class="ss-notes-grid" id="ssNotesGrid"></div>'
     + '</div>';
 }
-function ssUpdateNotesPanel(songName, secCode) {
+function ssUpdateNotesPanel(songName, secCode, occurIdx) {
   var panel = document.getElementById("ssNotesPanel");
   if (!panel) return;
   var code = String(secCode || "").trim();
-  var key = String(songName || "") + "|" + code;
+  var occur = (occurIdx != null && isFinite(occurIdx) && occurIdx > 0) ? occurIdx : "";
+  var key = String(songName || "") + "|" + code + "|" + String(occur);
   if (panel.getAttribute("data-ss-notes-key") === key) return;
   panel.setAttribute("data-ss-notes-song", songName || "");
   panel.setAttribute("data-ss-notes-sec", code);
+  panel.setAttribute("data-ss-notes-occur", String(occur));
   panel.setAttribute("data-ss-notes-key", key);
-  var slots = ssReadSectionNoteSlots(songName, code);
+  var slots = ssReadSectionNoteSlots(songName, code, occurIdx);
   var grid = document.getElementById("ssNotesGrid");
   if (!slots || !ssNoteSlotsHaveContent(slots)) {
     panel.hidden = true;
@@ -14565,6 +14603,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=305"></script>
+<script src="riffjams-admin.js?v=306"></script>
 </body>
 </html>
