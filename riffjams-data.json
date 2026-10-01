@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-01T19:45:32.679Z",
+  "updatedAt": "2026-10-01T20:09:33.252Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -40,6 +40,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -61,7 +62,8 @@
             [
               "C1",
               2,
-              "TW-C1"
+              "TW-C1",
+              []
             ],
             [
               "S1",
@@ -103,12 +105,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "N.I.B.",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -135,6 +139,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -151,12 +156,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "Warning",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -230,6 +237,7 @@
               "WP-S2"
             ],
             null,
+            null,
             null
           ]
         },
@@ -262,6 +270,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -276,6 +285,7 @@
               "S1",
               1
             ],
+            null,
             null,
             null,
             null,
@@ -336,6 +346,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -366,6 +377,7 @@
               "B4",
               3
             ],
+            null,
             null,
             null,
             null,
@@ -402,6 +414,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -421,6 +434,7 @@
               "S1",
               1
             ],
+            null,
             null,
             null,
             null,
@@ -488,6 +502,7 @@
               3,
               "FOB-B1"
             ],
+            null,
             null
           ]
         }
@@ -536,6 +551,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -577,6 +593,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -589,6 +606,7 @@
               "",
               []
             ],
+            null,
             null,
             null,
             null,
@@ -644,12 +662,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "Orchid",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -719,12 +739,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "Solitude",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -789,6 +811,7 @@
               "",
               []
             ],
+            null,
             null,
             null,
             null
@@ -891,6 +914,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -932,6 +956,7 @@
             null,
             null,
             null,
+            null,
             null
           ],
           "keys": [
@@ -955,12 +980,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "FX",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -1005,6 +1032,7 @@
               "B1",
               []
             ],
+            null,
             null,
             null,
             null,
@@ -1075,6 +1103,7 @@
             null,
             null,
             null,
+            null,
             null
           ],
           "keys": [
@@ -1140,12 +1169,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "Laguna Sunrise",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -1187,12 +1218,14 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
         {
           "song": "Under the Sun",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -1280,6 +1313,7 @@
               []
             ],
             null,
+            null,
             null
           ]
         },
@@ -1354,12 +1388,14 @@
               3,
               "S3",
               []
-            ]
+            ],
+            null
           ]
         },
         {
           "song": "Fluff",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -1433,6 +1469,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -1499,12 +1536,14 @@
               "KYTL-B4",
               []
             ],
+            null,
             null
           ]
         },
         {
           "song": "Who Are You?",
           "sections": [
+            null,
             null,
             null,
             null,
@@ -1551,6 +1590,7 @@
             null,
             null,
             null,
+            null,
             null
           ]
         },
@@ -1587,6 +1627,7 @@
               "",
               []
             ],
+            null,
             null,
             null,
             null,
@@ -2672,11 +2713,6 @@
               null,
               null,
               null,
-              null,
-              null,
-              null,
-              null,
-              null,
               null
             ]
           },
@@ -2722,23 +2758,12 @@
               null,
               null,
               null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
               null
             ]
           },
           {
             "song": "Behind the Wall of Sleep",
             "chips": [
-              null,
-              null,
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -2763,22 +2788,12 @@
               null,
               null,
               null,
-              null,
-              null,
-              null,
-              null,
-              null,
               null
             ]
           },
           {
             "song": "Evil Woman",
             "chips": [
-              null,
-              null,
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -2803,22 +2818,12 @@
               null,
               null,
               null,
-              null,
-              null,
-              null,
-              null,
-              null,
               null
             ]
           },
           {
             "song": "Warning",
             "chips": [
-              null,
-              null,
-              null,
-              null,
-              null,
               null,
               null,
               null,
