@@ -4735,7 +4735,7 @@ var ALBUMS_DEFAULT = [
     { song: "Iron Man", sections: [["V1",1,"IM-V1"],["V2",2,"IM-V2"],["V3",2,"IM-V3"],["V4",2,"IM-V4"],["S1",1,"IM-S1"],["S2",1,"IM-S2"],["O1",1,"IM-O1"]] },
     { song: "Electric Funeral", sections: [["I1",2,"EF-I1","1O"],["V1",3,"EF-V1","1O"],["B1",3,"EF-B1"],["B2",3,"EF-B2",1],["B3",3,"EF-B3",1],["B4",3,"EF-B4",1]] },
     { song: "Hand of Doom", sections: [["V1",3,"HOD-V1",3],["V2",3],["B1",2,"HOD-B1",1],["B2",2,"HOD-B2",1],["B3",3,"HOD-B3"],["B4",4,"HOD-B4"],["S1",1,"HOD-S1"]] },
-    { song: "Rat Salad", sections: [["I1",3,"RS-I1"],["V2",3],["S1",1]] },
+    { song: "Rat Salad", sections: [["I1",3,"RS-I1"],["V2",3],["S1",1,"RS-S1",1],["V1",2,"RS-V1",1]] },
     { song: "Fairies Wear Boots", sections: [["I1",2,"FOB-I1"],["I2",2,"FOB-I2"],["I3",2,"FOB-I3"],["I4",2,"FOB-I4"],["S1",1,"FOB-S1"],["V1",3,"FOB-V1"],["B1",3,"FOB-B1"],["L1",2,"FOB-L1"],["S2",1,"FOB-S2"],["F1",3]] },
   ]},
   { name: "Master of Reality", cover: "covers/mor.png", font: "font-mor", songs: [
@@ -6292,22 +6292,34 @@ function loadAlbums() {
         }
         if (s.song === "Rat Salad") {
           if (!s.sections) s.sections = [];
-          // Rename former V1 → I1 and link RS-I1
+          var rsI1 = null;
+          var rsS1 = null;
+          var rsV1 = null;
           s.sections.forEach(function(p){
             if (!isChipPair(p)) return;
-            if (p[0] === "V1") {
-              p[0] = "I1";
-              p[1] = 4;
-              p[2] = "RS-I1";
-            }
+            if (p[0] === "I1") rsI1 = p;
+            if (p[0] === "S1") rsS1 = p;
+            if (p[0] === "V1") rsV1 = p;
           });
-          var rsI1 = null;
-          s.sections.forEach(function(p){ if (isChipPair(p) && p[0] === "I1") rsI1 = p; });
           if (rsI1) {
             rsI1[1] = 4;
             rsI1[2] = "RS-I1";
           } else if (!s.sections.some(function(p){ return isChipPair(p) && p[0] === "I1"; })) {
             s.sections.unshift(["I1",3,"RS-I1"]);
+          }
+          if (rsS1) {
+            rsS1[1] = 1;
+            rsS1[2] = "RS-S1";
+            rsS1[3] = 1;
+          } else {
+            s.sections.push(["S1",1,"RS-S1",1]);
+          }
+          if (rsV1) {
+            rsV1[1] = 2;
+            rsV1[2] = "RS-V1";
+            rsV1[3] = 1;
+          } else {
+            s.sections.push(["V1",2,"RS-V1",1]);
           }
         }
         if (s.song === "Jack the Stripper") s.song = "Fairies Wear Boots";
@@ -14665,6 +14677,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=319"></script>
+<script src="riffjams-admin.js?v=320"></script>
 </body>
 </html>
