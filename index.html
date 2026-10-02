@@ -3276,7 +3276,7 @@
     text-shadow: none !important;
   }
 
-  /* Song lists + Excel-style grid; covers hug max chip column (Acrobat = 10) */
+  /* Song lists + Excel-style grid; covers hug max chip column (Riff = 12) */
   .sections-wrap {
     --row-g: 34px;
     --name-w: 236px;
@@ -3284,7 +3284,7 @@
     --chip-w: 48px;
     --chip-h: 28px;
     --chip-gap: 1px;
-    --cols: 10;
+    --cols: 12;
     --cover-rows: 6;
     --cover: calc(var(--chip-h) * var(--cover-rows));
     --grid-left: calc(var(--row-g) + var(--name-w) + var(--song-meta-w) + var(--cols) * var(--chip-w) - var(--chip-gap, 0px));
@@ -7020,10 +7020,25 @@ function countSongChips(song) {
   return n;
 }
 var SONG_SLOTS = 10; /* minimum columns; grid grows when you drag past the end */
+var RIFF_COLS = 12; /* Song Map Riff mode: fixed floor; album covers hug column 12 */
 function songArraySlots(arr) {
   var n = 0;
   (arr || []).forEach(function(pair, i){ if (isChipPair(pair) && i + 1 > n) n = i + 1; });
   if ((arr || []).length > n) n = arr.length;
+  return n;
+}
+/** Occupied riff chip columns only (ignore trailing empty padding). Floor at RIFF_COLS. */
+function riffMapSlotCount(albums) {
+  var n = RIFF_COLS;
+  (albums || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      var sn = 0;
+      ((s && s.sections) || []).forEach(function(pair, i){
+        if (isChipPair(pair) && i + 1 > sn) sn = i + 1;
+      });
+      if (sn > n) n = sn;
+    });
+  });
   return n;
 }
 function mapSlotCount(albums) {
@@ -7913,8 +7928,9 @@ function showSections(keepScroll) {
     : (soloMode ? ((SOLO_MAP && SOLO_MAP.albums) || []) : ALBUMS);
   var contentCols = arrangementMode
     ? arrangementMapSlotCount(ARRANGEMENT_MAP)
-    : (soloMode ? soloMapSlotCount(SOLO_MAP) : mapSlotCount(ALBUMS));
-  if (contentCols < SONG_SLOTS) contentCols = SONG_SLOTS;
+    : (soloMode ? soloMapSlotCount(SOLO_MAP) : riffMapSlotCount(ALBUMS));
+  /* Riff uses RIFF_COLS floor inside riffMapSlotCount; Arr/Solo keep SONG_SLOTS min. */
+  if ((arrangementMode || soloMode) && contentCols < SONG_SLOTS) contentCols = SONG_SLOTS;
   /* Edit: one empty column past the end so dragging right creates a new numbered column (display only until drop) */
   var maxCols = (sectionsMode === "edit") ? (contentCols + 1) : contentCols;
   var groupStart = SOLO_COL_GROUP_START; // 1-based
@@ -14677,6 +14693,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=320"></script>
+<script src="riffjams-admin.js?v=321"></script>
 </body>
 </html>
