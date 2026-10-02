@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-02T15:42:58.856Z",
+  "updatedAt": "2026-10-02T16:40:51.942Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -30,6 +30,8 @@
         {
           "song": "Black Sabbath",
           "sections": [
+            null,
+            null,
             null,
             null,
             null,
@@ -94,12 +96,16 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Behind the Wall of Sleep",
           "sections": [
+            null,
+            null,
             null,
             null,
             null,
@@ -128,12 +134,16 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Evil Woman",
           "sections": [
+            null,
+            null,
             null,
             null,
             null,
@@ -162,12 +172,16 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Warning",
           "sections": [
+            null,
+            null,
             null,
             null,
             null,
@@ -243,6 +257,8 @@
             ],
             null,
             null,
+            null,
+            null,
             null
           ]
         },
@@ -276,6 +292,8 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
@@ -290,6 +308,8 @@
               "S1",
               1
             ],
+            null,
+            null,
             null,
             null,
             null,
@@ -352,6 +372,8 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
@@ -393,6 +415,8 @@
               "EF-B4",
               1
             ],
+            null,
+            null,
             null,
             null,
             null,
@@ -474,6 +498,8 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
@@ -535,6 +561,8 @@
               "FOB-B1"
             ],
             null,
+            null,
+            null,
             null
           ]
         }
@@ -584,6 +612,8 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
@@ -626,6 +656,8 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
@@ -638,6 +670,8 @@
               "",
               []
             ],
+            null,
+            null,
             null,
             null,
             null,
@@ -695,12 +729,16 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Orchid",
           "sections": [
+            null,
+            null,
             null,
             null,
             null,
@@ -772,12 +810,16 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Solitude",
           "sections": [
+            null,
+            null,
             null,
             null,
             null,
@@ -843,6 +885,8 @@
               "",
               []
             ],
+            null,
+            null,
             null,
             null,
             null,
@@ -947,6 +991,8 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
@@ -989,6 +1035,8 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ],
           "keys": [
@@ -1013,12 +1061,16 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "FX",
           "sections": [
+            null,
+            null,
             null,
             null,
             null,
@@ -1064,6 +1116,8 @@
               "B1",
               []
             ],
+            null,
+            null,
             null,
             null,
             null,
@@ -1136,6 +1190,8 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ],
           "keys": [
@@ -1202,12 +1258,16 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Laguna Sunrise",
           "sections": [
+            null,
+            null,
             null,
             null,
             null,
@@ -1251,12 +1311,16 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Under the Sun",
           "sections": [
+            null,
+            null,
             null,
             null,
             null,
@@ -1346,6 +1410,8 @@
             ],
             null,
             null,
+            null,
+            null,
             null
           ]
         },
@@ -1421,12 +1487,16 @@
               "S3",
               []
             ],
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Fluff",
           "sections": [
+            null,
+            null,
             null,
             null,
             null,
@@ -1502,6 +1572,8 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
@@ -1569,12 +1641,16 @@
               []
             ],
             null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Who Are You?",
           "sections": [
+            null,
+            null,
             null,
             null,
             null,
@@ -1623,6 +1699,8 @@
             null,
             null,
             null,
+            null,
+            null,
             null
           ]
         },
@@ -1659,6 +1737,8 @@
               "",
               []
             ],
+            null,
+            null,
             null,
             null,
             null,
@@ -3230,38 +3310,27 @@
             "chips": [
               [
                 "I1",
-                2,
-                "EF-I1",
-                "1O"
+                3
               ],
               [
                 "V1",
-                3,
-                "EF-V1",
-                "1O"
+                3
               ],
               [
                 "B1",
-                3,
-                "EF-B1"
+                3
               ],
               [
                 "B2",
-                3,
-                "EF-B2",
-                1
+                3
               ],
               [
                 "B3",
-                3,
-                "EF-B3",
-                1
+                3
               ],
               [
                 "B4",
-                3,
-                "EF-B4",
-                1
+                3
               ],
               null,
               null,
@@ -3279,8 +3348,6 @@
             "chips": [
               [
                 "V1",
-                3,
-                "HOD-V1",
                 3
               ],
               [
@@ -3289,15 +3356,16 @@
               ],
               [
                 "B1",
-                2,
-                "HOD-B1",
-                1
+                2
               ],
               [
                 "B2",
-                2,
-                "HOD-B2",
-                1
+                2
+              ],
+              [
+                "S1",
+                1,
+                "HOD-S1"
               ],
               [
                 "B3",
@@ -3306,16 +3374,9 @@
               ],
               [
                 "B4",
-                4,
+                3,
                 "HOD-B4"
               ],
-              [
-                "S1",
-                1,
-                "HOD-S1"
-              ],
-              null,
-              null,
               null,
               null,
               null,
