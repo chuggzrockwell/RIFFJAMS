@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-03T02:02:34.302Z",
+  "updatedAt": "2026-10-03T02:04:42.955Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -128,8 +128,8 @@
               1,
               "NIB-V1",
               [
-                "5S",
-                "1S"
+                "1S",
+                "5S"
               ]
             ],
             [
@@ -3149,9 +3149,10 @@
                 1,
                 "NIB-V1",
                 [
-                  "5S",
-                  "1S"
-                ]
+                  "1S",
+                  "5S"
+                ],
+                51.7
               ],
               [
                 "C1",
@@ -5191,6 +5192,23 @@
           "stop": 257.3,
           "duration": 4.7,
           "lick": "O1"
+        }
+      ]
+    },
+    {
+      "album": "Black Sabbath",
+      "song": "N.I.B.",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 51.7,
+          "stop": null,
+          "duration": null,
+          "lick": "NIB-V1"
         }
       ]
     },
