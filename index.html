@@ -4722,7 +4722,7 @@ var ALBUMS_DEFAULT = [
   { name: "Black Sabbath", cover: "covers/sabbath-hp.png?v=288", font: "font-paranoid", songs: [
     { song: "Black Sabbath", sections: [] },
     { song: "The Wizard", sections: [["I1",2,"TW-I1","1S"],["V1",3,"TW-V1","1S"],["C1",2,"TW-C1"],["S1",1,"TW-S1",[5,1]],["S2",1,"TW-S2",[5,1]],["O1",null,"TW-O1"]] },
-    { song: "Behind the Wall of Sleep", sections: [] },
+    { song: "Wasp/Behind the Wall of Sleep", sections: [] },
     { song: "N.I.B.", sections: [["V1",1,"NIB-V1",["5S","1S"]],["C1",3,"NIB-C1",[]],["S1",1,"NIB-S1",[3,4,1]],["S2",1,"NIB-S2",[3,4,1]]] },
     { song: "Evil Woman", sections: [] },
     { song: "Sleeping Village", sections: [] },
@@ -4915,6 +4915,7 @@ function normalizeSoloMap(map, albumsFallback) {
     else return { albums: base };
   }
   renameJackTheStripperInAlbums(map.albums);
+  renameBehindTheWallOfSleep(map.albums);
   var byAlbum = {};
   map.albums.forEach(function(a){ if (a && a.name) byAlbum[a.name] = a; });
   var albums = base.map(function(ba){
@@ -5110,6 +5111,10 @@ var ssSelectedArrangementSection = null;
 try {
   singleSongMode = localStorage.getItem(SINGLE_SONG_MODE_KEY) === "1";
   singleSongName = localStorage.getItem(SINGLE_SONG_NAME_KEY) || "";
+  if (singleSongName === "Behind the Wall of Sleep") {
+    singleSongName = "Wasp/Behind the Wall of Sleep";
+    try { localStorage.setItem(SINGLE_SONG_NAME_KEY, singleSongName); } catch (eBwsName) {}
+  }
 } catch (eSingleM) {}
 var ARRANGEMENT_MAP = null;
 var arrangementHistory = [];
@@ -5177,6 +5182,7 @@ function normalizeArrangementMap(map, albumsFallback) {
     else return { albums: base };
   }
   renameJackTheStripperInAlbums(map.albums);
+  renameBehindTheWallOfSleep(map.albums);
   var byAlbum = {};
   map.albums.forEach(function(a){ if (a && a.name) byAlbum[a.name] = a; });
   var albums = base.map(function(ba){
@@ -6191,12 +6197,23 @@ function renameJackTheStripperInAlbums(albums) {
   return albums;
 }
 
+function renameBehindTheWallOfSleep(albums) {
+  (albums || []).forEach(function(a){
+    if (!a || !a.songs) return;
+    a.songs.forEach(function(s){
+      if (s && s.song === "Behind the Wall of Sleep") s.song = "Wasp/Behind the Wall of Sleep";
+    });
+  });
+  return albums;
+}
+
 function loadAlbums() {
   try {
     var raw = localStorage.getItem(ALBUMS_KEY);
     var albums = (!raw) ? cloneAlbums(ALBUMS_DEFAULT) : JSON.parse(raw);
     if (!albums || !albums.length) albums = cloneAlbums(ALBUMS_DEFAULT);
     renameJackTheStripperInAlbums(albums);
+    renameBehindTheWallOfSleep(albums);
     collapseAlbumTiers(albums);
     albums.forEach(function(a){
       (a.songs||[]).forEach(function(s){
@@ -7088,7 +7105,7 @@ function isDefaultPosList(list) {
   return p.length === 1 && p[0] === 1;
 }
 var SECTION_SONG_PREFIX = {
-  "Black Sabbath": "BS-", "The Wizard": "TW-", "Behind the Wall of Sleep": "BWS-", "N.I.B.": "NIB-",
+  "Black Sabbath": "BS-", "The Wizard": "TW-", "Wasp/Behind the Wall of Sleep": "BWS-", "N.I.B.": "NIB-",
   "Evil Woman": "EW-", "Sleeping Village": "SV-", "Warning": "WRN-",
   "War Pigs": "WP-", "Paranoid": "P-", "Planet Caravan": "PC-", "Iron Man": "IM-",
   "Electric Funeral": "EF-", "Hand of Doom": "HOD-", "Rat Salad": "RS-", "Fairies Wear Boots": "FOB-",
@@ -9088,6 +9105,7 @@ function lickLetter(id) {
 /* Repeat ON = loop whole playlist. Verified Topic/official embeds only. */
 var SM_YT_IDS = {
   "The Wizard": "xWeRNU4mqjw",
+  "Wasp/Behind the Wall of Sleep": "qf9mJ9Yr6Jo",
   "N.I.B.": "HFzDKTNLr2k",
   "War Pigs": "bc5Nk1DXyEY",
   "Paranoid": "xpM59e6lyws",
@@ -9140,7 +9158,7 @@ var SM_YT_PLAYALONG = {
 var SM_SONGSTERR = {
   "Black Sabbath": "https://www.songsterr.com/a/wsa/black-sabbath-black-sabbath-tab-s2752",
   "The Wizard": "https://www.songsterr.com/a/wsa/black-sabbath-the-wizard-tab-s24245",
-  "Behind the Wall of Sleep": "https://www.songsterr.com/a/wsa/black-sabbath-behind-the-wall-of-sleep-tab-s26937",
+  "Wasp/Behind the Wall of Sleep": "https://www.songsterr.com/a/wsa/black-sabbath-behind-the-wall-of-sleep-tab-s26937",
   "N.I.B.": "https://www.songsterr.com/a/wsa/black-sabbath-nib-tab-s2661",
   "Evil Woman": "https://www.songsterr.com/a/wsa/black-sabbath-evil-woman-tab-s26929",
   "Sleeping Village": "https://www.songsterr.com/a/wsa/black-sabbath-sleeping-village-tab-s1414963",
@@ -14838,6 +14856,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=329"></script>
+<script src="riffjams-admin.js?v=330"></script>
 </body>
 </html>
