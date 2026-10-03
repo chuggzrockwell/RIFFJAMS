@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-03T02:08:16.327Z",
+  "updatedAt": "2026-10-03T02:09:16.633Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3253,9 +3253,22 @@
                   3,
                   4
                 ],
-                310.7
+                310.7,
+                360.3
               ],
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "vERSE 1",
+                "start": 0,
+                "end": 1
+              },
+              {
+                "name": "VERSE 2",
+                "start": 2,
+                "end": 3
+              }
             ]
           },
           {
@@ -5265,9 +5278,9 @@
     {
       "album": "Black Sabbath",
       "song": "N.I.B.",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 2.54,
+      "endSec": 360.3,
+      "complete": true,
+      "riffSaturationIndex": 2.614,
       "chips": [
         {
           "code": "V1",
@@ -5361,8 +5374,8 @@
           "code": "S2",
           "tier": 1,
           "start": 310.7,
-          "stop": null,
-          "duration": null,
+          "stop": 360.3,
+          "duration": 49.6,
           "lick": "NIB-S2"
         }
       ]
