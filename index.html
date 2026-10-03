@@ -4723,7 +4723,7 @@ var ALBUMS_DEFAULT = [
     { song: "Black Sabbath", sections: [] },
     { song: "The Wizard", sections: [["I1",2,"TW-I1","1S"],["V1",3,"TW-V1","1S"],["C1",2,"TW-C1"],["S1",1,"TW-S1",[5,1]],["S2",1,"TW-S2",[5,1]],["O1",null,"TW-O1"]] },
     { song: "Behind the Wall of Sleep", sections: [] },
-    { song: "N.I.B.", sections: [] },
+    { song: "N.I.B.", sections: [["V1",1,"NIB-V1",["5S","1S"]],["C1",3,"NIB-C1",[]],["S1",1,"NIB-S1",[3,4,1]],["S2",1,"NIB-S2",[3,4,1]]] },
     { song: "Evil Woman", sections: [] },
     { song: "Sleeping Village", sections: [] },
     { song: "Warning", sections: [] },
@@ -5214,6 +5214,36 @@ function seedArrangementChipsFromAlbums(map, albums) {
   });
   return map;
 }
+function seedNibArrangementIfEmpty(map) {
+  var want = [
+    ["V1",1,"NIB-V1",["5S","1S"]],
+    ["C1",3,"NIB-C1",[]],
+    ["S1",1,"NIB-S1",[3,4,1]],
+    ["S2",1,"NIB-S2",[3,4,1]]
+  ];
+  ((map && map.albums) || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "N.I.B.") return;
+      if (countArrangementChips(s) > 0) return;
+      if (!s.chips) s.chips = [];
+      want.forEach(function(row){
+        var copy = row.slice();
+        copy[3] = Array.isArray(row[3]) ? row[3].slice() : row[3];
+        var placed = false;
+        var i;
+        for (i = 0; i < s.chips.length; i++) {
+          if (!isChipPair(s.chips[i])) {
+            s.chips[i] = copy;
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) s.chips.push(copy);
+      });
+    });
+  });
+  return map;
+}
 function loadArrangementMap() {
   try {
     var raw = localStorage.getItem(ARRANGEMENT_MAP_KEY);
@@ -5224,12 +5254,14 @@ function loadArrangementMap() {
         if (totalArrangementChips(map) === 0) {
           seedArrangementChipsFromAlbums(map, typeof ALBUMS !== "undefined" && ALBUMS ? ALBUMS : ALBUMS_DEFAULT);
         }
+        seedNibArrangementIfEmpty(map);
         return map;
       }
     }
   } catch (e) {}
   var blank = normalizeArrangementMap(null, ALBUMS_DEFAULT);
   seedArrangementChipsFromAlbums(blank, typeof ALBUMS !== "undefined" && ALBUMS ? ALBUMS : ALBUMS_DEFAULT);
+  seedNibArrangementIfEmpty(blank);
   return blank;
 }
 function saveArrangementMap() {
@@ -6321,6 +6353,37 @@ function loadAlbums() {
           } else {
             s.sections.push(["V1",2,"RS-V1",1]);
           }
+        }
+        if (s.song === "N.I.B.") {
+          if (!s.sections) s.sections = [];
+          var nibWant = [
+            ["V1",1,"NIB-V1",["5S","1S"]],
+            ["C1",3,"NIB-C1",[]],
+            ["S1",1,"NIB-S1",[3,4,1]],
+            ["S2",1,"NIB-S2",[3,4,1]]
+          ];
+          nibWant.forEach(function(want){
+            var hit = null;
+            s.sections.forEach(function(pair){ if (isChipPair(pair) && pair[0] === want[0]) hit = pair; });
+            var row = want.slice();
+            row[3] = Array.isArray(want[3]) ? want[3].slice() : want[3];
+            if (hit) {
+              hit[1] = row[1];
+              hit[2] = row[2];
+              hit[3] = row[3];
+            } else {
+              var placed = false;
+              var ni;
+              for (ni = 0; ni < s.sections.length; ni++) {
+                if (!isChipPair(s.sections[ni])) {
+                  s.sections[ni] = row;
+                  placed = true;
+                  break;
+                }
+              }
+              if (!placed) s.sections.push(row);
+            }
+          });
         }
         if (s.song === "Jack the Stripper") s.song = "Fairies Wear Boots";
         if (s.song === "Fairies Wear Boots") {
@@ -14693,6 +14756,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=321"></script>
+<script src="riffjams-admin.js?v=322"></script>
 </body>
 </html>

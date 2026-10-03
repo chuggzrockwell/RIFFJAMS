@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-02T17:05:33.367Z",
+  "updatedAt": "2026-10-03T01:49:34.921Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -123,10 +123,41 @@
         {
           "song": "N.I.B.",
           "sections": [
-            null,
-            null,
-            null,
-            null,
+            [
+              "V1",
+              1,
+              "NIB-V1",
+              [
+                "5S",
+                "1S"
+              ]
+            ],
+            [
+              "C1",
+              3,
+              "NIB-C1",
+              []
+            ],
+            [
+              "S1",
+              1,
+              "NIB-S1",
+              [
+                3,
+                4,
+                1
+              ]
+            ],
+            [
+              "S2",
+              1,
+              "NIB-S2",
+              [
+                3,
+                4,
+                1
+              ]
+            ],
             null,
             null,
             null,
@@ -3056,10 +3087,41 @@
           {
             "song": "N.I.B.",
             "chips": [
-              null,
-              null,
-              null,
-              null,
+              [
+                "V1",
+                1,
+                "NIB-V1",
+                [
+                  "5S",
+                  "1S"
+                ]
+              ],
+              [
+                "C1",
+                3,
+                "NIB-C1",
+                []
+              ],
+              [
+                "S1",
+                1,
+                "NIB-S1",
+                [
+                  3,
+                  4,
+                  1
+                ]
+              ],
+              [
+                "S2",
+                1,
+                "NIB-S2",
+                [
+                  3,
+                  4,
+                  1
+                ]
+              ],
               null,
               null,
               null,
