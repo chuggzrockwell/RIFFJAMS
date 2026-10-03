@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-03T01:53:05.088Z",
+  "updatedAt": "2026-10-03T01:54:04.034Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1910,6 +1910,14 @@
                 2,
                 "NIB-1-1B",
                 "1D"
+              ],
+              [
+                "1-2B",
+                2,
+                "NIB-1-2B",
+                [
+                  4
+                ]
               ]
             ]
           },
