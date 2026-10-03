@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-03T01:49:34.921Z",
+  "updatedAt": "2026-10-03T01:53:05.088Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1896,7 +1896,22 @@
           },
           {
             "song": "N.I.B.",
-            "licks": []
+            "licks": [
+              [
+                "1-1A",
+                1,
+                "NIB-1-1A",
+                [
+                  3
+                ]
+              ],
+              [
+                "1-1B",
+                2,
+                "NIB-1-1B",
+                "1D"
+              ]
+            ]
           },
           {
             "song": "Evil Woman",

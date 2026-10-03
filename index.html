@@ -4955,20 +4955,51 @@ function normalizeSoloMap(map, albumsFallback) {
   purgeRetiredSoloLicksFromAlbums(albums);
   return { albums: albums };
 }
+function seedNibSoloLicks(map) {
+  var want = [
+    ["1-1A", 1, "NIB-1-1A", [3]],
+    ["1-1B", 2, "NIB-1-1B", "1D"]
+  ];
+  ((map && map.albums) || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "N.I.B.") return;
+      if (!s.licks) s.licks = [];
+      want.forEach(function(row){
+        var hit = null;
+        s.licks.forEach(function(p){ if (isChipPair(p) && p[0] === row[0]) hit = p; });
+        var copy = row.slice();
+        copy[3] = Array.isArray(row[3]) ? row[3].slice() : row[3];
+        if (hit) {
+          hit[1] = copy[1];
+          hit[2] = copy[2];
+          hit[3] = copy[3];
+        } else {
+          var placed = false;
+          var i;
+          for (i = 0; i < s.licks.length; i++) {
+            if (!isChipPair(s.licks[i])) { s.licks[i] = copy; placed = true; break; }
+          }
+          if (!placed) s.licks.push(copy);
+        }
+      });
+    });
+  });
+  return map;
+}
 function loadSoloMap() {
   try {
     var raw = localStorage.getItem(SOLO_MAP_KEY);
     if (raw) {
       var parsed = JSON.parse(raw);
       if (parsed && (parsed.albums || Array.isArray(parsed))) {
-        return mergeEmptySoloFromCatalog(normalizeSoloMap(parsed, ALBUMS_DEFAULT));
+        return seedNibSoloLicks(mergeEmptySoloFromCatalog(normalizeSoloMap(parsed, ALBUMS_DEFAULT)));
       }
     }
   } catch (e) {}
   if (typeof buildDefaultSoloMapFromParanoid === "function" && typeof CATALOG !== "undefined" && CATALOG && CATALOG.length) {
-    return buildDefaultSoloMapFromParanoid();
+    return seedNibSoloLicks(buildDefaultSoloMapFromParanoid());
   }
-  return normalizeSoloMap(null, ALBUMS_DEFAULT);
+  return seedNibSoloLicks(normalizeSoloMap(null, ALBUMS_DEFAULT));
 }
 function saveSoloMap() {
   try { localStorage.setItem(SOLO_MAP_KEY, JSON.stringify(SOLO_MAP)); } catch (e) {}
@@ -11942,6 +11973,7 @@ var CATALOG = [
   ["LOTW-1-1A","B"],["LOTW-1-2A","B"],["LOTW-1-3A","B"],["LOTW-2-2A","B"],["LOTW-2-3A","B"],["LOTW-2-4A","B"],["LOTW-2-5A","B"],["LOTW-3-1B","B"],["LOTW-3-2B","B"],["LOTW-3-3B","B"],["LOTW-4-1B","B"],["LOTW-4-2B","B"],["LOTW-4-3B","B"],["LOTW-2-1A","B"],
   ["ITV-1-1B","B"],["ITV-1-2B","B"],["ITV-1-3B","B"],["ITV-1-4B","B"],["ITV-2-2B","B"],["ITV-2-1A","B"],["ITV-2-2A","B"],["ITV-B-1A","B"],["ITV-B-2A","B"],["ITV-B-3A","B"],
   ["TW-1-1A","B"],["TW-1-1B","B"],["TW-1-2B","B"],["TW-1-3B","B"],["TW-2-1A","B"],["TW-2-1B","B"],["TW-2-2A","B"],["TW-2-3A","B"],["TW-2-2B","B"],["TW-2-3B","B"],["TW-2-4B","B"],
+  ["NIB-1-1A","B"],["NIB-1-1B","B"],
   ["HOD-1","B"],["HOD-2E","B"],["HOD-3E","B"],["HOD-4E","B"],["HOD-5E","B"],["HOD-6E","B"],
   ["RS-1","B"],["RS-2E","B"],["RS-3E","B"],["RS-4E","B"],["RS-5E","B"],
   ["FOB-1-1A","B"],["FOB-1-2A","B"],["FOB-1-3A","B"],["FOB-1-4A","B"],["FOB-2-1A","B"],["FOB-2-2A","B"],["FOB-2-3A","B"],["PC-1B","B"],["PC-2B","B"],["PC-3B","B"],["PC-4B","B"],["PC-5B","B"],["PC-6B","B"],["PC-7B","B"],["PC-8B","B"],["PC-9B","B"],["PC-10B","B"],["PC-11B","B"],["PC-1E","B"],["PC-2E","B"],["PC-3E","B"],["PC-4E","B"],["PC-5E","B"],["PC-6E","B"],["PC-7E","B"],["PC-8E","B"],["PC-9E","B"],["PC-10E","B"],["PC-11E","B"],["PC-12E","B"],["PC-13E","B"],["PC-14E","B"],["PC-15E","B"],["PC-16E","B"],["PC-17E","B"],
@@ -12130,7 +12162,8 @@ function buildDefaultSoloMapFromParanoid() {
     "Killing Yourself to Live": [], "Looking for Today": [],
     "After Forever": [], "Children of the Grave": [],
     "Lord of This World": [], "Into the Void": [],
-    "The Wizard": []
+    "The Wizard": [],
+    "N.I.B.": []
   };
   (CATALOG || []).forEach(function(x){
     if (!x) return;
@@ -12155,11 +12188,12 @@ function buildDefaultSoloMapFromParanoid() {
     else if (id.indexOf("LOTW-") === 0) song = "Lord of This World";
     else if (id.indexOf("ITV-") === 0) song = "Into the Void";
     else if (id.indexOf("TW-") === 0) song = "The Wizard";
+    else if (id.indexOf("NIB-") === 0) song = "N.I.B.";
     if (!song || !buckets[song]) return;
     var k = lickKind(id);
     var tier = (k === "A") ? 1 : (k === "B") ? 2 : (k === "E") ? 1 : 1;
     // Chip text: drop song prefix; keep full id for Play
-    var label = id.replace(/^(IM|WP|PC|HOD|RS|FOB|P|SBS|ANA|KYTL2|KYTL|LFT|AF|COTG|LOTW|ITV|TW)-/, "");
+    var label = id.replace(/^(IM|WP|PC|HOD|RS|FOB|P|SBS|ANA|KYTL2|KYTL|LFT|AF|COTG|LOTW|ITV|TW|NIB)-/, "");
     buckets[song].push([label, tier, id]);
   });
   var albums = blankSoloMapFromAlbums(ALBUMS_DEFAULT);
@@ -14756,6 +14790,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=322"></script>
+<script src="riffjams-admin.js?v=323"></script>
 </body>
 </html>
