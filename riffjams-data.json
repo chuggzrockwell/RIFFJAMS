@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-03T02:09:16.633Z",
+  "updatedAt": "2026-10-03T02:10:20.430Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3268,6 +3268,31 @@
                 "name": "VERSE 2",
                 "start": 2,
                 "end": 3
+              },
+              {
+                "name": "VERSE 3",
+                "start": 4,
+                "end": 5
+              },
+              {
+                "name": "S1",
+                "start": 6,
+                "end": 6
+              },
+              {
+                "name": "VERSE 4",
+                "start": 7,
+                "end": 8
+              },
+              {
+                "name": "VERSE 5",
+                "start": 9,
+                "end": 10
+              },
+              {
+                "name": "S2",
+                "start": 11,
+                "end": 11
               }
             ]
           },
