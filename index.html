@@ -5603,9 +5603,16 @@ function listSongMapSongNames(albums) {
 function resolveSingleSongName(albums) {
   var names = listSongMapSongNames(albums);
   if (!names.length) return "";
+  /* Playing song, or the last song loaded this session. Persisted Single Song
+     name is only the fallback when nothing has been played/loaded yet. */
+  var sessionSong = "";
+  try {
+    if (typeof smSessionSongName === "function") sessionSong = smSessionSongName() || "";
+  } catch (eSessionSong) {}
+  if (sessionSong && names.indexOf(sessionSong) >= 0) return sessionSong;
   if (singleSongName && names.indexOf(singleSongName) >= 0) return singleSongName;
   var cur = (typeof smCurrent === "function") ? smCurrent() : null;
-  if (cur && cur.song && names.indexOf(cur.song) >= 0) return cur.song;
+  if (cur && cur.song && names.indexOf(cur.song) >= 0 && typeof smHasSessionSong !== "undefined" && smHasSessionSong) return cur.song;
   if (lastSectionFocus && typeof lastSectionFocus.ai === "number") {
     var alb = albums[lastSectionFocus.ai];
     var song = alb && alb.songs && alb.songs[lastSectionFocus.si];
@@ -5629,6 +5636,7 @@ function setSingleSongMode(on) {
   var next = !!on;
   if (next) {
     try { if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap(); } catch (eLoad) {}
+    /* Show the playing / last-loaded song. Do not seek, cue, or stop the player. */
     var focus = resolveSingleSongName(singleSongSourceAlbums());
     if (focus) setSingleSongFocus(focus);
   }
@@ -9198,6 +9206,10 @@ var smShuffle = false;
 var smRepeat = true; /* loop playlist when ON (green) */
 var smPlaying = false;
 var smUserPaused = false; /* true only after an explicit local pause */
+/* Song the player has actually played or loaded this page session.
+   The automatic first-track cue on boot does not count. */
+var smHasSessionSong = false;
+var smSessionSong = "";
 var smTickTimer = null;
 var smSeeking = false;
 var smPlayalongActive = false;
@@ -9413,9 +9425,13 @@ function smApplyRemotePlayerSync(msg) {
         smOrder = smPlaylist.map(function(_, i){ return i; });
         smIndex = pi;
       }
+      if (msg.playing && name) smNoteSessionSong(name);
     }
     smPlayalongActive = !!msg.playalong && !!(name && SM_YT_PLAYALONG[name]);
     smUpdateMeta();
+    if (msg.playing && name) {
+      try { syncSingleSongFocusFromPlayer(); } catch (eSingleRemote) {}
+    }
     var cur = smCurrent();
     var yt = "";
     if (cur) {
@@ -9557,6 +9573,19 @@ function smRebuildOrder(keepSong) {
 function smCurrent() {
   if (!smOrder.length || !smPlaylist.length) return null;
   return smPlaylist[smOrder[smIndex]] || null;
+}
+function smNoteSessionSong(name) {
+  if (!name) {
+    var cur = smCurrent();
+    name = cur && cur.song ? cur.song : "";
+  }
+  if (!name) return;
+  smSessionSong = name;
+  smHasSessionSong = true;
+}
+function smSessionSongName() {
+  if (!smHasSessionSong) return "";
+  return smSessionSong || "";
 }
 var SM_META_BUFFER_PX = 10; /* gap between meta (or barrier) and mode tools */
 var SM_META_BARRIER_RESERVE_PX = 8; /* barrier width + flex gap */
@@ -9750,8 +9779,10 @@ function smEnsureApi(cb) {
               return;
             }
             smPlaying = true;
+            smNoteSessionSong();
             if (smPlayerMode === "player") smSetPlayIcon(true);
             smStartTick(); smApplyPlaybackRate(); smSchedulePublishPlayerSync();
+            try { syncSingleSongFocusFromPlayer(); } catch (eSinglePlay) {}
             if (!smIsAudioLeader()) {
               try { smYtPlayer.mute(); smYtPlayer.pauseVideo(); } catch (errFollow) {}
             }
@@ -9806,13 +9837,17 @@ function smApplyPlaybackRate() {
     smYtPlayer.setPlaybackRate(rate);
   } catch (err) {}
 }
-function smLoadCurrent(autoplay) {
+function smLoadCurrent(autoplay, noteSession) {
   var cur = smCurrent();
   /* next/prev/shuffle load clears one-shot playalong override */
   smPlayalongActive = false;
   if (autoplay) smUserPaused = false;
+  /* Boot cue passes noteSession false so War Pigs is not "played this session". */
+  if (noteSession !== false && cur && cur.song) smNoteSessionSong(cur.song);
   smUpdateMeta();
-  try { syncSingleSongFocusFromPlayer(); } catch (eSingleSync) {}
+  if (noteSession !== false) {
+    try { syncSingleSongFocusFromPlayer(); } catch (eSingleSync) {}
+  }
   /* Force t=0 — YT player still reports previous video's getCurrentTime() */
   smPublishTrackChangeSync();
   if (!cur) return;
@@ -9833,6 +9868,7 @@ function smSeekBy(deltaSec) {
   smEnsureApi(function(){
     if (!smYtPlayer || !smYtPlayer.getCurrentTime) return;
     smMarkLocalPlayerAction();
+    smNoteSessionSong();
     var cur = smYtPlayer.getCurrentTime() || 0;
     var dur = smYtPlayer.getDuration() || 0;
     var next = Math.max(0, Math.min(dur || 1e9, cur + deltaSec));
@@ -9931,6 +9967,8 @@ function smPlaySongName(name, autoplay, playalong) {
   var oi = smOrder.indexOf(pi);
   smIndex = oi >= 0 ? oi : 0;
   var cur = smCurrent();
+  if (cur && cur.song) smNoteSessionSong(cur.song);
+  try { syncSingleSongFocusFromPlayer(); } catch (eSingleNamed) {}
   var yt = cur ? cur.yt : "";
   smPlayalongActive = false;
   if (playalong) {
@@ -9990,6 +10028,8 @@ function smTogglePlay() {
     }
     smUserPaused = false;
     smMarkLocalPlayerAction();
+    smNoteSessionSong();
+    try { syncSingleSongFocusFromPlayer(); } catch (eSingleToggle) {}
     /* Guard against peer sync pausing us during the load/start blip */
     smTrackChangeGraceUntil = Math.max(smTrackChangeGraceUntil, Date.now() + 2500);
     /* Fresh load: meta shows War Pigs but nothing is cued yet — load & play */
@@ -10227,6 +10267,7 @@ function smSeekFromClientX(clientX) {
   var scrub = document.getElementById("smScrub");
   if (!scrub || !smYtPlayer || !smYtPlayer.getDuration) return;
   smMarkLocalPlayerAction();
+  smNoteSessionSong();
   var r = scrub.getBoundingClientRect();
   var pct = r.width ? Math.min(1, Math.max(0, (clientX - r.left) / r.width)) : 0;
   var dur = smYtPlayer.getDuration() || 0;
@@ -10828,8 +10869,9 @@ function smInitPlayerUi() {
       window.addEventListener("pointerup", up);
     });
   }
-  /* Cue first track (War Pigs) so Play / Space work without a prior click */
-  if (smPlaylist.length) smLoadCurrent(false);
+  /* Cue first track (War Pigs) so Play / Space work without a prior click.
+     noteSession false: this boot cue is not "a song played this session". */
+  if (smPlaylist.length) smLoadCurrent(false, false);
   try {
     var rawSync = localStorage.getItem(SM_PLAYER_SYNC_KEY);
     if (rawSync) smApplyRemotePlayerSync(JSON.parse(rawSync));
@@ -14796,6 +14838,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=328"></script>
+<script src="riffjams-admin.js?v=329"></script>
 </body>
 </html>
