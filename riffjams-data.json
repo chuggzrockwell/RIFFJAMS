@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-03T02:05:52.457Z",
+  "updatedAt": "2026-10-03T02:06:59.692Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -142,9 +142,9 @@
               1,
               "NIB-S1",
               [
+                1,
                 3,
-                4,
-                1
+                4
               ]
             ],
             [
@@ -3183,14 +3183,42 @@
                 116.1
               ],
               [
+                "V1",
+                1,
+                "NIB-V1",
+                [
+                  "1S",
+                  "5S"
+                ],
+                145.9
+              ],
+              [
+                "V2",
+                1,
+                "V2",
+                5,
+                173.1
+              ],
+              [
                 "S1",
                 1,
                 "NIB-S1",
                 [
+                  1,
                   3,
-                  4,
-                  1
-                ]
+                  4
+                ],
+                181.1
+              ],
+              [
+                "V1",
+                1,
+                "NIB-V1",
+                [
+                  "1S",
+                  "5S"
+                ],
+                217.6
               ],
               [
                 "S2",
@@ -3202,9 +3230,6 @@
                   1
                 ]
               ],
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -5220,7 +5245,7 @@
       "song": "N.I.B.",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 3,
+      "riffSaturationIndex": 2.641,
       "chips": [
         {
           "code": "V1",
@@ -5250,9 +5275,41 @@
           "code": "C1",
           "tier": 3,
           "start": 116.1,
+          "stop": 145.9,
+          "duration": 29.8,
+          "lick": "NIB-C1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 145.9,
+          "stop": 173.1,
+          "duration": 27.2,
+          "lick": "NIB-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 1,
+          "start": 173.1,
+          "stop": 181.1,
+          "duration": 8,
+          "lick": "V2"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 181.1,
+          "stop": 217.6,
+          "duration": 36.5,
+          "lick": "NIB-S1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 217.6,
           "stop": null,
           "duration": null,
-          "lick": "NIB-C1"
+          "lick": "NIB-V1"
         }
       ]
     },
