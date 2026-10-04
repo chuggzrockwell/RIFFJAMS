@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-04T01:13:07.404Z",
+  "updatedAt": "2026-10-04T01:18:43.289Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3386,9 +3386,6 @@
           {
             "song": "Wicked World",
             "chips": [
-              null,
-              null,
-              null,
               null,
               null,
               null,
