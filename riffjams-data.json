@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-04T01:57:16.049Z",
+  "updatedAt": "2026-10-04T01:59:36.591Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -127,14 +127,12 @@
             [
               "S1",
               1,
-              "BWS-S1",
-              []
+              "BWS-S1"
             ],
             [
               "O1",
               2,
-              "BWS-O1",
-              []
+              "BWS-O1"
             ],
             null,
             null,
@@ -3263,16 +3261,31 @@
                 "S1",
                 1,
                 "BWS-S1",
-                []
+                [],
+                120.1
+              ],
+              [
+                "I1",
+                3,
+                "BWS-I1",
+                [],
+                150.5
+              ],
+              [
+                "V1",
+                3,
+                "BWS-V1",
+                1,
+                166.9
               ],
               [
                 "O1",
                 2,
                 "BWS-O1",
-                []
+                [],
+                188.2,
+                194.7
               ],
-              null,
-              null,
               null,
               null,
               null,
@@ -5450,9 +5463,9 @@
     {
       "album": "Black Sabbath",
       "song": "Wasp/Behind the Wall of Sleep",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.131,
+      "endSec": 194.7,
+      "complete": true,
+      "riffSaturationIndex": 1.423,
       "chips": [
         {
           "code": "I2",
@@ -5482,9 +5495,41 @@
           "code": "B1",
           "tier": 3,
           "start": 89.6,
-          "stop": null,
-          "duration": null,
+          "stop": 120.1,
+          "duration": 30.5,
           "lick": "BWS-B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 120.1,
+          "stop": 150.5,
+          "duration": 30.4,
+          "lick": "BWS-S1"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 150.5,
+          "stop": 166.9,
+          "duration": 16.4,
+          "lick": "BWS-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 166.9,
+          "stop": 188.2,
+          "duration": 21.3,
+          "lick": "BWS-V1"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 188.2,
+          "stop": 194.7,
+          "duration": 6.5,
+          "lick": "BWS-O1"
         }
       ]
     },
