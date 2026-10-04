@@ -4722,7 +4722,7 @@ var ALBUMS_DEFAULT = [
   { name: "Black Sabbath", cover: "covers/sabbath-hp.png?v=288", font: "font-paranoid", songs: [
     { song: "Black Sabbath", sections: [] },
     { song: "The Wizard", sections: [["I1",2,"TW-I1","1S"],["V1",3,"TW-V1","1S"],["C1",2,"TW-C1"],["S1",1,"TW-S1",[5,1]],["S2",1,"TW-S2",[5,1]],["O1",null,"TW-O1"]] },
-    { song: "Wasp/Behind the Wall of Sleep", sections: [] },
+    { song: "Wasp/Behind the Wall of Sleep", sections: [["I1",3,"BWS-I1",[]],["I2",2,"BWS-I2",[]],["V1",3,"BWS-V1",1],["B1",3,"BWS-B1",[]],["S1",1,"BWS-S1",[]],["O1",2,"BWS-O1",[]]] },
     { song: "N.I.B.", sections: [["V1",1,"NIB-V1",["5S","1S"]],["C1",3,"NIB-C1",[]],["S1",1,"NIB-S1",[3,4,1]],["S2",1,"NIB-S2",[3,4,1]]] },
     { song: "Evil Woman", sections: [] },
     { song: "Sleeping Village", sections: [] },
@@ -5286,6 +5286,38 @@ function seedNibArrangementIfEmpty(map) {
   });
   return map;
 }
+function seedBwsArrangementIfEmpty(map) {
+  var want = [
+    ["I1",3,"BWS-I1",[]],
+    ["I2",2,"BWS-I2",[]],
+    ["V1",3,"BWS-V1",1],
+    ["B1",3,"BWS-B1",[]],
+    ["S1",1,"BWS-S1",[]],
+    ["O1",2,"BWS-O1",[]]
+  ];
+  ((map && map.albums) || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "Wasp/Behind the Wall of Sleep") return;
+      if (countArrangementChips(s) > 0) return;
+      if (!s.chips) s.chips = [];
+      want.forEach(function(row){
+        var copy = row.slice();
+        copy[3] = Array.isArray(row[3]) ? row[3].slice() : row[3];
+        var placed = false;
+        var i;
+        for (i = 0; i < s.chips.length; i++) {
+          if (!isChipPair(s.chips[i])) {
+            s.chips[i] = copy;
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) s.chips.push(copy);
+      });
+    });
+  });
+  return map;
+}
 function loadArrangementMap() {
   try {
     var raw = localStorage.getItem(ARRANGEMENT_MAP_KEY);
@@ -5297,6 +5329,7 @@ function loadArrangementMap() {
           seedArrangementChipsFromAlbums(map, typeof ALBUMS !== "undefined" && ALBUMS ? ALBUMS : ALBUMS_DEFAULT);
         }
         seedNibArrangementIfEmpty(map);
+        seedBwsArrangementIfEmpty(map);
         return map;
       }
     }
@@ -5304,6 +5337,7 @@ function loadArrangementMap() {
   var blank = normalizeArrangementMap(null, ALBUMS_DEFAULT);
   seedArrangementChipsFromAlbums(blank, typeof ALBUMS !== "undefined" && ALBUMS ? ALBUMS : ALBUMS_DEFAULT);
   seedNibArrangementIfEmpty(blank);
+  seedBwsArrangementIfEmpty(blank);
   return blank;
 }
 function saveArrangementMap() {
@@ -6438,6 +6472,39 @@ function loadAlbums() {
               for (ni = 0; ni < s.sections.length; ni++) {
                 if (!isChipPair(s.sections[ni])) {
                   s.sections[ni] = row;
+                  placed = true;
+                  break;
+                }
+              }
+              if (!placed) s.sections.push(row);
+            }
+          });
+        }
+        if (s.song === "Wasp/Behind the Wall of Sleep") {
+          if (!s.sections) s.sections = [];
+          var bwsWant = [
+            ["I1",3,"BWS-I1",[]],
+            ["I2",2,"BWS-I2",[]],
+            ["V1",3,"BWS-V1",1],
+            ["B1",3,"BWS-B1",[]],
+            ["S1",1,"BWS-S1",[]],
+            ["O1",2,"BWS-O1",[]]
+          ];
+          bwsWant.forEach(function(want){
+            var hit = null;
+            s.sections.forEach(function(pair){ if (isChipPair(pair) && pair[0] === want[0]) hit = pair; });
+            var row = want.slice();
+            row[3] = Array.isArray(want[3]) ? want[3].slice() : want[3];
+            if (hit) {
+              hit[1] = row[1];
+              hit[2] = row[2];
+              hit[3] = row[3];
+            } else {
+              var placed = false;
+              var bi;
+              for (bi = 0; bi < s.sections.length; bi++) {
+                if (!isChipPair(s.sections[bi])) {
+                  s.sections[bi] = row;
                   placed = true;
                   break;
                 }
@@ -14856,6 +14923,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=330"></script>
+<script src="riffjams-admin.js?v=331"></script>
 </body>
 </html>
