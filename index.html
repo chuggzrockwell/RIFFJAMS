@@ -4577,6 +4577,8 @@
         <option value="O">Open position</option>
         <option value="P">pedal tone</option>
         <option value="S">single string</option>
+        <option value="i⁵–ii⁵–♭III⁵">i⁵–ii⁵–♭III⁵</option>
+        <option value="P3 w/open string">P3 w/open string</option>
       </select>
     </div>
     <div class="chip-edit-time-row" id="chipEditTimeRow" hidden>
@@ -4721,7 +4723,7 @@
 var ALBUMS_DEFAULT = [
   { name: "Black Sabbath", cover: "covers/sabbath-hp.png?v=288", font: "font-paranoid", songs: [
     { song: "Black Sabbath", sections: [] },
-    { song: "The Wizard", sections: [["I1",2,"TW-I1","1S"],["V1",3,"TW-V1","1S"],["C1",2,"TW-C1"],["S1",1,"TW-S1",[5,1]],["S2",1,"TW-S2",[5,1]],["O1",null,"TW-O1"]] },
+    { song: "The Wizard", sections: [["I1",2,"TW-I1","1S"],["V1",3,"TW-V1","1S"],["C1",2,"TW-C1"],["S1",1,"TW-S1",[5,1]],["S2",1,"TW-S2",[5,1]],["O1",2,"TW-O1",[]]] },
     { song: "Wasp/Behind the Wall of Sleep", sections: [["I1",3,"BWS-I1",[]],["I2",2,"BWS-I2",[]],["V1",3,"BWS-V1",1],["B1",3,"BWS-B1",[]],["S1",1,"BWS-S1",[]],["O1",2,"BWS-O1",[]]] },
     { song: "N.I.B.", sections: [["V1",1,"NIB-V1",["5S","1S"]],["C1",3,"NIB-C1",[]],["S1",1,"NIB-S1",[3,4,1]],["S2",1,"NIB-S2",[3,4,1]]] },
     { song: "Wicked World", sections: [] },
@@ -5331,6 +5333,7 @@ function loadArrangementMap() {
         }
         seedNibArrangementIfEmpty(map);
         seedBwsArrangementIfEmpty(map);
+        wireWizardO1Lick(map);
         return map;
       }
     }
@@ -5339,6 +5342,7 @@ function loadArrangementMap() {
   seedArrangementChipsFromAlbums(blank, typeof ALBUMS !== "undefined" && ALBUMS ? ALBUMS : ALBUMS_DEFAULT);
   seedNibArrangementIfEmpty(blank);
   seedBwsArrangementIfEmpty(blank);
+  wireWizardO1Lick(blank);
   return blank;
 }
 function saveArrangementMap() {
@@ -6242,6 +6246,22 @@ function renameBehindTheWallOfSleep(albums) {
   return albums;
 }
 
+function wireWizardO1Lick(songsOwner) {
+  var albums = (songsOwner && songsOwner.albums) ? songsOwner.albums : songsOwner;
+  (albums || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "The Wizard") return;
+      ["sections", "chips"].forEach(function(field){
+        (s[field] || []).forEach(function(pair){
+          if (!isChipPair(pair) || pair[0] !== "O1") return;
+          var lick = String(pair[2] || "");
+          if (!lick || lick === "O1") pair[2] = "TW-O1";
+        });
+      });
+    });
+  });
+}
+window.wireWizardO1Lick = wireWizardO1Lick;
 function loadAlbums() {
   try {
     var raw = localStorage.getItem(ALBUMS_KEY);
@@ -6334,7 +6354,7 @@ function loadAlbums() {
               if (code === "I1") {
                 var plist = parsePosList(hit[3]);
                 var has3 = plist.some(function(x){ return slotBase(x) === 3; });
-                if (!has3 && plist.length === 1 && slotBase(plist[0]) === 1 && !slotIsO(plist[0]) && !slotIsP(plist[0]) && !slotIsD(plist[0]) && !slotIsS(plist[0])) {
+                if (!has3 && plist.length === 1 && slotBase(plist[0]) === 1 && !slotMod(plist[0])) {
                   hit[3] = 3;
                 }
               }
@@ -6723,6 +6743,7 @@ function loadAlbums() {
         upsertIfEmpty(a, "Tomorrow's Dream", tdWant);
       });
     })(albums);
+    wireWizardO1Lick(albums);
     try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(albums)); } catch (err) {}
     return albums;
   } catch (e) {
@@ -7071,12 +7092,35 @@ function formatChipTime(sec) {
   return out;
 }
 
+function chipEditTypeCodes() {
+  var sel = document.getElementById("chipEditType");
+  var codes = [];
+  if (sel && sel.options) {
+    for (var i = 0; i < sel.options.length; i++) {
+      var v = sel.options[i].value;
+      if (v) codes.push(v);
+    }
+  }
+  if (!codes.length) codes = ["D", "O", "P", "S"];
+  codes.sort(function(a, b){ return b.length - a.length; });
+  return codes;
+}
 function normalizeSlot(v, fallback) {
   if (v == null || v === "") return fallback;
-  var s = String(v).toUpperCase();
-  var m = s.match(/^([1-5])([OPDS])?$/);
+  if (typeof v === "number" && v >= 1 && v <= 5 && v === Math.floor(v)) return v;
+  var s = String(v);
+  var m = s.match(/^([1-5])([\s\S]*)$/);
   if (!m) return fallback;
-  return m[2] ? (m[1] + m[2]) : parseInt(m[1], 10);
+  if (!m[2]) return parseInt(m[1], 10);
+  var rest = m[2];
+  var codes = chipEditTypeCodes();
+  var i, c;
+  for (i = 0; i < codes.length; i++) {
+    c = codes[i];
+    if (rest === c) return m[1] + c;
+    if (c.length === 1 && rest.toUpperCase() === c) return m[1] + c;
+  }
+  return fallback;
 }
 function slotBase(v) {
   return parseInt(String(normalizeSlot(v, 1)), 10);
@@ -7094,11 +7138,10 @@ function slotIsS(v) {
   return /S$/i.test(String(normalizeSlot(v, 1)));
 }
 function slotMod(v) {
-  if (slotIsO(v)) return "O";
-  if (slotIsP(v)) return "P";
-  if (slotIsD(v)) return "D";
-  if (slotIsS(v)) return "S";
-  return "";
+  var n = normalizeSlot(v, "");
+  if (n === "" || n == null) return "";
+  var m = String(n).match(/^[1-5]([\s\S]+)$/);
+  return m ? m[1] : "";
 }
 function slotCss(prefix, v) {
   return prefix + "-" + String(normalizeSlot(v, 1)).toLowerCase();
@@ -11897,7 +11940,7 @@ function readChipEditPosList() {
     if (n >= 1 && n <= 5) posBases.push(n);
   });
   var typeSel = document.getElementById("chipEditType");
-  var posSuf = (typeSel && /^(O|P|D|S)$/.test(typeSel.value)) ? typeSel.value : "";
+  var posSuf = (typeSel && typeSel.value && chipEditTypeCodes().indexOf(typeSel.value) !== -1) ? typeSel.value : "";
   return posBases.map(function(n){ return normalizeSlot(n + posSuf, 1); });
 }
 function saveChipEditor() {
@@ -14925,6 +14968,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=332"></script>
+<script src="riffjams-admin.js?v=333"></script>
 </body>
 </html>

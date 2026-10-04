@@ -616,6 +616,10 @@
           }
         } catch (eArrHydrate) {}
       }
+      if (typeof window.wireWizardO1Lick === "function") {
+        window.wireWizardO1Lick(window.ALBUMS);
+        window.wireWizardO1Lick(window.ARRANGEMENT_MAP);
+      }
       if (document.body.classList.contains("sections-mode")) window.showSections(true);
       if (document.body.classList.contains("sheet-mode") && window.currentLetter) window.showSeries(window.currentLetter);
     } catch (e) {
