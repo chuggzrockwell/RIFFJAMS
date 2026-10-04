@@ -206,6 +206,25 @@
           ]
         },
         {
+          "song": "Wicked World",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
           "song": "Evil Woman",
           "sections": [
             null,
@@ -1991,6 +2010,10 @@
             ]
           },
           {
+            "song": "Wicked World",
+            "licks": []
+          },
+          {
             "song": "Evil Woman",
             "licks": []
           },
@@ -3358,6 +3381,24 @@
                 "start": 11,
                 "end": 11
               }
+            ]
+          },
+          {
+            "song": "Wicked World",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
             ]
           },
           {
