@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-04T01:12:00.222Z",
+  "updatedAt": "2026-10-04T01:13:07.404Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -72,7 +72,7 @@
             ],
             [
               "C1",
-              2,
+              3,
               "TW-C1",
               []
             ],
@@ -3064,7 +3064,7 @@
               ],
               [
                 "C1",
-                2,
+                3,
                 "TW-C1",
                 1,
                 95.8
@@ -5256,7 +5256,7 @@
       "song": "The Wizard",
       "endSec": 257.3,
       "complete": true,
-      "riffSaturationIndex": 1.714,
+      "riffSaturationIndex": 1.673,
       "chips": [
         {
           "code": "I1",
@@ -5292,7 +5292,7 @@
         },
         {
           "code": "C1",
-          "tier": 2,
+          "tier": 3,
           "start": 95.8,
           "stop": 105.6,
           "duration": 9.8,
