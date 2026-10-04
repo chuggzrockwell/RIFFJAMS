@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-04T01:02:58.944Z",
+  "updatedAt": "2026-10-04T01:09:33.869Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -104,12 +104,42 @@
         {
           "song": "Wasp/Behind the Wall of Sleep",
           "sections": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
+            [
+              "I1",
+              3,
+              "BWS-I1",
+              []
+            ],
+            [
+              "I2",
+              2,
+              "BWS-I2",
+              []
+            ],
+            [
+              "V1",
+              3,
+              "BWS-V1",
+              1
+            ],
+            [
+              "B1",
+              3,
+              "BWS-B1",
+              []
+            ],
+            [
+              "S1",
+              1,
+              "BWS-S1",
+              []
+            ],
+            [
+              "O1",
+              2,
+              "BWS-O1",
+              []
+            ],
             null,
             null,
             null,
@@ -3136,12 +3166,42 @@
           {
             "song": "Wasp/Behind the Wall of Sleep",
             "chips": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              [
+                "I1",
+                3,
+                "BWS-I1",
+                []
+              ],
+              [
+                "I2",
+                2,
+                "BWS-I2",
+                []
+              ],
+              [
+                "V1",
+                3,
+                "BWS-V1",
+                1
+              ],
+              [
+                "B1",
+                3,
+                "BWS-B1",
+                []
+              ],
+              [
+                "S1",
+                1,
+                "BWS-S1",
+                []
+              ],
+              [
+                "O1",
+                2,
+                "BWS-O1",
+                []
+              ],
               null,
               null,
               null,
