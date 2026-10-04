@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-04T01:59:36.591Z",
+  "updatedAt": "2026-10-04T02:00:51.763Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3227,7 +3227,8 @@
                 "I1",
                 3,
                 "BWS-I1",
-                []
+                [],
+                0
               ],
               [
                 "I2",
@@ -3290,6 +3291,13 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "intro",
+                "start": 0,
+                "end": 2
+              }
             ]
           },
           {
@@ -5465,8 +5473,16 @@
       "song": "Wasp/Behind the Wall of Sleep",
       "endSec": 194.7,
       "complete": true,
-      "riffSaturationIndex": 1.423,
+      "riffSaturationIndex": 1.399,
       "chips": [
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 0,
+          "stop": 11.1,
+          "duration": 11.1,
+          "lick": "BWS-I1"
+        },
         {
           "code": "I2",
           "tier": 2,
