@@ -620,6 +620,10 @@
         window.wireWizardO1Lick(window.ALBUMS);
         window.wireWizardO1Lick(window.ARRANGEMENT_MAP);
       }
+      if (typeof window.wireNibV2Lick === "function") {
+        window.wireNibV2Lick(window.ALBUMS);
+        window.wireNibV2Lick(window.ARRANGEMENT_MAP);
+      }
       if (document.body.classList.contains("sections-mode")) window.showSections(true);
       if (document.body.classList.contains("sheet-mode") && window.currentLetter) window.showSeries(window.currentLetter);
     } catch (e) {
