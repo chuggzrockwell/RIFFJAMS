@@ -5333,7 +5333,8 @@ function loadArrangementMap() {
         }
         seedNibArrangementIfEmpty(map);
         seedBwsArrangementIfEmpty(map);
-        wireWizardO1Lick(map);
+        wireWizardO1Lick(map)
+        wireNibV2Lick(map);;
         return map;
       }
     }
@@ -5342,7 +5343,8 @@ function loadArrangementMap() {
   seedArrangementChipsFromAlbums(blank, typeof ALBUMS !== "undefined" && ALBUMS ? ALBUMS : ALBUMS_DEFAULT);
   seedNibArrangementIfEmpty(blank);
   seedBwsArrangementIfEmpty(blank);
-  wireWizardO1Lick(blank);
+  wireWizardO1Lick(blank)
+  wireNibV2Lick(blank);;
   return blank;
 }
 function saveArrangementMap() {
@@ -6262,6 +6264,22 @@ function wireWizardO1Lick(songsOwner) {
   });
 }
 window.wireWizardO1Lick = wireWizardO1Lick;
+function wireNibV2Lick(songsOwner) {
+  var albums = (songsOwner && songsOwner.albums) ? songsOwner.albums : songsOwner;
+  (albums || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "N.I.B.") return;
+      ["sections", "chips"].forEach(function(field){
+        (s[field] || []).forEach(function(pair){
+          if (!isChipPair(pair) || pair[0] !== "V2") return;
+          var lick = String(pair[2] || "");
+          if (!lick || lick === "V2") pair[2] = "NIB-V2";
+        });
+      });
+    });
+  });
+}
+window.wireNibV2Lick = wireNibV2Lick;
 function loadAlbums() {
   try {
     var raw = localStorage.getItem(ALBUMS_KEY);
@@ -6743,7 +6761,8 @@ function loadAlbums() {
         upsertIfEmpty(a, "Tomorrow's Dream", tdWant);
       });
     })(albums);
-    wireWizardO1Lick(albums);
+    wireWizardO1Lick(albums)
+    wireNibV2Lick(albums);;
     try { localStorage.setItem(ALBUMS_KEY, JSON.stringify(albums)); } catch (err) {}
     return albums;
   } catch (e) {
@@ -14961,6 +14980,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=338"></script>
+<script src="riffjams-admin.js?v=339"></script>
 </body>
 </html>
