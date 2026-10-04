@@ -2001,9 +2001,9 @@
   }
   /* Song metadata sits between the nameplate and chips in View only. */
   body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta {
-    --song-meta-w: 400px;
+    --song-meta-w: 100px;
   }
-  /* Meta cols off: collapse Key/Tuning/BPM/RSI so chips hug the nameplate (no gap). */
+  /* RSI off: collapse the column so chips hug the nameplate (no gap). */
   body.song-meta-cols-off .sections-wrap {
     --song-meta-w: 0px !important;
   }
@@ -4510,7 +4510,7 @@
       <button type="button" class="back" id="backSections">Back</button>
       <span class="badge" style="background:#fff;color:#111">Song Map</span>
       <span class="count" id="sectionsCount"></span>
-      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
+      <span class="keys" id="sectionsKeys">Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles Views · 7 Rulers · 8 RSI · i/v/… types · 1–5 tiers · Ctrl+1–5 positions · Shift+←/→ ±5s · Ctrl+←/→ track · 0 clear filters · Esc closes chip edit · Backspace home</span>
     </div>
     <div class="sec-modes" id="secModes">
       <button type="button" class="sec-mode-btn on" data-sec-mode="view">View</button>
@@ -4529,7 +4529,7 @@
         <div class="map-tools-menu" id="mapToolsMenu" role="menu">
           <button type="button" class="map-tools-item" id="secPeekBtn" role="menuitemcheckbox" aria-checked="false" title="Hover chips to peek tabs">Peek</button>
           <button type="button" class="map-tools-item" id="secRulersBtn" role="menuitemcheckbox" aria-checked="false" title="Show section rulers">Rulers</button>
-          <button type="button" class="map-tools-item" id="secMetaColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show Key, Tuning, BPM, RSI columns">Meta</button>
+          <button type="button" class="map-tools-item" id="secMetaColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show RSI column">RSI</button>
         </div>
       </div>
       <div class="ss-nav-picker-host" id="ssSongPickerHost" hidden></div>
@@ -7558,7 +7558,7 @@ function handleSectionRulersShortcut(e) {
   toggleSectionRulersUi();
   return true;
 }
-/* Song Map Tools → Meta (Key/Tuning/BPM/RSI). Same localStorage on/off pattern as Rulers. Default on. */
+/* Song Map Tools → RSI. Numpad 8 toggles RSI only. Default on. */
 var SONG_META_COLS_KEY = "riffjams-song-meta-cols";
 var songMetaColsOn = true;
 try {
@@ -7591,7 +7591,7 @@ function setSongMetaCols(on) {
     showSections(true);
   }
 }
-/* Tools → Meta and Numpad 8 share this exact toggle. */
+/* Tools → RSI and Numpad 8 share this exact toggle. */
 function toggleSongMetaColsUi() {
   setSongMetaCols(!songMetaColsOn);
   var sec = document.getElementById("sections");
@@ -8204,7 +8204,7 @@ function showSections(keepScroll) {
   }
   var showMetaCols = songMetaColsOn && (anySongMeta || anySongRsi);
   var metaHeads = showMetaCols
-    ? '<span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-name" aria-hidden="true"></span><div class="song-meta-heads"><span>Key</span><span>Tuning</span><span>BPM</span><span>RSI</span></div>'
+    ? '<span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-name" aria-hidden="true"></span><div class="song-meta-heads"><span>RSI</span></div>'
     : "";
   var ruler = '<div class="sec-ruler"><div class="row-num"></div>'+(metaHeads || '<div class="song-name-spacer" aria-hidden="true"></div>')+'<div class="song-secs">'+colNums+'</div></div>';
   var singleFocus = singleSongMode ? resolveSingleSongName(singleSongPickerAlbums()) : "";
@@ -9174,14 +9174,14 @@ function setSectionsMode(mode) {
     if (arrangementMode) {
       if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
       else if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-      else keys.textContent = "Arrangement · Peek · 6 cycles Views · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Arrangement · Peek · 6 cycles Views · 7 Rulers · 8 RSI · 0 clear filters · Esc closes chip edit · Backspace home";
     } else if (soloMode) {
-      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
-      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-      else keys.textContent = "Solo · Numpad 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · 0 clear filters · Esc closes chip edit · Backspace home";
-    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
-    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
-    else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles Views · 7 Rulers · 8 Meta · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
+      if (sectionsMode === "edit") keys.textContent = "Solo · Edit · Numpad 5 Peek · 6 cycles Views · 7 Rulers · 8 RSI · drag · Undo/Save · 0 clear filters · Esc closes chip edit · Backspace home";
+      else if (sectionsMode === "play") keys.textContent = "Solo · Numpad 5 Peek · 6 cycles Views · 7 Rulers · 8 RSI · lick clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+      else keys.textContent = "Solo · Numpad 5 Peek · 6 cycles Views · 7 Rulers · 8 RSI · 0 clear filters · Esc closes chip edit · Backspace home";
+    } else if (sectionsMode === "edit") keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles Views · 7 Rulers · 8 RSI · drag · Ctrl/Cmd+drag copy · Ctrl+C/V · Undo/Save · click section to edit · 0 clear filters · Esc closes chip edit · Backspace home";
+    else if (sectionsMode === "play") keys.textContent = "Numpad 1/2/3 View/Edit/Playboard · 5 Peek · 6 cycles Views · 7 Rulers · 8 RSI · section clicks queue · 0 clear filters · Esc closes chip edit · Backspace home";
+    else keys.textContent = "Numpad 1/2/3 · 5 Peek · 6 cycles Views · 7 Rulers · 8 RSI · Song Map · filters · Ctrl+1–5 positions · 0 clear filters · Esc closes chip edit · Backspace home";
   }
   if (sectionsMode === "play") {
     /* Stay on Song Map. Next/Current cues are the playalong UI; Playboard is a separate entry. */
@@ -11818,18 +11818,11 @@ function refreshSongRsiLabels() {
   return any;
 }
 function songMetaStripHtml(songName) {
-  var meta = readCanonicalSongMeta(songName);
-  var keyText = meta.keys.join(" · ");
-  var bpmText = meta.bpms.join(" · ");
   var rsiText = songRsiLabelByName[songName] || "—";
   function bit(value) {
     return '<span class="song-meta-bit"><span class="song-meta-v">'+songMetaEscapeAttr(value || "—")+'</span></span>';
   }
-  var title = [keyText || "—", meta.tuning || "—", bpmText || "—", rsiText].join(" · ");
-  return '<div class="song-meta-strip" title="'+songMetaEscapeAttr(title)+'">'
-    + bit(keyText)
-    + bit(meta.tuning)
-    + bit(bpmText)
+  return '<div class="song-meta-strip" title="'+songMetaEscapeAttr("RSI · "+rsiText)+'">'
     + bit(rsiText)
     + '</div>';
 }
@@ -14968,6 +14961,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=335"></script>
+<script src="riffjams-admin.js?v=336"></script>
 </body>
 </html>
