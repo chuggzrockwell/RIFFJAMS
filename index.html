@@ -5622,7 +5622,7 @@ function setMapView(view) {
   else document.body.classList.remove("sections-arrange", "ll-arrange");
 }
 function cycleMapView() {
-  var order = ["arrangement", "riff", "solo", "single"];
+  var order = ["arrangement", "single", "riff", "solo"];
   var cur = songMapViewValue();
   var i = order.indexOf(cur);
   setMapView(order[(i + 1) % order.length]);
@@ -14968,6 +14968,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=334"></script>
+<script src="riffjams-admin.js?v=335"></script>
 </body>
 </html>
