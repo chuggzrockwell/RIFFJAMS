@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-04T02:00:51.763Z",
+  "updatedAt": "2026-10-04T02:04:27.195Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -152,8 +152,8 @@
               1,
               "NIB-V1",
               [
-                "5S",
-                "1S"
+                "1S",
+                "5S"
               ]
             ],
             [
@@ -3297,6 +3297,26 @@
                 "name": "intro",
                 "start": 0,
                 "end": 2
+              },
+              {
+                "name": "v1",
+                "start": 3,
+                "end": 3
+              },
+              {
+                "name": "solo",
+                "start": 4,
+                "end": 5
+              },
+              {
+                "name": "verse 2",
+                "start": 6,
+                "end": 7
+              },
+              {
+                "name": "o",
+                "start": 8,
+                "end": 8
               }
             ]
           },
