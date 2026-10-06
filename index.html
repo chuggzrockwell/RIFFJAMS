@@ -6321,6 +6321,16 @@ function wireNibV2Lick(songsOwner) {
       });
     });
     (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "Rat Salad") return;
+      ["sections", "chips"].forEach(function(field){
+        (s[field] || []).forEach(function(pair){
+          if (!isChipPair(pair)) return;
+          if (pair[0] === "V1" && (!pair[2] || pair[2] === "V1" || pair[2] === "RS-V2")) pair[2] = "RS-V1";
+          if (pair[0] === "V2" && (!pair[2] || pair[2] === "V2")) pair[2] = "RS-V2";
+        });
+      });
+    });
+    (a.songs || []).forEach(function(s){
       if (!s || s.song !== "Paranoid") return;
       ["sections", "chips"].forEach(function(field){
         (s[field] || []).forEach(function(pair){
@@ -15343,6 +15353,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=369"></script>
+<script src="riffjams-admin.js?v=370"></script>
 </body>
 </html>
