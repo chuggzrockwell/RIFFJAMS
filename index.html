@@ -14326,7 +14326,7 @@ function onChipPointerMove(e) {
   e.preventDefault();
   clearChipDragOver();
   if (chipDrag.el) chipDrag.el.style.visibility = "hidden";
-  var over = chipFromPoint(e.clientX, e.clientY);
+  var over = chipDrag.group ? arrChipAtPoint(e.clientX, e.clientY) : chipFromPoint(e.clientX, e.clientY);
   if (chipDrag.el) chipDrag.el.style.visibility = "";
   if (over && over !== chipDrag.el && chipDrag.group) {
     var gPlan = arrGroupPlan({ ai: chipDrag.ai, si: chipDrag.si, ci: chipDrag.ci },
@@ -14370,6 +14370,15 @@ function arrGroupEls() {
   var out = [];
   document.querySelectorAll("#sectionsSheet .sec-chip.arr-group-sel").forEach(function(el){ out.push(el); });
   return out;
+}
+/* Group drag: hit-test by rect so cells held by the group itself (pointer-events:none while dragging) are valid drop targets */
+function arrChipAtPoint(x, y) {
+  var els = document.querySelectorAll("#sectionsSheet .sec-chip[data-ai][data-si][data-ci]");
+  for (var i = 0; i < els.length; i++) {
+    var r = els[i].getBoundingClientRect();
+    if (r.width && x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return els[i];
+  }
+  return null;
 }
 function arrGroupRows() {
   var rows = [];
@@ -15245,6 +15254,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=360"></script>
+<script src="riffjams-admin.js?v=361"></script>
 </body>
 </html>
