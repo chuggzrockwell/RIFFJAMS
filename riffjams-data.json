@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:50:59.199Z",
+  "updatedAt": "2026-10-06T13:52:00.117Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3897,17 +3897,26 @@
                 [],
                 141.1
               ],
-              null,
+              [
+                "V3",
+                2,
+                "IM-V3",
+                3,
+                166.1
+              ],
               [
                 "V4",
                 2,
                 "IM-V4",
-                3
+                3,
+                191.4
               ],
               [
                 "S1",
                 1,
-                "IM-S1"
+                "IM-S1",
+                1,
+                197.1
               ],
               [
                 "S2",
@@ -6303,7 +6312,7 @@
       "song": "Iron Man",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.62,
+      "riffSaturationIndex": 2.562,
       "chips": [
         {
           "code": "V1",
@@ -6341,9 +6350,33 @@
           "code": "V1",
           "tier": 1,
           "start": 141.1,
+          "stop": 166.1,
+          "duration": 25,
+          "lick": "IM-V1"
+        },
+        {
+          "code": "V3",
+          "tier": 2,
+          "start": 166.1,
+          "stop": 191.4,
+          "duration": 25.3,
+          "lick": "IM-V3"
+        },
+        {
+          "code": "V4",
+          "tier": 2,
+          "start": 191.4,
+          "stop": 197.1,
+          "duration": 5.7,
+          "lick": "IM-V4"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 197.1,
           "stop": null,
           "duration": null,
-          "lick": "IM-V1"
+          "lick": "IM-S1"
         }
       ]
     },
