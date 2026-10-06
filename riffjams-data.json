@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T14:14:20.692Z",
+  "updatedAt": "2026-10-06T14:17:00.165Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -536,14 +536,12 @@
             [
               "B1",
               2,
-              "HOD-B1",
-              1
+              "HOD-B1"
             ],
             [
               "B2",
-              2,
-              "HOD-B2",
-              1
+              1,
+              "HOD-B2"
             ],
             [
               "B3",
@@ -4136,12 +4134,25 @@
                 86.7
               ],
               [
+                "V1",
+                3,
+                "HOD-V1",
+                1,
+                107.8
+              ],
+              [
                 "B1",
-                2
+                2,
+                "HOD-B1",
+                1,
+                125
               ],
               [
                 "B2",
-                2
+                1,
+                "HOD-B2",
+                1,
+                139.1
               ],
               [
                 "S1",
@@ -4158,7 +4169,6 @@
                 3,
                 "HOD-B4"
               ],
-              null,
               null,
               null,
               null,
@@ -6748,7 +6758,7 @@
       "song": "Hand of Doom",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1,
+      "riffSaturationIndex": 1.101,
       "chips": [
         {
           "code": "V1",
@@ -6762,9 +6772,33 @@
           "code": "V2",
           "tier": 3,
           "start": 86.7,
+          "stop": 107.8,
+          "duration": 21.1,
+          "lick": "V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 107.8,
+          "stop": 125,
+          "duration": 17.2,
+          "lick": "HOD-V1"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 125,
+          "stop": 139.1,
+          "duration": 14.1,
+          "lick": "HOD-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 1,
+          "start": 139.1,
           "stop": null,
           "duration": null,
-          "lick": "V2"
+          "lick": "HOD-B2"
         }
       ]
     },
