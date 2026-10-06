@@ -7835,6 +7835,61 @@ function handleSongMetaColsShortcut(e) {
   toggleSongMetaColsUi();
   return true;
 }
+/* Song Map album filter: Numpad / then 1–8 (chrono album). Arm only, like * for aRSI/Saturation. */
+var songAlbumSlashArmed = false;
+function isNumpadSlash(e) {
+  return String(e.code || "") === "NumpadDivide" || (e.location === 3 && String(e.key || "") === "/") || e.keyCode === 111;
+}
+function songAlbumSlashShortcutTargetOk(t) {
+  if (!t) return true;
+  var tag = (t.tagName || "").toUpperCase();
+  if (tag === "INPUT" || tag === "TEXTAREA") return false;
+  if (t.isContentEditable) return false;
+  return true;
+}
+/** Set Song Map album filter to one chronological studio album only (same path as UI checkboxes). */
+function setSecAlbumFilterOnly(albumName) {
+  secAlbumFilter = {};
+  if (albumName) secAlbumFilter[albumName] = true;
+  buildSecFilters();
+  applySecFilters();
+  if (sectionsMode === "play" && typeof renderPlayBoard === "function") renderPlayBoard();
+}
+function albumSlashDigitFromEvent(e) {
+  if (!e) return null;
+  for (var i = 1; i <= 8; i++) {
+    var d = String(i);
+    if (typeof isNumpadKey === "function" && isNumpadKey(e, d)) return d;
+    if (String(e.code || "") === "Numpad" + d) return d;
+    if (e.location === 3 && String(e.key || "") === d) return d;
+  }
+  return null;
+}
+function handleAlbumSlashFilterShortcut(e) {
+  if (!e || e.type !== "keydown") return false;
+  if (e.metaKey || e.ctrlKey || e.altKey) return false;
+  if (!document.body.classList.contains("sections-mode")) return false;
+  if (!songAlbumSlashShortcutTargetOk(e.target)) return false;
+  if (isNumpadSlash(e)) {
+    songAlbumSlashArmed = true;
+    e.preventDefault();
+    return true;
+  }
+  var armed = songAlbumSlashArmed;
+  if (e.key !== "Shift" && e.key !== "NumLock") songAlbumSlashArmed = false;
+  if (!armed) return false;
+  var digit = albumSlashDigitFromEvent(e);
+  if (!digit) return false; /* armed then non-1–8: disarm only */
+  var albumName = (typeof boardAlbumName === "function")
+    ? boardAlbumName(digit)
+    : ((typeof BOARD_ALBUM_CHRONO !== "undefined" && BOARD_ALBUM_CHRONO[parseInt(digit, 10) - 1]) || "");
+  if (!albumName) return false;
+  e.preventDefault();
+  try { e.stopImmediatePropagation(); } catch (errStopAlb) { try { e.stopPropagation(); } catch (errAlb2) {} }
+  setSecAlbumFilterOnly(albumName);
+  return true;
+}
+
 function setMapToolsOpen(open) {
   var dd = document.getElementById("mapToolsDd");
   var btn = document.getElementById("mapToolsBtn");
@@ -15174,6 +15229,15 @@ function bindSongMetaColsShortcut() {
   }, true);
 }
 bindSongMetaColsShortcut();
+function bindAlbumSlashFilterShortcut() {
+  if (window.__riffjamsAlbumSlashKeyBound) return;
+  window.__riffjamsAlbumSlashKeyBound = true;
+  /* Capture on window so mode/tier digit handlers cannot swallow / then 1–8. */
+  window.addEventListener("keydown", function(e){
+    handleAlbumSlashFilterShortcut(e);
+  }, true);
+}
+bindAlbumSlashFilterShortcut();
 /* Song Map views. Numpad 6 cycles the Views dropdown; use capture like Rulers (7) / Meta (8). */
 function singleSongShortcutTargetOk(t) {
   if (!t) return true;
@@ -15426,6 +15490,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=375"></script>
+<script src="riffjams-admin.js?v=376"></script>
 </body>
 </html>
