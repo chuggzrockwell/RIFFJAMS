@@ -4577,7 +4577,7 @@
           <button type="button" class="map-tools-item" id="secRulersBtn" role="menuitemcheckbox" aria-checked="false" title="Show section rulers">Rulers</button>
           <button type="button" class="map-tools-item" id="secMetaColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show RSI column">RSI</button>
           <button type="button" class="map-tools-item" id="secARsiColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show aRSI (adjusted RSI) column — Numpad * then 8">aRSI</button>
-          <button type="button" class="map-tools-item" id="secSaturationBtn" role="menuitemcheckbox" aria-checked="false" title="Arrangement: riff-tier purple colors — Numpad * then 6">Saturation</button>
+          <button type="button" class="map-tools-item" id="secSaturationBtn" role="menuitemcheckbox" aria-checked="false" title="Toggle Arrangement riff-tier purples (any Song Map view) — Numpad * then 6">Saturation</button>
         </div>
       </div>
       <div class="ss-nav-picker-host" id="ssSongPickerHost" hidden></div>
@@ -5910,12 +5910,13 @@ function buildSingleSongArrRowHtml(focusName) {
       chipArr.push('<button type="button" class="sec-chip empty" data-arrange="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty arrangement slot"></button>');
     } else {
       var acode = ap[0], atier = chipTier(ap), alick = ap[2] || "", apos = posListAttr(chipPositions(ap));
+      var satTier = riffSectionTierFor(song.song, acode, atier);
       var atyp = secType(acode) || "S";
       var arrTone = arrChipColors(acode);
       var aStart = chipStartSec(ap);
       var aStartAttr = (aStart != null) ? String(aStart) : "";
       var arrStyle = "--arr-bg:"+arrTone.bg+";--arr-fg:"+arrTone.fg;
-      chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" style="'+arrStyle+'" data-arrange="1" data-song="'+ssEscAttr(song.song)+'" data-sec="'+ssEscAttr(acode)+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+ssEscAttr(alick)+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+ssEscText(acode)+'</button>');
+      chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", satTier)+'" style="'+arrStyle+'" data-arrange="1" data-song="'+ssEscAttr(song.song)+'" data-sec="'+ssEscAttr(acode)+'" data-type="'+atyp+'" data-tier="'+satTier+'" data-lick="'+ssEscAttr(alick)+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+ssEscText(acode)+'</button>');
     }
   }
   var np = (album && album.font === "font-sbs") ? "np-sbs"
@@ -7282,6 +7283,30 @@ function chipTier(pair) {
   if (t === 1 || t === 2) return t;
   return 3;
 }
+/* Arrangement Saturation: .tier-N must match Riff Song Map for that song+section code.
+   Arrangement chips store their own pair[1] (often stale); look up ALBUMS sections. */
+function riffSectionTierFor(songName, code, fallback) {
+  var fb = (fallback == null) ? 3 : chipTier([null, fallback]);
+  var want = String(code || "");
+  var song = String(songName || "");
+  if (!want || !song) return fb;
+  var albums = (typeof ALBUMS !== "undefined" && ALBUMS && ALBUMS.length) ? ALBUMS : null;
+  if (!albums) return fb;
+  var ai, si, i, a, s, pair;
+  for (ai = 0; ai < albums.length; ai++) {
+    a = albums[ai];
+    for (si = 0; si < ((a && a.songs) || []).length; si++) {
+      s = a.songs[si];
+      if (!s || s.song !== song) continue;
+      for (i = 0; i < (s.sections || []).length; i++) {
+        pair = s.sections[i];
+        if (isChipPair(pair) && String(pair[0]) === want) return chipTier(pair);
+      }
+      return fb;
+    }
+  }
+  return fb;
+}
 function collapseAlbumTiers(albums) {
   (albums || []).forEach(function(a){
     (a.songs || []).forEach(function(s){
@@ -7812,6 +7837,7 @@ function handleSongMetaColsShortcut(e) {
   if (isNumpadStar(e)) {
     songMetaStarArmed = true;
     e.preventDefault();
+    try { e.stopImmediatePropagation(); } catch (errStar) { try { e.stopPropagation(); } catch (errStar2) {} }
     return true;
   }
   var armed = songMetaStarArmed;
@@ -8408,7 +8434,8 @@ function showSections(keepScroll) {
     + (!sectionRulersOn ? " section-rulers-off" : "")
     + (!songMetaAnyColOn() ? " song-meta-cols-off" : "")
     + (songMetaColsOn && aRsiColOn ? " song-meta-two" : "")
-    + (highlightMode ? " sec-peek-on" : "");
+    + (highlightMode ? " sec-peek-on" : "")
+    + (typeof arrSaturationOn !== "undefined" && arrSaturationOn ? " arr-saturation" : "");
   document.getElementById("home").className = "hidden";
   document.getElementById("series").className = "hidden";
   document.getElementById("sections").className = "";
@@ -8482,13 +8509,14 @@ function showSections(keepScroll) {
             chipArr.push('<button type="button" class="sec-chip empty" data-arrange="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty arrangement slot"></button>');
           } else {
             var acode = ap[0], atier = chipTier(ap), alick = ap[2] || "", apos = posListAttr(chipPositions(ap));
+            var satTier = riffSectionTierFor(s.song, acode, atier);
             var atyp = secType(acode) || "S";
             var arrTone = arrChipColors(acode);
             var aStart = chipStartSec(ap);
             var aStartAttr = (aStart != null) ? String(aStart) : "";
             var arrStyle = "--arr-bg:"+arrTone.bg+";--arr-fg:"+arrTone.fg;
             n++;
-            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", atier)+'" style="'+arrStyle+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+atier+'" data-lick="'+alick+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
+            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", satTier)+'" style="'+arrStyle+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+satTier+'" data-lick="'+alick+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
           }
         }
       } else if (soloMode) {
@@ -15265,7 +15293,8 @@ function handleSingleSongShortcut(e) {
   if (!document.body.classList.contains("sections-mode")) return false;
   if (!singleSongShortcutTargetOk(e.target)) return false;
   if (!isSingleSongNumpad6(e)) return false;
-  /* * then 6 = Saturation: handled earlier via stopImmediatePropagation in handleSongMetaColsShortcut. */
+  /* * then 6 = Saturation (any Song Map view). Meta handler arms *; do not cycle Views. */
+  if (typeof songMetaStarArmed !== "undefined" && songMetaStarArmed) return false;
   e.preventDefault();
   try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
   cycleMapView();
@@ -15490,6 +15519,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=376"></script>
+<script src="riffjams-admin.js?v=377"></script>
 </body>
 </html>
