@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T02:24:01.441Z",
+  "updatedAt": "2026-10-06T02:25:41.576Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -956,6 +956,11 @@
               3
             ],
             [
+              "V2",
+              3,
+              "V2"
+            ],
+            [
               "B1",
               2,
               "ITV-B1",
@@ -983,16 +988,11 @@
               "ITV-S2"
             ],
             [
-              "V2",
-              3,
-              "ITV-V2"
+              "S3",
+              1,
+              "S3"
             ],
             null,
-            [
-              "S3",
-              3,
-              "ITV-S3"
-            ],
             null,
             null,
             null
@@ -4358,7 +4358,7 @@
               [
                 "V2",
                 3,
-                "ITV-V2",
+                "V2",
                 1,
                 125.1
               ],
@@ -4372,7 +4372,7 @@
               [
                 "V2",
                 3,
-                "ITV-V2",
+                "V2",
                 1,
                 172.2
               ],
@@ -4400,7 +4400,7 @@
               [
                 "V2",
                 3,
-                "ITV-V2",
+                "V2",
                 1,
                 263.8
               ],
@@ -4434,12 +4434,19 @@
               ],
               [
                 "S3",
-                3,
-                "ITV-S3",
+                1,
+                "S3",
                 1,
                 338.1
               ],
-              null
+              [
+                "B2",
+                1,
+                "ITV-B2",
+                3,
+                356.3,
+                367.5
+              ]
             ]
           }
         ]
@@ -6039,9 +6046,9 @@
     {
       "album": "Master of Reality",
       "song": "Into the Void",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 2.483,
+      "endSec": 367.5,
+      "complete": true,
+      "riffSaturationIndex": 2.524,
       "chips": [
         {
           "code": "I1",
@@ -6165,11 +6172,19 @@
         },
         {
           "code": "S3",
-          "tier": 3,
+          "tier": 1,
           "start": 338.1,
-          "stop": null,
-          "duration": null,
+          "stop": 356.3,
+          "duration": 18.2,
           "lick": "S3"
+        },
+        {
+          "code": "B2",
+          "tier": 1,
+          "start": 356.3,
+          "stop": 367.5,
+          "duration": 11.2,
+          "lick": "ITV-B2"
         }
       ]
     },
