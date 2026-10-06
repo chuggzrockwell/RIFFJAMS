@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T01:17:01.358Z",
+  "updatedAt": "2026-10-06T01:26:21.103Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -874,7 +874,6 @@
                 4
               ]
             ],
-            null,
             [
               "S2",
               1,
@@ -886,10 +885,10 @@
               ]
             ],
             [
-              "B3",
-              1,
+              "B2",
+              3,
               "",
-              3
+              []
             ],
             [
               "V2",
@@ -900,9 +899,9 @@
             [
               "O1",
               1,
-              "O1",
-              []
+              "O1"
             ],
+            null,
             null,
             null,
             null,
@@ -4225,17 +4224,14 @@
                 "O1",
                 1,
                 297.9,
-                null
-              ],
-              null,
-              [
-                "B3",
-                1,
-                "LOTW-B3",
-                3,
-                null,
                 314.8
-              ]
+              ],
+              [
+                "B2",
+                3,
+                "LOTW-B2"
+              ],
+              null
             ]
           },
           {
@@ -5750,9 +5746,9 @@
     {
       "album": "Master of Reality",
       "song": "Lord of This World",
-      "endSec": 314.8,
-      "complete": true,
-      "riffSaturationIndex": 2.403,
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 2.369,
       "chips": [
         {
           "code": "I1",
@@ -5854,8 +5850,8 @@
           "code": "O1",
           "tier": 1,
           "start": 297.9,
-          "stop": 314.8,
-          "duration": 16.9,
+          "stop": null,
+          "duration": null,
           "lick": "O1"
         }
       ]
