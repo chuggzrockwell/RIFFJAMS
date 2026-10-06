@@ -2015,6 +2015,10 @@
   body.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta {
     --song-meta-w: 100px;
   }
+  /* RSI + aRSI both on: two plates. */
+  body.song-meta-two.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta {
+    --song-meta-w: 184px;
+  }
   /* RSI off: collapse the column so chips hug the nameplate (no gap). */
   body.song-meta-cols-off .sections-wrap {
     --song-meta-w: 0px !important;
@@ -4542,6 +4546,7 @@
           <button type="button" class="map-tools-item" id="secPeekBtn" role="menuitemcheckbox" aria-checked="false" title="Hover chips to peek tabs">Peek</button>
           <button type="button" class="map-tools-item" id="secRulersBtn" role="menuitemcheckbox" aria-checked="false" title="Show section rulers">Rulers</button>
           <button type="button" class="map-tools-item" id="secMetaColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show RSI column">RSI</button>
+          <button type="button" class="map-tools-item" id="secARsiColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show aRSI (adjusted RSI) column — Numpad 8 then *">aRSI</button>
         </div>
       </div>
       <div class="ss-nav-picker-host" id="ssSongPickerHost" hidden></div>
@@ -7647,8 +7652,19 @@ try {
   var _smc = localStorage.getItem(SONG_META_COLS_KEY);
   if (_smc === "0") songMetaColsOn = false;
 } catch (eSmc) {}
+/* Song Map Tools → aRSI (adjusted RSI with variety). Numpad 8 then * toggles it. Default off. */
+var ARSI_COL_KEY = "riffjams-arsi-col";
+var aRsiColOn = false;
+try { if (localStorage.getItem(ARSI_COL_KEY) === "1") aRsiColOn = true; } catch (eArsi) {}
+function songMetaAnyColOn() { return songMetaColsOn || aRsiColOn; }
 function syncSongMetaColsUi() {
-  document.body.classList.toggle("song-meta-cols-off", !songMetaColsOn);
+  document.body.classList.toggle("song-meta-cols-off", !songMetaAnyColOn());
+  document.body.classList.toggle("song-meta-two", songMetaColsOn && aRsiColOn);
+  var aBtn = document.getElementById("secARsiColsBtn");
+  if (aBtn) {
+    aBtn.classList.toggle("on", aRsiColOn);
+    aBtn.setAttribute("aria-checked", aRsiColOn ? "true" : "false");
+  }
   var btn = document.getElementById("secMetaColsBtn");
   if (!btn) return;
   btn.classList.toggle("on", songMetaColsOn);
@@ -7672,6 +7688,13 @@ function setSongMetaCols(on) {
   if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") {
     showSections(true);
   }
+}
+function toggleARsiColUi() {
+  aRsiColOn = !aRsiColOn;
+  try { localStorage.setItem(ARSI_COL_KEY, aRsiColOn ? "1" : "0"); } catch (eArsiSet) {}
+  syncSongMetaColsUi();
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") showSections(true);
 }
 /* Tools → RSI and Numpad 8 share this exact toggle. */
 function toggleSongMetaColsUi() {
@@ -7706,12 +7729,27 @@ function isSongMetaColsNumpad8(e) {
   if (typeof isNumpadKey === "function" && isNumpadKey(e, "8")) return true;
   return false;
 }
+var songMetaLast8At = 0;
+function isNumpadStar(e) {
+  return String(e.code || "") === "NumpadMultiply" || (e.location === 3 && String(e.key || "") === "*") || e.keyCode === 106;
+}
 function handleSongMetaColsShortcut(e) {
   if (!e || e.type !== "keydown") return false;
   if (e.metaKey || e.ctrlKey || e.altKey) return false;
   if (!document.body.classList.contains("sections-mode")) return false;
   if (!songMetaColsShortcutTargetOk(e.target)) return false;
+  if (isNumpadStar(e) && songMetaLast8At && (Date.now() - songMetaLast8At) < 1500) {
+    songMetaLast8At = 0;
+    e.preventDefault();
+    try { e.stopImmediatePropagation(); } catch (errStopA) {}
+    /* 8* = aRSI: put RSI back the way it was before the 8, then toggle aRSI. */
+    setSongMetaCols(!songMetaColsOn);
+    toggleARsiColUi();
+    return true;
+  }
   if (!isSongMetaColsNumpad8(e)) return false;
+  if (e.repeat) { e.preventDefault(); return true; }
+  songMetaLast8At = Date.now();
   e.preventDefault();
   try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
   /* Same path as Tools → Meta. Single window-capture listener only (no doc duplicate). */
@@ -8233,7 +8271,8 @@ function showSections(keepScroll) {
     + (!arrangementMode && !singleSongMode && soloMode ? " sections-solo" : "")
     + (singleSongMode ? " sections-single-song" : "")
     + (!sectionRulersOn ? " section-rulers-off" : "")
-    + (!songMetaColsOn ? " song-meta-cols-off" : "")
+    + (!songMetaAnyColOn() ? " song-meta-cols-off" : "")
+    + (songMetaColsOn && aRsiColOn ? " song-meta-two" : "")
     + (highlightMode ? " sec-peek-on" : "");
   document.getElementById("home").className = "hidden";
   document.getElementById("series").className = "hidden";
@@ -8284,9 +8323,10 @@ function showSections(keepScroll) {
       });
     });
   }
-  var showMetaCols = songMetaColsOn && (anySongMeta || anySongRsi);
+  var showMetaCols = songMetaAnyColOn() && (anySongMeta || anySongRsi);
   var metaHeads = showMetaCols
-    ? '<span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-name" aria-hidden="true"></span><div class="song-meta-heads"><span>RSI</span></div>'
+    ? '<span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-name" aria-hidden="true"></span><div class="song-meta-heads">'
+      + (songMetaColsOn ? '<span>RSI</span>' : '') + (aRsiColOn ? '<span>aRSI</span>' : '') + '</div>'
     : "";
   var ruler = '<div class="sec-ruler"><div class="row-num"></div>'+(metaHeads || '<div class="song-name-spacer" aria-hidden="true"></div>')+'<div class="song-secs">'+colNums+'</div></div>';
   var singleFocus = singleSongMode ? resolveSingleSongName(singleSongPickerAlbums()) : "";
@@ -11890,10 +11930,16 @@ function arrangementRsiLabel(row) {
   });
   if (!(qDur > 0)) return null;
   var q = qPts / qDur;
+  /* aRSI (adjusted RSI) = RSI × (0.55 + 0.45 × B), B = V / (V + 3), V = 3·u1 + 2·u2 + u3 (distinct codes per tier). */
+  var variety = (3 * Object.keys(seen[1]).length) + (2 * Object.keys(seen[2]).length) + Object.keys(seen[3]).length;
+  var b = variety / (variety + 3);
+  row._aRsi = (q * (0.55 + 0.45 * b)).toFixed(2);
   return q.toFixed(2);
 }
+var songARsiLabelByName = {};
 function refreshSongRsiLabels() {
   songRsiLabelByName = {};
+  songARsiLabelByName = {};
   var map = ARRANGEMENT_MAP;
   if (!map) return false;
   var any = false;
@@ -11902,6 +11948,7 @@ function refreshSongRsiLabels() {
     var label = arrangementRsiLabel(row);
     if (label == null) return;
     songRsiLabelByName[row.song] = label;
+    if (row._aRsi != null) songARsiLabelByName[row.song] = row._aRsi;
     any = true;
   });
   return any;
@@ -11911,8 +11958,13 @@ function songMetaStripHtml(songName) {
   function bit(value) {
     return '<span class="song-meta-bit"><span class="song-meta-v">'+songMetaEscapeAttr(value || "—")+'</span></span>';
   }
-  return '<div class="song-meta-strip" title="'+songMetaEscapeAttr("RSI · "+rsiText)+'">'
-    + bit(rsiText)
+  var aRsiText = songARsiLabelByName[songName] || "—";
+  var tip = [];
+  if (songMetaColsOn) tip.push("RSI · " + rsiText);
+  if (aRsiColOn) tip.push("aRSI · " + aRsiText);
+  return '<div class="song-meta-strip" title="'+songMetaEscapeAttr(tip.join("  "))+'">'
+    + (songMetaColsOn ? bit(rsiText) : "")
+    + (aRsiColOn ? bit(aRsiText) : "")
     + '</div>';
 }
 function readSongMetaDraft(containerId) {
@@ -14010,6 +14062,11 @@ document.getElementById("secModes").onclick = function(e){
     setMapToolsOpen(false);
     return;
   }
+  if (e.target.closest("#secARsiColsBtn")) {
+    toggleARsiColUi();
+    setMapToolsOpen(false);
+    return;
+  }
   var btn = e.target.closest(".sec-mode-btn[data-sec-mode]");
   if (!btn) return;
   setSectionsMode(btn.getAttribute("data-sec-mode"));
@@ -15283,6 +15340,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=367"></script>
+<script src="riffjams-admin.js?v=368"></script>
 </body>
 </html>
