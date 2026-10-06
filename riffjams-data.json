@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:31:35.579Z",
+  "updatedAt": "2026-10-06T13:33:25.557Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3610,7 +3610,8 @@
                 "I1",
                 2,
                 "WP-I1",
-                "1P"
+                "1P",
+                0
               ],
               [
                 "V1",
@@ -5913,6 +5914,23 @@
           "stop": 360.3,
           "duration": 49.6,
           "lick": "NIB-S2"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "War Pigs",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "WP-I1"
         }
       ]
     },
