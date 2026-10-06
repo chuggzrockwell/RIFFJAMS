@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T16:14:24.518Z",
+  "updatedAt": "2026-10-06T16:15:25.594Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -673,7 +673,7 @@
             [
               "B1",
               3,
-              "FOB-B1"
+              "FOB-L1"
             ],
             [
               "V1",
@@ -4390,23 +4390,35 @@
                 1,
                 62.1
               ],
-              null,
-              null,
               [
                 "V1",
                 3,
-                "FOB-V1"
+                "FOB-V1",
+                1,
+                75.4
               ],
               [
                 "B1",
                 3,
-                "FOB-L1"
+                "FOB-L1",
+                1,
+                160.3
               ],
               [
                 "S2",
                 1,
-                "FOB-S2"
+                "FOB-S2",
+                1,
+                173.8
               ],
+              [
+                "B1",
+                3,
+                "FOB-L1",
+                1,
+                194.5
+              ],
+              null,
               [
                 "O1",
                 3,
@@ -7141,7 +7153,7 @@
       "song": "Fairies Wear Boots",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.787,
+      "riffSaturationIndex": 1.464,
       "chips": [
         {
           "code": "I1",
@@ -7187,9 +7199,41 @@
           "code": "I4",
           "tier": 3,
           "start": 62.1,
+          "stop": 75.4,
+          "duration": 13.3,
+          "lick": "FOB-I4"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 75.4,
+          "stop": 160.3,
+          "duration": 84.9,
+          "lick": "FOB-V1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 160.3,
+          "stop": 173.8,
+          "duration": 13.5,
+          "lick": "FOB-L1"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 173.8,
+          "stop": 194.5,
+          "duration": 20.7,
+          "lick": "FOB-S2"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 194.5,
           "stop": null,
           "duration": null,
-          "lick": "FOB-I4"
+          "lick": "FOB-L1"
         }
       ]
     },
