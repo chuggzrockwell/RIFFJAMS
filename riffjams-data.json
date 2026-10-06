@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T01:05:29.697Z",
+  "updatedAt": "2026-10-06T01:07:02.814Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -4178,14 +4178,14 @@
                 "3D",
                 166.6
               ],
-              null,
               [
                 "V1",
                 2,
                 "LOTW-V1",
                 3,
-                28.1
+                201.1
               ],
+              null,
               null,
               [
                 "B2",
@@ -5726,16 +5726,8 @@
       "song": "Lord of This World",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.139,
+      "riffSaturationIndex": 2.311,
       "chips": [
-        {
-          "code": "V1",
-          "tier": 2,
-          "start": 28.1,
-          "stop": 28.1,
-          "duration": null,
-          "lick": "LOTW-V1"
-        },
         {
           "code": "V1",
           "tier": 2,
@@ -5788,9 +5780,17 @@
           "code": "I1",
           "tier": 1,
           "start": 166.6,
+          "stop": 201.1,
+          "duration": 34.5,
+          "lick": "LOTW-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 201.1,
           "stop": null,
           "duration": null,
-          "lick": "LOTW-I1"
+          "lick": "LOTW-V1"
         }
       ]
     },
