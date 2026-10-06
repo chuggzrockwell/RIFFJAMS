@@ -6307,6 +6307,14 @@ function wireNibV2Lick(songsOwner) {
       });
     });
     (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "Paranoid") return;
+      ["sections", "chips"].forEach(function(field){
+        (s[field] || []).forEach(function(pair){
+          if (isChipPair(pair) && pair[0] === "V3" && (!pair[2] || pair[2] === "V3")) pair[2] = "P-V3";
+        });
+      });
+    });
+    (a.songs || []).forEach(function(s){
       if (!s || s.song !== "Into the Void") return;
       ["sections", "chips"].forEach(function(field){
         (s[field] || []).forEach(function(pair){
@@ -15271,6 +15279,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=364"></script>
+<script src="riffjams-admin.js?v=365"></script>
 </body>
 </html>
