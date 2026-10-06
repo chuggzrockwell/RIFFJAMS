@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:42:07.473Z",
+  "updatedAt": "2026-10-06T13:43:17.647Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -371,7 +371,11 @@
               "S1",
               1
             ],
-            null,
+            [
+              "V3",
+              3,
+              "V3"
+            ],
             null,
             null,
             null,
@@ -3735,20 +3739,36 @@
               [
                 "V1",
                 3,
-                "P-V1"
+                "P-V1",
+                1,
+                12.2
               ],
               [
                 "V2",
                 3,
-                "P-V2"
+                "P-V2",
+                1,
+                23.9
               ],
+              [
+                "V1",
+                3,
+                "P-V1",
+                1,
+                35.7
+              ],
+              [
+                "V3",
+                3,
+                "V3",
+                1,
+                47.4
+              ],
+              null,
               [
                 "S1",
                 1
               ],
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -6115,15 +6135,47 @@
       "song": "Paranoid",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": null,
+      "riffSaturationIndex": 1.257,
       "chips": [
         {
           "code": "I1",
           "tier": 2,
           "start": 0,
+          "stop": 12.2,
+          "duration": 12.2,
+          "lick": "P-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 12.2,
+          "stop": 23.9,
+          "duration": 11.7,
+          "lick": "P-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 23.9,
+          "stop": 35.7,
+          "duration": 11.8,
+          "lick": "P-V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 35.7,
+          "stop": 47.4,
+          "duration": 11.7,
+          "lick": "P-V1"
+        },
+        {
+          "code": "V3",
+          "tier": 3,
+          "start": 47.4,
           "stop": null,
           "duration": null,
-          "lick": "P-I1"
+          "lick": "V3"
         }
       ]
     },
