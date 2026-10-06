@@ -902,7 +902,12 @@
               "LOTW-V2",
               []
             ],
-            null,
+            [
+              "O1",
+              1,
+              "LOTW-O1",
+              []
+            ],
             null,
             null,
             null,
