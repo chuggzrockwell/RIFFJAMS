@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T16:01:30.451Z",
+  "updatedAt": "2026-10-06T16:13:22.262Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -587,7 +587,8 @@
             [
               "V1",
               2,
-              "RS-V2"
+              "RS-V1",
+              1
             ],
             [
               "V2",
@@ -597,12 +598,13 @@
             [
               "V3",
               3,
-              "V3"
+              "RS-V3"
             ],
             [
               "S1",
               1,
-              "RS-S1"
+              "RS-S1",
+              1
             ],
             [
               "D",
@@ -641,7 +643,7 @@
             ],
             [
               "I4",
-              3,
+              2,
               "FOB-I4",
               []
             ],
@@ -657,9 +659,14 @@
               "FOB-V1"
             ],
             [
-              "B1",
-              3,
+              "L1",
+              2,
               "FOB-L1"
+            ],
+            [
+              "L2",
+              3,
+              "FOB-L2"
             ],
             [
               "S2",
@@ -677,16 +684,15 @@
               "FOB-V1"
             ],
             [
-              "L1",
-              2,
-              "FOB-L1"
-            ],
-            [
               "O1",
-              1,
+              3,
               "FOB-O1"
             ],
-            null,
+            [
+              "B2",
+              3,
+              "FOB-B1"
+            ],
             null
           ]
         }
@@ -4272,7 +4278,7 @@
               [
                 "V1",
                 2,
-                "RS-V2",
+                "RS-V1",
                 1,
                 12.9
               ],
@@ -4286,7 +4292,7 @@
               [
                 "V3",
                 3,
-                "V3",
+                "RS-V3",
                 1,
                 27.3
               ],
@@ -4307,7 +4313,7 @@
               [
                 "V3",
                 3,
-                "V3",
+                "RS-V3",
                 1,
                 66.9
               ],
@@ -4328,7 +4334,7 @@
               [
                 "V3",
                 3,
-                "V3",
+                "RS-V3",
                 1,
                 137.2,
                 146.5
@@ -4348,7 +4354,9 @@
               [
                 "I1",
                 3,
-                "FOB-I1"
+                "FOB-I1",
+                1,
+                0
               ],
               [
                 "I2",
@@ -4389,17 +4397,25 @@
                 "FOB-S2"
               ],
               [
+                "O1",
+                3,
+                "FOB-O1"
+              ],
+              [
+                "B2",
+                3,
+                "FOB-B1"
+              ],
+              [
                 "L1",
                 2,
                 "FOB-L1"
               ],
               [
-                "O1",
-                1,
-                "FOB-O1"
+                "L2",
+                3,
+                "FOB-L2"
               ],
-              null,
-              null,
               null,
               null,
               null,
@@ -7044,7 +7060,7 @@
           "start": 12.9,
           "stop": 17.8,
           "duration": 4.9,
-          "lick": "RS-V2"
+          "lick": "RS-V1"
         },
         {
           "code": "V2",
@@ -7060,7 +7076,7 @@
           "start": 27.3,
           "stop": 36.7,
           "duration": 9.4,
-          "lick": "V3"
+          "lick": "RS-V3"
         },
         {
           "code": "S1",
@@ -7084,7 +7100,7 @@
           "start": 66.9,
           "stop": 76.1,
           "duration": 9.2,
-          "lick": "V3"
+          "lick": "RS-V3"
         },
         {
           "code": "D",
@@ -7108,7 +7124,24 @@
           "start": 137.2,
           "stop": 146.5,
           "duration": 9.3,
-          "lick": "V3"
+          "lick": "RS-V3"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "Fairies Wear Boots",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "FOB-I1"
         }
       ]
     },
