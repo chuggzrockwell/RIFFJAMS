@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T14:00:57.518Z",
+  "updatedAt": "2026-10-06T14:02:12.622Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -508,14 +508,12 @@
             [
               "B3",
               3,
-              "EF-B3",
-              1
+              "EF-B3"
             ],
             [
               "B4",
               3,
-              "EF-B4",
-              1
+              "EF-B4"
             ],
             null,
             null,
@@ -4049,19 +4047,43 @@
                 3,
                 "EF-B2",
                 1,
-                136
+                136.3
               ],
-              null,
               [
                 "B3",
-                3
+                3,
+                "EF-B3",
+                1,
+                145.1
+              ],
+              [
+                "B2",
+                3,
+                "EF-B2",
+                1,
+                153.3
+              ],
+              [
+                "B3",
+                3,
+                "EF-B3",
+                1,
+                161.5
               ],
               [
                 "B4",
-                3
+                3,
+                "EF-B4",
+                1,
+                169.8
               ],
-              null,
-              null,
+              [
+                "I1",
+                3,
+                "EF-I1",
+                "1O",
+                188.1
+              ],
               null,
               null,
               null,
@@ -6607,17 +6629,57 @@
           "code": "B1",
           "tier": 3,
           "start": 108.9,
-          "stop": 136,
-          "duration": 27.1,
+          "stop": 136.3,
+          "duration": 27.4,
           "lick": "EF-B1"
         },
         {
           "code": "B2",
           "tier": 3,
-          "start": 136,
+          "start": 136.3,
+          "stop": 145.1,
+          "duration": 8.8,
+          "lick": "EF-B2"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 145.1,
+          "stop": 153.3,
+          "duration": 8.2,
+          "lick": "EF-B3"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 153.3,
+          "stop": 161.5,
+          "duration": 8.2,
+          "lick": "EF-B2"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 161.5,
+          "stop": 169.8,
+          "duration": 8.3,
+          "lick": "EF-B3"
+        },
+        {
+          "code": "B4",
+          "tier": 3,
+          "start": 169.8,
+          "stop": 188.1,
+          "duration": 18.3,
+          "lick": "EF-B4"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 188.1,
           "stop": null,
           "duration": null,
-          "lick": "EF-B2"
+          "lick": "EF-I1"
         }
       ]
     },
