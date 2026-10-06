@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T01:00:51.734Z",
+  "updatedAt": "2026-10-06T01:02:16.746Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -855,7 +855,7 @@
             [
               "V1",
               2,
-              "",
+              "LOTW-V1",
               3
             ],
             [
@@ -899,8 +899,7 @@
             [
               "V2",
               3,
-              "LOTW-V2",
-              []
+              "LOTW-V2"
             ],
             null,
             null,
@@ -4117,8 +4116,16 @@
               [
                 "V1",
                 2,
-                "",
-                3
+                "LOTW-V1",
+                3,
+                28.1
+              ],
+              [
+                "V2",
+                3,
+                "LOTW-V2",
+                1,
+                70.9
               ],
               [
                 "B1",
@@ -4157,11 +4164,6 @@
                 1,
                 "",
                 3
-              ],
-              [
-                "V2",
-                3,
-                "LOTW-V2"
               ],
               null,
               null,
@@ -5678,6 +5680,31 @@
           "stop": 360.3,
           "duration": 49.6,
           "lick": "NIB-S2"
+        }
+      ]
+    },
+    {
+      "album": "Master of Reality",
+      "song": "Lord of This World",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 2,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 28.1,
+          "stop": 70.9,
+          "duration": 42.8,
+          "lick": "LOTW-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 70.9,
+          "stop": null,
+          "duration": null,
+          "lick": "LOTW-V2"
         }
       ]
     },
