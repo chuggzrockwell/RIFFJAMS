@@ -6306,6 +6306,14 @@ function wireNibV2Lick(songsOwner) {
         });
       });
     });
+    (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "Into the Void") return;
+      ["sections", "chips"].forEach(function(field){
+        (s[field] || []).forEach(function(pair){
+          if (isChipPair(pair) && pair[0] === "V2" && (!pair[2] || pair[2] === "V2")) pair[2] = "ITV-V2";
+        });
+      });
+    });
   });
 }
 window.wireNibV2Lick = wireNibV2Lick;
@@ -15254,6 +15262,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=361"></script>
+<script src="riffjams-admin.js?v=362"></script>
 </body>
 </html>
