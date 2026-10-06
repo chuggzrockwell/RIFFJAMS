@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:45:08.601Z",
+  "updatedAt": "2026-10-06T13:47:00.067Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -369,12 +369,13 @@
             ],
             [
               "S1",
-              1
+              1,
+              "P-S1"
             ],
             [
               "V3",
               3,
-              "P-V3"
+              "V3"
             ],
             null,
             null,
@@ -3760,7 +3761,7 @@
               [
                 "V3",
                 3,
-                "P-V3",
+                "V3",
                 1,
                 47.4
               ],
@@ -3776,17 +3777,50 @@
                 3,
                 "P-V1",
                 1,
-                35.7
+                70.9
               ],
-              null,
               [
                 "S1",
-                1
+                1,
+                "P-S1",
+                1,
+                82.7
               ],
-              null,
-              null,
-              null,
-              null,
+              [
+                "I1",
+                2,
+                "P-I1",
+                "4S",
+                106.1
+              ],
+              [
+                "V1",
+                3,
+                "P-V1",
+                1,
+                117.8
+              ],
+              [
+                "V2",
+                3,
+                "P-V2",
+                1,
+                129.6
+              ],
+              [
+                "V1",
+                3,
+                "P-V1",
+                1,
+                141.3
+              ],
+              [
+                "I1",
+                2,
+                "P-I1",
+                "4S",
+                106.1
+              ],
               null,
               null,
               null,
@@ -6147,7 +6181,7 @@
       "song": "Paranoid",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.206,
+      "riffSaturationIndex": 1.583,
       "chips": [
         {
           "code": "I1",
@@ -6177,14 +6211,6 @@
           "code": "V1",
           "tier": 3,
           "start": 35.7,
-          "stop": 35.7,
-          "duration": null,
-          "lick": "P-V1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 35.7,
           "stop": 47.4,
           "duration": 11.7,
           "lick": "P-V1"
@@ -6201,9 +6227,65 @@
           "code": "I1",
           "tier": 2,
           "start": 59.2,
-          "stop": null,
+          "stop": 70.9,
+          "duration": 11.7,
+          "lick": "P-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 70.9,
+          "stop": 82.7,
+          "duration": 11.8,
+          "lick": "P-V1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 82.7,
+          "stop": 106.1,
+          "duration": 23.4,
+          "lick": "P-S1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 106.1,
+          "stop": 106.1,
           "duration": null,
           "lick": "P-I1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 106.1,
+          "stop": 117.8,
+          "duration": 11.7,
+          "lick": "P-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 117.8,
+          "stop": 129.6,
+          "duration": 11.8,
+          "lick": "P-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 129.6,
+          "stop": 141.3,
+          "duration": 11.7,
+          "lick": "P-V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 141.3,
+          "stop": null,
+          "duration": null,
+          "lick": "P-V1"
         }
       ]
     },
