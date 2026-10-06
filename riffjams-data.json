@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T01:31:32.997Z",
+  "updatedAt": "2026-10-06T01:33:27.069Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -827,7 +827,12 @@
         {
           "song": "Orchid",
           "sections": [
-            null,
+            [
+              "I1",
+              1,
+              "LOTW-I1",
+              "3D"
+            ],
             null,
             null,
             null,
@@ -887,8 +892,7 @@
             [
               "B2",
               3,
-              "",
-              []
+              "LOTW-B2"
             ],
             [
               "V2",
@@ -4107,7 +4111,12 @@
           {
             "song": "Orchid",
             "chips": [
-              null,
+              [
+                "I1",
+                1,
+                "LOTW-I1",
+                "3D"
+              ],
               null,
               null,
               null,
@@ -4188,6 +4197,13 @@
                 166.6
               ],
               [
+                "B2",
+                3,
+                "LOTW-B2",
+                [],
+                178.2
+              ],
+              [
                 "V1",
                 2,
                 "LOTW-V1",
@@ -4226,11 +4242,6 @@
                 1,
                 297.9,
                 314.8
-              ],
-              [
-                "B2",
-                3,
-                "LOTW-B2"
               ],
               null
             ]
@@ -5747,9 +5758,9 @@
     {
       "album": "Master of Reality",
       "song": "Lord of This World",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 2.369,
+      "endSec": 314.8,
+      "complete": true,
+      "riffSaturationIndex": 2.257,
       "chips": [
         {
           "code": "I1",
@@ -5811,9 +5822,17 @@
           "code": "I1",
           "tier": 1,
           "start": 166.6,
-          "stop": 201.1,
-          "duration": 34.5,
+          "stop": 178.2,
+          "duration": 11.6,
           "lick": "LOTW-I1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 178.2,
+          "stop": 201.1,
+          "duration": 22.9,
+          "lick": "LOTW-B2"
         },
         {
           "code": "V1",
@@ -5851,8 +5870,8 @@
           "code": "O1",
           "tier": 1,
           "start": 297.9,
-          "stop": null,
-          "duration": null,
+          "stop": 314.8,
+          "duration": 16.9,
           "lick": "LOTW-O1"
         }
       ]
