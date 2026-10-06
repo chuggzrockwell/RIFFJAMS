@@ -1621,6 +1621,18 @@
     opacity: 0.35;
     pointer-events: none;
   }
+  .sec-chip.arr-group-sel {
+    outline: 2px solid #fff !important;
+    outline-offset: -2px;
+    box-shadow: 0 0 0 2px #00b4ff, 0 0 10px rgba(0,180,255,.55) !important;
+  }
+  .arr-marquee {
+    position: fixed;
+    border: 1px dashed #00b4ff;
+    background: rgba(0,180,255,.12);
+    z-index: 9999;
+    pointer-events: none;
+  }
   .sec-chip.drag-over {
     outline: 2px solid #7030a0 !important;
     outline-offset: -2px;
@@ -14264,6 +14276,7 @@ function endChipPointerDrag(cancelled) {
     el.style.visibility = "";
     try { if (chipDrag.pointerId != null) el.releasePointerCapture(chipDrag.pointerId); } catch (err) {}
   }
+  arrGroupEls().forEach(function(g){ g.classList.remove("dragging"); });
   clearChipDragOver();
   var moved = false;
   if (!cancelled && pointerDragActive && over && over !== el) {
@@ -14279,7 +14292,10 @@ function finishChipMove(toChip) {
   var toAi = parseInt(toChip.getAttribute("data-ai"), 10);
   var toSi = parseInt(toChip.getAttribute("data-si"), 10);
   var toCi = parseInt(toChip.getAttribute("data-ci"), 10);
-  var ok = moveSongMapChip(chipDrag.ai, chipDrag.si, chipDrag.ci, toAi, toSi, toCi, !!chipDrag.copy);
+  var ok = chipDrag.group
+    ? moveArrGroup({ ai: chipDrag.ai, si: chipDrag.si, ci: chipDrag.ci }, toAi, toSi, toCi, !!chipDrag.copy)
+    : moveSongMapChip(chipDrag.ai, chipDrag.si, chipDrag.ci, toAi, toSi, toCi, !!chipDrag.copy);
+  arrGroupEls().forEach(function(g){ g.classList.remove("dragging"); });
   clearChipDragOver();
   if (chipDrag.el) {
     chipDrag.el.classList.remove("dragging");
@@ -14305,13 +14321,26 @@ function onChipPointerMove(e) {
       chipDrag.el.classList.add("dragging");
       try { chipDrag.el.setPointerCapture(e.pointerId); } catch (err) {}
     }
+    if (chipDrag.group) arrGroupEls().forEach(function(g){ g.classList.add("dragging"); });
   }
   e.preventDefault();
   clearChipDragOver();
   if (chipDrag.el) chipDrag.el.style.visibility = "hidden";
   var over = chipFromPoint(e.clientX, e.clientY);
   if (chipDrag.el) chipDrag.el.style.visibility = "";
-  if (over && over !== chipDrag.el) {
+  if (over && over !== chipDrag.el && chipDrag.group) {
+    var gPlan = arrGroupPlan({ ai: chipDrag.ai, si: chipDrag.si, ci: chipDrag.ci },
+      parseInt(over.getAttribute("data-ai"), 10), parseInt(over.getAttribute("data-si"), 10), parseInt(over.getAttribute("data-ci"), 10));
+    if (gPlan) {
+      gPlan.forEach(function(m){
+        var tEl = document.querySelector('#sectionsSheet .sec-chip[data-ai="' + m.toAi + '"][data-si="' + m.toSi + '"][data-ci="' + m.toCi + '"]');
+        if (tEl) tEl.classList.add(tEl.classList.contains("empty") ? "drag-over-empty" : "drag-over");
+      });
+      chipDrag.over = over;
+    } else {
+      chipDrag.over = null;
+    }
+  } else if (over && over !== chipDrag.el) {
     over.classList.add(over.classList.contains("empty") ? "drag-over-empty" : "drag-over");
     chipDrag.over = over;
   } else {
@@ -14321,6 +14350,211 @@ function onChipPointerMove(e) {
 function onChipPointerUp(e) {
   if (!chipDrag || e.pointerId !== chipDrag.pointerId) return;
   endChipPointerDrag(false);
+}
+/* ---- Arrangement Edit: grouped select (marquee / Shift+click) + group drag ---- */
+var arrGroupSel = {};
+var arrMarquee = null;
+function arrGroupOn() { return !!arrangementMode && !singleSongMode && sectionsMode === "edit"; }
+function arrGroupKeyOf(el) { return el.getAttribute("data-ai") + "|" + el.getAttribute("data-si") + "|" + el.getAttribute("data-ci"); }
+function arrGroupCount() { return Object.keys(arrGroupSel).length; }
+function arrGroupApply() {
+  document.querySelectorAll(".sec-chip.arr-group-sel").forEach(function(el){ el.classList.remove("arr-group-sel"); });
+  if (!arrGroupOn()) return;
+  document.querySelectorAll("#sectionsSheet .sec-chip[data-ci]").forEach(function(el){
+    if (el.classList.contains("empty")) return;
+    if (arrGroupSel[arrGroupKeyOf(el)]) el.classList.add("arr-group-sel");
+  });
+}
+function arrGroupClear() { arrGroupSel = {}; arrGroupApply(); }
+function arrGroupEls() {
+  var out = [];
+  document.querySelectorAll("#sectionsSheet .sec-chip.arr-group-sel").forEach(function(el){ out.push(el); });
+  return out;
+}
+function arrGroupRows() {
+  var rows = [];
+  document.querySelectorAll("#sectionsSheet .song-row[data-ai][data-si]").forEach(function(r){
+    rows.push(r.getAttribute("data-ai") + "|" + r.getAttribute("data-si"));
+  });
+  return rows;
+}
+/* Returns [{ai,si,ci,toAi,toSi,toCi}] or null when the move does not fit */
+function arrGroupPlan(anchor, toAi, toSi, toCi) {
+  var keys = Object.keys(arrGroupSel);
+  if (!keys.length) return null;
+  var dCi = toCi - anchor.ci;
+  var rows = arrGroupRows();
+  var aIdx = rows.indexOf(anchor.ai + "|" + anchor.si);
+  var tIdx = rows.indexOf(toAi + "|" + toSi);
+  if (aIdx < 0 || tIdx < 0) return null;
+  var dRow = tIdx - aIdx;
+  var plan = [];
+  for (var i = 0; i < keys.length; i++) {
+    var p = keys[i].split("|").map(function(n){ return parseInt(n, 10); });
+    var rIdx = rows.indexOf(p[0] + "|" + p[1]);
+    if (rIdx < 0) return null;
+    var nr = rIdx + dRow;
+    if (nr < 0 || nr >= rows.length) return null;
+    var nci = p[2] + dCi;
+    if (nci < 0) return null;
+    var t = rows[nr].split("|").map(function(n){ return parseInt(n, 10); });
+    plan.push({ ai: p[0], si: p[1], ci: p[2], toAi: t[0], toSi: t[1], toCi: nci });
+  }
+  return plan;
+}
+function moveArrGroup(anchor, toAi, toSi, toCi, copy) {
+  var plan = arrGroupPlan(anchor, toAi, toSi, toCi);
+  if (!plan || !plan.length) return false;
+  if (plan[0].ai === plan[0].toAi && plan[0].si === plan[0].toSi && plan[0].ci === plan[0].toCi) return false;
+  var maxCi = 0;
+  plan.forEach(function(m){ maxCi = Math.max(maxCi, m.ci, m.toCi); });
+  ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){ if (s) growSongSlotsTo(s, maxCi); });
+  });
+  var items = [];
+  plan.forEach(function(m){
+    var s = getEditSong(m.ai, m.si);
+    var it = s && s.chips ? s.chips[m.ci] : null;
+    if (isChipPair(it)) items.push({ m: m, item: it.slice() });
+  });
+  if (!items.length) return false;
+  pushArrangementHistory();
+  var vacated = [];
+  if (!copy) {
+    items.forEach(function(x){
+      getEditSong(x.m.ai, x.m.si).chips[x.m.ci] = null;
+      vacated.push({ ai: x.m.ai, si: x.m.si, ci: x.m.ci });
+    });
+  }
+  var displaced = [];
+  var newSel = {};
+  items.forEach(function(x){
+    var ts = getEditSong(x.m.toAi, x.m.toSi);
+    var prev = ts.chips[x.m.toCi];
+    if (!copy && isChipPair(prev)) displaced.push({ ai: x.m.toAi, si: x.m.toSi, item: prev });
+    ts.chips[x.m.toCi] = x.item;
+    newSel[x.m.toAi + "|" + x.m.toSi + "|" + x.m.toCi] = true;
+  });
+  /* Chips that were in the way drop into the slots the group left (same song first). */
+  displaced.forEach(function(d){
+    var spot = null, i;
+    for (i = 0; i < vacated.length; i++) {
+      var v = vacated[i];
+      if (v.ai === d.ai && v.si === d.si && !isChipPair(getEditSong(v.ai, v.si).chips[v.ci])) { spot = v; break; }
+    }
+    if (!spot) {
+      for (i = 0; i < vacated.length; i++) {
+        var v2 = vacated[i];
+        if (!isChipPair(getEditSong(v2.ai, v2.si).chips[v2.ci])) { spot = v2; break; }
+      }
+    }
+    if (spot) {
+      getEditSong(spot.ai, spot.si).chips[spot.ci] = d.item;
+    } else {
+      var ds = getEditSong(d.ai, d.si);
+      var k = 0;
+      while (isChipPair(ds.chips[k])) k++;
+      growSongSlotsTo(ds, k);
+      ds.chips[k] = d.item;
+    }
+  });
+  arrGroupSel = newSel;
+  saveArrangementMap();
+  return true;
+}
+function arrMarqueeUpdate(e) {
+  if (!arrMarquee || e.pointerId !== arrMarquee.pointerId) return;
+  var dx = e.clientX - arrMarquee.x0, dy = e.clientY - arrMarquee.y0;
+  if (!arrMarquee.active) {
+    if (Math.abs(dx) + Math.abs(dy) < 6) return;
+    arrMarquee.active = true;
+    arrMarquee.box = document.createElement("div");
+    arrMarquee.box.className = "arr-marquee";
+    document.body.appendChild(arrMarquee.box);
+  }
+  e.preventDefault();
+  var l = Math.min(e.clientX, arrMarquee.x0), t = Math.min(e.clientY, arrMarquee.y0);
+  var r = Math.max(e.clientX, arrMarquee.x0), b = Math.max(e.clientY, arrMarquee.y0);
+  var bx = arrMarquee.box.style;
+  bx.left = l + "px"; bx.top = t + "px"; bx.width = (r - l) + "px"; bx.height = (b - t) + "px";
+  var sel = {};
+  Object.keys(arrMarquee.base).forEach(function(k){ sel[k] = true; });
+  document.querySelectorAll("#sectionsSheet .sec-chip[data-ci]").forEach(function(el){
+    if (el.classList.contains("empty") || el.classList.contains("filtered-out")) return;
+    var rc = el.getBoundingClientRect();
+    if (rc.right < l || rc.left > r || rc.bottom < t || rc.top > b) return;
+    sel[arrGroupKeyOf(el)] = true;
+  });
+  arrGroupSel = sel;
+  arrGroupApply();
+}
+function arrMarqueeEnd(e) {
+  if (!arrMarquee || (e && e.pointerId !== arrMarquee.pointerId)) return;
+  document.removeEventListener("pointermove", arrMarqueeUpdate);
+  document.removeEventListener("pointerup", arrMarqueeEnd);
+  document.removeEventListener("pointercancel", arrMarqueeEnd);
+  var m = arrMarquee;
+  arrMarquee = null;
+  if (m.box && m.box.parentNode) m.box.parentNode.removeChild(m.box);
+  if (m.active) {
+    didChipDrag = true; /* swallow the click that follows */
+    suppressArrBgClick = true;
+  } else if (!m.onEmptyChip && !m.add) {
+    arrGroupClear();
+  }
+}
+var suppressArrBgClick = false;
+document.addEventListener("click", function(e){
+  if (suppressArrBgClick) { suppressArrBgClick = false; e.preventDefault(); e.stopPropagation(); }
+}, true);
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape" && arrGroupCount() && arrGroupOn()) {
+    var ed = document.getElementById("chipEditor");
+    if (ed && ed.classList.contains("open")) return;
+    arrGroupClear();
+  }
+});
+(function(){
+  var orig = showSections;
+  showSections = function(){
+    var r = orig.apply(this, arguments);
+    try { if (!arrGroupOn()) arrGroupSel = {}; arrGroupApply(); } catch (eAG) {}
+    return r;
+  };
+})();
+/* Returns true when it handled the pointerdown */
+function arrGroupPointerDown(e) {
+  if (!arrGroupOn()) return false;
+  if (e.pointerType === "mouse" && e.button !== 0) return false;
+  var ed = document.getElementById("chipEditor");
+  if (ed && ed.classList.contains("open")) return false;
+  var chip = e.target.closest(".sec-chip");
+  if (chip && !chip.classList.contains("empty")) {
+    if (e.shiftKey) {
+      var k = arrGroupKeyOf(chip);
+      if (arrGroupSel[k]) delete arrGroupSel[k]; else arrGroupSel[k] = true;
+      arrGroupApply();
+      didChipDrag = true;
+      e.preventDefault();
+      return true;
+    }
+    if (!arrGroupSel[arrGroupKeyOf(chip)] && arrGroupCount()) arrGroupClear();
+    return false;
+  }
+  if (!chip) {
+    if (!e.target.closest(".song-row, .sections-grid, #sectionsSheet")) return false;
+    if (e.target.closest("button, input, select, textarea, a, label, .song-name, .song-name-wrap, .song-sec-ruler, .song-meta-strip")) return false;
+  }
+  didChipDrag = false;
+  arrMarquee = {
+    x0: e.clientX, y0: e.clientY, pointerId: e.pointerId, active: false, box: null,
+    add: !!e.shiftKey, onEmptyChip: !!chip,
+    base: e.shiftKey ? Object.assign({}, arrGroupSel) : {}
+  };
+  document.addEventListener("pointermove", arrMarqueeUpdate, { passive: false });
+  document.addEventListener("pointerup", arrMarqueeEnd);
+  document.addEventListener("pointercancel", arrMarqueeEnd);
+  return !chip; /* empty chip: still let normal click (new chip) happen if no drag */
 }
 var sectionsSheetEl = document.getElementById("sectionsSheet");
 sectionsSheetEl.addEventListener("click", function(e){
@@ -14365,6 +14599,7 @@ sectionsSheetEl.addEventListener("pointerdown", function(e){
   if (handleSectionRulerPointerDown(e)) return;
   if (sectionsMode !== "edit") return;
   if (e.pointerType === "mouse" && e.button !== 0) return;
+  if (arrGroupPointerDown(e)) return;
   var chip = e.target.closest(".sec-chip");
   if (!chip || chip.classList.contains("empty")) return;
   // Don't start a new drag while editing text in the chip editor
@@ -14380,7 +14615,8 @@ sectionsSheetEl.addEventListener("pointerdown", function(e){
     startY: e.clientY,
     pointerId: e.pointerId,
     over: null,
-    copy: wantCopy
+    copy: wantCopy,
+    group: arrGroupOn() && arrGroupCount() > 1 && !!arrGroupSel[arrGroupKeyOf(chip)]
   };
   lastSectionFocus = { ai: chipDrag.ai, si: chipDrag.si, ci: chipDrag.ci };
   pointerDragActive = false;
@@ -15009,6 +15245,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=359"></script>
+<script src="riffjams-admin.js?v=360"></script>
 </body>
 </html>
