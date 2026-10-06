@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T02:15:39.425Z",
+  "updatedAt": "2026-10-06T02:17:10.642Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -4338,12 +4338,20 @@
                 1,
                 125.1
               ],
+              null,
               [
-                "V1",
-                1,
-                "ITV-V1",
+                "B1",
+                2,
+                "ITV-B1",
+                "1O",
+                183.8
+              ],
+              [
+                "V2",
                 3,
-                73.9
+                "V2",
+                1,
+                206.7
               ],
               [
                 "B1",
@@ -4352,8 +4360,6 @@
                 "1O",
                 183.8
               ],
-              null,
-              null,
               null,
               null,
               null,
@@ -5964,7 +5970,7 @@
       "song": "Into the Void",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.865,
+      "riffSaturationIndex": 1.88,
       "chips": [
         {
           "code": "I1",
@@ -5994,14 +6000,6 @@
           "code": "V1",
           "tier": 1,
           "start": 73.9,
-          "stop": 73.9,
-          "duration": null,
-          "lick": "ITV-V1"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 73.9,
           "stop": 125.1,
           "duration": 51.2,
           "lick": "ITV-V1"
@@ -6018,9 +6016,25 @@
           "code": "B1",
           "tier": 2,
           "start": 183.8,
-          "stop": null,
+          "stop": 183.8,
           "duration": null,
           "lick": "ITV-B1"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 183.8,
+          "stop": 206.7,
+          "duration": 22.9,
+          "lick": "ITV-B1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 206.7,
+          "stop": null,
+          "duration": null,
+          "lick": "V2"
         }
       ]
     },
