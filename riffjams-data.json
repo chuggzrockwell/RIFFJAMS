@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:58:32.693Z",
+  "updatedAt": "2026-10-06T13:59:46.913Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -493,8 +493,7 @@
             [
               "V1",
               3,
-              "EF-V1",
-              "1O"
+              "EF-V1"
             ],
             [
               "B1",
@@ -4008,12 +4007,32 @@
                 "I1",
                 3,
                 "EF-I1",
-                "1O"
+                "1O",
+                0
               ],
               [
                 "V1",
-                3
+                3,
+                "EF-V1",
+                1,
+                15.8
               ],
+              [
+                "I1",
+                3,
+                "EF-I1",
+                "1O",
+                46.9
+              ],
+              [
+                "V1",
+                3,
+                "EF-V1",
+                1,
+                62.4
+              ],
+              null,
+              null,
               [
                 "B1",
                 3
@@ -4030,10 +4049,6 @@
                 "B4",
                 3
               ],
-              null,
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -6527,6 +6542,47 @@
           "stop": 351,
           "duration": 19.2,
           "lick": "IM-O1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "Electric Funeral",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 0,
+          "stop": 15.8,
+          "duration": 15.8,
+          "lick": "EF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 15.8,
+          "stop": 46.9,
+          "duration": 31.1,
+          "lick": "EF-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 46.9,
+          "stop": 62.4,
+          "duration": 15.5,
+          "lick": "EF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 62.4,
+          "stop": null,
+          "duration": null,
+          "lick": "EF-V1"
         }
       ]
     },
