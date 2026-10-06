@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T14:03:15.378Z",
+  "updatedAt": "2026-10-06T14:07:20.492Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -375,7 +375,7 @@
             [
               "V3",
               3,
-              "V3"
+              "P-V3"
             ],
             null,
             null,
@@ -531,8 +531,7 @@
             [
               "V1",
               3,
-              "HOD-V1",
-              3
+              "HOD-V1"
             ],
             [
               "B1",
@@ -973,7 +972,8 @@
             [
               "V2",
               2,
-              "V2"
+              "ITV-V2",
+              []
             ],
             [
               "B1",
@@ -990,22 +990,26 @@
             [
               "S1",
               1,
-              "ITV-S1"
+              "ITV-S1",
+              []
             ],
             [
               "B3",
               3,
-              "ITV-B3"
+              "ITV-B3",
+              []
             ],
             [
               "S2",
               1,
-              "ITV-S2"
+              "ITV-S2",
+              []
             ],
             [
               "S3",
               1,
-              "S3"
+              "ITV-S3",
+              []
             ],
             null,
             null,
@@ -3769,7 +3773,7 @@
               [
                 "V3",
                 3,
-                "V3",
+                "P-V3",
                 1,
                 47.4
               ],
@@ -3869,7 +3873,7 @@
             "song": "Iron Man",
             "chips": [
               [
-                "i1",
+                "I1",
                 3,
                 "i1"
               ],
@@ -4115,7 +4119,10 @@
             "chips": [
               [
                 "V1",
-                3
+                3,
+                "HOD-V1",
+                1,
+                0
               ],
               null,
               [
@@ -4639,7 +4646,7 @@
               [
                 "V2",
                 2,
-                "V2",
+                "ITV-V2",
                 1,
                 125.1
               ],
@@ -4653,7 +4660,7 @@
               [
                 "V2",
                 3,
-                "V2",
+                "ITV-V2",
                 1,
                 172.2
               ],
@@ -4681,7 +4688,7 @@
               [
                 "V2",
                 3,
-                "V2",
+                "ITV-V2",
                 1,
                 263.8
               ],
@@ -4714,7 +4721,7 @@
               [
                 "S3",
                 1,
-                "S3",
+                "ITV-S3",
                 1,
                 338.1
               ],
@@ -6375,7 +6382,7 @@
           "start": 47.4,
           "stop": 59.2,
           "duration": 11.8,
-          "lick": "V3"
+          "lick": "P-V3"
         },
         {
           "code": "I1",
@@ -6727,6 +6734,23 @@
       ]
     },
     {
+      "album": "Paranoid",
+      "song": "Hand of Doom",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "HOD-V1"
+        }
+      ]
+    },
+    {
       "album": "Master of Reality",
       "song": "Lord of This World",
       "endSec": 314.8,
@@ -6900,7 +6924,7 @@
           "start": 125.1,
           "stop": 134.5,
           "duration": 9.4,
-          "lick": "V2"
+          "lick": "ITV-V2"
         },
         {
           "code": "V1",
@@ -6916,7 +6940,7 @@
           "start": 172.2,
           "stop": 183.8,
           "duration": 11.6,
-          "lick": "V2"
+          "lick": "ITV-V2"
         },
         {
           "code": "B1",
@@ -6948,7 +6972,7 @@
           "start": 263.8,
           "stop": 273.2,
           "duration": 9.4,
-          "lick": "V2"
+          "lick": "ITV-V2"
         },
         {
           "code": "V1",
@@ -6980,7 +7004,7 @@
           "start": 338.1,
           "stop": 356.3,
           "duration": 18.2,
-          "lick": "S3"
+          "lick": "ITV-S3"
         },
         {
           "code": "B2",
