@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T14:17:00.165Z",
+  "updatedAt": "2026-10-06T14:18:22.457Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -4152,7 +4152,21 @@
                 1,
                 "HOD-B2",
                 1,
-                139.1
+                138.8
+              ],
+              [
+                "B1",
+                2,
+                "HOD-B1",
+                1,
+                166.2
+              ],
+              [
+                "B2",
+                1,
+                "HOD-B2",
+                1,
+                179.9
               ],
               [
                 "S1",
@@ -4169,8 +4183,6 @@
                 3,
                 "HOD-B4"
               ],
-              null,
-              null,
               null,
               null,
               null,
@@ -6758,7 +6770,7 @@
       "song": "Hand of Doom",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.101,
+      "riffSaturationIndex": 1.457,
       "chips": [
         {
           "code": "V1",
@@ -6788,14 +6800,30 @@
           "code": "B1",
           "tier": 2,
           "start": 125,
-          "stop": 139.1,
-          "duration": 14.1,
+          "stop": 138.8,
+          "duration": 13.8,
           "lick": "HOD-B1"
         },
         {
           "code": "B2",
           "tier": 1,
-          "start": 139.1,
+          "start": 138.8,
+          "stop": 166.2,
+          "duration": 27.4,
+          "lick": "HOD-B2"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 166.2,
+          "stop": 179.9,
+          "duration": 13.7,
+          "lick": "HOD-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 1,
+          "start": 179.9,
           "stop": null,
           "duration": null,
           "lick": "HOD-B2"
