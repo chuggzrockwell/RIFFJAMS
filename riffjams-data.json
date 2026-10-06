@@ -681,7 +681,11 @@
               2,
               "FOB-L1"
             ],
-            null,
+            [
+              "O1",
+              1,
+              "FOB-O1"
+            ],
             null,
             null
           ]
@@ -4389,7 +4393,11 @@
                 2,
                 "FOB-L1"
               ],
-              null,
+              [
+                "O1",
+                1,
+                "FOB-O1"
+              ],
               null,
               null,
               null,
