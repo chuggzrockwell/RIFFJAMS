@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T14:02:12.622Z",
+  "updatedAt": "2026-10-06T14:03:15.378Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -4084,9 +4084,28 @@
                 "1O",
                 188.1
               ],
-              null,
-              null,
-              null,
+              [
+                "V1",
+                3,
+                "EF-V1",
+                1,
+                203.3
+              ],
+              [
+                "I1",
+                3,
+                "EF-I1",
+                "1O",
+                233.4
+              ],
+              [
+                "V1",
+                3,
+                "EF-V1",
+                1,
+                248.7,
+                279
+              ],
               null,
               null
             ]
@@ -6581,8 +6600,8 @@
     {
       "album": "Paranoid",
       "song": "Electric Funeral",
-      "endSec": null,
-      "complete": false,
+      "endSec": 279,
+      "complete": true,
       "riffSaturationIndex": 1,
       "chips": [
         {
@@ -6677,9 +6696,33 @@
           "code": "I1",
           "tier": 3,
           "start": 188.1,
-          "stop": null,
-          "duration": null,
+          "stop": 203.3,
+          "duration": 15.2,
           "lick": "EF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 203.3,
+          "stop": 233.4,
+          "duration": 30.1,
+          "lick": "EF-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 233.4,
+          "stop": 248.7,
+          "duration": 15.3,
+          "lick": "EF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 248.7,
+          "stop": 279,
+          "duration": 30.3,
+          "lick": "EF-V1"
         }
       ]
     },
