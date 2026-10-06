@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T01:33:27.069Z",
+  "updatedAt": "2026-10-06T01:50:35.736Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -945,57 +945,47 @@
             [
               "I2",
               3,
-              "ITV-I2",
+              "",
               []
             ],
             [
               "V1",
               1,
-              "ITV-V1",
+              "",
               3
             ],
             [
               "B1",
               2,
-              "ITV-B1",
+              "",
               "1O"
             ],
             [
               "S1",
               1,
-              "ITV-S1",
+              "",
               []
             ],
             [
               "B2",
               1,
-              "ITV-B2",
+              "",
               3
             ],
             [
               "B3",
-              3,
-              "ITV-B3",
+              1,
+              "",
               []
             ],
             [
               "S2",
               1,
-              "ITV-S2",
+              "",
               []
             ],
-            [
-              "V2",
-              3,
-              "ITV-V2",
-              3
-            ],
-            [
-              "S3",
-              3,
-              "ITV-S3",
-              []
-            ],
+            null,
+            null,
             null,
             null,
             null,
@@ -4214,6 +4204,13 @@
                 178.2
               ],
               [
+                "I1",
+                1,
+                "LOTW-I1",
+                "3D",
+                189.5
+              ],
+              [
                 "V1",
                 2,
                 "LOTW-V1",
@@ -4252,8 +4249,7 @@
                 1,
                 297.9,
                 314.8
-              ],
-              null
+              ]
             ]
           },
           {
@@ -4283,48 +4279,49 @@
                 "I1",
                 2,
                 "ITV-I1",
-                "1O"
+                "1O",
+                0
               ],
               [
                 "I2",
                 3,
-                "ITV-I2",
+                "",
                 []
               ],
               [
                 "V1",
                 1,
-                "ITV-V1",
+                "",
                 3
               ],
               [
                 "B1",
                 2,
-                "ITV-B1",
+                "",
                 "1O"
               ],
               [
                 "S1",
                 1,
-                "ITV-S1",
+                "",
                 []
               ],
               [
                 "B2",
                 1,
-                "ITV-B2",
+                "",
                 3
               ],
               [
                 "B3",
-                3,
-                "ITV-B3",
+                1,
+                "",
                 []
               ],
               [
                 "S2",
                 1,
-                "ITV-S2",
+                "",
                 []
               ],
               null,
@@ -5770,7 +5767,7 @@
       "song": "Lord of This World",
       "endSec": 314.8,
       "complete": true,
-      "riffSaturationIndex": 2.257,
+      "riffSaturationIndex": 2.331,
       "chips": [
         {
           "code": "I1",
@@ -5840,9 +5837,17 @@
           "code": "B2",
           "tier": 3,
           "start": 178.2,
-          "stop": 201.1,
-          "duration": 22.9,
+          "stop": 189.5,
+          "duration": 11.3,
           "lick": "LOTW-B2"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 189.5,
+          "stop": 201.1,
+          "duration": 11.6,
+          "lick": "LOTW-I1"
         },
         {
           "code": "V1",
@@ -5883,6 +5888,23 @@
           "stop": 314.8,
           "duration": 16.9,
           "lick": "LOTW-O1"
+        }
+      ]
+    },
+    {
+      "album": "Master of Reality",
+      "song": "Into the Void",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "ITV-I1"
         }
       ]
     },
