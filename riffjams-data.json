@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T16:13:22.262Z",
+  "updatedAt": "2026-10-06T16:14:24.518Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -638,20 +638,17 @@
             [
               "I3",
               2,
-              "FOB-I3",
-              []
+              "FOB-I3"
             ],
             [
               "I4",
-              2,
-              "FOB-I4",
-              []
+              3,
+              "FOB-I4"
             ],
             [
               "S1",
               1,
-              "FOB-S1",
-              []
+              "FOB-S1"
             ],
             [
               "V1",
@@ -4362,25 +4359,39 @@
                 "I2",
                 2,
                 "FOB-I2",
-                "1D"
+                "1D",
+                13.9
               ],
               [
                 "I3",
                 2,
                 "FOB-I3",
-                []
+                [],
+                26.4
               ],
               [
                 "I4",
                 3,
-                "FOB-I4"
+                "FOB-I4",
+                1,
+                38.8
               ],
               [
                 "S1",
                 1,
                 "FOB-S1",
-                []
+                [],
+                50.1
               ],
+              [
+                "I4",
+                3,
+                "FOB-I4",
+                1,
+                62.1
+              ],
+              null,
+              null,
               [
                 "V1",
                 3,
@@ -4416,9 +4427,6 @@
                 3,
                 "FOB-L2"
               ],
-              null,
-              null,
-              null,
               null,
               null
             ]
@@ -7133,15 +7141,55 @@
       "song": "Fairies Wear Boots",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": null,
+      "riffSaturationIndex": 1.787,
       "chips": [
         {
           "code": "I1",
           "tier": 3,
           "start": 0,
+          "stop": 13.9,
+          "duration": 13.9,
+          "lick": "FOB-I1"
+        },
+        {
+          "code": "I2",
+          "tier": 2,
+          "start": 13.9,
+          "stop": 26.4,
+          "duration": 12.5,
+          "lick": "FOB-I2"
+        },
+        {
+          "code": "I3",
+          "tier": 2,
+          "start": 26.4,
+          "stop": 38.8,
+          "duration": 12.4,
+          "lick": "FOB-I3"
+        },
+        {
+          "code": "I4",
+          "tier": 3,
+          "start": 38.8,
+          "stop": 50.1,
+          "duration": 11.3,
+          "lick": "FOB-I4"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 50.1,
+          "stop": 62.1,
+          "duration": 12,
+          "lick": "FOB-S1"
+        },
+        {
+          "code": "I4",
+          "tier": 3,
+          "start": 62.1,
           "stop": null,
           "duration": null,
-          "lick": "FOB-I1"
+          "lick": "FOB-I4"
         }
       ]
     },
