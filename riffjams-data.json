@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T01:50:35.736Z",
+  "updatedAt": "2026-10-06T01:57:48.807Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -892,7 +892,8 @@
             [
               "B2",
               3,
-              "LOTW-B2"
+              "LOTW-B2",
+              []
             ],
             [
               "V2",
@@ -945,7 +946,7 @@
             [
               "I2",
               3,
-              "",
+              "ITV-I2",
               []
             ],
             [
@@ -4285,8 +4286,9 @@
               [
                 "I2",
                 3,
-                "",
-                []
+                "ITV-I2",
+                [],
+                38.2
               ],
               [
                 "V1",
@@ -5896,15 +5898,23 @@
       "song": "Into the Void",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": null,
+      "riffSaturationIndex": 2,
       "chips": [
         {
           "code": "I1",
           "tier": 2,
           "start": 0,
+          "stop": 38.2,
+          "duration": 38.2,
+          "lick": "ITV-I1"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 38.2,
           "stop": null,
           "duration": null,
-          "lick": "ITV-I1"
+          "lick": "ITV-I2"
         }
       ]
     },
