@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:40:40.327Z",
+  "updatedAt": "2026-10-06T13:42:07.473Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3711,7 +3711,14 @@
                 3,
                 437.2
               ],
-              null,
+              [
+                "O1",
+                2,
+                "WP-O1",
+                1,
+                458.7,
+                467.1
+              ],
               null
             ]
           },
@@ -3722,7 +3729,8 @@
                 "I1",
                 2,
                 "P-I1",
-                "4S"
+                "4S",
+                0
               ],
               [
                 "V1",
@@ -5968,9 +5976,9 @@
     {
       "album": "Paranoid",
       "song": "War Pigs",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 2.082,
+      "endSec": 467.1,
+      "complete": true,
+      "riffSaturationIndex": 2.123,
       "chips": [
         {
           "code": "I1",
@@ -6088,9 +6096,34 @@
           "code": "O2",
           "tier": 1,
           "start": 437.2,
+          "stop": 458.7,
+          "duration": 21.5,
+          "lick": "WP-O2"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 458.7,
+          "stop": 467.1,
+          "duration": 8.4,
+          "lick": "WP-O1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "Paranoid",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
           "stop": null,
           "duration": null,
-          "lick": "WP-O2"
+          "lick": "P-I1"
         }
       ]
     },
