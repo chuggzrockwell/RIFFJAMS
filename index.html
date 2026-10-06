@@ -10077,6 +10077,12 @@ function smSelectSingleSongArrangementChip(chip) {
     var attrStart = parseFloat(chip.getAttribute("data-start") || "");
     if (isFinite(attrStart) && attrStart >= 0) start = attrStart;
   }
+  if (start == null) {
+    /* Untimed opening chip starts at 0:00 */
+    var firstCi = -1;
+    (song.chips || []).some(function(p, i){ if (isChipPair(p)) { firstCi = i; return true; } return false; });
+    if (ci === firstCi) start = 0;
+  }
   var item = { code: pair[0], start: start, ci: ci, pair: pair };
   /* Pin until seek lands — otherwise smTick/smUpdateArrNextCue overwrites the tab
      from the pre-seek clock (~250ms), which feels like the first click was swallowed. */
@@ -14455,7 +14461,7 @@ document.getElementById("sectionsSheet").onclick = function(e){
   if (!chip) return;
   if (didChipDrag) { didChipDrag = false; return; }
   if (chip.classList.contains("filtered-out") && sectionsMode !== "edit") return;
-  if (singleSongMode && chip.getAttribute("data-arrange") === "1" && sectionsMode !== "edit") {
+  if ((singleSongMode || (arrangementMode && sectionsMode === "view")) && chip.getAttribute("data-arrange") === "1" && sectionsMode !== "edit") {
     if (chip.classList.contains("empty")) return;
     smSelectSingleSongArrangementChip(chip);
     return;
@@ -15003,6 +15009,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=349"></script>
+<script src="riffjams-admin.js?v=350"></script>
 </body>
 </html>
