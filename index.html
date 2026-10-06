@@ -6279,6 +6279,15 @@ window.wireWizardO1Lick = wireWizardO1Lick;
 function wireNibV2Lick(songsOwner) {
   var albums = (songsOwner && songsOwner.albums) ? songsOwner.albums : songsOwner;
   (albums || []).forEach(function(a){
+    /* Chip codes are uppercase (I1, V2...); a lowercase code like "i1" loses its section color */
+    (a.songs || []).forEach(function(s){
+      if (!s) return;
+      ["sections", "chips"].forEach(function(field){
+        (s[field] || []).forEach(function(pair){
+          if (isChipPair(pair) && typeof pair[0] === "string" && /^[a-z]/.test(pair[0])) pair[0] = pair[0].toUpperCase();
+        });
+      });
+    });
     (a.songs || []).forEach(function(s){
       if (!s || s.song !== "N.I.B.") return;
       ["sections", "chips"].forEach(function(field){
@@ -6944,7 +6953,7 @@ function resetAlbumsToDefault() {
 }
 function secType(code) {
   if (!code) return "";
-  var m = String(code).match(/^[A-Z]+/);
+  var m = String(code).toUpperCase().match(/^[A-Z]+/);
   return m ? m[0] : "";
 }
 function secNum(code) {
@@ -15279,6 +15288,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=365"></script>
+<script src="riffjams-admin.js?v=366"></script>
 </body>
 </html>
