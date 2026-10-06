@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T14:19:24.491Z",
+  "updatedAt": "2026-10-06T14:20:28.727Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -563,7 +563,11 @@
               3,
               "V2"
             ],
-            null,
+            [
+              "B5",
+              3,
+              "B5"
+            ],
             null,
             null,
             null,
@@ -4196,8 +4200,20 @@
                 1,
                 264.6
               ],
-              null,
-              null,
+              [
+                "B5",
+                3,
+                "B5",
+                [],
+                291.5
+              ],
+              [
+                "V1",
+                3,
+                "HOD-V1",
+                1,
+                0
+              ],
               null,
               null,
               null,
@@ -6782,8 +6798,16 @@
       "song": "Hand of Doom",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.57,
+      "riffSaturationIndex": 1.702,
       "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 0,
+          "stop": 0,
+          "duration": null,
+          "lick": "HOD-V1"
+        },
         {
           "code": "V1",
           "tier": 3,
@@ -6868,9 +6892,17 @@
           "code": "S1",
           "tier": 1,
           "start": 264.6,
+          "stop": 291.5,
+          "duration": 26.9,
+          "lick": "HOD-S1"
+        },
+        {
+          "code": "B5",
+          "tier": 3,
+          "start": 291.5,
           "stop": null,
           "duration": null,
-          "lick": "HOD-S1"
+          "lick": "B5"
         }
       ]
     },
