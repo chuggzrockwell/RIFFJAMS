@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T14:18:22.457Z",
+  "updatedAt": "2026-10-06T14:19:24.491Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -550,7 +550,7 @@
             ],
             [
               "B4",
-              4,
+              3,
               "HOD-B4"
             ],
             [
@@ -4169,21 +4169,33 @@
                 179.9
               ],
               [
-                "S1",
-                1,
-                "HOD-S1"
-              ],
-              [
                 "B3",
                 3,
-                "HOD-B3"
+                "HOD-B3",
+                1,
+                207.2
               ],
               [
                 "B4",
                 3,
-                "HOD-B4"
+                "HOD-B4",
+                1,
+                217.1
               ],
-              null,
+              [
+                "B1",
+                2,
+                "HOD-B1",
+                1,
+                250.8
+              ],
+              [
+                "S1",
+                1,
+                "HOD-S1",
+                1,
+                264.6
+              ],
               null,
               null,
               null,
@@ -6770,7 +6782,7 @@
       "song": "Hand of Doom",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.457,
+      "riffSaturationIndex": 1.57,
       "chips": [
         {
           "code": "V1",
@@ -6824,9 +6836,41 @@
           "code": "B2",
           "tier": 1,
           "start": 179.9,
+          "stop": 207.2,
+          "duration": 27.3,
+          "lick": "HOD-B2"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 207.2,
+          "stop": 217.1,
+          "duration": 9.9,
+          "lick": "HOD-B3"
+        },
+        {
+          "code": "B4",
+          "tier": 3,
+          "start": 217.1,
+          "stop": 250.8,
+          "duration": 33.7,
+          "lick": "HOD-B4"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 250.8,
+          "stop": 264.6,
+          "duration": 13.8,
+          "lick": "HOD-B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 264.6,
           "stop": null,
           "duration": null,
-          "lick": "HOD-B2"
+          "lick": "HOD-S1"
         }
       ]
     },
