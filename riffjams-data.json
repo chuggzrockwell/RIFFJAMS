@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:38:24.777Z",
+  "updatedAt": "2026-10-06T13:39:28.995Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -265,12 +265,7 @@
         {
           "song": "Warning",
           "sections": [
-            [
-              "O2",
-              1,
-              "WP-O2",
-              3
-            ],
+            null,
             null,
             null,
             null,
@@ -3582,12 +3577,7 @@
           {
             "song": "Warning",
             "chips": [
-              [
-                "O2",
-                1,
-                "WP-O2",
-                3
-              ],
+              null,
               null,
               null,
               null,
@@ -3710,7 +3700,9 @@
               [
                 "S2",
                 1,
-                "WP-S2"
+                "WP-S2",
+                1,
+                416.1
               ],
               null,
               null,
@@ -5972,7 +5964,7 @@
       "song": "War Pigs",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.982,
+      "riffSaturationIndex": 2.035,
       "chips": [
         {
           "code": "I1",
@@ -6074,9 +6066,17 @@
           "code": "O2",
           "tier": 1,
           "start": 394.4,
+          "stop": 416.1,
+          "duration": 21.7,
+          "lick": "WP-O2"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 416.1,
           "stop": null,
           "duration": null,
-          "lick": "WP-O2"
+          "lick": "WP-S2"
         }
       ]
     },
