@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T02:05:41.683Z",
+  "updatedAt": "2026-10-06T02:06:45.888Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -985,7 +985,11 @@
               "",
               []
             ],
-            null,
+            [
+              "V2",
+              3,
+              "V2"
+            ],
             null,
             null,
             null,
@@ -4305,6 +4309,12 @@
                 73.9
               ],
               [
+                "V2",
+                3,
+                "V2"
+              ],
+              null,
+              [
                 "B1",
                 2,
                 "",
@@ -4334,8 +4344,6 @@
                 "",
                 []
               ],
-              null,
-              null,
               null,
               null,
               null,
