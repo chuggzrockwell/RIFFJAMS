@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:39:28.995Z",
+  "updatedAt": "2026-10-06T13:40:40.327Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3704,7 +3704,13 @@
                 1,
                 416.1
               ],
-              null,
+              [
+                "O2",
+                1,
+                "WP-O2",
+                3,
+                437.2
+              ],
               null,
               null
             ]
@@ -5964,7 +5970,7 @@
       "song": "War Pigs",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.035,
+      "riffSaturationIndex": 2.082,
       "chips": [
         {
           "code": "I1",
@@ -6074,9 +6080,17 @@
           "code": "S2",
           "tier": 1,
           "start": 416.1,
+          "stop": 437.2,
+          "duration": 21.1,
+          "lick": "WP-S2"
+        },
+        {
+          "code": "O2",
+          "tier": 1,
+          "start": 437.2,
           "stop": null,
           "duration": null,
-          "lick": "WP-S2"
+          "lick": "WP-O2"
         }
       ]
     },
