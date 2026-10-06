@@ -896,7 +896,12 @@
               "",
               3
             ],
-            null,
+            [
+              "V2",
+              3,
+              "LOTW-V2",
+              []
+            ],
             null,
             null,
             null,
