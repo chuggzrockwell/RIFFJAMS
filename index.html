@@ -4546,7 +4546,7 @@
           <button type="button" class="map-tools-item" id="secPeekBtn" role="menuitemcheckbox" aria-checked="false" title="Hover chips to peek tabs">Peek</button>
           <button type="button" class="map-tools-item" id="secRulersBtn" role="menuitemcheckbox" aria-checked="false" title="Show section rulers">Rulers</button>
           <button type="button" class="map-tools-item" id="secMetaColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show RSI column">RSI</button>
-          <button type="button" class="map-tools-item" id="secARsiColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show aRSI (adjusted RSI) column — Numpad 8 then *">aRSI</button>
+          <button type="button" class="map-tools-item" id="secARsiColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show aRSI (adjusted RSI) column — Numpad * then 8">aRSI</button>
         </div>
       </div>
       <div class="ss-nav-picker-host" id="ssSongPickerHost" hidden></div>
@@ -7652,7 +7652,7 @@ try {
   var _smc = localStorage.getItem(SONG_META_COLS_KEY);
   if (_smc === "0") songMetaColsOn = false;
 } catch (eSmc) {}
-/* Song Map Tools → aRSI (adjusted RSI with variety). Numpad 8 then * toggles it. Default off. */
+/* Song Map Tools → aRSI (adjusted RSI with variety). Numpad * then 8 toggles it. Default off. */
 var ARSI_COL_KEY = "riffjams-arsi-col";
 var aRsiColOn = false;
 try { if (localStorage.getItem(ARSI_COL_KEY) === "1") aRsiColOn = true; } catch (eArsi) {}
@@ -7729,7 +7729,7 @@ function isSongMetaColsNumpad8(e) {
   if (typeof isNumpadKey === "function" && isNumpadKey(e, "8")) return true;
   return false;
 }
-var songMetaLast8At = 0;
+var songMetaStarArmed = false;
 function isNumpadStar(e) {
   return String(e.code || "") === "NumpadMultiply" || (e.location === 3 && String(e.key || "") === "*") || e.keyCode === 106;
 }
@@ -7738,18 +7738,21 @@ function handleSongMetaColsShortcut(e) {
   if (e.metaKey || e.ctrlKey || e.altKey) return false;
   if (!document.body.classList.contains("sections-mode")) return false;
   if (!songMetaColsShortcutTargetOk(e.target)) return false;
-  if (isNumpadStar(e) && songMetaLast8At && (Date.now() - songMetaLast8At) < 1500) {
-    songMetaLast8At = 0;
+  /* * then 8 = aRSI. * only arms the next key; 8 fires instantly either way. */
+  if (isNumpadStar(e)) {
+    songMetaStarArmed = true;
+    e.preventDefault();
+    return true;
+  }
+  var armed = songMetaStarArmed;
+  if (e.key !== "Shift" && e.key !== "NumLock") songMetaStarArmed = false;
+  if (!isSongMetaColsNumpad8(e)) return false;
+  if (armed) {
     e.preventDefault();
     try { e.stopImmediatePropagation(); } catch (errStopA) {}
-    /* 8* = aRSI: put RSI back the way it was before the 8, then toggle aRSI. */
-    setSongMetaCols(!songMetaColsOn);
     toggleARsiColUi();
     return true;
   }
-  if (!isSongMetaColsNumpad8(e)) return false;
-  if (e.repeat) { e.preventDefault(); return true; }
-  songMetaLast8At = Date.now();
   e.preventDefault();
   try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
   /* Same path as Tools → Meta. Single window-capture listener only (no doc duplicate). */
@@ -15340,6 +15343,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=368"></script>
+<script src="riffjams-admin.js?v=369"></script>
 </body>
 </html>
