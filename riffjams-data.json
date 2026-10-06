@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T02:21:27.082Z",
+  "updatedAt": "2026-10-06T02:22:59.667Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -964,8 +964,7 @@
             [
               "S1",
               1,
-              "",
-              []
+              "ITV-S1"
             ],
             [
               "B2",
@@ -976,21 +975,23 @@
             [
               "B3",
               1,
-              "",
-              []
+              "ITV-B3"
             ],
             [
               "S2",
               1,
-              "",
-              []
+              "ITV-S2"
             ],
             [
               "V2",
               3,
               "V2"
             ],
-            null,
+            [
+              "B4",
+              3,
+              "B4"
+            ],
             null,
             null,
             null,
@@ -3105,6 +3106,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -3211,6 +3213,7 @@
               ],
               null,
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -3313,6 +3316,7 @@
                 188.2,
                 194.7
               ],
+              null,
               null,
               null,
               null,
@@ -3461,6 +3465,7 @@
               null,
               null,
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -3519,12 +3524,14 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
           {
             "song": "Evil Woman",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -3561,12 +3568,14 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
           {
             "song": "Warning",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -3650,6 +3659,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -3687,6 +3697,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -3701,6 +3712,7 @@
                 "S1",
                 1
               ],
+              null,
               null,
               null,
               null,
@@ -3771,6 +3783,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -3803,6 +3816,7 @@
                 "B4",
                 3
               ],
+              null,
               null,
               null,
               null,
@@ -3854,6 +3868,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -3878,6 +3893,7 @@
                 3,
                 "RS-V2"
               ],
+              null,
               null,
               null,
               null,
@@ -3954,6 +3970,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           }
@@ -3997,6 +4014,7 @@
                 "",
                 []
               ],
+              null,
               null,
               null,
               null,
@@ -4053,6 +4071,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -4065,6 +4084,7 @@
                 "",
                 []
               ],
+              null,
               null,
               null,
               null,
@@ -4130,6 +4150,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -4142,6 +4163,7 @@
                 "LOTW-I1",
                 "3D"
               ],
+              null,
               null,
               null,
               null,
@@ -4276,12 +4298,14 @@
                 297.9,
                 314.8
               ],
+              null,
               null
             ]
           },
           {
             "song": "Solitude",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -4390,21 +4414,29 @@
               [
                 "S1",
                 1,
-                "",
-                []
+                "ITV-S1",
+                [],
+                285.8
               ],
-              null,
               [
                 "B3",
                 1,
-                "",
-                []
+                "ITV-B3",
+                [],
+                303.8
               ],
               [
                 "S2",
                 1,
-                "",
-                []
+                "ITV-S2",
+                [],
+                327.6
+              ],
+              null,
+              [
+                "B4",
+                3,
+                "B4"
               ]
             ]
           }
@@ -4418,6 +4450,7 @@
           {
             "song": "Wheels of Confusion",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -4521,6 +4554,7 @@
               null,
               null,
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -4564,12 +4598,14 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
           {
             "song": "FX",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -4666,6 +4702,7 @@
                 228,
                 263.5
               ],
+              null,
               null,
               null,
               null,
@@ -4803,6 +4840,7 @@
                 268.7,
                 320.7
               ],
+              null,
               null,
               null
             ],
@@ -4965,6 +5003,7 @@
                 220.2,
                 225.1
               ],
+              null,
               null
             ],
             "sectionRulers": [
@@ -4993,6 +5032,7 @@
           {
             "song": "Laguna Sunrise",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -5084,6 +5124,7 @@
               null,
               null,
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -5112,6 +5153,7 @@
           {
             "song": "Under the Sun",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -5209,6 +5251,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -5288,12 +5331,14 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
           {
             "song": "Fluff",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -5377,6 +5422,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -5448,12 +5494,14 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
           {
             "song": "Who Are You?",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -5510,6 +5558,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -5546,6 +5595,7 @@
                 "",
                 []
               ],
+              null,
               null,
               null,
               null,
@@ -5989,7 +6039,7 @@
       "song": "Into the Void",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.36,
+      "riffSaturationIndex": 2.466,
       "chips": [
         {
           "code": "I1",
@@ -6083,9 +6133,33 @@
           "code": "V1",
           "tier": 1,
           "start": 273.2,
+          "stop": 285.8,
+          "duration": 12.6,
+          "lick": "ITV-V1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 285.8,
+          "stop": 303.8,
+          "duration": 18,
+          "lick": "ITV-S1"
+        },
+        {
+          "code": "B3",
+          "tier": 1,
+          "start": 303.8,
+          "stop": 327.6,
+          "duration": 23.8,
+          "lick": "ITV-B3"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 327.6,
           "stop": null,
           "duration": null,
-          "lick": "ITV-V1"
+          "lick": "ITV-S2"
         }
       ]
     },
