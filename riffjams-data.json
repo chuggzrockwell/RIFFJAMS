@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:55:29.215Z",
+  "updatedAt": "2026-10-06T13:57:27.372Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -393,7 +393,8 @@
           "sections": [
             [
               "V",
-              3
+              3,
+              "PC-V"
             ],
             [
               "S1",
@@ -518,11 +519,7 @@
               "EF-B4",
               1
             ],
-            [
-              "S2",
-              1,
-              "IM-S2"
-            ],
+            null,
             null,
             null,
             null,
@@ -3842,7 +3839,10 @@
             "chips": [
               [
                 "V",
-                3
+                3,
+                "PC-V",
+                1,
+                0
               ],
               [
                 "S1",
@@ -4027,11 +4027,7 @@
                 "B4",
                 3
               ],
-              [
-                "S2",
-                1,
-                "IM-S2"
-              ],
+              null,
               null,
               null,
               null,
@@ -6366,6 +6362,23 @@
           "stop": 164.2,
           "duration": 22.9,
           "lick": "P-V1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "Planet Caravan",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "V",
+          "tier": 3,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "PC-V"
         }
       ]
     },
