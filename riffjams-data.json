@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T02:27:04.698Z",
+  "updatedAt": "2026-10-06T13:30:09.251Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -293,7 +293,7 @@
           "sections": [
             [
               "I1",
-              1,
+              2,
               "WP-I1",
               "1P"
             ],
@@ -967,15 +967,15 @@
               "1O"
             ],
             [
-              "S1",
-              1,
-              "ITV-S1"
-            ],
-            [
               "B2",
               1,
               "ITV-B2",
               3
+            ],
+            [
+              "S1",
+              1,
+              "ITV-S1"
             ],
             [
               "B3",
@@ -3606,7 +3606,7 @@
             "chips": [
               [
                 "I1",
-                1,
+                2,
                 "WP-I1",
                 "1P"
               ],
@@ -4414,9 +4414,7 @@
               [
                 "S1",
                 1,
-                "ITV-S1",
-                [],
-                285.8
+                "ITV-S1"
               ],
               [
                 "B3",
@@ -6142,17 +6140,9 @@
           "code": "V1",
           "tier": 1,
           "start": 273.2,
-          "stop": 285.8,
-          "duration": 12.6,
-          "lick": "ITV-V1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 285.8,
           "stop": 303.8,
-          "duration": 18,
-          "lick": "ITV-S1"
+          "duration": 30.6,
+          "lick": "ITV-V1"
         },
         {
           "code": "B3",
