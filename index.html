@@ -6311,8 +6311,17 @@ function wireNibV2Lick(songsOwner) {
       ["sections", "chips"].forEach(function(field){
         (s[field] || []).forEach(function(pair){
           if (isChipPair(pair) && pair[0] === "V2" && (!pair[2] || pair[2] === "V2")) pair[2] = "ITV-V2";
+          if (isChipPair(pair) && pair[0] === "S3" && (!pair[2] || pair[2] === "S3")) pair[2] = "ITV-S3";
         });
       });
+      if (Array.isArray(s.sections)) {
+        var hasS3 = s.sections.some(function(p){ return isChipPair(p) && p[0] === "S3"; });
+        if (!hasS3) {
+          var slot = -1;
+          for (var k = 0; k < s.sections.length; k++) { if (!isChipPair(s.sections[k])) { slot = k; break; } }
+          if (slot < 0) s.sections.push(["S3", 3, "ITV-S3"]); else s.sections[slot] = ["S3", 3, "ITV-S3"];
+        }
+      }
     });
   });
 }
@@ -15262,6 +15271,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=363"></script>
+<script src="riffjams-admin.js?v=364"></script>
 </body>
 </html>
