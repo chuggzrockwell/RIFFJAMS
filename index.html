@@ -6286,6 +6286,11 @@ function wireNibV2Lick(songsOwner) {
           var pos = pair[3];
           if (pos === 3 || pos === "3" || (Array.isArray(pos) && pos.length === 1 && String(pos[0]) === "3")) pair[3] = "3D";
         });
+        (s[field] || []).forEach(function(pair){
+          if (!isChipPair(pair) || pair[0] !== "B1") return;
+          if (!pair[2]) pair[2] = "LOTW-B1";
+          if (Array.isArray(pair[3]) && !pair[3].length) pair[3] = 3;
+        });
       });
     });
   });
@@ -14991,6 +14996,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=341"></script>
+<script src="riffjams-admin.js?v=342"></script>
 </body>
 </html>
