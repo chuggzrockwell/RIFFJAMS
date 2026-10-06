@@ -6277,6 +6277,17 @@ function wireNibV2Lick(songsOwner) {
         });
       });
     });
+    (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "Lord of This World") return;
+      ["sections", "chips"].forEach(function(field){
+        (s[field] || []).forEach(function(pair){
+          if (!isChipPair(pair) || pair[0] !== "I1") return;
+          if (!pair[2]) pair[2] = "LOTW-I1";
+          var pos = pair[3];
+          if (pos === 3 || pos === "3" || (Array.isArray(pos) && pos.length === 1 && String(pos[0]) === "3")) pair[3] = "3D";
+        });
+      });
+    });
   });
 }
 window.wireNibV2Lick = wireNibV2Lick;
@@ -14980,6 +14991,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=339"></script>
+<script src="riffjams-admin.js?v=340"></script>
 </body>
 </html>
