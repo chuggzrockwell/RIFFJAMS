@@ -3520,6 +3520,36 @@
       inset 0 -1px 0 rgba(0,0,0,.25),
       0 0 0 1px rgba(0,0,0,.35) !important;
   }
+  /* Saturation: Arrangement chips use riff-view tier purples (Tools → Saturation / * then 6) */
+  body.sections-arrange.arr-saturation .sec-chip.tier-1:not(.empty):not(.filtered-out) {
+    background: #7030a0 !important;
+    color: #fff !important;
+    text-shadow: none !important;
+    box-shadow:
+      inset -1px 0 0 rgba(0,0,0,.25),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 0 1px rgba(0,0,0,.35) !important;
+  }
+  body.sections-arrange.arr-saturation .sec-chip.tier-2:not(.empty):not(.filtered-out) {
+    background: #a365d1 !important;
+    color: #fff !important;
+    text-shadow: none !important;
+    box-shadow:
+      inset -1px 0 0 rgba(0,0,0,.25),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 0 1px rgba(0,0,0,.35) !important;
+  }
+  body.sections-arrange.arr-saturation .sec-chip.tier-3:not(.empty):not(.filtered-out),
+  body.sections-arrange.arr-saturation .sec-chip.tier-4:not(.empty):not(.filtered-out),
+  body.sections-arrange.arr-saturation .sec-chip.tier-5:not(.empty):not(.filtered-out) {
+    background: #d4bbe3 !important;
+    color: #1a1020 !important;
+    text-shadow: none !important;
+    box-shadow:
+      inset -1px 0 0 rgba(0,0,0,.25),
+      inset 0 -1px 0 rgba(0,0,0,.25),
+      0 0 0 1px rgba(0,0,0,.35) !important;
+  }
   body.sections-arrange .sec-chip.S:not(.filtered-out),
   body.sections-arrange .sec-chip.L:not(.filtered-out) {
     color: var(--arr-fg, #fff) !important;
@@ -4547,6 +4577,7 @@
           <button type="button" class="map-tools-item" id="secRulersBtn" role="menuitemcheckbox" aria-checked="false" title="Show section rulers">Rulers</button>
           <button type="button" class="map-tools-item" id="secMetaColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show RSI column">RSI</button>
           <button type="button" class="map-tools-item" id="secARsiColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show aRSI (adjusted RSI) column — Numpad * then 8">aRSI</button>
+          <button type="button" class="map-tools-item" id="secSaturationBtn" role="menuitemcheckbox" aria-checked="false" title="Arrangement: riff-tier purple colors — Numpad * then 6">Saturation</button>
         </div>
       </div>
       <div class="ss-nav-picker-host" id="ssSongPickerHost" hidden></div>
@@ -7740,16 +7771,44 @@ function isSongMetaColsNumpad8(e) {
   if (typeof isNumpadKey === "function" && isNumpadKey(e, "8")) return true;
   return false;
 }
+/* Song Map Tools → Saturation (Arrangement riff-tier purples). Numpad * then 6 toggles. Default off. */
+var ARR_SATURATION_KEY = "riffjams-arr-saturation";
+var arrSaturationOn = false;
+try { if (localStorage.getItem(ARR_SATURATION_KEY) === "1") arrSaturationOn = true; } catch (eSat) {}
+function syncArrSaturationUi() {
+  document.body.classList.toggle("arr-saturation", !!arrSaturationOn);
+  var btn = document.getElementById("secSaturationBtn");
+  if (!btn) return;
+  btn.classList.toggle("on", arrSaturationOn);
+  btn.setAttribute("aria-checked", arrSaturationOn ? "true" : "false");
+}
+function toggleArrSaturationUi() {
+  arrSaturationOn = !arrSaturationOn;
+  try { localStorage.setItem(ARR_SATURATION_KEY, arrSaturationOn ? "1" : "0"); } catch (eSatSet) {}
+  syncArrSaturationUi();
+}
 var songMetaStarArmed = false;
 function isNumpadStar(e) {
   return String(e.code || "") === "NumpadMultiply" || (e.location === 3 && String(e.key || "") === "*") || e.keyCode === 106;
+}
+function isSongMetaStarNumpad6(e) {
+  if (!e) return false;
+  var code = String(e.code || "");
+  var key = String(e.key || "");
+  if (code === "Numpad6") return true;
+  if (e.location === 3 && key === "6") return true;
+  /* NumLock off: physical Numpad 6 reports as ArrowRight (location NUMPAD). */
+  if (e.location === 3 && (key === "ArrowRight" || code === "ArrowRight" || e.keyCode === 39 || e.which === 39)) return true;
+  if (e.keyCode === 102 || e.which === 102) return true;
+  if (typeof isNumpadKey === "function" && isNumpadKey(e, "6")) return true;
+  return false;
 }
 function handleSongMetaColsShortcut(e) {
   if (!e || e.type !== "keydown") return false;
   if (e.metaKey || e.ctrlKey || e.altKey) return false;
   if (!document.body.classList.contains("sections-mode")) return false;
   if (!songMetaColsShortcutTargetOk(e.target)) return false;
-  /* * then 8 = aRSI. * only arms the next key; 8 fires instantly either way. */
+  /* * arms next key: *8 = aRSI, *6 = Saturation. Follow-up key fires instantly. */
   if (isNumpadStar(e)) {
     songMetaStarArmed = true;
     e.preventDefault();
@@ -7757,6 +7816,12 @@ function handleSongMetaColsShortcut(e) {
   }
   var armed = songMetaStarArmed;
   if (e.key !== "Shift" && e.key !== "NumLock") songMetaStarArmed = false;
+  if (armed && isSongMetaStarNumpad6(e)) {
+    e.preventDefault();
+    try { e.stopImmediatePropagation(); } catch (errStopSat) { try { e.stopPropagation(); } catch (errSat2) {} }
+    toggleArrSaturationUi();
+    return true;
+  }
   if (!isSongMetaColsNumpad8(e)) return false;
   if (armed) {
     e.preventDefault();
@@ -7782,6 +7847,7 @@ function mapToolsIsOpen() {
 }
 syncSectionRulersUi();
 syncSongMetaColsUi();
+syncArrSaturationUi();
 /* Song-section rulers: inclusive chip columns on the song of the map on screen.
    Overlaps clamp — a ruler never takes a chip another ruler already claims. */
 function readSectionRulers(song) {
@@ -14081,6 +14147,11 @@ document.getElementById("secModes").onclick = function(e){
     setMapToolsOpen(false);
     return;
   }
+  if (e.target.closest("#secSaturationBtn")) {
+    toggleArrSaturationUi();
+    setMapToolsOpen(false);
+    return;
+  }
   var btn = e.target.closest(".sec-mode-btn[data-sec-mode]");
   if (!btn) return;
   setSectionsMode(btn.getAttribute("data-sec-mode"));
@@ -15130,6 +15201,7 @@ function handleSingleSongShortcut(e) {
   if (!document.body.classList.contains("sections-mode")) return false;
   if (!singleSongShortcutTargetOk(e.target)) return false;
   if (!isSingleSongNumpad6(e)) return false;
+  /* * then 6 = Saturation: handled earlier via stopImmediatePropagation in handleSongMetaColsShortcut. */
   e.preventDefault();
   try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
   cycleMapView();
@@ -15354,6 +15426,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=374"></script>
+<script src="riffjams-admin.js?v=375"></script>
 </body>
 </html>
