@@ -10240,9 +10240,15 @@ function smFindArrangementSongByName(songName) {
 function smCollectTimedArrChips(song) {
   var out = [];
   if (!song) return out;
+  var firstCi = -1;
+  (song.chips || []).some(function(pair, ci){ if (isChipPair(pair)) { firstCi = ci; return true; } return false; });
+  var anyTimed = (song.chips || []).some(function(pair){ return isChipPair(pair) && chipStartSec(pair) != null; });
+  if (!anyTimed) firstCi = -1;
   (song.chips || []).forEach(function(pair, ci){
     if (!isChipPair(pair)) return;
     var start = chipStartSec(pair);
+    /* Untimed opening chip (e.g. intro) counts from 0:00 so it highlights before the first timed chip. */
+    if (start == null && !out.length && ci === firstCi) start = 0;
     if (start == null) return;
     out.push({ code: pair[0], start: start, ci: ci, pair: pair });
   });
@@ -14996,6 +15002,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=345"></script>
+<script src="riffjams-admin.js?v=346"></script>
 </body>
 </html>
