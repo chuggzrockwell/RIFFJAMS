@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:52:00.117Z",
+  "updatedAt": "2026-10-06T13:53:10.705Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3919,6 +3919,35 @@
                 197.1
               ],
               [
+                "V4",
+                2,
+                "IM-V4",
+                3,
+                219.1
+              ],
+              [
+                "V4",
+                2,
+                "IM-V4",
+                3,
+                225.5
+              ],
+              [
+                "V1",
+                1,
+                "IM-V1",
+                [],
+                237.4
+              ],
+              [
+                "V2",
+                2,
+                "IM-V2",
+                3,
+                262.2
+              ],
+              null,
+              [
                 "S2",
                 1,
                 "IM-S2"
@@ -3932,11 +3961,6 @@
                   3
                 ]
               ],
-              null,
-              null,
-              null,
-              null,
-              null,
               null
             ]
           },
@@ -6312,7 +6336,7 @@
       "song": "Iron Man",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.562,
+      "riffSaturationIndex": 2.606,
       "chips": [
         {
           "code": "V1",
@@ -6374,9 +6398,41 @@
           "code": "S1",
           "tier": 1,
           "start": 197.1,
+          "stop": 219.1,
+          "duration": 22,
+          "lick": "IM-S1"
+        },
+        {
+          "code": "V4",
+          "tier": 2,
+          "start": 219.1,
+          "stop": 225.5,
+          "duration": 6.4,
+          "lick": "IM-V4"
+        },
+        {
+          "code": "V4",
+          "tier": 2,
+          "start": 225.5,
+          "stop": 237.4,
+          "duration": 11.9,
+          "lick": "IM-V4"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 237.4,
+          "stop": 262.2,
+          "duration": 24.8,
+          "lick": "IM-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 262.2,
           "stop": null,
           "duration": null,
-          "lick": "IM-S1"
+          "lick": "IM-V2"
         }
       ]
     },
