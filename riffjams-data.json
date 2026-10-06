@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:33:25.557Z",
+  "updatedAt": "2026-10-06T13:35:09.265Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3616,24 +3616,37 @@
               [
                 "V1",
                 3,
-                "WP-V1"
+                "WP-V1",
+                1,
+                51.9
               ],
               [
                 "V2",
                 2,
                 "WP-V2",
-                "1i⁵–ii⁵–♭III⁵"
+                "1i⁵–ii⁵–♭III⁵",
+                105.9
               ],
               [
                 "V3",
                 2,
-                "WP-V3"
+                "WP-V3",
+                1,
+                126.9
               ],
               [
                 "V4",
                 1,
                 "WP-V4",
-                "1O"
+                "1O",
+                137.5
+              ],
+              [
+                "V3",
+                2,
+                "WP-V3",
+                1,
+                158.2
               ],
               [
                 "S1",
@@ -3657,7 +3670,6 @@
                 1,
                 "WP-S2"
               ],
-              null,
               null,
               null,
               null,
@@ -5922,15 +5934,55 @@
       "song": "War Pigs",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": null,
+      "riffSaturationIndex": 1.79,
       "chips": [
         {
           "code": "I1",
           "tier": 2,
           "start": 0,
+          "stop": 51.9,
+          "duration": 51.9,
+          "lick": "WP-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 51.9,
+          "stop": 105.9,
+          "duration": 54,
+          "lick": "WP-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 105.9,
+          "stop": 126.9,
+          "duration": 21,
+          "lick": "WP-V2"
+        },
+        {
+          "code": "V3",
+          "tier": 2,
+          "start": 126.9,
+          "stop": 137.5,
+          "duration": 10.6,
+          "lick": "WP-V3"
+        },
+        {
+          "code": "V4",
+          "tier": 1,
+          "start": 137.5,
+          "stop": 158.2,
+          "duration": 20.7,
+          "lick": "WP-V4"
+        },
+        {
+          "code": "V3",
+          "tier": 2,
+          "start": 158.2,
           "stop": null,
           "duration": null,
-          "lick": "WP-I1"
+          "lick": "WP-V3"
         }
       ]
     },
