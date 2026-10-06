@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T02:18:45.593Z",
+  "updatedAt": "2026-10-06T02:19:54.014Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -4338,20 +4338,19 @@
                 1,
                 125.1
               ],
-              null,
               [
-                "B1",
-                2,
-                "ITV-B1",
-                "1O",
-                183.8
+                "V1",
+                1,
+                "ITV-V1",
+                3,
+                134.5
               ],
               [
                 "V2",
                 3,
                 "V2",
                 1,
-                206.7
+                172.2
               ],
               [
                 "B1",
@@ -4360,6 +4359,7 @@
                 "1O",
                 183.8
               ],
+              null,
               null,
               null,
               null,
@@ -5970,7 +5970,7 @@
       "song": "Into the Void",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.88,
+      "riffSaturationIndex": 2.275,
       "chips": [
         {
           "code": "I1",
@@ -6008,33 +6008,33 @@
           "code": "V2",
           "tier": 3,
           "start": 125.1,
-          "stop": 183.8,
-          "duration": 58.7,
+          "stop": 134.5,
+          "duration": 9.4,
           "lick": "V2"
         },
         {
-          "code": "B1",
-          "tier": 2,
-          "start": 183.8,
-          "stop": 183.8,
-          "duration": null,
-          "lick": "ITV-B1"
-        },
-        {
-          "code": "B1",
-          "tier": 2,
-          "start": 183.8,
-          "stop": 206.7,
-          "duration": 22.9,
-          "lick": "ITV-B1"
+          "code": "V1",
+          "tier": 1,
+          "start": 134.5,
+          "stop": 172.2,
+          "duration": 37.7,
+          "lick": "ITV-V1"
         },
         {
           "code": "V2",
           "tier": 3,
-          "start": 206.7,
+          "start": 172.2,
+          "stop": 183.8,
+          "duration": 11.6,
+          "lick": "V2"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 183.8,
           "stop": null,
           "duration": null,
-          "lick": "V2"
+          "lick": "ITV-B1"
         }
       ]
     },
