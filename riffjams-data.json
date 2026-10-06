@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:37:18.279Z",
+  "updatedAt": "2026-10-06T13:38:24.777Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -265,7 +265,12 @@
         {
           "song": "Warning",
           "sections": [
-            null,
+            [
+              "O2",
+              1,
+              "WP-O2",
+              3
+            ],
             null,
             null,
             null,
@@ -3577,7 +3582,12 @@
           {
             "song": "Warning",
             "chips": [
-              null,
+              [
+                "O2",
+                1,
+                "WP-O2",
+                3
+              ],
               null,
               null,
               null,
@@ -3683,24 +3693,27 @@
                 "1i⁵–ii⁵–♭III⁵",
                 322.6
               ],
-              null,
-              null,
               [
                 "O1",
                 2,
-                "WP-O1"
+                "WP-O1",
+                1,
+                343.3
               ],
               [
                 "O2",
                 1,
                 "WP-O2",
-                3
+                3,
+                394.4
               ],
               [
                 "S2",
                 1,
                 "WP-S2"
               ],
+              null,
+              null,
               null
             ]
           },
@@ -5959,7 +5972,7 @@
       "song": "War Pigs",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.978,
+      "riffSaturationIndex": 1.982,
       "chips": [
         {
           "code": "I1",
@@ -6045,9 +6058,25 @@
           "code": "V2",
           "tier": 2,
           "start": 322.6,
+          "stop": 343.3,
+          "duration": 20.7,
+          "lick": "WP-V2"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 343.3,
+          "stop": 394.4,
+          "duration": 51.1,
+          "lick": "WP-O1"
+        },
+        {
+          "code": "O2",
+          "tier": 1,
+          "start": 394.4,
           "stop": null,
           "duration": null,
-          "lick": "WP-V2"
+          "lick": "WP-O2"
         }
       ]
     },
