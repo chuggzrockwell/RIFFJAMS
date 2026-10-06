@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T01:03:29.837Z",
+  "updatedAt": "2026-10-06T01:05:29.697Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -899,7 +899,8 @@
             [
               "V2",
               3,
-              "LOTW-V2"
+              "LOTW-V2",
+              []
             ],
             null,
             null,
@@ -3092,6 +3093,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -3195,7 +3197,8 @@
                 [],
                 252.6,
                 257.3
-              ]
+              ],
+              null
             ],
             "sectionRulers": [
               {
@@ -3297,6 +3300,7 @@
                 188.2,
                 194.7
               ],
+              null,
               null,
               null,
               null,
@@ -3439,6 +3443,7 @@
                 310.7,
                 360.3
               ],
+              null,
               null
             ],
             "sectionRulers": [
@@ -3493,12 +3498,15 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
           {
             "song": "Evil Woman",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -3529,12 +3537,14 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
           {
             "song": "Warning",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -4161,7 +4171,21 @@
                 ],
                 136.9
               ],
+              [
+                "I1",
+                1,
+                "LOTW-I1",
+                "3D",
+                166.6
+              ],
               null,
+              [
+                "V1",
+                2,
+                "LOTW-V1",
+                3,
+                28.1
+              ],
               null,
               [
                 "B2",
@@ -4185,8 +4209,6 @@
                 "",
                 3
               ],
-              null,
-              null,
               null
             ]
           },
@@ -5704,8 +5726,16 @@
       "song": "Lord of This World",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.904,
+      "riffSaturationIndex": 2.139,
       "chips": [
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 28.1,
+          "stop": 28.1,
+          "duration": null,
+          "lick": "LOTW-V1"
+        },
         {
           "code": "V1",
           "tier": 2,
@@ -5750,9 +5780,17 @@
           "code": "S1",
           "tier": 1,
           "start": 136.9,
+          "stop": 166.6,
+          "duration": 29.7,
+          "lick": "LOTW-S1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 166.6,
           "stop": null,
           "duration": null,
-          "lick": "LOTW-S1"
+          "lick": "LOTW-I1"
         }
       ]
     },
