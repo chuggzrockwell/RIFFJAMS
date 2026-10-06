@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T15:37:29.465Z",
+  "updatedAt": "2026-10-06T15:38:35.921Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -586,7 +586,7 @@
             ],
             [
               "V1",
-              3,
+              2,
               "RS-V2"
             ],
             [
@@ -4263,7 +4263,7 @@
               ],
               [
                 "V1",
-                3,
+                2,
                 "RS-V2",
                 1,
                 12.9
@@ -4317,7 +4317,14 @@
                 1,
                 127.7
               ],
-              null,
+              [
+                "V3",
+                3,
+                "V3",
+                1,
+                137.2,
+                146.5
+              ],
               null,
               null,
               null,
@@ -7012,9 +7019,9 @@
     {
       "album": "Paranoid",
       "song": "Rat Salad",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.326,
+      "endSec": 146.5,
+      "complete": true,
+      "riffSaturationIndex": 1.317,
       "chips": [
         {
           "code": "I1",
@@ -7026,7 +7033,7 @@
         },
         {
           "code": "V1",
-          "tier": 3,
+          "tier": 2,
           "start": 12.9,
           "stop": 17.8,
           "duration": 4.9,
@@ -7084,9 +7091,17 @@
           "code": "V2",
           "tier": 3,
           "start": 127.7,
-          "stop": null,
-          "duration": null,
+          "stop": 137.2,
+          "duration": 9.5,
           "lick": "RS-V2"
+        },
+        {
+          "code": "V3",
+          "tier": 3,
+          "start": 137.2,
+          "stop": 146.5,
+          "duration": 9.3,
+          "lick": "V3"
         }
       ]
     },
