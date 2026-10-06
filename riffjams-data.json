@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T16:16:28.556Z",
+  "updatedAt": "2026-10-06T16:17:29.387Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3149,6 +3149,8 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
@@ -3256,6 +3258,8 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -3358,6 +3362,8 @@
                 188.2,
                 194.7
               ],
+              null,
+              null,
               null,
               null,
               null,
@@ -3508,6 +3514,8 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -3567,12 +3575,16 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
           {
             "song": "Evil Woman",
             "chips": [
+              null,
+              null,
               null,
               null,
               null,
@@ -3611,12 +3623,16 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
           {
             "song": "Warning",
             "chips": [
+              null,
+              null,
               null,
               null,
               null,
@@ -3759,6 +3775,8 @@
                 458.7,
                 467.1
               ],
+              null,
+              null,
               null
             ]
           },
@@ -3854,6 +3872,8 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
@@ -3875,6 +3895,8 @@
                 149,
                 269
               ],
+              null,
+              null,
               null,
               null,
               null,
@@ -4021,7 +4043,9 @@
                 ],
                 331.8,
                 351
-              ]
+              ],
+              null,
+              null
             ]
           },
           {
@@ -4133,6 +4157,8 @@
                 248.7,
                 279
               ],
+              null,
+              null,
               null,
               null
             ]
@@ -4259,7 +4285,9 @@
                 1,
                 405.4,
                 428
-              ]
+              ],
+              null,
+              null
             ]
           },
           {
@@ -4336,6 +4364,8 @@
                 137.2,
                 146.5
               ],
+              null,
+              null,
               null,
               null,
               null,
@@ -4440,6 +4470,27 @@
                 226.8
               ],
               [
+                "I4",
+                3,
+                "FOB-I4",
+                1,
+                238.6
+              ],
+              [
+                "V1",
+                3,
+                "FOB-V1",
+                1,
+                250.3
+              ],
+              [
+                "B1",
+                3,
+                "FOB-L1",
+                1,
+                328.2
+              ],
+              [
                 "O1",
                 3,
                 "FOB-O1"
@@ -4453,8 +4504,7 @@
                 "L2",
                 3,
                 "FOB-L2"
-              ],
-              null
+              ]
             ]
           }
         ]
@@ -4497,6 +4547,8 @@
                 "",
                 []
               ],
+              null,
+              null,
               null,
               null,
               null,
@@ -4555,6 +4607,8 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
@@ -4567,6 +4621,8 @@
                 "",
                 []
               ],
+              null,
+              null,
               null,
               null,
               null,
@@ -4634,6 +4690,8 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
@@ -4646,6 +4704,8 @@
                 "LOTW-I1",
                 "3D"
               ],
+              null,
+              null,
               null,
               null,
               null,
@@ -4782,12 +4842,16 @@
                 314.8
               ],
               null,
+              null,
+              null,
               null
             ]
           },
           {
             "song": "Solitude",
             "chips": [
+              null,
+              null,
               null,
               null,
               null,
@@ -4927,7 +4991,9 @@
                 3,
                 356.3,
                 367.5
-              ]
+              ],
+              null,
+              null
             ]
           }
         ]
@@ -4940,6 +5006,8 @@
           {
             "song": "Wheels of Confusion",
             "chips": [
+              null,
+              null,
               null,
               null,
               null,
@@ -5045,6 +5113,8 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -5089,12 +5159,16 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
           {
             "song": "FX",
             "chips": [
+              null,
+              null,
               null,
               null,
               null,
@@ -5192,6 +5266,8 @@
                 228,
                 263.5
               ],
+              null,
+              null,
               null,
               null,
               null,
@@ -5330,6 +5406,8 @@
                 268.7,
                 320.7
               ],
+              null,
+              null,
               null,
               null,
               null
@@ -5494,6 +5572,8 @@
                 225.1
               ],
               null,
+              null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -5522,6 +5602,8 @@
           {
             "song": "Laguna Sunrise",
             "chips": [
+              null,
+              null,
               null,
               null,
               null,
@@ -5615,6 +5697,8 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -5643,6 +5727,8 @@
           {
             "song": "Under the Sun",
             "chips": [
+              null,
+              null,
               null,
               null,
               null,
@@ -5742,6 +5828,8 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
@@ -5822,12 +5910,16 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
           {
             "song": "Fluff",
             "chips": [
+              null,
+              null,
               null,
               null,
               null,
@@ -5913,6 +6005,8 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
@@ -5985,12 +6079,16 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
           {
             "song": "Who Are You?",
             "chips": [
+              null,
+              null,
               null,
               null,
               null,
@@ -6049,6 +6147,8 @@
               null,
               null,
               null,
+              null,
+              null,
               null
             ]
           },
@@ -6085,6 +6185,8 @@
                 "",
                 []
               ],
+              null,
+              null,
               null,
               null,
               null,
@@ -7167,7 +7269,7 @@
       "song": "Fairies Wear Boots",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.449,
+      "riffSaturationIndex": 1.346,
       "chips": [
         {
           "code": "I1",
@@ -7269,9 +7371,33 @@
           "code": "I3",
           "tier": 2,
           "start": 226.8,
+          "stop": 238.6,
+          "duration": 11.8,
+          "lick": "FOB-I3"
+        },
+        {
+          "code": "I4",
+          "tier": 3,
+          "start": 238.6,
+          "stop": 250.3,
+          "duration": 11.7,
+          "lick": "FOB-I4"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 250.3,
+          "stop": 328.2,
+          "duration": 77.9,
+          "lick": "FOB-V1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 328.2,
           "stop": null,
           "duration": null,
-          "lick": "FOB-I3"
+          "lick": "FOB-L1"
         }
       ]
     },
