@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:47:00.067Z",
+  "updatedAt": "2026-10-06T13:48:38.244Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -460,7 +460,11 @@
                 3
               ]
             ],
-            null,
+            [
+              "I1",
+              3,
+              "i1"
+            ],
             null,
             null,
             null,
@@ -3812,15 +3816,10 @@
                 3,
                 "P-V1",
                 1,
-                141.3
+                141.3,
+                164.2
               ],
-              [
-                "I1",
-                2,
-                "P-I1",
-                "4S",
-                106.1
-              ],
+              null,
               null,
               null,
               null,
@@ -3859,6 +3858,13 @@
           {
             "song": "Iron Man",
             "chips": [
+              [
+                "i1",
+                3,
+                "i1",
+                1,
+                0
+              ],
               [
                 "V1",
                 1,
@@ -3902,7 +3908,6 @@
                   3
                 ]
               ],
-              null,
               null,
               null,
               null,
@@ -6179,9 +6184,9 @@
     {
       "album": "Paranoid",
       "song": "Paranoid",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.583,
+      "endSec": 164.2,
+      "complete": true,
+      "riffSaturationIndex": 1.502,
       "chips": [
         {
           "code": "I1",
@@ -6251,14 +6256,6 @@
           "code": "I1",
           "tier": 2,
           "start": 106.1,
-          "stop": 106.1,
-          "duration": null,
-          "lick": "P-I1"
-        },
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 106.1,
           "stop": 117.8,
           "duration": 11.7,
           "lick": "P-I1"
@@ -6283,9 +6280,26 @@
           "code": "V1",
           "tier": 3,
           "start": 141.3,
+          "stop": 164.2,
+          "duration": 22.9,
+          "lick": "P-V1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "Iron Man",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "i1",
+          "tier": 3,
+          "start": 0,
           "stop": null,
           "duration": null,
-          "lick": "P-V1"
+          "lick": "i1"
         }
       ]
     },
