@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T16:15:25.594Z",
+  "updatedAt": "2026-10-06T16:16:28.556Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -4418,16 +4418,31 @@
                 1,
                 194.5
               ],
-              null,
+              [
+                "B2",
+                3,
+                "FOB-B1",
+                1,
+                208.3
+              ],
+              [
+                "I2",
+                2,
+                "FOB-I2",
+                "1D",
+                215.2
+              ],
+              [
+                "I3",
+                2,
+                "FOB-I3",
+                [],
+                226.8
+              ],
               [
                 "O1",
                 3,
                 "FOB-O1"
-              ],
-              [
-                "B2",
-                3,
-                "FOB-B1"
               ],
               [
                 "L1",
@@ -4439,7 +4454,6 @@
                 3,
                 "FOB-L2"
               ],
-              null,
               null
             ]
           }
@@ -7153,7 +7167,7 @@
       "song": "Fairies Wear Boots",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.464,
+      "riffSaturationIndex": 1.449,
       "chips": [
         {
           "code": "I1",
@@ -7231,9 +7245,33 @@
           "code": "B1",
           "tier": 3,
           "start": 194.5,
+          "stop": 208.3,
+          "duration": 13.8,
+          "lick": "FOB-L1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 208.3,
+          "stop": 215.2,
+          "duration": 6.9,
+          "lick": "FOB-B1"
+        },
+        {
+          "code": "I2",
+          "tier": 2,
+          "start": 215.2,
+          "stop": 226.8,
+          "duration": 11.6,
+          "lick": "FOB-I2"
+        },
+        {
+          "code": "I3",
+          "tier": 2,
+          "start": 226.8,
           "stop": null,
           "duration": null,
-          "lick": "FOB-L1"
+          "lick": "FOB-I3"
         }
       ]
     },
