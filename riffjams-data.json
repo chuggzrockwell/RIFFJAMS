@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-06T13:59:46.913Z",
+  "updatedAt": "2026-10-06T14:00:57.518Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -503,8 +503,7 @@
             [
               "B2",
               3,
-              "EF-B2",
-              1
+              "EF-B2"
             ],
             [
               "B3",
@@ -4031,16 +4030,28 @@
                 1,
                 62.4
               ],
-              null,
-              null,
+              [
+                "I1",
+                3,
+                "EF-I1",
+                "1O",
+                93.5
+              ],
               [
                 "B1",
-                3
+                3,
+                "EF-B1",
+                1,
+                108.9
               ],
               [
                 "B2",
-                3
+                3,
+                "EF-B2",
+                1,
+                136
               ],
+              null,
               [
                 "B3",
                 3
@@ -6580,9 +6591,33 @@
           "code": "V1",
           "tier": 3,
           "start": 62.4,
+          "stop": 93.5,
+          "duration": 31.1,
+          "lick": "EF-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 93.5,
+          "stop": 108.9,
+          "duration": 15.4,
+          "lick": "EF-I1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 108.9,
+          "stop": 136,
+          "duration": 27.1,
+          "lick": "EF-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 136,
           "stop": null,
           "duration": null,
-          "lick": "EF-V1"
+          "lick": "EF-B2"
         }
       ]
     },
