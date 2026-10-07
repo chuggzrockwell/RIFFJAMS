@@ -3781,6 +3781,34 @@
     z-index: 5;
     position: relative;
   }
+  /* Single Song Loop: cyan bracket around the looped chip range (reads over tier/arr colors + now-glow). */
+  body:not(.sections-single-song) #secLoopBtn { display: none; }
+  body.sections-single-song .ss-arr-wrap .sec-chip.is-loop:not(.empty) {
+    position: relative;
+  }
+  body.sections-single-song .ss-arr-wrap .sec-chip.is-loop:not(.empty)::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: -2px; /* bridge the 2px chip gap so the range reads as one bracket */
+    border-top: 3px solid #00e5ff;
+    border-bottom: 3px solid #00e5ff;
+    pointer-events: none;
+    z-index: 6;
+  }
+  body.sections-single-song .ss-arr-wrap .sec-chip.is-loop-start:not(.empty)::after {
+    border-left: 3px solid #00e5ff;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+  }
+  body.sections-single-song .ss-arr-wrap .sec-chip.is-loop-end:not(.empty)::after {
+    right: 0;
+    border-right: 3px solid #00e5ff;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
   /* Playing section tab: left under the arrangement chips; only current tab. */
   .ss-section-tab {
     flex: 1 1 auto;
@@ -4594,6 +4622,7 @@
           <button type="button" class="map-tools-item" id="secMetaColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show RSI column">RSI</button>
           <button type="button" class="map-tools-item" id="secARsiColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show aRSI (adjusted RSI) column — Numpad * then 8">aRSI</button>
           <button type="button" class="map-tools-item" id="secSaturationBtn" role="menuitemcheckbox" aria-checked="false" title="Toggle Arrangement riff-tier purples (any Song Map view) — Numpad * then 6">Saturation</button>
+          <button type="button" class="map-tools-item" id="secLoopBtn" role="menuitemcheckbox" aria-checked="false" title="Single Song: loop the playing section — Numpad 9 · Shift+click a chip to extend · click a chip to reset">Loop</button>
         </div>
       </div>
       <div class="ss-nav-picker-host" id="ssSongPickerHost" hidden></div>
@@ -5742,7 +5771,10 @@ function resolveSingleSongName(albums) {
 }
 function setSingleSongFocus(name) {
   var nextName = name ? String(name) : "";
-  if (nextName !== singleSongName) ssSelectedArrangementSection = null;
+  if (nextName !== singleSongName) {
+    ssSelectedArrangementSection = null;
+    if (typeof ssLoop !== "undefined" && ssLoop.on && ssLoop.song !== nextName) setSsLoop(false);
+  }
   singleSongName = nextName;
   try { localStorage.setItem(SINGLE_SONG_NAME_KEY, singleSongName); } catch (eFocus) {}
 }
@@ -5750,6 +5782,7 @@ function syncSingleSongUi() {
   var on = !!singleSongMode && document.body.classList.contains("sections-mode");
   document.body.classList.toggle("sections-single-song", on);
   if (!on && typeof clearSingleSongNavPicker === "function") clearSingleSongNavPicker();
+  if (!on && typeof ssLoop !== "undefined" && ssLoop.on) setSsLoop(false);
   syncModeSelects();
 }
 function setSingleSongMode(on) {
@@ -8761,6 +8794,9 @@ function showSections(keepScroll) {
     if (hasSoloGroup) wrapEl.style.setProperty("--solo-group-cols", String(maxCols - groupStart + 1));
   }
   if (singleSongMode && typeof ssFitArrangementChips === "function") ssFitArrangementChips();
+  if (typeof ssLoop !== "undefined" && ssLoop.on) {
+    if (ssLoopIsActive()) syncSsLoopUi(); else setSsLoop(false);
+  }
   document.body.classList.toggle("solo-cols-collapsed", !arrangementMode && !!soloMode && hasSoloGroup && soloColsCollapsed);
   var groupBtn = document.getElementById("soloColGroupToggle");
   if (groupBtn) {
@@ -10436,6 +10472,8 @@ function smEnsureApi(cb) {
         onReady: function(){ cb && cb(); },
         onStateChange: function(e){
           if (e.data === YT.PlayerState.ENDED) {
+            /* Single Song Loop to song end: wrap instead of advancing */
+            if (smIsAudioLeader() && typeof ssLoopHandleEnded === "function" && ssLoopHandleEnded()) return;
             /* Only audio leader advances — followers follow via sync */
             if (smIsAudioLeader()) smOnEnded();
             return;
@@ -10603,6 +10641,249 @@ function smSelectSingleSongArrangementChip(chip) {
     smPlaySongName(songName, wasPlaying);
   }
   if (start != null) smSeekSingleSongSection(songName, start, 0);
+}
+/* —— Single Song Loop (Tools → Loop · Numpad 9) ——
+   Loops the playing section using chip start/end times. Shift+click another chip extends the
+   loop to a contiguous range; plain click resets it to that chip. Scoped to one song: turns off
+   when the Single Song focus changes or Single Song closes. Enforced from smTick + a rAF loop. */
+var ssLoop = { on: false, song: "", aCi: -1, bCi: -1 };
+var ssLoopRaf = 0;
+var ssLoopLastSeekAt = 0;
+function ssLoopSongName() {
+  if (typeof singleSongMode === "undefined" || !singleSongMode) return "";
+  return resolveSingleSongName(singleSongPickerAlbums()) || singleSongName || "";
+}
+function ssLoopIsActive() {
+  return !!(ssLoop.on && ssLoop.song && singleSongMode
+    && document.body.classList.contains("sections-single-song")
+    && ssLoop.song === ssLoopSongName());
+}
+function ssLoopChipStart(song, ci) {
+  var chips = (song && song.chips) || [];
+  var pair = chips[ci];
+  if (!isChipPair(pair)) return null;
+  var st = chipStartSec(pair);
+  if (st != null) return st;
+  var firstCi = -1;
+  chips.some(function(p, i){ if (isChipPair(p)) { firstCi = i; return true; } return false; });
+  if (ci === firstCi) return 0;
+  for (var j = ci - 1; j >= 0; j--) {
+    if (!isChipPair(chips[j])) continue;
+    var pe = chipEndSec(chips[j]);
+    return pe;
+  }
+  return null;
+}
+/** Resolved loop: { song, lo, hi, start, end (null = song end), first: cue item } or null. */
+function ssLoopRange() {
+  if (!ssLoop.on || !ssLoop.song) return null;
+  var song = smFindArrangementSongByName(ssLoop.song);
+  if (!song) return null;
+  var chips = song.chips || [];
+  var lo = Math.min(ssLoop.aCi, ssLoop.bCi), hi = Math.max(ssLoop.aCi, ssLoop.bCi);
+  while (lo <= hi && !isChipPair(chips[lo])) lo++;
+  while (hi >= lo && !isChipPair(chips[hi])) hi--;
+  if (lo > hi) return null;
+  var start = null, startCi = lo;
+  for (var ci = lo; ci <= hi && start == null; ci++) {
+    if (!isChipPair(chips[ci])) continue;
+    start = ssLoopChipStart(song, ci);
+    startCi = ci;
+  }
+  if (start == null) return null;
+  var end = chipEndSec(chips[hi]);
+  if (end == null) {
+    for (var n = hi + 1; n < chips.length; n++) {
+      if (!isChipPair(chips[n])) continue;
+      var ns = chipStartSec(chips[n]);
+      if (ns != null) { end = ns; break; }
+    }
+  }
+  if (end == null) end = songArrangementEndSec(song);
+  if (end != null && end <= start + 0.25) end = null;
+  return {
+    song: ssLoop.song, lo: lo, hi: hi, start: start, end: end,
+    first: { code: chips[startCi][0], start: start, ci: startCi, pair: chips[startCi] }
+  };
+}
+function ssLoopEndAt(r) {
+  if (!r) return null;
+  if (r.end != null) return r.end;
+  var dur = 0;
+  try { dur = (smYtPlayer && smYtPlayer.getDuration) ? (smYtPlayer.getDuration() || 0) : 0; } catch (eDur) {}
+  return dur > r.start + 1 ? dur - 0.3 : null;
+}
+function ssLoopPlayerTime() {
+  try { return (smYtPlayer && smYtPlayer.getCurrentTime) ? (smYtPlayer.getCurrentTime() || 0) : 0; } catch (eT) { return 0; }
+}
+function syncSsLoopUi() {
+  var active = ssLoopIsActive();
+  document.body.classList.toggle("ss-loop-on", active);
+  var btn = document.getElementById("secLoopBtn");
+  if (btn) {
+    btn.classList.toggle("on", active);
+    btn.setAttribute("aria-checked", active ? "true" : "false");
+  }
+  var r = active ? ssLoopRange() : null;
+  var wrap = document.getElementById("ssArrWrap");
+  if (!wrap) return;
+  wrap.querySelectorAll(".sec-chip[data-ci]").forEach(function(el){
+    var ci = parseInt(el.getAttribute("data-ci"), 10);
+    var inR = !!r && !el.classList.contains("empty") && ci >= r.lo && ci <= r.hi;
+    el.classList.toggle("is-loop", inR);
+    el.classList.toggle("is-loop-start", inR && ci === r.lo);
+    el.classList.toggle("is-loop-end", inR && ci === r.hi);
+  });
+}
+function ssLoopSeek(sec) {
+  ssLoopLastSeekAt = Date.now();
+  if (!smYtPlayer || !smYtPlayer.seekTo) return;
+  try { smMarkLocalPlayerAction(); } catch (eLead) {}
+  try { smYtPlayer.seekTo(sec, true); } catch (eSeek) { return; }
+  if (typeof smTick === "function") smTick();
+  if (typeof smSchedulePublishPlayerSync === "function") smSchedulePublishPlayerSync();
+}
+/** Wrap to loop start when playback reaches loop end. Returns true if it seeked. */
+function ssLoopCheck() {
+  if (!ssLoop.on) return false;
+  if (!ssLoopIsActive()) {
+    /* Left Single Song / Song Map, or the focus moved to another song: never loop a stale range. */
+    setSsLoop(false);
+    return false;
+  }
+  if (smSeeking || !smYtPlayer || !smYtPlayer.getCurrentTime) return false;
+  if (typeof smIsAudioLeader === "function" && !smIsAudioLeader()) return false;
+  var cur = smCurrent();
+  if (!cur || cur.song !== ssLoop.song) return false;
+  if (Date.now() - ssLoopLastSeekAt < 300) return false;
+  var r = ssLoopRange();
+  var endAt = ssLoopEndAt(r);
+  if (!r || endAt == null) return false;
+  var t = ssLoopPlayerTime();
+  if (t >= endAt - 0.03) {
+    ssLoopSeek(r.start);
+    return true;
+  }
+  return false;
+}
+function ssLoopFrame() {
+  ssLoopRaf = 0;
+  if (!ssLoop.on) return;
+  ssLoopCheck();
+  if (ssLoop.on) ssLoopRaf = requestAnimationFrame(ssLoopFrame);
+}
+function ssLoopStartWatch() {
+  if (!ssLoopRaf && typeof requestAnimationFrame === "function") ssLoopRaf = requestAnimationFrame(ssLoopFrame);
+}
+/** YT ENDED while looping to song end: jump back instead of advancing the playlist. */
+function ssLoopHandleEnded() {
+  if (!ssLoopIsActive()) return false;
+  var cur = smCurrent();
+  if (!cur || cur.song !== ssLoop.song) return false;
+  var r = ssLoopRange();
+  if (!r) return false;
+  ssLoopSeek(r.start);
+  try { smYtPlayer.playVideo(); } catch (ePlay) {}
+  return true;
+}
+/** Which chip is playing now (or most recently picked) in the Single Song strip. */
+function ssLoopCurrentCi(songName) {
+  var song = smFindArrangementSongByName(songName);
+  if (!song) return -1;
+  var cur = smCurrent();
+  if (cur && cur.song === songName) {
+    var pick = smPickArrNextCue(smCollectTimedArrChips(song), ssLoopPlayerTime());
+    if (!pick.empty && pick.current) return pick.current.ci;
+  }
+  var sel = ssSelectedArrangementSection;
+  if (sel && sel.song === songName && sel.item) return sel.item.ci;
+  var chips = song.chips || [];
+  for (var i = 0; i < chips.length; i++) if (isChipPair(chips[i])) return i;
+  return -1;
+}
+function setSsLoop(on, ci) {
+  if (!on) {
+    ssLoop.on = false;
+    ssLoop.song = "";
+    ssLoop.aCi = ssLoop.bCi = -1;
+    if (ssLoopRaf) { try { cancelAnimationFrame(ssLoopRaf); } catch (eC) {} ssLoopRaf = 0; }
+    syncSsLoopUi();
+    if (typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
+    return false;
+  }
+  var name = ssLoopSongName();
+  if (!name) { syncSsLoopUi(); return false; }
+  var useCi = (typeof ci === "number" && ci >= 0) ? ci : ssLoopCurrentCi(name);
+  if (useCi < 0) { syncSsLoopUi(); return false; }
+  ssLoop.on = true;
+  ssLoop.song = name;
+  ssLoop.aCi = ssLoop.bCi = useCi;
+  try { smMarkLocalPlayerAction(); } catch (eLead) {}
+  syncSsLoopUi();
+  ssLoopStartWatch();
+  if (typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
+  return true;
+}
+function toggleSsLoopUi() {
+  if (ssLoopIsActive()) return setSsLoop(false);
+  return setSsLoop(true);
+}
+/** Single Song chip click while Loop is on. Returns true when handled. */
+function ssLoopChipClick(chip, e) {
+  if (!ssLoopIsActive() || !chip || chip.classList.contains("empty")) return false;
+  if (!chip.closest("#ssArrWrap")) return false;
+  if ((chip.getAttribute("data-song") || "") !== ssLoop.song) return false;
+  var ci = parseInt(chip.getAttribute("data-ci"), 10);
+  if (!isFinite(ci)) return false;
+  if (e && e.shiftKey) {
+    /* Extend: contiguous range from the first selected chip to this one (either direction). */
+    ssLoop.bCi = ci;
+    syncSsLoopUi();
+    var r = ssLoopRange();
+    var endAt = ssLoopEndAt(r);
+    var t = ssLoopPlayerTime();
+    var cur = smCurrent();
+    if (r && cur && cur.song === ssLoop.song && (t < r.start - 0.05 || (endAt != null && t >= endAt))) ssLoopSeek(r.start);
+    if (typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
+    return true;
+  }
+  /* Plain click: loop just this chip, then seek there (normal chip-select path). */
+  ssLoop.aCi = ssLoop.bCi = ci;
+  syncSsLoopUi();
+  smSelectSingleSongArrangementChip(chip);
+  ssLoopLastSeekAt = Date.now();
+  return true;
+}
+function isLoopNumpad9(e) {
+  if (!e) return false;
+  var code = String(e.code || "");
+  var key = String(e.key || "");
+  if (code === "Numpad9") return true;
+  if (e.location === 3 && (key === "9" || key === "PageUp")) return true;
+  if (e.keyCode === 105 || e.which === 105) return true;
+  return false;
+}
+function handleSsLoopShortcut(e) {
+  if (!e || e.type !== "keydown") return false;
+  if (e.metaKey || e.ctrlKey || e.altKey) return false;
+  if (!document.body.classList.contains("sections-mode")) return false;
+  if (!document.body.classList.contains("sections-single-song")) return false;
+  if (!singleSongShortcutTargetOk(e.target)) return false;
+  if (!isLoopNumpad9(e)) return false;
+  /* * or / armed: leave the key to those handlers (bound after this one). */
+  if ((typeof songMetaStarArmed !== "undefined" && songMetaStarArmed)
+      || (typeof songAlbumSlashArmed !== "undefined" && songAlbumSlashArmed)) return false;
+  if (typeof modeEntryBuf !== "undefined" && modeEntryBuf) return false;
+  e.preventDefault();
+  try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
+  if (e.repeat) return true;
+  toggleSsLoopUi();
+  return true;
+}
+function bindSsLoopShortcut() {
+  if (window.__riffjamsSsLoopKeyBound) return;
+  window.__riffjamsSsLoopKeyBound = true;
+  window.addEventListener("keydown", function(e){ handleSsLoopShortcut(e); }, true);
 }
 /* Ctrl+Left: ≥3s into track → restart; <3s → previous song */
 function smCtrlLeftArrow() {
@@ -10824,6 +11105,18 @@ function smUpdateArrNextCue(force) {
     if (smYtPlayer && smYtPlayer.getCurrentTime) t = smYtPlayer.getCurrentTime() || 0;
   } catch (eT) { t = 0; }
   var pick = smPickArrNextCue(timed, t);
+  /* Single Song Loop: inside the loop, NEXT after the last looped chip is the loop start. */
+  var loopWrapAt = null;
+  if (inSingle && !pick.empty && typeof ssLoopIsActive === "function" && ssLoopIsActive() && ssLoop.song === songName) {
+    var lr = ssLoopRange();
+    var lEnd = ssLoopEndAt(lr);
+    if (lr && lEnd != null && t >= lr.start - 0.25 && t < lEnd + 0.5) {
+      if (!pick.next || pick.next.start >= lEnd - 0.01) {
+        pick = { current: pick.current, next: lr.first, empty: false };
+        loopWrapAt = lEnd;
+      }
+    }
+  }
   var emptyMsg = "Set times on chips";
   var endMsg = "End";
   if (pick.empty) {
@@ -10851,7 +11144,7 @@ function smUpdateArrNextCue(force) {
       var remain = null;
       var isEndCd = false;
       if (pick.next) {
-        remain = pick.next.start - t;
+        remain = ((loopWrapAt != null) ? loopWrapAt : pick.next.start) - t;
       } else {
         var endAt = songArrangementEndSec(song);
         if (endAt != null) {
@@ -10905,7 +11198,7 @@ function smUpdateArrNextCue(force) {
     } else {
       /* Show upcoming section tab 2s before it begins; replace previous at that moment. */
       var tabPick = pick;
-      if (!pick.empty && pick.next && (pick.next.start - t) <= 2) {
+      if (!pick.empty && pick.next && (((loopWrapAt != null) ? loopWrapAt : pick.next.start) - t) <= 2) {
         tabPick = { current: pick.next, next: pick.next, empty: false };
       }
       ssUpdateSectionTab(songName, tabPick);
@@ -10941,6 +11234,7 @@ function smTick() {
     try { tickVid = (smYtPlayer.getVideoData && smYtPlayer.getVideoData().video_id) || ""; } catch (errVid) {}
     if (!expectYt || !tickVid || tickVid === expectYt) smPublishPlayerSync(false);
   }
+  if (ssLoop.on && typeof ssLoopCheck === "function") ssLoopCheck();
   if (typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(false);
 }
 function smSeekFromClientX(clientX) {
@@ -14488,6 +14782,11 @@ document.getElementById("secModes").onclick = function(e){
     setMapToolsOpen(false);
     return;
   }
+  if (e.target.closest("#secLoopBtn")) {
+    toggleSsLoopUi();
+    setMapToolsOpen(false);
+    return;
+  }
   var btn = e.target.closest(".sec-mode-btn[data-sec-mode]");
   if (!btn) return;
   setSectionsMode(btn.getAttribute("data-sec-mode"));
@@ -15215,6 +15514,7 @@ document.getElementById("sectionsSheet").onclick = function(e){
   if (chip.classList.contains("filtered-out") && sectionsMode !== "edit") return;
   if ((singleSongMode || (arrangementMode && sectionsMode === "view")) && chip.getAttribute("data-arrange") === "1" && sectionsMode !== "edit") {
     if (chip.classList.contains("empty")) return;
+    if (singleSongMode && typeof ssLoopChipClick === "function" && ssLoopChipClick(chip, e)) return;
     smSelectSingleSongArrangementChip(chip);
     return;
   }
@@ -15499,6 +15799,8 @@ function bindSectionRulersShortcut() {
     handleSectionRulersShortcut(e);
   }, true);
 }
+/* Bound before Rulers/Meta/Slash so * and / arming is still readable when Numpad 9 arrives. */
+bindSsLoopShortcut();
 bindSectionRulersShortcut();
 function bindSongMetaColsShortcut() {
   if (window.__riffjamsMetaColsKeyBound) return;
@@ -15784,6 +16086,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=387"></script>
+<script src="riffjams-admin.js?v=388"></script>
 </body>
 </html>
