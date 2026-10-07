@@ -1565,6 +1565,7 @@
     outline-offset: 1px;
   }
   .album-block.filtered-out { display: none !important; }
+  .song-row.filtered-out { display: none !important; }
   .song-thumb {
     flex: 0 0 calc(var(--chip-h) - 6px);
     width: calc(var(--chip-h) - 6px);
@@ -9417,8 +9418,9 @@ function applySecFilters() {
     var albumOk = !active || !albumOn || !!secAlbumFilter[albumName];
     block.classList.toggle("filtered-out", active && !albumOk);
     if (!albumOk) return;
+    var anySongVisible = false;
     block.querySelectorAll(".song-row").forEach(function(row){
-      row.classList.remove("filtered-out");
+      var rowHasVisible = false;
       row.querySelectorAll(".sec-chip").forEach(function(chip){
         if (chip.classList.contains("empty")) {
           chip.classList.remove("filtered-out");
@@ -9426,9 +9428,17 @@ function applySecFilters() {
         }
         var ok = !active || chipMatchesFilter(chip);
         chip.classList.toggle("filtered-out", !ok);
-        if (ok) shown += 1;
+        if (ok) {
+          shown += 1;
+          rowHasVisible = true;
+        }
       });
+      // Song Map: hide entire row when filters leave no applicable chips
+      row.classList.toggle("filtered-out", active && !rowHasVisible);
+      if (!active || rowHasVisible) anySongVisible = true;
     });
+    // Hide album block if every song row was filtered out
+    if (active && !anySongVisible) block.classList.add("filtered-out");
   });
   var total = 0;
   if (arrangementMode && ARRANGEMENT_MAP) total = totalArrangementChips(ARRANGEMENT_MAP);
@@ -15604,6 +15614,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=382"></script>
+<script src="riffjams-admin.js?v=383"></script>
 </body>
 </html>
