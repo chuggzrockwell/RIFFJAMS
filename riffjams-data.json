@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-07T01:13:13.237Z",
+  "updatedAt": "2026-10-07T15:57:36.820Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1028,7 +1028,7 @@
             [
               "B4",
               3,
-              "ITV-B4",
+              "",
               []
             ],
             null,
@@ -4981,7 +4981,11 @@
                 356.3,
                 367.5
               ],
-              null,
+              [
+                "B4",
+                3,
+                "ITV-B4"
+              ],
               null
             ],
             "sectionRulers": [
@@ -7554,9 +7558,9 @@
     {
       "album": "Master of Reality",
       "song": "Into the Void",
-      "endSec": 367.5,
-      "complete": true,
-      "riffSaturationIndex": 2.484,
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 2.468,
       "chips": [
         {
           "code": "I1",
@@ -7690,8 +7694,8 @@
           "code": "B2",
           "tier": 1,
           "start": 356.3,
-          "stop": 367.5,
-          "duration": 11.2,
+          "stop": null,
+          "duration": null,
           "lick": "ITV-B2"
         }
       ]
