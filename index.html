@@ -3671,7 +3671,7 @@
     overflow: visible;
   }
   .song-row:hover { background: rgba(112,48,160,.04); }
-  /* Single Song mode (v380): nav picker, scale chips to fit all cols before megachip (+5px gap). */
+  /* Single Song mode (v385): nav picker, scale chips to fit; NEXT panel matches tab-crop gap. */
   body.sections-single-song .sec-filters,
   body.sections-single-song .sec-edit-tools {
     display: none !important;
@@ -3691,14 +3691,15 @@
     min-height: calc(100vh - 160px);
     position: relative;
   }
-  /* NEXT SECTION megachip + countdown: right of chip strip with --ss-mega-gap (JS refines left). */
+  /* NEXT SECTION megachip + countdown: right of chip strip; JS sets left (+5px) and top
+     so the label sits the same gap below chips as the tab crop. */
   body.sections-mode.sections-single-song .sm-arr-next-panel {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 14px;
     position: absolute;
-    top: 4px;
+    top: 4px; /* fallback; ssPlaceNextPanel overwrites to match tab-crop gap */
     left: calc(var(--ss-cols) * var(--ss-chip-w) + var(--ss-mega-gap) + 8px);
     right: auto;
     width: var(--ss-mega-w);
@@ -3811,6 +3812,7 @@
   /* Ultra-wide crops that stay unreadably short in cols 1–15 go under the countdown. */
   body.sections-mode.sections-single-song .ss-section-tab.ss-tab-below-cue {
     position: absolute;
+    /* top/left refined by ssPlaceNextPanel after the cue panel moves down */
     top: calc(4px + 2.2rem + 280px + 14px + 4.5rem + 18px);
     left: calc(var(--ss-cols) * var(--ss-chip-w) + var(--ss-mega-gap) + 8px);
     right: 8px;
@@ -5985,14 +5987,60 @@ function ssFitArrangementChips() {
   var stripW = cols * chipW - chipGap + wrapPadX;
   wrap.style.width = stripW + "px";
   wrap.style.maxWidth = stripW + "px";
-  /* Exact 5px buffer between right edge of last chip and left edge of megachip. */
-  if (panel) {
-    var layoutRect = layout.getBoundingClientRect();
-    var lastChip = chipEls.length ? chipEls[chipEls.length - 1] : null;
-    var edgeEl = lastChip || wrap;
-    var edgeRect = edgeEl.getBoundingClientRect();
-    var left = Math.round(edgeRect.right - layoutRect.left + gap);
-    if (isFinite(left) && left > 0) panel.style.left = left + "px";
+  if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel();
+}
+/** Single Song: place NEXT SECTION panel — 5px right of last chip; top matches tab-crop gap below chips. */
+function ssPlaceNextPanel() {
+  if (typeof singleSongMode !== "undefined" && !singleSongMode) return;
+  if (!document.body.classList.contains("sections-single-song")) return;
+  var layout = document.querySelector("#sectionsSheet .ss-layout");
+  var wrap = document.getElementById("ssArrWrap");
+  var panel = document.getElementById("smArrNextPanel");
+  var tab = document.getElementById("ssSectionTab");
+  if (!layout || !panel || !wrap) return;
+  var layoutRect = layout.getBoundingClientRect();
+  var gap = parseFloat(getComputedStyle(layout).getPropertyValue("--ss-mega-gap"));
+  if (!isFinite(gap)) gap = 5;
+  var chipEls = wrap.querySelectorAll(".song-secs > .sec-chip");
+  var lastChip = chipEls.length ? chipEls[chipEls.length - 1] : null;
+  var edgeEl = lastChip || wrap;
+  var edgeRect = edgeEl.getBoundingClientRect();
+  var left = Math.round(edgeRect.right - layoutRect.left + gap);
+  if (isFinite(left) && left > 0) panel.style.left = left + "px";
+
+  var secs = wrap.querySelector(".song-secs");
+  var chipsBottom = secs
+    ? secs.getBoundingClientRect().bottom
+    : (lastChip ? lastChip.getBoundingClientRect().bottom : wrap.getBoundingClientRect().bottom);
+  var cropTop = null;
+  if (tab && !tab.classList.contains("ss-tab-below-cue")) {
+    var img = tab.querySelector("img.ss-tab-img");
+    var cropEl = img || tab.querySelector(".ss-tab-empty");
+    if (cropEl) {
+      cropTop = cropEl.getBoundingClientRect().top;
+    } else {
+      var tcs = getComputedStyle(tab);
+      cropTop = tab.getBoundingClientRect().top + (parseFloat(tcs.paddingTop) || 0);
+    }
+  }
+  var top;
+  if (cropTop != null && isFinite(cropTop)) {
+    top = Math.round(cropTop - layoutRect.top);
+  } else {
+    var layoutGap = parseFloat(getComputedStyle(layout).rowGap);
+    if (!isFinite(layoutGap)) layoutGap = parseFloat(getComputedStyle(layout).gap) || 16;
+    var wrapPadB = parseFloat(getComputedStyle(wrap).paddingBottom) || 0;
+    var tabPadT = tab ? (parseFloat(getComputedStyle(tab).paddingTop) || 8) : 8;
+    top = Math.round(chipsBottom - layoutRect.top + wrapPadB + layoutGap + tabPadT);
+  }
+  if (isFinite(top) && top >= 0) panel.style.top = top + "px";
+
+  if (tab && tab.classList.contains("ss-tab-below-cue")) {
+    var panelBottom = panel.getBoundingClientRect().bottom;
+    tab.style.top = Math.round(panelBottom - layoutRect.top + 18) + "px";
+    if (panel.style.left) tab.style.left = panel.style.left;
+  } else if (tab) {
+    tab.style.top = "";
   }
 }
 var _ssFitChipsResizeTimer = 0;
@@ -6036,6 +6084,7 @@ function ssPlaceSectionTab() {
   var isUltraWide = fitH < 90;
   if (isUltraWide) el.classList.add("ss-tab-below-cue");
   else el.classList.remove("ss-tab-below-cue");
+  if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel();
 }
 function ssUpdateSectionTab(songName, pick) {
   var el = document.getElementById("ssSectionTab");
@@ -6051,6 +6100,7 @@ function ssUpdateSectionTab(songName, pick) {
       var emptyPanel = document.getElementById("smArrNextPanel");
       var emptyBefore = emptyNotes || emptyPanel;
       if (emptyLayout && emptyBefore && el.parentNode !== emptyLayout) emptyLayout.insertBefore(el, emptyBefore);
+      if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel();
     }
     if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, "");
     return;
@@ -6068,7 +6118,9 @@ function ssUpdateSectionTab(songName, pick) {
     if (el.getAttribute("data-ss-tab") !== item.code) {
       el.innerHTML = '<div class="ss-tab-empty">No tab linked</div>';
       el.setAttribute("data-ss-tab", item.code || "");
+      el.classList.remove("ss-tab-below-cue");
     }
+    if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel();
     if (typeof ssUpdateNotesPanel === "function") ssUpdateNotesPanel(songName, item.code, noteOccur);
     return;
   }
@@ -15614,6 +15666,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=384"></script>
+<script src="riffjams-admin.js?v=385"></script>
 </body>
 </html>
