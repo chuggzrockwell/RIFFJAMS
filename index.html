@@ -3664,7 +3664,7 @@
     overflow: visible;
   }
   .song-row:hover { background: rgba(112,48,160,.04); }
-  /* Single Song mode (v296): nav picker, 1.5× chips, megachip at col 15, tab under chips. */
+  /* Single Song mode (v378): nav picker, 1.5× chips, megachip at col 15 (clear of chips), tab under chips. */
   body.sections-single-song .sec-filters,
   body.sections-single-song .sec-edit-tools {
     display: none !important;
@@ -3679,7 +3679,7 @@
     min-height: calc(100vh - 160px);
     position: relative;
   }
-  /* NEXT SECTION megachip + countdown: top-right, pinned at arrangement col 15. */
+  /* NEXT SECTION megachip + countdown: beside col 15, clear of the chip strip. */
   body.sections-mode.sections-single-song .sm-arr-next-panel {
     display: flex;
     flex-direction: column;
@@ -3697,7 +3697,7 @@
     pointer-events: none;
     box-sizing: border-box;
   }
-  /* Arrangement chip strip directly under nav — 1.5× Song Map chip size */
+  /* Arrangement chip strip under nav — 1.5× chips, capped at cols 1–15 so the megachip never covers them. */
   body.sections-single-song .ss-arr-wrap {
     --row-g: 0px;
     --name-w: 0px;
@@ -3709,8 +3709,9 @@
     --cover: calc(var(--chip-h) * var(--cover-rows));
     display: flex !important;
     flex-direction: column;
-    width: 100%;
-    max-width: none;
+    /* +8px = horizontal padding so cols 1–15 fit inside border-box width */
+    width: calc(15 * var(--ss-chip-w) + 8px);
+    max-width: calc(15 * var(--ss-chip-w) + 8px);
     padding: 6px 4px 2px;
     box-sizing: border-box;
     overflow-x: auto;
@@ -15519,6 +15520,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=377"></script>
+<script src="riffjams-admin.js?v=378"></script>
 </body>
 </html>
