@@ -3781,34 +3781,19 @@
     z-index: 5;
     position: relative;
   }
-  /* Single Song Loop: cyan bracket around the looped chip range (reads over tier/arr colors + now-glow). */
+  /* Single Song Loop: light-cyan bar under the looped chip range (JS positions it in the
+     strip→tab gap; absolute, so no flow/gap change and the now-playing glow is untouched). */
   body:not(.sections-single-song) #secLoopBtn { display: none; }
-  body.sections-single-song .ss-arr-wrap .sec-chip.is-loop:not(.empty) {
-    position: relative;
-  }
-  body.sections-single-song .ss-arr-wrap .sec-chip.is-loop:not(.empty)::after {
-    content: "";
+  .ss-loop-line {
     position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: -2px; /* bridge the 2px chip gap so the range reads as one bracket */
-    border-top: 3px solid #00e5ff;
-    border-bottom: 3px solid #00e5ff;
+    height: 4px;
+    border-radius: 999px;
+    background: #9ee0f0;
     pointer-events: none;
-    z-index: 6;
+    z-index: 4;
+    display: none;
   }
-  body.sections-single-song .ss-arr-wrap .sec-chip.is-loop-start:not(.empty)::after {
-    border-left: 3px solid #00e5ff;
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
-  }
-  body.sections-single-song .ss-arr-wrap .sec-chip.is-loop-end:not(.empty)::after {
-    right: 0;
-    border-right: 3px solid #00e5ff;
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
-  }
+  body.sections-single-song.ss-loop-on .ss-loop-line.is-on { display: block; }
   /* Playing section tab: left under the arrangement chips; only current tab. */
   .ss-section-tab {
     flex: 1 1 auto;
@@ -6084,6 +6069,7 @@ function ssPlaceNextPanel() {
   } else if (tab) {
     tab.style.top = "";
   }
+  if (typeof ssPositionLoopLine === "function") ssPositionLoopLine();
 }
 var _ssFitChipsResizeTimer = 0;
 function ssScheduleFitArrangementChips() {
@@ -10734,6 +10720,40 @@ function syncSsLoopUi() {
     el.classList.toggle("is-loop-start", inR && ci === r.lo);
     el.classList.toggle("is-loop-end", inR && ci === r.hi);
   });
+  ssPositionLoopLine();
+}
+/** Loop underline: one bar from the first looped chip's left edge to the last one's right edge
+    (single chip: small inset), a few px below the chips inside the existing strip→tab gap. */
+function ssPositionLoopLine() {
+  var layout = document.querySelector("#sectionsSheet .ss-layout");
+  if (!layout) return;
+  var line = document.getElementById("ssLoopLine");
+  var wrap = document.getElementById("ssArrWrap");
+  var first = wrap && wrap.querySelector(".sec-chip.is-loop-start");
+  var last = wrap && wrap.querySelector(".sec-chip.is-loop-end");
+  if (!first || !last || !ssLoopIsActive()) {
+    if (line) line.classList.remove("is-on");
+    return;
+  }
+  if (!line) {
+    line = document.createElement("div");
+    line.id = "ssLoopLine";
+    line.className = "ss-loop-line";
+    line.setAttribute("aria-hidden", "true");
+    layout.appendChild(line);
+  }
+  var lr = layout.getBoundingClientRect();
+  var fr = first.getBoundingClientRect();
+  var er = last.getBoundingClientRect();
+  var inset = (first === last) ? Math.min(6, Math.max(2, fr.width * 0.08)) : 0;
+  var left = fr.left - lr.left + inset;
+  var width = er.right - fr.left - inset * 2;
+  /* Clear the now-playing glow's solid 3px ring: sit 6px under the chip bottoms. */
+  var top = Math.max(fr.bottom, er.bottom) - lr.top + 6;
+  line.style.left = Math.round(left * 10) / 10 + "px";
+  line.style.width = Math.max(4, Math.round(width * 10) / 10) + "px";
+  line.style.top = Math.round(top) + "px";
+  line.classList.add("is-on");
 }
 function ssLoopSeek(sec) {
   ssLoopLastSeekAt = Date.now();
@@ -16086,6 +16106,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=388"></script>
+<script src="riffjams-admin.js?v=389"></script>
 </body>
 </html>
