@@ -9593,7 +9593,103 @@ function clearSecFilters() {
 }
 
 
+/* Keep the visible Song Map content pinned across mode/view switches.
+   Raw scrollY is not enough: Edit/Play change row heights and the padding/toolbars above
+   the grid, so the same scrollY lands on different rows. Anchor on the first visible
+   song row (or the Single Song panel) and restore its viewport y after re-render + layout. */
+function songMapScrollEls() {
+  var sheet = document.getElementById("sectionsSheet");
+  return sheet ? Array.prototype.slice.call(sheet.querySelectorAll(".sections-wrap, .ss-layout, .sections-layout")) : [];
+}
+function captureSongMapAnchor() {
+  var a = { sx: window.scrollX || window.pageXOffset || 0, sy: window.scrollY || window.pageYOffset || 0, top: 0, ai: null, si: null, name: "", sel: "", inner: [] };
+  var sheet = document.getElementById("sectionsSheet");
+  if (!sheet) return a;
+  songMapScrollEls().forEach(function(el){
+    a.inner.push({ cls: String(el.className).split(/\s+/)[0], l: el.scrollLeft, t: el.scrollTop });
+  });
+  var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+  var rows = sheet.querySelectorAll(".song-row");
+  var pick = null, pickTop = 0, fallback = null, fallbackTop = 0;
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i].getBoundingClientRect();
+    if (r.height <= 0 || r.bottom <= 0) continue;
+    if (r.top >= vh) break;
+    if (!fallback) { fallback = rows[i]; fallbackTop = r.top; }
+    if (r.top >= 0) { pick = rows[i]; pickTop = r.top; break; }
+  }
+  if (!pick && fallback) { pick = fallback; pickTop = fallbackTop; }
+  if (pick) {
+    var nm = pick.querySelector(".song-name");
+    a.ai = pick.getAttribute("data-ai");
+    a.si = pick.getAttribute("data-si");
+    a.name = nm ? nm.textContent : "";
+    a.top = pickTop;
+    return a;
+  }
+  var sels = [".ss-layout", ".sections-layout"];
+  for (var j = 0; j < sels.length; j++) {
+    var el = sheet.querySelector(sels[j]);
+    if (el && el.getBoundingClientRect().height > 0) { a.sel = sels[j]; a.top = el.getBoundingClientRect().top; break; }
+  }
+  return a;
+}
+function findSongMapAnchorEl(a) {
+  var sheet = document.getElementById("sectionsSheet");
+  if (!sheet || !a) return null;
+  if (a.name || a.ai != null) {
+    var rows = sheet.querySelectorAll(".song-row");
+    var byPos = null;
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (row.getBoundingClientRect().height <= 0) continue;
+      var nm = row.querySelector(".song-name");
+      var same = row.getAttribute("data-ai") === a.ai && row.getAttribute("data-si") === a.si;
+      if (nm && a.name && nm.textContent === a.name) return row;
+      if (same && !byPos) byPos = row;
+    }
+    if (byPos) return byPos;
+  }
+  if (a.sel) return sheet.querySelector(a.sel);
+  return sheet.querySelector(".ss-layout") || sheet.querySelector(".sections-layout");
+}
+function restoreSongMapAnchor(a) {
+  if (!a) return;
+  var sec = document.getElementById("sections");
+  if (!sec || sec.classList.contains("hidden")) return;
+  songMapScrollEls().forEach(function(el){
+    var cls = String(el.className).split(/\s+/)[0];
+    for (var i = 0; i < a.inner.length; i++) {
+      if (a.inner[i].cls === cls) {
+        if (el.scrollLeft !== a.inner[i].l) el.scrollLeft = a.inner[i].l;
+        if (el.scrollTop !== a.inner[i].t) el.scrollTop = a.inner[i].t;
+        break;
+      }
+    }
+  });
+  var el = findSongMapAnchorEl(a);
+  var curY = window.scrollY || window.pageYOffset || 0;
+  if (el && el.getBoundingClientRect().height > 0) {
+    var d = el.getBoundingClientRect().top - a.top;
+    window.scrollTo(a.sx, Math.max(0, curY + d));
+  } else {
+    window.scrollTo(a.sx, a.sy);
+  }
+}
+/* Restore now (no visible flash), then after the next two frames once late layout settles. */
+function holdSongMapAnchor(a) {
+  if (!a) return;
+  restoreSongMapAnchor(a);
+  if (typeof requestAnimationFrame !== "function") return;
+  requestAnimationFrame(function(){
+    restoreSongMapAnchor(a);
+    requestAnimationFrame(function(){ restoreSongMapAnchor(a); });
+  });
+}
+
 function setSectionsMode(mode) {
+  var secVisibleAtStart = document.getElementById("sections") && !document.getElementById("sections").classList.contains("hidden");
+  var modeAnchor = secVisibleAtStart ? captureSongMapAnchor() : null;
   if (mode === "edit") sectionsMode = "edit";
   else if (mode === "play") sectionsMode = "play";
   else sectionsMode = "view";
@@ -9625,6 +9721,7 @@ function setSectionsMode(mode) {
   if (document.getElementById("sections") && !document.getElementById("sections").classList.contains("hidden")) {
     showSections(true); /* keep scroll when toggling View/Edit/Play */
   }
+  if (modeAnchor) holdSongMapAnchor(modeAnchor);
 }
 function lickLetter(id) {
   for (var i = 0; i < CATALOG.length; i++) {
@@ -15583,9 +15680,10 @@ document.addEventListener("keydown", function(e){
   if (document.body.classList.contains("sections-mode")) {
     var tag = (e.target && e.target.tagName) || "";
     if (tag === "INPUT" || tag === "TEXTAREA") return;
-    if (isNumpadKey(e, "1")) { setSectionsMode("view"); return; }
-    if (isNumpadKey(e, "2")) { setSectionsMode("edit"); return; }
-    if (isNumpadKey(e, "3")) { setSectionsMode("play"); openPlayWindow(); return; }
+    /* preventDefault: with NumLock off these arrive as End/ArrowDown/PageDown and would scroll the page. */
+    if (isNumpadKey(e, "1")) { e.preventDefault(); setSectionsMode("view"); return; }
+    if (isNumpadKey(e, "2")) { e.preventDefault(); setSectionsMode("edit"); return; }
+    if (isNumpadKey(e, "3")) { e.preventDefault(); setSectionsMode("play"); openPlayWindow(); return; }
     if (isNumpadKey(e, "5")) { setHighlightMode(!highlightMode); return; }
     /* Numpad 6 = Single Song — handled in capture (bindSingleSongShortcut), like 7/8. */
     if (singleSongMode && !e.shiftKey && !e.altKey && !e.metaKey && !e.ctrlKey
@@ -15594,9 +15692,9 @@ document.addEventListener("keydown", function(e){
       stepSingleSongFocus(e.key === "ArrowUp" ? -1 : 1);
       return;
     }
-    if (e.shiftKey && k === "v") { setSectionsMode("view"); return; }
-    if (e.shiftKey && k === "e") { setSectionsMode("edit"); return; }
-    if (e.shiftKey && k === "p") { setSectionsMode("play"); return; }
+    if (e.shiftKey && k === "v") { e.preventDefault(); setSectionsMode("view"); return; }
+    if (e.shiftKey && k === "e") { e.preventDefault(); setSectionsMode("edit"); return; }
+    if (e.shiftKey && k === "p") { e.preventDefault(); setSectionsMode("play"); return; }
     if (!e.shiftKey && (k === "i" || k === "v" || k === "c" || k === "b" || k === "s" || k === "l" || k === "o" || k === "f")) {
       toggleSecTypeKey(k);
       return;
@@ -15666,6 +15764,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=385"></script>
+<script src="riffjams-admin.js?v=386"></script>
 </body>
 </html>
