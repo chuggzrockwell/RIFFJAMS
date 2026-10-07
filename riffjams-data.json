@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-07T16:06:26.672Z",
+  "updatedAt": "2026-10-07T16:18:23.885Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -5020,7 +5020,7 @@
               {
                 "name": "solo",
                 "start": 12,
-                "end": 18
+                "end": 17
               }
             ]
           }
