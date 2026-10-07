@@ -5687,11 +5687,20 @@ function setMapView(view) {
   else if (document.body.classList.contains("sheet-mode") && currentLetter) showSeries(currentLetter);
   else document.body.classList.remove("sections-arrange", "ll-arrange");
 }
-function cycleMapView() {
+var cycleMapViewGridAnchor = null;
+function cycleMapView(dir) {
   var order = ["arrangement", "single", "riff", "solo"];
   var cur = songMapViewValue();
   var i = order.indexOf(cur);
-  setMapView(order[(i + 1) % order.length]);
+  var step = (dir < 0) ? -1 : 1;
+  if (i < 0) i = (step < 0) ? 0 : -1;
+  var sec = document.getElementById("sections");
+  var anchor = (sec && !sec.classList.contains("hidden") && typeof captureSongMapAnchor === "function") ? captureSongMapAnchor() : null;
+  /* Single Song has no song rows: remember the grid row we left so cycling back out lands on it. */
+  if (anchor && anchor.name) cycleMapViewGridAnchor = anchor;
+  else if (anchor && cycleMapViewGridAnchor) anchor = cycleMapViewGridAnchor;
+  setMapView(order[(i + step + order.length) % order.length]);
+  if (anchor && typeof holdSongMapAnchor === "function") holdSongMapAnchor(anchor);
 }
 function singleSongSourceAlbums() {
   /* Single Song picker + cues share Arrangement catalog when present. */
@@ -15541,8 +15550,19 @@ function handleSingleSongShortcut(e) {
   if (typeof songMetaStarArmed !== "undefined" && songMetaStarArmed) return false;
   e.preventDefault();
   try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
-  cycleMapView();
+  cycleMapView(isShiftNumpad6(e) ? -1 : 1);
   return true;
+}
+/* Shift+Numpad 6 = cycle Views backward. Windows + NumLock on sends Shift+NP6 as
+   key ArrowRight / code Numpad6 with shiftKey often false (fake Shift release).
+   NumLock off sends plain NP6 as ArrowRight too, so use the NumLock state to tell them apart. */
+function isShiftNumpad6(e) {
+  if (!e || String(e.code || "") !== "Numpad6") return false;
+  if (e.shiftKey) return true;
+  if (String(e.key || "") !== "ArrowRight") return false;
+  var numLockOn = true;
+  try { if (typeof e.getModifierState === "function") numLockOn = !!e.getModifierState("NumLock"); } catch (errNl) {}
+  return numLockOn;
 }
 function bindSingleSongShortcut() {
   if (window.__riffjamsSingleSongKeyBound) return;
@@ -15764,6 +15784,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=386"></script>
+<script src="riffjams-admin.js?v=387"></script>
 </body>
 </html>
