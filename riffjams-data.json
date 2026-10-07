@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-07T00:31:20.442Z",
+  "updatedAt": "2026-10-07T00:39:52.825Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1004,8 +1004,7 @@
             [
               "S1",
               1,
-              "ITV-S1",
-              []
+              "ITV-S1"
             ],
             [
               "B3",
@@ -4943,7 +4942,9 @@
               [
                 "S1",
                 1,
-                "ITV-S1"
+                "ITV-S1",
+                1,
+                285.8
               ],
               [
                 "B3",
@@ -4979,9 +4980,34 @@
             ],
             "sectionRulers": [
               {
-                "name": "Section",
+                "name": "Intro",
                 "start": 0,
                 "end": 2
+              },
+              {
+                "name": "verse 1",
+                "start": 3,
+                "end": 4
+              },
+              {
+                "name": "verse 2",
+                "start": 5,
+                "end": 6
+              },
+              {
+                "name": "Bridge",
+                "start": 7,
+                "end": 8
+              },
+              {
+                "name": "verse 3",
+                "start": 9,
+                "end": 11
+              },
+              {
+                "name": "solo",
+                "start": 12,
+                "end": 16
               }
             ]
           }
@@ -7618,9 +7644,17 @@
           "code": "V1",
           "tier": 1,
           "start": 273.2,
-          "stop": 303.8,
-          "duration": 30.6,
+          "stop": 285.8,
+          "duration": 12.6,
           "lick": "ITV-V1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 285.8,
+          "stop": 303.8,
+          "duration": 18,
+          "lick": "ITV-S1"
         },
         {
           "code": "B3",
