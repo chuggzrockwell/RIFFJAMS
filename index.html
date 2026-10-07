@@ -3664,13 +3664,18 @@
     overflow: visible;
   }
   .song-row:hover { background: rgba(112,48,160,.04); }
-  /* Single Song mode (v378): nav picker, 1.5× chips, megachip at col 15 (clear of chips), tab under chips. */
+  /* Single Song mode (v380): nav picker, scale chips to fit all cols before megachip (+5px gap). */
   body.sections-single-song .sec-filters,
   body.sections-single-song .sec-edit-tools {
     display: none !important;
   }
   body.sections-single-song .sections-layout.ss-layout {
     --ss-chip-w: 72px;
+    --ss-chip-h: 42px;
+    --ss-chip-font: 1.05rem;
+    --ss-cols: 1;
+    --ss-mega-w: 360px;
+    --ss-mega-gap: 5px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -3679,7 +3684,7 @@
     min-height: calc(100vh - 160px);
     position: relative;
   }
-  /* NEXT SECTION megachip + countdown: beside col 15, clear of the chip strip. */
+  /* NEXT SECTION megachip + countdown: right of chip strip with --ss-mega-gap (JS refines left). */
   body.sections-mode.sections-single-song .sm-arr-next-panel {
     display: flex;
     flex-direction: column;
@@ -3687,34 +3692,35 @@
     gap: 14px;
     position: absolute;
     top: 4px;
-    left: calc(15 * var(--ss-chip-w) + 12px);
+    left: calc(var(--ss-cols) * var(--ss-chip-w) + var(--ss-mega-gap) + 8px);
     right: auto;
-    width: 360px;
-    min-width: 360px;
-    max-width: 360px;
+    width: var(--ss-mega-w);
+    min-width: var(--ss-mega-w);
+    max-width: var(--ss-mega-w);
     margin: 0;
     z-index: 55;
     pointer-events: none;
     box-sizing: border-box;
   }
-  /* Arrangement chip strip under nav — 1.5× chips, capped at cols 1–15 so the megachip never covers them. */
+  /* Arrangement chip strip under nav — prefer 1.5× chips; JS scales --ss-chip-w to fit all cols. */
   body.sections-single-song .ss-arr-wrap {
     --row-g: 0px;
     --name-w: 0px;
     --song-meta-w: 0px;
-    --chip-w: 72px; /* 48 × 1.5 */
-    --chip-h: 42px; /* 28 × 1.5 */
+    --chip-w: var(--ss-chip-w);
+    --chip-h: var(--ss-chip-h);
     --chip-gap: 2px;
     --cover-rows: 1;
     --cover: calc(var(--chip-h) * var(--cover-rows));
     display: flex !important;
     flex-direction: column;
-    /* +8px = horizontal padding so cols 1–15 fit inside border-box width */
-    width: calc(15 * var(--ss-chip-w) + 8px);
-    max-width: calc(15 * var(--ss-chip-w) + 8px);
+    /* +8px = horizontal padding (4px × 2) inside border-box */
+    width: calc(var(--cols) * var(--ss-chip-w) - var(--chip-gap) + 8px);
+    max-width: calc(var(--cols) * var(--ss-chip-w) - var(--chip-gap) + 8px);
     padding: 6px 4px 2px;
     box-sizing: border-box;
-    overflow-x: auto;
+    overflow-x: hidden !important; /* never show a horizontal scrollbar under chips */
+    overflow-y: visible;
   }
   body.sections-single-song .ss-arr-wrap .ss-arr-row {
     align-items: center;
@@ -3724,7 +3730,7 @@
     align-self: center;
   }
   body.sections-single-song .ss-arr-wrap .sec-chip {
-    font-size: 1.05rem !important; /* ~0.7 × 1.5 */
+    font-size: var(--ss-chip-font, 1.05rem) !important;
     font-weight: 400 !important;
     letter-spacing: 0.02em !important;
     line-height: 1 !important;
@@ -3778,11 +3784,11 @@
     max-width: min(100%, calc(100vw - 420px));
     box-sizing: border-box;
   }
-  /* Stay in columns 1–15 (before megachip). Wide crops scale down to fit. */
+  /* Stay under the chip strip (before megachip). Wide crops scale down to fit. */
   body.sections-mode.sections-single-song .ss-section-tab {
     flex: 0 0 auto;
-    width: min(calc(15 * var(--ss-chip-w)), 100%);
-    max-width: calc(15 * var(--ss-chip-w));
+    width: min(calc(var(--ss-cols) * var(--ss-chip-w)), 100%);
+    max-width: calc(var(--ss-cols) * var(--ss-chip-w));
     align-self: flex-start;
   }
   .ss-section-tab img.ss-tab-img {
@@ -3799,7 +3805,7 @@
   body.sections-mode.sections-single-song .ss-section-tab.ss-tab-below-cue {
     position: absolute;
     top: calc(4px + 2.2rem + 280px + 14px + 4.5rem + 18px);
-    left: calc(15 * var(--ss-chip-w) + 12px);
+    left: calc(var(--ss-cols) * var(--ss-chip-w) + var(--ss-mega-gap) + 8px);
     right: 8px;
     flex: 0 0 auto;
     width: auto;
@@ -3823,7 +3829,7 @@
   .ss-notes {
     flex: 0 0 auto;
     width: auto;
-    max-width: min(calc(15 * var(--ss-chip-w)), 100%);
+    max-width: min(calc(var(--ss-cols) * var(--ss-chip-w)), 100%);
     align-self: flex-start;
     box-sizing: border-box;
     padding: 6px 4px 10px;
@@ -5929,6 +5935,75 @@ function buildSingleSongArrRowHtml(focusName) {
     + '<div class="song-chip-col">'+sectionRulerLaneHtml(song, maxCols)+'<div class="song-secs">'+chipArr.join("")+'</div></div>'
     + '</div></div>';
 }
+/** Scale Single Song arrangement chips so every col fits left of the megachip (+5px gap). Never scroll. */
+function ssFitArrangementChips() {
+  if (typeof singleSongMode !== "undefined" && !singleSongMode) return;
+  if (!document.body.classList.contains("sections-single-song")) return;
+  var layout = document.querySelector("#sectionsSheet .ss-layout");
+  var wrap = document.getElementById("ssArrWrap");
+  var panel = document.getElementById("smArrNextPanel");
+  if (!layout || !wrap) return;
+  var chipEls = wrap.querySelectorAll(".song-secs > .sec-chip");
+  var cols = chipEls.length;
+  if (!cols) {
+    var colsRaw = wrap.style.getPropertyValue("--cols") || getComputedStyle(wrap).getPropertyValue("--cols");
+    cols = Math.max(1, parseInt(colsRaw, 10) || 1);
+  }
+  var preferred = 72;
+  var chipGap = 2;
+  var wrapPadX = 8; /* padding 4px × 2 */
+  var megaW = parseFloat(getComputedStyle(layout).getPropertyValue("--ss-mega-w")) || 360;
+  var gap = parseFloat(getComputedStyle(layout).getPropertyValue("--ss-mega-gap"));
+  if (!isFinite(gap)) gap = 5;
+  var layoutCS = getComputedStyle(layout);
+  var padL = parseFloat(layoutCS.paddingLeft) || 0;
+  var padR = parseFloat(layoutCS.paddingRight) || 0;
+  /* Content width left for the strip so megachip + gap still fit. */
+  var availWrap = layout.clientWidth - padL - padR - megaW - gap;
+  /* wrap border-box = cols * chipW - chipGap + wrapPadX */
+  var chipW = Math.min(preferred, (availWrap - wrapPadX + chipGap) / cols);
+  if (!isFinite(chipW) || chipW < 10) chipW = 10;
+  chipW = Math.floor(chipW * 100) / 100;
+  var scale = chipW / preferred;
+  var chipH = Math.max(14, Math.round(42 * scale));
+  var fontPx = Math.max(8, Math.round(16.8 * scale * 100) / 100);
+  layout.style.setProperty("--ss-chip-w", chipW + "px");
+  layout.style.setProperty("--ss-chip-h", chipH + "px");
+  layout.style.setProperty("--ss-chip-font", fontPx + "px");
+  layout.style.setProperty("--ss-cols", String(cols));
+  wrap.style.setProperty("--cols", String(cols));
+  wrap.style.setProperty("--chip-w", chipW + "px");
+  wrap.style.setProperty("--chip-h", chipH + "px");
+  wrap.style.setProperty("--chip-gap", chipGap + "px");
+  var stripW = cols * chipW - chipGap + wrapPadX;
+  wrap.style.width = stripW + "px";
+  wrap.style.maxWidth = stripW + "px";
+  /* Exact 5px buffer between right edge of last chip and left edge of megachip. */
+  if (panel) {
+    var layoutRect = layout.getBoundingClientRect();
+    var lastChip = chipEls.length ? chipEls[chipEls.length - 1] : null;
+    var edgeEl = lastChip || wrap;
+    var edgeRect = edgeEl.getBoundingClientRect();
+    var left = Math.round(edgeRect.right - layoutRect.left + gap);
+    if (isFinite(left) && left > 0) panel.style.left = left + "px";
+  }
+}
+var _ssFitChipsResizeTimer = 0;
+function ssScheduleFitArrangementChips() {
+  if (_ssFitChipsResizeTimer) clearTimeout(_ssFitChipsResizeTimer);
+  _ssFitChipsResizeTimer = setTimeout(function(){
+    _ssFitChipsResizeTimer = 0;
+    ssFitArrangementChips();
+    if (typeof ssPlaceSectionTab === "function") ssPlaceSectionTab();
+  }, 50);
+}
+if (!_ssFitChipsResizeBound) {
+  var _ssFitChipsResizeBound = true;
+  window.addEventListener("resize", ssScheduleFitArrangementChips);
+  if (window.visualViewport) {
+    try { window.visualViewport.addEventListener("resize", ssScheduleFitArrangementChips); } catch (eVv) {}
+  }
+}
 function ssPlaceSectionTab() {
   var el = document.getElementById("ssSectionTab");
   var layout = document.querySelector("#sectionsSheet .ss-layout");
@@ -5946,8 +6021,10 @@ function ssPlaceSectionTab() {
     layout.insertBefore(el, notes);
   }
   var chipW = parseFloat(getComputedStyle(layout).getPropertyValue("--ss-chip-w")) || 72;
-  var inlineLimit = 15 * chipW;
-  /* Fit-to-15-cols height; only park under countdown when that would be unreadably short. */
+  var cols = parseFloat(getComputedStyle(layout).getPropertyValue("--ss-cols")) || 1;
+  if (!(cols > 0)) cols = 1;
+  var inlineLimit = cols * chipW;
+  /* Fit-to-strip height; only park under countdown when that would be unreadably short. */
   var fitH = inlineLimit * (img.naturalHeight / img.naturalWidth);
   var isUltraWide = fitH < 90;
   if (isUltraWide) el.classList.add("ss-tab-below-cue");
@@ -8611,10 +8688,11 @@ function showSections(keepScroll) {
   }
   if ((arrangementMode || singleSongMode) && typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
   var wrapEl = document.querySelector("#sectionsSheet .sections-wrap");
-  if (wrapEl) {
+  if (wrapEl && !singleSongMode) {
     wrapEl.style.setProperty("--cols", String(displayCols));
     if (hasSoloGroup) wrapEl.style.setProperty("--solo-group-cols", String(maxCols - groupStart + 1));
   }
+  if (singleSongMode && typeof ssFitArrangementChips === "function") ssFitArrangementChips();
   document.body.classList.toggle("solo-cols-collapsed", !arrangementMode && !!soloMode && hasSoloGroup && soloColsCollapsed);
   var groupBtn = document.getElementById("soloColGroupToggle");
   if (groupBtn) {
@@ -15520,6 +15598,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=379"></script>
+<script src="riffjams-admin.js?v=380"></script>
 </body>
 </html>
