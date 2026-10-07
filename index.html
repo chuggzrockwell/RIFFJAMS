@@ -952,9 +952,15 @@
     color: rgba(0,0,0,.45);
     min-width: 4em;
   }
-  body.sections-edit .sec-filters { opacity: .55; pointer-events: none; }
-
-  body.sections-play .sec-filters { opacity: 1; }
+  /* Riff/Solo Edit: dim filters so every chip stays visible while editing.
+     Arrangement: filters stay interactive in View, Edit, and Play. */
+  body.sections-edit:not(.sections-arrange) .sec-filters { opacity: .55; pointer-events: none; }
+  body.sections-arrange .sec-filters,
+  body.sections-play .sec-filters,
+  body.sections-mode:not(.sections-edit) .sec-filters {
+    opacity: 1;
+    pointer-events: auto;
+  }
   /* Song Map: map only (no right preview). Play stays on the map; Playboard is a separate page. */
   body.sections-mode .sec-play-pane { display: none !important; }
   body.playboard-mode {
@@ -9401,8 +9407,8 @@ function chipMatchesFilter(chip) {
 function applySecFilters() {
   var sheet = document.getElementById("sectionsSheet");
   if (!sheet) return;
-  // Edit mode always shows every chip so creates/edits are visible (section map only)
-  var active = (sectionsMode !== "edit") && secFiltersActive();
+  // Riff/Solo Edit: show every chip while editing. Arrangement: filters apply in View/Edit/Play.
+  var active = secFiltersActive() && (sectionsMode !== "edit" || !!arrangementMode);
   var shown = 0;
   sheet.querySelectorAll(".album-block").forEach(function(block){
     var albumName = block.getAttribute("data-album") || "";
@@ -15598,6 +15604,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=381"></script>
+<script src="riffjams-admin.js?v=382"></script>
 </body>
 </html>
