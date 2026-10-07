@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-07T16:22:10.670Z",
+  "updatedAt": "2026-10-07T16:25:49.159Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -4754,7 +4754,7 @@
                 2,
                 "LOTW-B1",
                 3,
-                124
+                123.1
               ],
               [
                 "S1",
@@ -4835,9 +4835,24 @@
             ],
             "sectionRulers": [
               {
-                "name": "Section",
+                "name": "intro",
                 "start": 0,
                 "end": 0
+              },
+              {
+                "name": "verse 1",
+                "start": 1,
+                "end": 2
+              },
+              {
+                "name": "verse 2",
+                "start": 3,
+                "end": 4
+              },
+              {
+                "name": "bridge",
+                "start": 5,
+                "end": 6
               }
             ]
           },
@@ -7441,7 +7456,7 @@
       "song": "Lord of This World",
       "endSec": 314.8,
       "complete": true,
-      "riffSaturationIndex": 2.331,
+      "riffSaturationIndex": 2.334,
       "chips": [
         {
           "code": "I1",
@@ -7479,16 +7494,16 @@
           "code": "V2",
           "tier": 3,
           "start": 117.2,
-          "stop": 124,
-          "duration": 6.8,
+          "stop": 123.1,
+          "duration": 5.9,
           "lick": "LOTW-V2"
         },
         {
           "code": "B1",
           "tier": 2,
-          "start": 124,
+          "start": 123.1,
           "stop": 136.9,
-          "duration": 12.9,
+          "duration": 13.8,
           "lick": "LOTW-B1"
         },
         {
