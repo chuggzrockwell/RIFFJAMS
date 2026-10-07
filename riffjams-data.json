@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-07T19:03:15.623Z",
+  "updatedAt": "2026-10-07T19:32:38.845Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -4850,7 +4850,7 @@
                 "end": 4
               },
               {
-                "name": "bridge",
+                "name": "bridge 1",
                 "start": 5,
                 "end": 9
               },
@@ -4860,9 +4860,9 @@
                 "end": 11
               },
               {
-                "name": "Section",
+                "name": "bridge 2",
                 "start": 12,
-                "end": 13
+                "end": 14
               }
             ]
           },
