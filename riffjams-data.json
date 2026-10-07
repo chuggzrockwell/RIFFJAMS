@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-07T00:25:02.438Z",
+  "updatedAt": "2026-10-07T00:31:20.442Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -4480,12 +4480,15 @@
                 "FOB-O1",
                 1,
                 342,
-                365.5
+                null
               ],
               [
                 "L1",
                 2,
-                "FOB-L1"
+                "FOB-L1",
+                [],
+                null,
+                365.5
               ],
               null,
               null
@@ -4973,6 +4976,13 @@
               ],
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "Section",
+                "start": 0,
+                "end": 2
+              }
             ]
           }
         ]
@@ -7246,9 +7256,9 @@
     {
       "album": "Paranoid",
       "song": "Fairies Wear Boots",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.332,
+      "endSec": 365.5,
+      "complete": true,
+      "riffSaturationIndex": 1.311,
       "chips": [
         {
           "code": "I1",
@@ -7374,8 +7384,8 @@
           "code": "O1",
           "tier": 3,
           "start": 342,
-          "stop": null,
-          "duration": null,
+          "stop": 365.5,
+          "duration": 23.5,
           "lick": "FOB-O1"
         }
       ]
