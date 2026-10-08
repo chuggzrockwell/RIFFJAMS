@@ -1633,6 +1633,111 @@
     outline-offset: -2px;
     box-shadow: 0 0 0 2px #00b4ff, 0 0 10px rgba(0,180,255,.55) !important;
   }
+
+  /* Arrangement repeat blocks: ×N badge + bottom bracket on the unit; pads keep row width. */
+  .sec-chip.rep-blk { position: relative; }
+  .sec-chip.rep-blk::after {
+    content: "";
+    position: absolute;
+    left: 3px; right: 3px; bottom: 2px;
+    height: 0;
+    border-bottom: 2px solid rgba(255,255,255,.92);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .sec-chip.rep-first::after { left: 5px; border-left: 2px solid rgba(255,255,255,.92); height: 5px; bottom: 2px; }
+  .sec-chip.rep-last::after { right: 5px; border-right: 2px solid rgba(255,255,255,.92); height: 5px; bottom: 2px; }
+  .sec-chip.rep-first.rep-last::after { left: 5px; right: 5px; height: 5px; }
+  .sec-chip.rep-last::before {
+    content: attr(data-rep-label);
+    position: absolute;
+    top: 1px; right: 1px;
+    z-index: 3;
+    padding: 0 3px;
+    min-width: 1.1em;
+    height: 1.05em;
+    line-height: 1.05em;
+    font-size: .58em;
+    font-weight: 800;
+    letter-spacing: .02em;
+    color: #fff;
+    background: #000;
+    border: 1px solid rgba(255,255,255,.85);
+    border-radius: 3px;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  body.sections-single-song .sec-chip.rep-last::before {
+    font-size: max(7px, .58em);
+    padding: 0 2px;
+  }
+  .song-secs > .rep-pad {
+    flex: 0 0 calc(var(--chip-w) - var(--chip-gap));
+    width: calc(var(--chip-w) - var(--chip-gap));
+    min-width: calc(var(--chip-w) - var(--chip-gap));
+    height: var(--chip-h, 42px);
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .song-sec-lane.rep-lock { opacity: .72; cursor: not-allowed; }
+  /* PASS X OF N: overlay pill on the top edge of the megachip (out of flow, so nothing shifts). */
+  .sm-arr-cue-next { position: relative; }
+  .sm-arr-pass {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    z-index: 2;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(0,0,0,.72);
+    border: 1px solid rgba(255,255,255,.85);
+    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-size: .95rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #fff;
+    pointer-events: none;
+  }
+  .sm-arr-pass.is-on { display: block; }
+  .sm-arr-next-chip[data-pass] { position: relative; }
+  .sm-arr-next-chip[data-pass]::after {
+    content: attr(data-pass);
+    position: absolute;
+    right: 10px; bottom: 8px;
+    font-family: "Paranoid Title", "Black Ops One", cursive;
+    font-size: .85rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.92);
+    text-shadow: 0 1px 2px rgba(0,0,0,.55);
+    pointer-events: none;
+  }
+  .rj-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(12px);
+    z-index: 10050;
+    max-width: min(92vw, 420px);
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: rgba(12,12,16,.92);
+    color: #fff;
+    font-size: .92rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    box-shadow: 0 8px 28px rgba(0,0,0,.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .rj-toast.is-on { opacity: 1; transform: translateX(-50%) translateY(0); }
   .arr-marquee {
     position: fixed;
     border: 1px dashed #00b4ff;
@@ -3173,6 +3278,7 @@
   body.sections-mode .sm-arr-next-chip,
   body.sections-mode .sm-arr-cur-chip,
   body.sections-mode .sm-arr-next-countdown,
+  body.sections-mode .sm-arr-pass,
   body.sections-mode .song-name,
   body.sections-mode .song-name.np-paranoid,
   body.sections-mode .song-name.np-sbs,
@@ -4613,6 +4719,8 @@
       <div class="ss-nav-picker-host" id="ssSongPickerHost" hidden></div>
       <span class="sec-edit-tools" id="secEditTools" hidden>
         <button type="button" class="sec-tool-btn" id="secUndoBtn" title="Undo (Ctrl+Z)">Undo</button>
+        <button type="button" class="sec-tool-btn" id="secRepeatBtn" hidden title="Fold exact repeat (R)">Repeat</button>
+        <button type="button" class="sec-tool-btn" id="secUnrepeatBtn" hidden title="Expand repeat block (U)">Unrepeat</button>
         <button type="button" class="sec-tool-btn primary" id="secSaveBtn" title="Save (Ctrl+S)">Save</button>
         <span class="sec-save-status" id="secSaveStatus" aria-live="polite"></span>
       </span>
@@ -4664,6 +4772,12 @@
       <div class="chip-edit-time-controls">
         <input type="text" id="chipEditTime" maxlength="12" placeholder="0:00 or seconds" autocomplete="off" inputmode="decimal">
         <button type="button" id="chipEditTimeFromPlayer" title="Grab current Song Map player time">Set from player</button>
+      </div>
+    </div>
+    <div class="chip-edit-time-row chip-edit-pass-times-row" id="chipEditPassTimesRow" hidden>
+      <label for="chipEditPassTimes" id="chipEditPassTimesLabel">Start time, later passes</label>
+      <div class="chip-edit-time-controls">
+        <input type="text" id="chipEditPassTimes" maxlength="200" placeholder="1:02, 1:40" autocomplete="off" title="Start times for passes 2..N, comma-separated">
       </div>
     </div>
     <div class="chip-edit-end-time-row" id="chipEditEndTimeRow" hidden>
@@ -5431,6 +5545,14 @@ function saveArrangementMap() {
       (a.songs || []).forEach(function(s){ clearArrangementEndSecExceptLast(s); });
     });
   } catch (eClr) {}
+  /* Repeat blocks broken by a move/delete/paste fall back to plain chips (times untouched). */
+  var repStripped = 0;
+  try {
+    ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).forEach(function(a){
+      (a.songs || []).forEach(function(s){ repStripped += arrRepeatStripInvalid(s); });
+    });
+  } catch (eRep) {}
+  if (repStripped && typeof rjToast === "function") rjToast("Repeat block expanded: its chips were moved or removed.");
   try { localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP)); } catch (e) {}
   arrangementDirty = false;
   updateEditSaveUi();
@@ -5540,7 +5662,13 @@ function syncMirrorSectionArrangement(songName, pair, fromArrangement) {
     var arrEntry = (keepStart != null)
       ? makeChipEntry(code, tier, arrLick, posList, keepStart)
       : makeChipEntry(code, tier, arrLick, posList);
-    if (aidx >= 0) arrSong.chips[aidx] = arrEntry;
+    if (aidx >= 0) {
+      /* Repeat block: keep the block marker and apply the Riff edit to every pass. */
+      var repHitM = arrRepeatInfo(arrSong.chips).byCi[aidx];
+      var oldM = arrSong.chips[aidx];
+      arrSong.chips[aidx] = arrEntry;
+      if (repHitM) arrRepAfterEditorSave(arrSong, aidx, repHitM, oldM, true);
+    }
     else placeChipInSparseList(arrSong.chips, arrEntry);
     try { localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP)); } catch (eArr) {}
   }
@@ -5947,8 +6075,13 @@ function buildSingleSongArrRowHtml(focusName) {
   }
   var maxCols = Math.max(last + 1, 1);
   var chipArr = [];
+  var repInfo = arrRepeatInfo(chips);
+  var dispCols = 0;
   for (ci = 0; ci < maxCols; ci++) {
     var ap = (ci < chips.length) ? chips[ci] : null;
+    var repCell = arrRepCell(repInfo, ci);
+    if (repCell && repCell.hide) continue;
+    dispCols++;
     if (!isChipPair(ap)) {
       chipArr.push('<button type="button" class="sec-chip empty" data-arrange="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty arrangement slot"></button>');
     } else {
@@ -5959,16 +6092,16 @@ function buildSingleSongArrRowHtml(focusName) {
       var aStart = chipStartSec(ap);
       var aStartAttr = (aStart != null) ? String(aStart) : "";
       var arrStyle = "--arr-bg:"+arrTone.bg+";--arr-fg:"+arrTone.fg;
-      chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", satTier)+'" style="'+arrStyle+'" data-arrange="1" data-song="'+ssEscAttr(song.song)+'" data-sec="'+ssEscAttr(acode)+'" data-type="'+atyp+'" data-tier="'+satTier+'" data-lick="'+ssEscAttr(alick)+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+ssEscText(acode)+'</button>');
+      chipArr.push(arrRepDecorate('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", satTier)+'" style="'+arrStyle+'" data-arrange="1" data-song="'+ssEscAttr(song.song)+'" data-sec="'+ssEscAttr(acode)+'" data-type="'+atyp+'" data-tier="'+satTier+'" data-lick="'+ssEscAttr(alick)+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+ssEscText(acode)+'</button>', repCell));
     }
   }
   var np = (album && album.font === "font-sbs") ? "np-sbs"
     : (album && album.font === "font-mor") ? "np-mor"
     : (album && album.font === "font-vol4") ? "np-vol4"
     : "np-paranoid";
-  return '<div class="ss-arr-wrap sections-wrap" id="ssArrWrap" style="--cols:'+maxCols+'">'
+  return '<div class="ss-arr-wrap sections-wrap" id="ssArrWrap" style="--cols:'+Math.max(dispCols, 1)+'">'
     + '<div class="song-row '+np+' ss-arr-row" data-ai="'+ai+'" data-si="'+si+'">'
-    + '<div class="song-chip-col">'+sectionRulerLaneHtml(song, maxCols)+'<div class="song-secs">'+chipArr.join("")+'</div></div>'
+    + '<div class="song-chip-col">'+sectionRulerLaneHtml(song, Math.max(dispCols, 1), repInfo)+'<div class="song-secs">'+chipArr.join("")+'</div></div>'
     + '</div></div>';
 }
 /** Scale Single Song arrangement chips so every col fits left of the megachip (+5px gap). Never scroll. */
@@ -7147,11 +7280,12 @@ function updateEditSaveUi() {
     else undoBtn.disabled = soloMode ? !soloHistory.length : !albumHistory.length;
   }
   if (saveBtn) saveBtn.disabled = false;
+  syncArrRepeatButtons();
   var keys = document.getElementById("sectionsKeys");
   if (keys && document.body.className.indexOf("sections-mode") >= 0) {
     if (arrangementMode) {
       if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · Esc/0 home";
-      else if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Undo/Save · Esc/0 home";
+      else if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Shift+click/box select · R repeat · Shift+R ×N · U unrepeat · Undo/Save · Esc/0 home";
       else keys.textContent = "Arrangement · 6 cycles Views · Esc/0 home";
     } else if (soloMode) {
       if (sectionsMode === "play") keys.textContent = "Solo · lick clicks queue · Esc/0 home";
@@ -8215,6 +8349,441 @@ function clampSectionRulerEdge(rulers, ri, edge, next) {
   if (end < start) return { start: r.start, end: r.end };
   return { start: start, end: end };
 }
+/* —— Arrangement repeat blocks (Arrangement + Single Song) ——
+   Data stays flat: every pass keeps its own chip, with its real start/end time, in song.chips.
+   A block is a contiguous run whose chips carry pair[6] = { rep: N, unit: L, k: j } (j = 0..L·N-1)
+   and whose codes repeat every L chips. Rows without pair[6] load unchanged, and every reader of
+   song.chips (timings, RSI/aRSI, Riff sync, NEXT, Loop, filters) keeps seeing every pass.
+   Only the display folds passes 2..N into the first pass. Anything that breaks a block
+   (moving or deleting a chip inside it) just leaves plain chips: markers are stripped on save. */
+function arrRepMark(pair) {
+  if (!isChipPair(pair)) return null;
+  var m = pair[6];
+  if (!m || typeof m !== "object") return null;
+  var n = m.rep | 0, u = m.unit | 0, k = m.k;
+  if (n < 2 || u < 1 || typeof k !== "number" || k < 0 || k >= n * u) return null;
+  return { rep: n, unit: u, k: k | 0 };
+}
+function arrRepCode(pair) { return String((pair && pair[0]) || "").trim().toUpperCase(); }
+/** Valid blocks in a chip row: { blocks: [{start, end (excl), unit, rep}], byCi: {ci: {b, pass, k}} }. */
+function arrRepeatInfo(chips) {
+  chips = chips || [];
+  var blocks = [], byCi = {};
+  var i = 0, j;
+  while (i < chips.length) {
+    var m = arrRepMark(chips[i]);
+    if (!m || m.k !== 0) { i++; continue; }
+    var len = m.unit * m.rep;
+    var ok = (i + len <= chips.length);
+    for (j = 0; ok && j < len; j++) {
+      var mj = arrRepMark(chips[i + j]);
+      if (!mj || mj.rep !== m.rep || mj.unit !== m.unit || mj.k !== j) ok = false;
+      else if (arrRepCode(chips[i + j]) !== arrRepCode(chips[i + (j % m.unit)])) ok = false;
+    }
+    if (!ok) { i++; continue; }
+    var b = { start: i, end: i + len, unit: m.unit, rep: m.rep };
+    blocks.push(b);
+    for (j = 0; j < len; j++) byCi[i + j] = { b: b, pass: Math.floor(j / m.unit), k: j % m.unit };
+    i += len;
+  }
+  return { blocks: blocks, byCi: byCi };
+}
+function arrRepPassCis(b, k) {
+  var out = [];
+  for (var p = 0; p < b.rep; p++) out.push(b.start + p * b.unit + k);
+  return out;
+}
+/** Strip markers that are not part of a valid block. Returns how many chips lost a marker. */
+function arrRepeatStripInvalid(song) {
+  if (!song || !song.chips) return 0;
+  var info = arrRepeatInfo(song.chips);
+  var n = 0;
+  song.chips.forEach(function(p, ci){
+    if (p && p.length > 6 && !info.byCi[ci]) { p.length = 6; n++; }
+  });
+  return n;
+}
+/** Pad a short pair to [code, tier, lick, positions, start, end] without changing what it means
+    (missing positions = default list, so store that list explicitly rather than []). */
+function arrRepPad(pair) {
+  if (!pair) return pair;
+  if (pair.length < 4) {
+    var pl = chipPositions(pair);
+    if (pair.length < 3) pair[2] = "";
+    pair[3] = pl.length === 1 ? pl[0] : pl.slice();
+  }
+  while (pair.length < 6) pair.push(null);
+  return pair;
+}
+function arrRepPosValue(pair) {
+  var pl = chipPositions(pair);
+  return pl.length === 1 ? pl[0] : pl.slice();
+}
+function arrRepSetMark(pair, rep, unit, k) {
+  if (!pair) return;
+  arrRepPad(pair);
+  pair[6] = { rep: rep, unit: unit, k: k };
+}
+function arrRepClearMark(pair) { if (pair && pair.length > 6) pair.length = 6; }
+/** Display column for a data ci (passes 2..N fold onto the first pass). */
+function arrRepDispCol(info, ci) {
+  if (!info || !info.blocks.length) return ci;
+  var hit = info.byCi[ci];
+  var base = hit ? (hit.b.start + hit.k) : ci;
+  var hidden = 0;
+  info.blocks.forEach(function(b){ if (b.end <= base) hidden += (b.rep - 1) * b.unit; });
+  return base - hidden;
+}
+/** Render helper: null (plain cell), {hide:true} (folded pass), or {cls, attrs} for a unit chip. */
+function arrRepCell(info, ci) {
+  var hit = info && info.byCi[ci];
+  if (!hit) return null;
+  if (hit.pass > 0) return { hide: true };
+  var b = hit.b;
+  var cls = " rep-blk" + (hit.k === 0 ? " rep-first" : "") + (hit.k === b.unit - 1 ? " rep-last" : "");
+  var attrs = ' data-rep-n="' + b.rep + '" data-rep-cis="' + arrRepPassCis(b, hit.k).join(",") + '" data-rep-start="' + b.start + '"'
+    + (hit.k === b.unit - 1 ? ' data-rep-label="×' + b.rep + '"' : "");
+  return { hide: false, cls: cls, attrs: attrs };
+}
+function arrRepDecorate(html, rc) {
+  if (!rc || rc.hide) return html;
+  return html.replace('class="sec-chip ', 'class="sec-chip' + rc.cls + ' ').replace(' data-ai="', rc.attrs + ' data-ai="');
+}
+function arrRepChipCis(el) {
+  var raw = el && el.getAttribute("data-rep-cis");
+  if (raw) return raw.split(",").map(function(x){ return parseInt(x, 10); });
+  var ci = el ? parseInt(el.getAttribute("data-ci"), 10) : NaN;
+  return isFinite(ci) ? [ci] : [];
+}
+/** Pass (0-based) of block b being played at time t, or -1 if t is outside the block. */
+function arrRepPassAt(song, b, t) {
+  var pick = smPickArrNextCue(smCollectTimedArrChips(song), t);
+  if (pick.empty || !pick.current) return -1;
+  var ci = pick.current.ci;
+  if (ci < b.start || ci >= b.end) return -1;
+  return Math.floor((ci - b.start) / b.unit);
+}
+/** Block chip click → data ci of that unit chip in the right pass.
+    anchorCi (Loop Shift+click): extend across the whole block toward the anchor's far side.
+    Otherwise: the pass being played, else pass 1. */
+function arrRepClickCi(chip, song, ci, anchorCi) {
+  if (!chip || !song || !chip.getAttribute("data-rep-cis")) return ci;
+  var cis = arrRepChipCis(chip);
+  var info = arrRepeatInfo(song.chips);
+  var hit = info.byCi[cis[0]];
+  if (!hit) return ci;
+  var b = hit.b;
+  if (typeof anchorCi === "number" && anchorCi >= 0) {
+    if (anchorCi < b.start) return cis[cis.length - 1];
+    if (anchorCi >= b.end) return cis[0];
+    var ah = info.byCi[anchorCi];
+    if (ah && ah.b.start === b.start) return cis[ah.pass];
+  }
+  var cur = (typeof smCurrent === "function") ? smCurrent() : null;
+  if (cur && cur.song === song.song) {
+    var pass = arrRepPassAt(song, b, smPlayerTimeNow());
+    if (pass >= 0) return cis[pass];
+  }
+  return cis[0];
+}
+/** While playing: ×N badge → "pass/N" on the playing block; PASS X OF N under the megachip;
+    pass tag on the megachip when NEXT is inside a block. */
+function arrRepPaintPlaying(songName, song, pick) {
+  var info = arrRepeatInfo(song && song.chips);
+  var cur = (pick && !pick.empty && pick.current) ? info.byCi[pick.current.ci] : null;
+  var nxt = (pick && !pick.empty && pick.next) ? info.byCi[pick.next.ci] : null;
+  document.querySelectorAll("#sectionsSheet .sec-chip.rep-last[data-song]").forEach(function(el){
+    var n = el.getAttribute("data-rep-n");
+    var label = "×" + n;
+    if (cur && el.getAttribute("data-song") === songName && parseInt(el.getAttribute("data-rep-start"), 10) === cur.b.start) {
+      label = (cur.pass + 1) + "/" + n;
+    }
+    if (el.getAttribute("data-rep-label") !== label) el.setAttribute("data-rep-label", label);
+  });
+  var passEl = document.getElementById("smArrPass");
+  if (passEl) {
+    var txt = cur ? ("Pass " + (cur.pass + 1) + " of " + cur.b.rep) : "";
+    if (passEl.textContent !== txt) passEl.textContent = txt;
+    passEl.classList.toggle("is-on", !!cur);
+    var megaEl = document.getElementById("smArrNextChip");
+    if (cur && megaEl) {
+      var topPx = (megaEl.offsetTop + 10) + "px";
+      if (passEl.style.top !== topPx) passEl.style.top = topPx;
+    }
+  }
+  var nextEl = document.getElementById("smArrNextChip");
+  if (nextEl) {
+    if (nxt) nextEl.setAttribute("data-pass", "Pass " + (nxt.pass + 1) + "/" + nxt.b.rep);
+    else nextEl.removeAttribute("data-pass");
+  }
+}
+var rjToastTimer = 0;
+function rjToast(msg) {
+  var el = document.getElementById("rjToast");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "rjToast";
+    el.className = "rj-toast";
+    el.setAttribute("role", "status");
+    el.setAttribute("aria-live", "polite");
+    document.body.appendChild(el);
+  }
+  el.textContent = msg || "";
+  el.classList.toggle("is-on", !!msg);
+  if (rjToastTimer) clearTimeout(rjToastTimer);
+  if (msg) rjToastTimer = setTimeout(function(){ el.classList.remove("is-on"); }, 2600);
+}
+/* —— Edit: Repeat (R) · Repeat ×N (Shift+R) · Unrepeat (U) on the group selection —— */
+function arrRepEditOn() { return !!arrangementMode && !singleSongMode && sectionsMode === "edit"; }
+function arrRepSelection() {
+  var keys = Object.keys(arrGroupSel || {});
+  if (!keys.length) return { error: "Select chips first (Shift+click or drag a box)." };
+  var row = null, cis = [];
+  for (var i = 0; i < keys.length; i++) {
+    var p = keys[i].split("|");
+    var rk = p[0] + "|" + p[1];
+    if (row && rk !== row) return { error: "Repeat works on one arrangement row at a time." };
+    row = rk;
+    cis.push(parseInt(p[2], 10));
+  }
+  var rp = row.split("|");
+  var ai = parseInt(rp[0], 10), si = parseInt(rp[1], 10);
+  var song = getEditSong(ai, si);
+  if (!song || !song.chips) return { error: "Song not found." };
+  cis.sort(function(a, b){ return a - b; });
+  cis = cis.filter(function(c, idx){ return idx === 0 || c !== cis[idx - 1]; });
+  var info = arrRepeatInfo(song.chips);
+  var blocks = [];
+  cis.forEach(function(c){
+    var h = info.byCi[c];
+    if (h && blocks.indexOf(h.b) < 0) blocks.push(h.b);
+  });
+  return { ai: ai, si: si, song: song, cis: cis, info: info, blocks: blocks };
+}
+function arrRepSelectBlock(ai, si, start, end) {
+  var sel = {};
+  for (var c = start; c < end; c++) sel[ai + "|" + si + "|" + c] = true;
+  arrGroupSel = sel;
+}
+function arrRepShiftRulers(song, at, d) {
+  if (!song || !d) return;
+  var rulers = readSectionRulers(song);
+  if (!rulers.length) return;
+  song.sectionRulers = rulers.map(function(r){
+    var s = r.start, e = r.end;
+    if (s >= at) s = Math.max(at, s + d);
+    if (e >= at) e = Math.max(s, e + d);
+    return { name: r.name, start: s, end: e };
+  });
+}
+function arrRepCodesText(song, start, n) {
+  var out = [];
+  for (var i = 0; i < n; i++) out.push(String(song.chips[start + i][0]));
+  return out.join(" ");
+}
+/** R: fold an exact repetition (I1 V1 I1 V1 → [I1 V1] ×2). */
+function arrRepeatFoldSelection() {
+  if (!arrRepEditOn()) return false;
+  var s = arrRepSelection();
+  if (s.error) { rjToast(s.error); return true; }
+  if (s.blocks.length) { rjToast("Already a repeat block. Use Shift+R to change ×N, or U to unrepeat."); return true; }
+  var cis = s.cis, chips = s.song.chips;
+  if (cis.length < 2) { rjToast("Select at least two chips (or Shift+R to repeat one ×N)."); return true; }
+  for (var i = 0; i < cis.length; i++) {
+    if (!isChipPair(chips[cis[i]])) { rjToast("Selection has an empty cell. Select consecutive chips."); return true; }
+    if (i && cis[i] !== cis[i - 1] + 1) { rjToast("Select consecutive chips (no gaps)."); return true; }
+  }
+  var total = cis.length, start = cis[0], unit = 0;
+  for (var L = 1; L <= total / 2 && !unit; L++) {
+    if (total % L) continue;
+    var ok = true;
+    for (var j = L; j < total && ok; j++) {
+      if (arrRepCode(chips[start + j]) !== arrRepCode(chips[start + (j % L)])) ok = false;
+    }
+    if (ok) unit = L;
+  }
+  if (!unit) { rjToast("Not an exact repeat (" + arrRepCodesText(s.song, start, total) + "). Nothing changed."); return true; }
+  pushArrangementHistory();
+  var rep = total / unit;
+  for (var k = 0; k < total; k++) arrRepSetMark(chips[start + k], rep, unit, k);
+  saveArrangementMap();
+  arrRepSelectBlock(s.ai, s.si, start, start + total);
+  showSections(true);
+  rjToast("Repeat: " + arrRepCodesText(s.song, start, unit) + " ×" + rep);
+  return true;
+}
+/** Shift+R: set ×N on the selected block, or repeat a selected unit N times (new passes have no times). */
+function arrRepeatSetCount() {
+  if (!arrRepEditOn()) return false;
+  var s = arrRepSelection();
+  if (s.error) { rjToast(s.error); return true; }
+  var song = s.song, chips = song.chips;
+  var b = null, unit, start, curRep;
+  if (s.blocks.length > 1) { rjToast("Select one repeat block."); return true; }
+  if (s.blocks.length === 1) {
+    b = s.blocks[0];
+    unit = b.unit; start = b.start; curRep = b.rep;
+  } else {
+    var cis = s.cis;
+    for (var i = 0; i < cis.length; i++) {
+      if (!isChipPair(chips[cis[i]])) { rjToast("Selection has an empty cell. Select consecutive chips."); return true; }
+      if (i && cis[i] !== cis[i - 1] + 1) { rjToast("Select consecutive chips (no gaps)."); return true; }
+    }
+    unit = cis.length; start = cis[0]; curRep = 1;
+  }
+  var raw = window.prompt("Repeat " + arrRepCodesText(song, start, unit) + " ×N (1 = unrepeat):", String(Math.max(2, curRep)));
+  if (raw == null) return true;
+  var want = parseInt(String(raw).trim().replace(/^[x×]/i, ""), 10);
+  if (!isFinite(want) || want < 1 || want > 32) { rjToast("Enter a number from 1 to 32."); return true; }
+  if (want === curRep) return true;
+  if (want === 1) return arrUnrepeatSelection();
+  var oldEnd = start + unit * curRep;
+  var d = (want - curRep) * unit;
+  if (d < 0) {
+    var dropTimed = 0;
+    for (var x = start + unit * want; x < oldEnd; x++) if (chipStartSec(chips[x]) != null) dropTimed++;
+    var msg = "Remove passes " + (want + 1) + "–" + curRep + " (" + (-d) + " chips" + (dropTimed ? ", " + dropTimed + " with start times" : "") + ")?";
+    if (!window.confirm(msg)) return true;
+  }
+  pushArrangementHistory();
+  chips = song.chips;
+  var keepEnd = songArrangementEndSec(song);
+  if (d > 0) {
+    var copies = [];
+    for (var p = 0; p < d; p++) {
+      var src = chips[start + (p % unit)].slice(0, 6);
+      arrRepPad(src);
+      src[4] = null; src[5] = null;
+      copies.push(src);
+    }
+    chips.splice.apply(chips, [oldEnd, 0].concat(copies));
+    /* keep the row width: absorb the insert into trailing empty slots when there are any */
+    var trim = d;
+    while (trim > 0 && chips.length > SONG_SLOTS && !isChipPair(chips[chips.length - 1])) { chips.pop(); trim--; }
+    arrRepShiftRulers(song, oldEnd, d);
+  } else {
+    chips.splice(start + unit * want, -d);
+    for (var q = 0; q < -d; q++) chips.push(null);
+    arrRepShiftRulers(song, start + unit * want, d);
+  }
+  var total = unit * want;
+  for (var k = 0; k < total; k++) arrRepSetMark(chips[start + k], want, unit, k);
+  clearArrangementEndSecExceptLast(song);
+  if (keepEnd != null && songArrangementEndSec(song) == null) {
+    var lastAfter = arrangementLastOccupiedCi(song);
+    if (lastAfter >= 0) setChipEndSec(chips[lastAfter], keepEnd);
+  }
+  saveArrangementMap();
+  arrRepSelectBlock(s.ai, s.si, start, start + total);
+  showSections(true);
+  rjToast("Repeat: " + arrRepCodesText(song, start, unit) + " ×" + want + (d > 0 ? ". New passes need start times (chip editor)." : ""));
+  return true;
+}
+/** U: expand selected repeat blocks back into individual chips (times untouched). */
+function arrUnrepeatSelection() {
+  if (!arrRepEditOn()) return false;
+  var s = arrRepSelection();
+  if (s.error) { rjToast(s.error); return true; }
+  if (!s.blocks.length) { rjToast("No repeat block in the selection."); return true; }
+  pushArrangementHistory();
+  var expanded = 0;
+  s.blocks.forEach(function(b){
+    for (var c = b.start; c < b.end; c++) arrRepClearMark(s.song.chips[c]);
+    expanded += b.end - b.start;
+  });
+  saveArrangementMap();
+  showSections(true);
+  rjToast("Unrepeated: " + expanded + " chips restored");
+  return true;
+}
+/** Edit-tools buttons follow the group selection. */
+function syncArrRepeatButtons() {
+  var rb = document.getElementById("secRepeatBtn");
+  var ub = document.getElementById("secUnrepeatBtn");
+  if (!rb || !ub) return;
+  var on = arrRepEditOn() && Object.keys(arrGroupSel || {}).length > 0;
+  var hasBlock = false;
+  if (on) {
+    var s = arrRepSelection();
+    hasBlock = !s.error && s.blocks.length > 0;
+  }
+  rb.hidden = !on || hasBlock;
+  ub.hidden = !on || !hasBlock;
+}
+/** Group drag: dragging any chip of a block carries the whole block (all passes). */
+function arrRepExpandGroupForDrag(chip) {
+  if (!arrRepEditOn() || !chip) return;
+  if (chip.getAttribute("data-rep-cis") && !arrGroupSel[arrGroupKeyOf(chip)]) {
+    arrGroupSel = {};
+    arrGroupSel[arrGroupKeyOf(chip)] = true;
+  }
+  var keys = Object.keys(arrGroupSel || {});
+  if (!keys.length) return;
+  var add = {};
+  keys.forEach(function(key){
+    var p = key.split("|");
+    var song = getEditSong(parseInt(p[0], 10), parseInt(p[1], 10));
+    if (!song || !song.chips) return;
+    var hit = arrRepeatInfo(song.chips).byCi[parseInt(p[2], 10)];
+    if (!hit) return;
+    for (var c = hit.b.start; c < hit.b.end; c++) add[p[0] + "|" + p[1] + "|" + c] = true;
+  });
+  Object.keys(add).forEach(function(k){ arrGroupSel[k] = true; });
+  arrGroupApply();
+}
+/** Chip editor: per-pass start times row for a block chip. */
+function arrRepEditorFill(state) {
+  var row = document.getElementById("chipEditPassTimesRow");
+  var inp = document.getElementById("chipEditPassTimes");
+  var lbl = document.getElementById("chipEditPassTimesLabel");
+  if (!row || !inp) return;
+  row.hidden = true;
+  inp.value = "";
+  var startLbl = document.querySelector('#chipEditor label[for="chipEditTime"]');
+  if (startLbl) startLbl.textContent = "Start time";
+  if (!state || state.isNew || !usesArrangementMap()) return;
+  var song = getEditSong(state.ai, state.si);
+  var hit = song && arrRepeatInfo(song.chips).byCi[state.ci];
+  if (!hit) return;
+  if (startLbl) startLbl.textContent = "Start time, pass 1 of " + hit.b.rep;
+  var cis = arrRepPassCis(hit.b, hit.k);
+  var parts = [];
+  for (var p = 1; p < cis.length; p++) parts.push(formatChipTime(chipStartSec(song.chips[cis[p]])) || "—");
+  inp.value = parts.join(", ");
+  if (lbl) lbl.textContent = hit.b.rep === 2 ? "Start time, pass 2" : ("Start times, passes 2–" + hit.b.rep + " (comma-separated)");
+  row.hidden = false;
+}
+/** After the chip editor replaced chips[ci] with a fresh entry: keep the block, apply
+    code/tier/lick/positions to every pass, and per-pass start times from the editor. */
+function arrRepAfterEditorSave(song, ci, hit, oldPair, noTimes) {
+  if (!song || !hit) return;
+  var entry = song.chips[ci];
+  if (!isChipPair(entry)) return;
+  var m = oldPair && oldPair[6];
+  if (m) arrRepSetMark(entry, m.rep, m.unit, m.k);
+  var cis = arrRepPassCis(hit.b, hit.k);
+  var inp = document.getElementById("chipEditPassTimes");
+  var row = document.getElementById("chipEditPassTimesRow");
+  var times = (!noTimes && inp && row && !row.hidden) ? String(inp.value || "").split(",") : null;
+  cis.forEach(function(pc, p){
+    if (pc === ci) return;
+    var pair = song.chips[pc];
+    if (!isChipPair(pair)) return;
+    arrRepPad(pair);
+    pair[0] = entry[0];
+    pair[1] = entry[1];
+    pair[2] = entry[2] || "";
+    pair[3] = arrRepPosValue(entry);
+    if (times && p >= 1 && times[p - 1] != null) {
+      var tok = String(times[p - 1]).trim();
+      if (!tok || tok === "—") setChipStartSec(pair, null);
+      else {
+        var sec = parseChipTimeInput(tok);
+        if (sec != null) setChipStartSec(pair, sec);
+      }
+    }
+  });
+}
 function sectionRulerDrawRange(start, end) {
   var s = start;
   var e = end;
@@ -8226,16 +8795,28 @@ function sectionRulerDrawRange(start, end) {
   if (e < s) return null;
   return { start: s, end: e };
 }
-function sectionRulerLaneHtml(song, maxCols) {
+function sectionRulerLaneHtml(song, maxCols, repInfo) {
   if (!sectionRulersOn) return "";
   var rulers = readSectionRulers(song);
-  var edit = sectionsMode === "edit";
+  var hasRep = !!(repInfo && repInfo.blocks && repInfo.blocks.length);
+  /* Rows with repeat blocks show rulers folded to the display columns; editing them is locked there. */
+  var edit = sectionsMode === "edit" && !hasRep;
+  var repLock = sectionsMode === "edit" && hasRep;
   var parts = [];
   var visible = 0;
   var i;
   for (i = 0; i < rulers.length; i++) {
     var draw = sectionRulerDrawRange(rulers[i].start, rulers[i].end);
     if (!draw) continue;
+    if (hasRep) {
+      var dLo = Infinity, dHi = -Infinity;
+      for (var dc = draw.start; dc <= draw.end; dc++) {
+        var dcol = arrRepDispCol(repInfo, dc);
+        if (dcol < dLo) dLo = dcol;
+        if (dcol > dHi) dHi = dcol;
+      }
+      draw = { start: dLo, end: dHi };
+    }
     visible++;
     var label = rulers[i].name || "Section";
     var esc = songMetaEscapeAttr(label);
@@ -8251,9 +8832,9 @@ function sectionRulerLaneHtml(song, maxCols) {
       parts.push('<div class="song-sec-ruler" data-ri="'+i+'" style="'+style+'" title="'+esc+'"><span class="song-sec-name">'+esc+'</span></div>');
     }
   }
-  if (!edit && !visible) return "";
-  var tip = edit ? ' title="Drag across chips to add a section"' : "";
-  return '<div class="song-sec-lane" data-cols="'+maxCols+'"'+tip+'>'+parts.join("")+'</div>';
+  if (!edit && !repLock && !visible) return "";
+  var tip = edit ? ' title="Drag across chips to add a section"' : (repLock ? ' title="Unrepeat (U) to edit section rulers on this row"' : "");
+  return '<div class="song-sec-lane'+(repLock ? ' rep-lock' : '')+'" data-cols="'+maxCols+'"'+tip+'>'+parts.join("")+'</div>';
 }
 function pushSectionRulerHistory() {
   if (usesArrangementMap()) pushArrangementHistory();
@@ -8526,6 +9107,11 @@ function handleSectionRulerPointerDown(e) {
   if (e.target.closest(".song-sec-name") && e.target.tagName === "INPUT") return false;
   var lane = e.target.closest(".song-sec-lane");
   if (!lane) return false;
+  if (lane.classList.contains("rep-lock")) {
+    e.preventDefault();
+    rjToast("Section rulers are locked on rows with repeat blocks. Unrepeat (U) to edit them.");
+    return true;
+  }
   var editor = document.getElementById("chipEditor");
   if (editor && editor.classList.contains("open")) return false;
   var row = lane.closest(".song-row");
@@ -8666,11 +9252,16 @@ function showSections(keepScroll) {
       rowN += 1;
       var chipArr = [];
       var ci;
+      var repInfo = null;
       if (arrangementMode) {
         ensureArrangementSlots(s);
         var achips = (s.chips || []);
+        repInfo = arrRepeatInfo(achips);
+        var repHidden = 0;
         for (ci = 0; ci < maxCols; ci++) {
           var ap = (ci < achips.length) ? achips[ci] : null;
+          var repCell = arrRepCell(repInfo, ci);
+          if (repCell && repCell.hide) { n++; repHidden++; continue; }
           if (!isChipPair(ap)) {
             chipArr.push('<button type="button" class="sec-chip empty" data-arrange="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty arrangement slot"></button>');
           } else {
@@ -8682,9 +9273,11 @@ function showSections(keepScroll) {
             var aStartAttr = (aStart != null) ? String(aStart) : "";
             var arrStyle = "--arr-bg:"+arrTone.bg+";--arr-fg:"+arrTone.fg;
             n++;
-            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", satTier)+'" style="'+arrStyle+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+satTier+'" data-lick="'+alick+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
+            chipArr.push(arrRepDecorate('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", satTier)+'" style="'+arrStyle+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+satTier+'" data-lick="'+alick+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>', repCell));
           }
         }
+        /* Folded passes keep the grid width: pad the row so columns line up with other rows. */
+        for (var rpad = 0; rpad < repHidden; rpad++) chipArr.push('<span class="rep-pad" aria-hidden="true"></span>');
       } else if (soloMode) {
         ensureSoloSlots(s);
         var licks = (s.licks || []);
@@ -8727,7 +9320,7 @@ function showSections(keepScroll) {
       }
       var nameTitle = (sectionsMode === "edit") ? ' title="Edit key, tuning, and BPM"' : "";
       var metaStrip = (sectionsMode === "view" && showMetaCols) ? songMetaStripHtml(s.song) : "";
-      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-chip-col">'+sectionRulerLaneHtml(s, maxCols)+'<div class="song-secs">'+chips+'</div></div></div>';
+      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-chip-col">'+sectionRulerLaneHtml(s, maxCols, repInfo)+'<div class="song-secs">'+chips+'</div></div></div>';
     }).join("");
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
     if (singleSongMode && !rows) return "";
@@ -8740,6 +9333,7 @@ function showSections(keepScroll) {
       + '<div class="sm-arr-cue-col sm-arr-cue-next">'
       + '<div class="sm-arr-next-label">Next section</div>'
       + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
+      + '<div class="sm-arr-pass" id="smArrPass" aria-live="polite"></div>'
       + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
       + '</div>'
       + '</aside>'
@@ -8748,6 +9342,7 @@ function showSections(keepScroll) {
         + '<div class="sm-arr-cue-col sm-arr-cue-next">'
         + '<div class="sm-arr-next-label">Next section</div>'
         + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
+        + '<div class="sm-arr-pass" id="smArrPass" aria-live="polite"></div>'
         + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
         + '</div>'
         + '<div class="sm-arr-cue-col sm-arr-cue-current">'
@@ -9513,7 +10108,8 @@ function applySecFilters() {
         var ok = !active || chipMatchesFilter(chip);
         chip.classList.toggle("filtered-out", !ok);
         if (ok) {
-          shown += 1;
+          /* Repeat block unit chips stand for every pass (data-rep-n). */
+          shown += Math.max(1, parseInt(chip.getAttribute("data-rep-n") || "1", 10) || 1);
           rowHasVisible = true;
         }
       });
@@ -10592,15 +11188,17 @@ function smSeekSingleSongSection(songName, sec, attempt) {
     smSchedulePublishPlayerSync();
   });
 }
-function smSelectSingleSongArrangementChip(chip) {
+function smSelectSingleSongArrangementChip(chip, ciOverride) {
   if (!chip || chip.classList.contains("empty")) return;
   var songName = chip.getAttribute("data-song") || "";
-  var ci = parseInt(chip.getAttribute("data-ci"), 10);
+  var chipCi = parseInt(chip.getAttribute("data-ci"), 10);
   var song = smFindArrangementSongByName(songName);
+  /* Repeat block: the unit chip stands for every pass; seek to it in the pass playing now (or pass 1). */
+  var ci = (typeof ciOverride === "number" && ciOverride >= 0) ? ciOverride : arrRepClickCi(chip, song, chipCi);
   var pair = song && song.chips && song.chips[ci];
   if (!song || !isChipPair(pair)) return;
   var start = chipStartSec(pair);
-  if (start == null) {
+  if (start == null && ci === chipCi) {
     var attrStart = parseFloat(chip.getAttribute("data-start") || "");
     if (isFinite(attrStart) && attrStart >= 0) start = attrStart;
   }
@@ -10715,11 +11313,12 @@ function syncSsLoopUi() {
   var wrap = document.getElementById("ssArrWrap");
   if (!wrap) return;
   wrap.querySelectorAll(".sec-chip[data-ci]").forEach(function(el){
-    var ci = parseInt(el.getAttribute("data-ci"), 10);
-    var inR = !!r && !el.classList.contains("empty") && ci >= r.lo && ci <= r.hi;
+    /* Repeat block unit chips cover every pass: looped if any pass is in range. */
+    var cis = arrRepChipCis(el);
+    var inR = !!r && !el.classList.contains("empty") && cis.some(function(c){ return c >= r.lo && c <= r.hi; });
     el.classList.toggle("is-loop", inR);
-    el.classList.toggle("is-loop-start", inR && ci === r.lo);
-    el.classList.toggle("is-loop-end", inR && ci === r.hi);
+    el.classList.toggle("is-loop-start", inR && cis.indexOf(r.lo) >= 0);
+    el.classList.toggle("is-loop-end", inR && cis.indexOf(r.hi) >= 0);
   });
   ssPositionLoopLine();
 }
@@ -10730,8 +11329,9 @@ function ssPositionLoopLine() {
   if (!layout) return;
   var line = document.getElementById("ssLoopLine");
   var wrap = document.getElementById("ssArrWrap");
-  var first = wrap && wrap.querySelector(".sec-chip.is-loop-start");
-  var last = wrap && wrap.querySelector(".sec-chip.is-loop-end");
+  var looped = wrap ? wrap.querySelectorAll(".sec-chip.is-loop") : [];
+  var first = looped.length ? looped[0] : null;
+  var last = looped.length ? looped[looped.length - 1] : null;
   if (!first || !last || !ssLoopIsActive()) {
     if (line) line.classList.remove("is-on");
     return;
@@ -10856,8 +11456,11 @@ function ssLoopChipClick(chip, e) {
   if ((chip.getAttribute("data-song") || "") !== ssLoop.song) return false;
   var ci = parseInt(chip.getAttribute("data-ci"), 10);
   if (!isFinite(ci)) return false;
+  var loopSong = smFindArrangementSongByName(ssLoop.song);
   if (e && e.shiftKey) {
-    /* Extend: contiguous range from the first selected chip to this one (either direction). */
+    /* Extend: contiguous range from the first selected chip to this one (either direction).
+       Repeat block chip: extend through every pass on the anchor's far side (real time order). */
+    ci = arrRepClickCi(chip, loopSong, ci, ssLoop.aCi);
     ssLoop.bCi = ci;
     syncSsLoopUi();
     var r = ssLoopRange();
@@ -10868,10 +11471,11 @@ function ssLoopChipClick(chip, e) {
     if (typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
     return true;
   }
-  /* Plain click: loop just this chip, then seek there (normal chip-select path). */
+  /* Plain click: loop just this chip (repeat block: in the pass playing now), then seek there. */
+  ci = arrRepClickCi(chip, loopSong, ci);
   ssLoop.aCi = ssLoop.bCi = ci;
   syncSsLoopUi();
-  smSelectSingleSongArrangementChip(chip);
+  smSelectSingleSongArrangementChip(chip, ci);
   ssLoopLastSeekAt = Date.now();
   return true;
 }
@@ -11250,9 +11854,10 @@ function smUpdateArrNextCue(force) {
     document.querySelectorAll('.sec-chip[data-arrange="1"][data-song]').forEach(function(el){
       if (el.getAttribute("data-song") !== songName) return;
       var ci = parseInt(el.getAttribute("data-ci"), 10);
-      if (ci === nowCi) el.classList.add("is-arr-now");
+      if (ci === nowCi || (el.hasAttribute("data-rep-cis") && arrRepChipCis(el).indexOf(nowCi) >= 0)) el.classList.add("is-arr-now");
     });
   }
+  arrRepPaintPlaying(songName, song, pick);
   if (inSingle && typeof ssUpdateSectionTab === "function") {
     var sel = ssSelectedArrangementSection;
     var holdSel = false;
@@ -12603,6 +13208,12 @@ function openChipEditor(anchor, state) {
       var lastCi = arrangementLastOccupiedCi(editSong);
       /* Last occupied chip, or a new chip past the current last (will become last on save) */
       showEnd = (lastCi < 0) || (state.ci === lastCi) || (state.isNew && state.ci > lastCi);
+      /* Repeat block ending the song: its unit chip carries the song End time (last pass). */
+      var repEndHit = (!state.isNew && lastCi >= 0) ? arrRepeatInfo(editSong.chips).byCi[state.ci] : null;
+      if (!showEnd && repEndHit && arrRepPassCis(repEndHit.b, repEndHit.k).indexOf(lastCi) >= 0) {
+        showEnd = true;
+        state.endSec = chipEndSec(editSong.chips[lastCi]);
+      }
     }
     if (showEnd) {
       endRow.hidden = false;
@@ -12613,6 +13224,7 @@ function openChipEditor(anchor, state) {
       endInput.value = "";
     }
   }
+  arrRepEditorFill(state);
   ed.classList.add("open");
   ed.setAttribute("aria-hidden", "false");
   ensureChipEditResizeObserver();
@@ -12894,10 +13506,15 @@ function saveChipEditor() {
     });
     song = getEditSong(ai, si);
     if (!song) return;
+    /* Repeat block: the unit chip edits every pass (code/tier/lick/positions); times stay per pass. */
+    var repHit = chipEditState.isNew ? null : arrRepeatInfo(song.chips).byCi[ci];
+    var repOld = song.chips[ci];
     song.chips[ci] = entry;
+    if (repHit) arrRepAfterEditorSave(song, ci, repHit, repOld);
     clearArrangementEndSecExceptLast(song);
     var lastCi = arrangementLastOccupiedCi(song);
     if (ci === lastCi) setChipEndSec(song.chips[ci], endSec);
+    else if (repHit && endRowEl && !endRowEl.hidden && arrRepPassCis(repHit.b, repHit.k).indexOf(lastCi) >= 0) setChipEndSec(song.chips[lastCi], endSec);
     saveArrangementMap();
     syncMirrorSectionArrangement(song.song, entry, true);
     if (typeof window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES === "function") {
@@ -14819,6 +15436,14 @@ document.getElementById("secModes").onclick = function(e){
     else undoAlbums();
     return;
   }
+  if (e.target.closest("#secRepeatBtn")) {
+    if (e.shiftKey) arrRepeatSetCount(); else arrRepeatFoldSelection();
+    return;
+  }
+  if (e.target.closest("#secUnrepeatBtn")) {
+    arrUnrepeatSelection();
+    return;
+  }
   if (e.target.closest("#secSaveBtn")) {
     if (arrangementMode) saveArrangementMapNow();
     else if (soloMode) saveSoloMapNow();
@@ -15270,11 +15895,12 @@ function arrGroupKeyOf(el) { return el.getAttribute("data-ai") + "|" + el.getAtt
 function arrGroupCount() { return Object.keys(arrGroupSel).length; }
 function arrGroupApply() {
   document.querySelectorAll(".sec-chip.arr-group-sel").forEach(function(el){ el.classList.remove("arr-group-sel"); });
-  if (!arrGroupOn()) return;
+  if (!arrGroupOn()) { syncArrRepeatButtons(); return; }
   document.querySelectorAll("#sectionsSheet .sec-chip[data-ci]").forEach(function(el){
     if (el.classList.contains("empty")) return;
     if (arrGroupSel[arrGroupKeyOf(el)]) el.classList.add("arr-group-sel");
   });
+  syncArrRepeatButtons();
 }
 function arrGroupClear() { arrGroupSel = {}; arrGroupApply(); }
 function arrGroupEls() {
@@ -15404,6 +16030,12 @@ function arrMarqueeUpdate(e) {
     if (!rc.width || !rc.height) return; /* collapsed Solo cols / hidden */
     if (rc.right < l || rc.left > r || rc.bottom < t || rc.top > b) return;
     sel[arrGroupKeyOf(el)] = true;
+    /* Marquee over a repeat unit: include every pass so R / Unrepeat / drag see the full block. */
+    if (arrRepEditOn() && el.getAttribute("data-rep-cis")) {
+      arrRepChipCis(el).forEach(function(c){
+        sel[el.getAttribute("data-ai") + "|" + el.getAttribute("data-si") + "|" + c] = true;
+      });
+    }
   });
   arrGroupSel = sel;
   arrGroupApply();
@@ -15453,6 +16085,18 @@ function arrGroupPointerDown(e) {
     if (e.shiftKey) {
       var k = arrGroupKeyOf(chip);
       if (arrGroupSel[k]) delete arrGroupSel[k]; else arrGroupSel[k] = true;
+      /* Shift+click a repeat unit: toggle the whole block (all passes). */
+      if (arrRepEditOn() && chip.getAttribute("data-rep-cis")) {
+        var aiS = chip.getAttribute("data-ai"), siS = chip.getAttribute("data-si");
+        var songS = getEditSong(parseInt(aiS, 10), parseInt(siS, 10));
+        var hitS = songS && arrRepeatInfo(songS.chips).byCi[parseInt(chip.getAttribute("data-ci"), 10)];
+        if (hitS) {
+          for (var cS = hitS.b.start; cS < hitS.b.end; cS++) {
+            var kk = aiS + "|" + siS + "|" + cS;
+            if (arrGroupSel[k]) arrGroupSel[kk] = true; else delete arrGroupSel[kk];
+          }
+        }
+      }
       arrGroupApply();
       didChipDrag = true;
       e.preventDefault();
@@ -15524,6 +16168,8 @@ sectionsSheetEl.addEventListener("pointerdown", function(e){
   if (!chip || chip.classList.contains("empty")) return;
   // Don't start a new drag while editing text in the chip editor
   if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) return;
+  /* Repeat block: dragging any unit chip moves every pass together. */
+  if (arrRepEditOn()) arrRepExpandGroupForDrag(chip);
   /* Edit: Ctrl/Cmd+drag duplicates (Section + Arrangement); Alt+drag also works in Section mode */
   var wantCopy = !!(e.ctrlKey || e.metaKey) || (!arrangementMode && !!e.altKey);
   chipDrag = {
@@ -16122,6 +16768,14 @@ document.addEventListener("keydown", function(e){
     if (e.shiftKey && k === "v") { e.preventDefault(); setSectionsMode("view"); return; }
     if (e.shiftKey && k === "e") { e.preventDefault(); setSectionsMode("edit"); return; }
     if (e.shiftKey && k === "p") { e.preventDefault(); setSectionsMode("play"); return; }
+    /* Arrangement Edit: R = fold exact repeat · Shift+R = set ×N · U = unrepeat */
+    if (arrRepEditOn() && !e.altKey && !e.metaKey && !e.ctrlKey && (k === "r" || k === "u")) {
+      e.preventDefault();
+      if (k === "u") arrUnrepeatSelection();
+      else if (e.shiftKey) arrRepeatSetCount();
+      else arrRepeatFoldSelection();
+      return;
+    }
     if (!e.shiftKey && (k === "i" || k === "v" || k === "c" || k === "b" || k === "s" || k === "l" || k === "o" || k === "f")) {
       toggleSecTypeKey(k);
       return;
@@ -16191,6 +16845,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=391"></script>
+<script src="riffjams-admin.js?v=392"></script>
 </body>
 </html>
