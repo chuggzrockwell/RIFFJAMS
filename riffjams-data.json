@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:19:40.368Z",
+  "updatedAt": "2026-10-08T22:20:48.376Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1796,8 +1796,7 @@
             [
               "S3",
               1,
-              "KYTL-S3",
-              []
+              "KYTL-S3"
             ],
             [
               "B4",
@@ -6917,12 +6916,19 @@
                 [],
                 241.8
               ],
-              null,
               [
                 "S3",
                 1,
                 "KYTL-S3",
-                []
+                [],
+                288.6
+              ],
+              [
+                "B4",
+                2,
+                "KYTL-B4",
+                [],
+                308.7
               ],
               null,
               null,
@@ -9661,7 +9667,7 @@
       "song": "Killing Yourself to Live",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.386,
+      "riffSaturationIndex": 2.367,
       "chips": [
         {
           "code": "I1",
@@ -9755,6 +9761,22 @@
           "code": "B4",
           "tier": 2,
           "start": 241.8,
+          "stop": 288.6,
+          "duration": 46.8,
+          "lick": "KYTL-B4"
+        },
+        {
+          "code": "S3",
+          "tier": 1,
+          "start": 288.6,
+          "stop": 308.7,
+          "duration": 20.1,
+          "lick": "KYTL-S3"
+        },
+        {
+          "code": "B4",
+          "tier": 2,
+          "start": 308.7,
           "stop": null,
           "duration": null,
           "lick": "KYTL-B4"
