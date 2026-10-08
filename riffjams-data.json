@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T21:33:51.913Z",
+  "updatedAt": "2026-10-08T21:34:58.371Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -6190,14 +6190,29 @@
                 3,
                 "C1"
               ],
-              null,
+              [
+                "i3",
+                1,
+                "I1",
+                [
+                  1,
+                  5
+                ],
+                35.8
+              ],
+              [
+                "V1",
+                2,
+                "V1",
+                4,
+                47.7
+              ],
               [
                 "L2",
                 1,
                 "L2",
                 2
               ],
-              null,
               [
                 "B1",
                 3,
@@ -6238,6 +6253,18 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "INTRO",
+                "start": 0,
+                "end": 2
+              },
+              {
+                "name": "VERSE 1",
+                "start": 3,
+                "end": 4
+              }
             ]
           },
           {
@@ -8667,9 +8694,25 @@
           "code": "i3",
           "tier": 1,
           "start": 35.8,
+          "stop": 35.8,
+          "duration": null,
+          "lick": "I1"
+        },
+        {
+          "code": "i3",
+          "tier": 1,
+          "start": 35.8,
           "stop": 47.7,
           "duration": 11.9,
           "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 47.7,
+          "stop": 47.7,
+          "duration": null,
+          "lick": "V1"
         },
         {
           "code": "V1",
