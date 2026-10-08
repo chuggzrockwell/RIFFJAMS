@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T17:55:52.153Z",
+  "updatedAt": "2026-10-08T17:57:02.282Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -5822,7 +5822,8 @@
                 "V1",
                 1,
                 "V1",
-                "3S"
+                "3S",
+                0
               ],
               [
                 "PC1",
@@ -5831,7 +5832,8 @@
                 [
                   1,
                   5
-                ]
+                ],
+                42.5
               ],
               [
                 "PC2",
@@ -8249,6 +8251,31 @@
           "stop": 140.7,
           "duration": 12.3,
           "lick": "SVD-I1"
+        }
+      ]
+    },
+    {
+      "album": "Sabbath Bloody Sabbath",
+      "song": "Sabbath Bloody Sabbath",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 3,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 0,
+          "stop": 42.5,
+          "duration": 42.5,
+          "lick": "V1"
+        },
+        {
+          "code": "PC1",
+          "tier": 3,
+          "start": 42.5,
+          "stop": null,
+          "duration": null,
+          "lick": "PC1"
         }
       ]
     }
