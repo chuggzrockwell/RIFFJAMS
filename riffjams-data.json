@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:31:08.327Z",
+  "updatedAt": "2026-10-08T22:32:09.681Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1838,9 +1838,8 @@
             ],
             [
               "PC1",
-              2,
-              "LFT-PC1",
-              []
+              3,
+              "LFT-PC1"
             ],
             [
               "C1",
@@ -1853,7 +1852,11 @@
               "LFT-S1",
               []
             ],
-            null,
+            [
+              "PC2",
+              3,
+              "PC2"
+            ],
             null,
             null,
             null,
@@ -7024,18 +7027,26 @@
                 0
               ],
               [
-                "C1",
+                "PC1",
                 3,
                 "LFT-PC1",
                 [],
                 45.8
               ],
               [
-                "PC1",
-                2,
-                "LFT-PC1"
+                "PC2",
+                3,
+                "PC2",
+                1,
+                71.8
               ],
-              null,
+              [
+                "V1",
+                2,
+                "LFT-V1",
+                [],
+                79.1
+              ],
               null,
               null,
               [
@@ -7071,6 +7082,18 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "VERSE 1",
+                "start": 0,
+                "end": 2
+              },
+              {
+                "name": "VERSE 2",
+                "start": 3,
+                "end": 5
+              }
             ]
           },
           {
@@ -9812,7 +9835,7 @@
       "song": "Looking for Today",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2,
+      "riffSaturationIndex": 1.579,
       "chips": [
         {
           "code": "V1",
@@ -9823,12 +9846,28 @@
           "lick": "LFT-V1"
         },
         {
-          "code": "C1",
+          "code": "PC1",
           "tier": 3,
           "start": 45.8,
+          "stop": 71.8,
+          "duration": 26,
+          "lick": "LFT-PC1"
+        },
+        {
+          "code": "PC2",
+          "tier": 3,
+          "start": 71.8,
+          "stop": 79.1,
+          "duration": 7.3,
+          "lick": "PC2"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 79.1,
           "stop": null,
           "duration": null,
-          "lick": "LFT-PC1"
+          "lick": "LFT-V1"
         }
       ]
     }
