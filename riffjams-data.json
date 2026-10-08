@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:17:04.539Z",
+  "updatedAt": "2026-10-08T22:18:10.198Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1771,14 +1771,12 @@
             [
               "S1",
               1,
-              "KYTL-S1",
-              []
+              "KYTL-S1"
             ],
             [
               "B1",
               2,
-              "KYTL-B1",
-              []
+              "KYTL-B1"
             ],
             [
               "B2",
@@ -6872,26 +6870,28 @@
                 2,
                 "KYTL-V1",
                 [],
-                33.7
+                76.4
               ],
               [
                 "C1",
                 2,
                 "KYTL-C1",
                 [],
-                55.1
+                90.7
               ],
               [
                 "S1",
                 1,
                 "KYTL-S1",
-                []
+                [],
+                105
               ],
               [
                 "B1",
                 2,
                 "KYTL-B1",
-                []
+                [],
+                148
               ],
               [
                 "B2",
@@ -6942,19 +6942,19 @@
             ],
             "sectionRulers": [
               {
-                "name": "i",
-                "start": 0,
-                "end": 0
-              },
-              {
                 "name": "verse 1",
-                "start": 1,
+                "start": 0,
                 "end": 2
               },
               {
                 "name": "verse 2",
                 "start": 3,
                 "end": 5
+              },
+              {
+                "name": "solo",
+                "start": 6,
+                "end": 7
               }
             ]
           },
@@ -9656,7 +9656,7 @@
       "song": "Killing Yourself to Live",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2,
+      "riffSaturationIndex": 2.297,
       "chips": [
         {
           "code": "I1",
@@ -9670,25 +9670,9 @@
           "code": "V1",
           "tier": 2,
           "start": 33.7,
-          "stop": 33.7,
-          "duration": null,
-          "lick": "KYTL-V1"
-        },
-        {
-          "code": "V1",
-          "tier": 2,
-          "start": 33.7,
           "stop": 55.1,
           "duration": 21.4,
           "lick": "KYTL-V1"
-        },
-        {
-          "code": "C1",
-          "tier": 2,
-          "start": 55.1,
-          "stop": 55.1,
-          "duration": null,
-          "lick": "KYTL-C1"
         },
         {
           "code": "C1",
@@ -9702,9 +9686,41 @@
           "code": "I1",
           "tier": 2,
           "start": 69.3,
+          "stop": 76.4,
+          "duration": 7.1,
+          "lick": "KYTL-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 76.4,
+          "stop": 90.7,
+          "duration": 14.3,
+          "lick": "KYTL-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 2,
+          "start": 90.7,
+          "stop": 105,
+          "duration": 14.3,
+          "lick": "KYTL-C1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 105,
+          "stop": 148,
+          "duration": 43,
+          "lick": "KYTL-S1"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 148,
           "stop": null,
           "duration": null,
-          "lick": "KYTL-I1"
+          "lick": "KYTL-B1"
         }
       ]
     }
