@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T17:59:25.794Z",
+  "updatedAt": "2026-10-08T18:00:27.918Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -5857,14 +5857,15 @@
                   1,
                   5
                 ],
-                42.5
+                113.4
               ],
               [
                 "C2",
                 3,
-                "PC2"
+                "PC2",
+                1,
+                138.1
               ],
-              null,
               [
                 "S1",
                 1,
@@ -5872,13 +5873,22 @@
                 [
                   1,
                   3
-                ]
+                ],
+                145.1
+              ],
+              [
+                "V1",
+                1,
+                "V1",
+                "3S",
+                173.7
               ],
               [
                 "B1",
                 3,
                 "B1",
-                "5S"
+                "5S",
+                180.6
               ],
               [
                 "B2",
@@ -8284,7 +8294,7 @@
       "song": "Sabbath Bloody Sabbath",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.202,
+      "riffSaturationIndex": 2.337,
       "chips": [
         {
           "code": "V1",
@@ -8293,14 +8303,6 @@
           "stop": 42.5,
           "duration": 42.5,
           "lick": "V1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 42.5,
-          "stop": 42.5,
-          "duration": null,
-          "lick": "PC1"
         },
         {
           "code": "C1",
@@ -8322,9 +8324,49 @@
           "code": "V1",
           "tier": 1,
           "start": 70.7,
+          "stop": 113.4,
+          "duration": 42.7,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 113.4,
+          "stop": 138.1,
+          "duration": 24.7,
+          "lick": "PC1"
+        },
+        {
+          "code": "C2",
+          "tier": 3,
+          "start": 138.1,
+          "stop": 145.1,
+          "duration": 7,
+          "lick": "PC2"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 145.1,
+          "stop": 173.7,
+          "duration": 28.6,
+          "lick": "S1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 173.7,
+          "stop": 180.6,
+          "duration": 6.9,
+          "lick": "V1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 180.6,
           "stop": null,
           "duration": null,
-          "lick": "V1"
+          "lick": "B1"
         }
       ]
     }
