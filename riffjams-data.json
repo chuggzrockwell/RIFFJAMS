@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T18:25:19.219Z",
+  "updatedAt": "2026-10-08T18:26:37.005Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1624,7 +1624,11 @@
               "S3",
               []
             ],
-            null,
+            [
+              "V2",
+              3,
+              "V1"
+            ],
             null,
             null
           ]
@@ -6005,6 +6009,27 @@
                 3,
                 47.7
               ],
+              [
+                "V2",
+                3,
+                "V1",
+                [],
+                54.5
+              ],
+              [
+                "I1",
+                1,
+                "I1",
+                3,
+                61.3
+              ],
+              [
+                "V2",
+                3,
+                "V1",
+                [],
+                68.1
+              ],
               null,
               null,
               [
@@ -6063,10 +6088,7 @@
                 3,
                 "S3",
                 []
-              ],
-              null,
-              null,
-              null
+              ]
             ]
           },
           {
@@ -8488,7 +8510,7 @@
       "song": "A National Acrobat",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.442,
+      "riffSaturationIndex": 2.41,
       "chips": [
         {
           "code": "I1",
@@ -8526,9 +8548,33 @@
           "code": "I1",
           "tier": 1,
           "start": 47.7,
+          "stop": 54.5,
+          "duration": 6.8,
+          "lick": "I1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 54.5,
+          "stop": 61.3,
+          "duration": 6.8,
+          "lick": "V1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 61.3,
+          "stop": 68.1,
+          "duration": 6.8,
+          "lick": "I1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 68.1,
           "stop": null,
           "duration": null,
-          "lick": "I1"
+          "lick": "V1"
         }
       ]
     }
