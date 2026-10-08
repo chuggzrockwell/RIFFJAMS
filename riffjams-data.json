@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:40:32.765Z",
+  "updatedAt": "2026-10-08T22:41:45.098Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -7196,6 +7196,28 @@
                 1,
                 123.1
               ],
+              [
+                "I3",
+                3,
+                "I3",
+                1,
+                136.3
+              ],
+              [
+                "V1",
+                3,
+                "SAR-V1",
+                [],
+                143
+              ],
+              [
+                "C1",
+                3,
+                "SAR-C1",
+                [],
+                163.6
+              ],
+              null,
               null,
               null,
               [
@@ -7210,10 +7232,6 @@
                 "",
                 []
               ],
-              null,
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -7242,7 +7260,7 @@
               {
                 "name": "C",
                 "start": 6,
-                "end": 6
+                "end": 8
               }
             ]
           }
@@ -10015,7 +10033,7 @@
       "song": "Spiral Architect",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.734,
+      "riffSaturationIndex": 1.553,
       "chips": [
         {
           "code": "I1",
@@ -10077,9 +10095,33 @@
           "code": "I2",
           "tier": 3,
           "start": 123.1,
+          "stop": 136.3,
+          "duration": 13.2,
+          "lick": "I2"
+        },
+        {
+          "code": "I3",
+          "tier": 3,
+          "start": 136.3,
+          "stop": 143,
+          "duration": 6.7,
+          "lick": "I3"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 143,
+          "stop": 163.6,
+          "duration": 20.6,
+          "lick": "SAR-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 163.6,
           "stop": null,
           "duration": null,
-          "lick": "I2"
+          "lick": "SAR-C1"
         }
       ]
     }
