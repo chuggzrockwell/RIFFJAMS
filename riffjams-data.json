@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T21:31:04.655Z",
+  "updatedAt": "2026-10-08T21:32:49.675Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1713,8 +1713,24 @@
                 3
               ]
             ],
-            null,
-            null,
+            [
+              "I2",
+              1,
+              "L1",
+              [
+                1,
+                2
+              ]
+            ],
+            [
+              "I3",
+              1,
+              "I1",
+              [
+                1,
+                5
+              ]
+            ],
             null,
             null,
             null,
@@ -6139,26 +6155,41 @@
                 0
               ],
               [
-                "L1",
+                "i2",
                 1,
                 "L1",
                 [
                   1,
                   2
-                ]
+                ],
+                24.3
               ],
+              [
+                "i3",
+                1,
+                "I1",
+                [
+                  1,
+                  5
+                ],
+                35.8
+              ],
+              [
+                "V1",
+                2,
+                "V1",
+                4,
+                47.7
+              ],
+              null,
+              null,
               [
                 "L2",
                 1,
                 "L2",
                 2
               ],
-              [
-                "V1",
-                2,
-                "V1",
-                4
-              ],
+              null,
               [
                 "B1",
                 3,
@@ -6183,11 +6214,15 @@
                   3
                 ]
               ],
-              null,
-              null,
-              null,
-              null,
-              null,
+              [
+                "L1",
+                1,
+                "L1",
+                [
+                  1,
+                  2
+                ]
+              ],
               null,
               null,
               null,
@@ -8602,15 +8637,39 @@
       "song": "Sabbra Cadabra",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": null,
+      "riffSaturationIndex": 3,
       "chips": [
         {
           "code": "I1",
           "tier": 1,
           "start": 0,
+          "stop": 24.3,
+          "duration": 24.3,
+          "lick": "I1"
+        },
+        {
+          "code": "i2",
+          "tier": 1,
+          "start": 24.3,
+          "stop": 35.8,
+          "duration": 11.5,
+          "lick": "L1"
+        },
+        {
+          "code": "i3",
+          "tier": 1,
+          "start": 35.8,
+          "stop": 47.7,
+          "duration": 11.9,
+          "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 47.7,
           "stop": null,
           "duration": null,
-          "lick": "I1"
+          "lick": "V1"
         }
       ]
     }
