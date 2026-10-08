@@ -1671,14 +1671,6 @@
     font-size: max(7px, .58em);
     padding: 0 2px;
   }
-  .song-secs > .rep-pad {
-    flex: 0 0 calc(var(--chip-w) - var(--chip-gap));
-    width: calc(var(--chip-w) - var(--chip-gap));
-    min-width: calc(var(--chip-w) - var(--chip-gap));
-    height: var(--chip-h, 42px);
-    visibility: hidden;
-    pointer-events: none;
-  }
   .song-sec-lane.rep-lock { opacity: .72; cursor: not-allowed; }
   /* PASS X OF N: overlay pill on the top edge of the megachip (out of flow, so nothing shifts). */
   .sm-arr-cue-next { position: relative; }
@@ -3782,6 +3774,15 @@
   body.sections-single-song .sec-edit-tools {
     display: none !important;
   }
+  /* Single Song Edit: only Repeat / Unrepeat, and only while chips are selected. */
+  body.sections-single-song.sections-edit .sec-edit-tools.ss-rep-on:not([hidden]) {
+    display: inline-flex !important;
+  }
+  body.sections-single-song .sec-edit-tools #secUndoBtn,
+  body.sections-single-song .sec-edit-tools #secSaveBtn,
+  body.sections-single-song .sec-edit-tools #secSaveStatus {
+    display: none !important;
+  }
   body.sections-single-song .sections-layout.ss-layout {
     --ss-chip-w: 72px;
     --ss-chip-h: 42px;
@@ -5552,7 +5553,7 @@ function saveArrangementMap() {
       (a.songs || []).forEach(function(s){ repStripped += arrRepeatStripInvalid(s); });
     });
   } catch (eRep) {}
-  if (repStripped && typeof rjToast === "function") rjToast("Repeat block expanded: its chips were moved or removed.");
+  /* Silent: Arrangement shows plain chips, so a block broken there just stops folding in Single Song. */
   try { localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP)); } catch (e) {}
   arrangementDirty = false;
   updateEditSaveUi();
@@ -7293,7 +7294,7 @@ function updateEditSaveUi() {
   if (keys && document.body.className.indexOf("sections-mode") >= 0) {
     if (arrangementMode) {
       if (sectionsMode === "play") keys.textContent = "Arrangement · chip clicks queue · Esc/0 home";
-      else if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Shift+click/box select · R repeat · Shift+R ×N · U unrepeat · Undo/Save · Esc/0 home";
+      else if (sectionsMode === "edit") keys.textContent = "Arrangement · Edit · drag · Ctrl/Cmd+drag copy · Undo/Save · Esc/0 home";
       else keys.textContent = "Arrangement · 6 cycles Views · Esc/0 home";
     } else if (soloMode) {
       if (sectionsMode === "play") keys.textContent = "Solo · lick clicks queue · Esc/0 home";
@@ -8542,7 +8543,9 @@ function rjToast(msg) {
   if (msg) rjToastTimer = setTimeout(function(){ el.classList.remove("is-on"); }, 2600);
 }
 /* —— Edit: Repeat (R) · Repeat ×N (Shift+R) · Unrepeat (U) on the group selection —— */
-function arrRepEditOn() { return !!arrangementMode && !singleSongMode && sectionsMode === "edit"; }
+function arrRepEditOn() {
+  return !!singleSongMode && sectionsMode === "edit" && document.body.classList.contains("sections-single-song");
+}
 function arrRepSelection() {
   var keys = Object.keys(arrGroupSel || {});
   if (!keys.length) return { error: "Select chips first (Shift+click or drag a box)." };
@@ -8717,27 +8720,8 @@ function syncArrRepeatButtons() {
   }
   rb.hidden = !on || hasBlock;
   ub.hidden = !on || !hasBlock;
-}
-/** Group drag: dragging any chip of a block carries the whole block (all passes). */
-function arrRepExpandGroupForDrag(chip) {
-  if (!arrRepEditOn() || !chip) return;
-  if (chip.getAttribute("data-rep-cis") && !arrGroupSel[arrGroupKeyOf(chip)]) {
-    arrGroupSel = {};
-    arrGroupSel[arrGroupKeyOf(chip)] = true;
-  }
-  var keys = Object.keys(arrGroupSel || {});
-  if (!keys.length) return;
-  var add = {};
-  keys.forEach(function(key){
-    var p = key.split("|");
-    var song = getEditSong(parseInt(p[0], 10), parseInt(p[1], 10));
-    if (!song || !song.chips) return;
-    var hit = arrRepeatInfo(song.chips).byCi[parseInt(p[2], 10)];
-    if (!hit) return;
-    for (var c = hit.b.start; c < hit.b.end; c++) add[p[0] + "|" + p[1] + "|" + c] = true;
-  });
-  Object.keys(add).forEach(function(k){ arrGroupSel[k] = true; });
-  arrGroupApply();
+  var tools = document.getElementById("secEditTools");
+  if (tools) tools.classList.toggle("ss-rep-on", on);
 }
 /** Chip editor: per-pass start times row for a block chip. */
 function arrRepEditorFill(state) {
@@ -8749,7 +8733,7 @@ function arrRepEditorFill(state) {
   inp.value = "";
   var startLbl = document.querySelector('#chipEditor label[for="chipEditTime"]');
   if (startLbl) startLbl.textContent = "Start time";
-  if (!state || state.isNew || !usesArrangementMap()) return;
+  if (!state || state.isNew || !singleSongMode) return;
   var song = getEditSong(state.ai, state.si);
   var hit = song && arrRepeatInfo(song.chips).byCi[state.ci];
   if (!hit) return;
@@ -9260,16 +9244,11 @@ function showSections(keepScroll) {
       rowN += 1;
       var chipArr = [];
       var ci;
-      var repInfo = null;
       if (arrangementMode) {
         ensureArrangementSlots(s);
         var achips = (s.chips || []);
-        repInfo = arrRepeatInfo(achips);
-        var repHidden = 0;
         for (ci = 0; ci < maxCols; ci++) {
           var ap = (ci < achips.length) ? achips[ci] : null;
-          var repCell = arrRepCell(repInfo, ci);
-          if (repCell && repCell.hide) { n++; repHidden++; continue; }
           if (!isChipPair(ap)) {
             chipArr.push('<button type="button" class="sec-chip empty" data-arrange="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty arrangement slot"></button>');
           } else {
@@ -9281,11 +9260,9 @@ function showSections(keepScroll) {
             var aStartAttr = (aStart != null) ? String(aStart) : "";
             var arrStyle = "--arr-bg:"+arrTone.bg+";--arr-fg:"+arrTone.fg;
             n++;
-            chipArr.push(arrRepDecorate('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", satTier)+'" style="'+arrStyle+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+satTier+'" data-lick="'+alick+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>', repCell));
+            chipArr.push('<button type="button" class="sec-chip '+atyp+' '+slotCss("tier", satTier)+'" style="'+arrStyle+'" data-arrange="1" data-song="'+s.song+'" data-sec="'+acode+'" data-type="'+atyp+'" data-tier="'+satTier+'" data-lick="'+alick+'" data-position="'+apos+'" data-start="'+aStartAttr+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+acode+'</button>');
           }
         }
-        /* Folded passes keep the grid width: pad the row so columns line up with other rows. */
-        for (var rpad = 0; rpad < repHidden; rpad++) chipArr.push('<span class="rep-pad" aria-hidden="true"></span>');
       } else if (soloMode) {
         ensureSoloSlots(s);
         var licks = (s.licks || []);
@@ -9328,7 +9305,7 @@ function showSections(keepScroll) {
       }
       var nameTitle = (sectionsMode === "edit") ? ' title="Edit key, tuning, and BPM"' : "";
       var metaStrip = (sectionsMode === "view" && showMetaCols) ? songMetaStripHtml(s.song) : "";
-      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-chip-col">'+sectionRulerLaneHtml(s, maxCols, repInfo)+'<div class="song-secs">'+chips+'</div></div></div>';
+      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-chip-col">'+sectionRulerLaneHtml(s, maxCols)+'<div class="song-secs">'+chips+'</div></div></div>';
     }).join("");
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
     if (singleSongMode && !rows) return "";
@@ -9350,7 +9327,6 @@ function showSections(keepScroll) {
         + '<div class="sm-arr-cue-col sm-arr-cue-next">'
         + '<div class="sm-arr-next-label">Next section</div>'
         + '<div class="sm-arr-next-chip is-empty" id="smArrNextChip">Set times on chips</div>'
-        + '<div class="sm-arr-pass" id="smArrPass" aria-live="polite"></div>'
         + '<div class="sm-arr-next-countdown" id="smArrNextCountdown" aria-hidden="true"></div>'
         + '</div>'
         + '<div class="sm-arr-cue-col sm-arr-cue-current">'
@@ -11865,7 +11841,7 @@ function smUpdateArrNextCue(force) {
       if (ci === nowCi || (el.hasAttribute("data-rep-cis") && arrRepChipCis(el).indexOf(nowCi) >= 0)) el.classList.add("is-arr-now");
     });
   }
-  arrRepPaintPlaying(songName, song, pick);
+  arrRepPaintPlaying(songName, song, inSingle ? pick : null);
   if (inSingle && typeof ssUpdateSectionTab === "function") {
     var sel = ssSelectedArrangementSection;
     var holdSel = false;
@@ -13217,7 +13193,7 @@ function openChipEditor(anchor, state) {
       /* Last occupied chip, or a new chip past the current last (will become last on save) */
       showEnd = (lastCi < 0) || (state.ci === lastCi) || (state.isNew && state.ci > lastCi);
       /* Repeat block ending the song: its unit chip carries the song End time (last pass). */
-      var repEndHit = (!state.isNew && lastCi >= 0) ? arrRepeatInfo(editSong.chips).byCi[state.ci] : null;
+      var repEndHit = (singleSongMode && !state.isNew && lastCi >= 0) ? arrRepeatInfo(editSong.chips).byCi[state.ci] : null;
       if (!showEnd && repEndHit && arrRepPassCis(repEndHit.b, repEndHit.k).indexOf(lastCi) >= 0) {
         showEnd = true;
         state.endSec = chipEndSec(editSong.chips[lastCi]);
@@ -13516,11 +13492,13 @@ function saveChipEditor() {
     });
     song = getEditSong(ai, si);
     if (!song) return;
-    /* Repeat block: the unit chip edits every pass (code/tier/lick/positions); times stay per pass. */
-    var repHit = chipEditState.isNew ? null : arrRepeatInfo(song.chips).byCi[ci];
+    /* Single Song repeat block: the unit chip edits every pass (code/tier/lick/positions); times stay
+       per pass. Arrangement edits just that chip and keeps its block marker (still folds if codes match). */
+    var repHit = (chipEditState.isNew || !singleSongMode) ? null : arrRepeatInfo(song.chips).byCi[ci];
     var repOld = song.chips[ci];
     song.chips[ci] = entry;
     if (repHit) arrRepAfterEditorSave(song, ci, repHit, repOld);
+    else if (repOld && repOld.length > 6 && repOld[6]) arrRepSetMark(entry, repOld[6].rep, repOld[6].unit, repOld[6].k);
     clearArrangementEndSecExceptLast(song);
     var lastCi = arrangementLastOccupiedCi(song);
     if (ci === lastCi) setChipEndSec(song.chips[ci], endSec);
@@ -15871,7 +15849,8 @@ function onChipPointerUp(e) {
 var arrGroupSel = {};
 var arrMarquee = null;
 /* Arrangement, Riff, and Solo grids (Edit only). Single Song strip excluded. */
-function arrGroupOn() { return !singleSongMode && sectionsMode === "edit"; }
+/* Arrangement/Riff/Solo Edit: select + group drag. Single Song Edit: select only (for Repeat / Unrepeat). */
+function arrGroupOn() { return sectionsMode === "edit" && (!singleSongMode || document.body.classList.contains("sections-single-song")); }
 /* Which map the grid edits (same precedence as moveSongMapChip / getEditSong). */
 function groupMapKind() { return usesArrangementMap() ? "arr" : (soloMode ? "solo" : "riff"); }
 function groupSlots(song) {
@@ -16089,6 +16068,7 @@ document.addEventListener("keydown", function(e){
 function arrGroupPointerDown(e) {
   if (!arrGroupOn()) return false;
   if (e.pointerType === "mouse" && e.button !== 0) return false;
+  if (singleSongMode && !(e.target.closest && e.target.closest("#ssArrWrap"))) return false;
   var ed = document.getElementById("chipEditor");
   if (ed && ed.classList.contains("open")) return false;
   var chip = e.target.closest(".sec-chip");
@@ -16179,8 +16159,8 @@ sectionsSheetEl.addEventListener("pointerdown", function(e){
   if (!chip || chip.classList.contains("empty")) return;
   // Don't start a new drag while editing text in the chip editor
   if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) return;
-  /* Repeat block: dragging any unit chip moves every pass together. */
-  if (arrRepEditOn()) arrRepExpandGroupForDrag(chip);
+  /* Single Song: a folded repeat chip stands for several passes, so it is not draggable (click edits it). */
+  if (singleSongMode && chip.getAttribute("data-rep-cis")) return;
   /* Edit: Ctrl/Cmd+drag duplicates (Section + Arrangement); Alt+drag also works in Section mode */
   var wantCopy = !!(e.ctrlKey || e.metaKey) || (!arrangementMode && !!e.altKey);
   chipDrag = {
@@ -16193,7 +16173,7 @@ sectionsSheetEl.addEventListener("pointerdown", function(e){
     pointerId: e.pointerId,
     over: null,
     copy: wantCopy,
-    group: arrGroupOn() && arrGroupCount() > 1 && !!arrGroupSel[arrGroupKeyOf(chip)]
+    group: arrGroupOn() && !singleSongMode && arrGroupCount() > 1 && !!arrGroupSel[arrGroupKeyOf(chip)]
   };
   lastSectionFocus = { ai: chipDrag.ai, si: chipDrag.si, ci: chipDrag.ci };
   pointerDragActive = false;
@@ -16856,6 +16836,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=393"></script>
+<script src="riffjams-admin.js?v=394"></script>
 </body>
 </html>
