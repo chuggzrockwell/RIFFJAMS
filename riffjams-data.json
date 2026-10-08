@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T21:43:31.465Z",
+  "updatedAt": "2026-10-08T21:46:18.425Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1739,7 +1739,11 @@
               3,
               "O2"
             ],
-            null,
+            [
+              "04",
+              3,
+              "04"
+            ],
             null,
             null
           ]
@@ -3172,6 +3176,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -3282,6 +3287,7 @@
               null,
               null,
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -3384,6 +3390,7 @@
                 188.2,
                 194.7
               ],
+              null,
               null,
               null,
               null,
@@ -3540,6 +3547,7 @@
               null,
               null,
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -3602,12 +3610,14 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
           {
             "song": "Evil Woman",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -3652,12 +3662,14 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
           {
             "song": "Warning",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -3806,6 +3818,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -3904,6 +3917,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -3925,6 +3939,7 @@
                 149,
                 269
               ],
+              null,
               null,
               null,
               null,
@@ -4077,6 +4092,7 @@
               ],
               null,
               null,
+              null,
               null
             ]
           },
@@ -4189,6 +4205,7 @@
                 248.7,
                 279
               ],
+              null,
               null,
               null,
               null,
@@ -4321,6 +4338,7 @@
               ],
               null,
               null,
+              null,
               null
             ]
           },
@@ -4398,6 +4416,7 @@
                 137.2,
                 146.5
               ],
+              null,
               null,
               null,
               null,
@@ -4536,6 +4555,7 @@
               ],
               null,
               null,
+              null,
               null
             ]
           }
@@ -4579,6 +4599,7 @@
                 "",
                 []
               ],
+              null,
               null,
               null,
               null,
@@ -4643,6 +4664,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -4655,6 +4677,7 @@
                 "",
                 []
               ],
+              null,
               null,
               null,
               null,
@@ -4728,12 +4751,14 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
           {
             "song": "Orchid",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -4877,6 +4902,7 @@
               null,
               null,
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -4915,6 +4941,7 @@
           {
             "song": "Solitude",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -5069,6 +5096,7 @@
                 367.5
               ],
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -5114,6 +5142,7 @@
           {
             "song": "Wheels of Confusion",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -5225,6 +5254,7 @@
               null,
               null,
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -5272,12 +5302,14 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
           {
             "song": "FX",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -5378,6 +5410,7 @@
                 228,
                 263.5
               ],
+              null,
               null,
               null,
               null,
@@ -5519,6 +5552,7 @@
                 268.7,
                 320.7
               ],
+              null,
               null,
               null,
               null,
@@ -5689,6 +5723,7 @@
               null,
               null,
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -5717,6 +5752,7 @@
           {
             "song": "Laguna Sunrise",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -5816,6 +5852,7 @@
               null,
               null,
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -5844,6 +5881,7 @@
           {
             "song": "Under the Sun",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -6002,6 +6040,7 @@
               null,
               null,
               null,
+              null,
               null
             ],
             "sectionRulers": [
@@ -6156,12 +6195,14 @@
                 "S3",
                 []
               ],
+              null,
               null
             ]
           },
           {
             "song": "Fluff",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -6347,7 +6388,8 @@
                 "O2",
                 3,
                 "O1",
-                []
+                [],
+                289.8
               ],
               [
                 "O3",
@@ -6356,7 +6398,13 @@
                 [],
                 306.6
               ],
-              null
+              [
+                "04",
+                3,
+                "04",
+                [],
+                317.7
+              ]
             ],
             "sectionRulers": [
               {
@@ -6458,12 +6506,14 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
           {
             "song": "Who Are You?",
             "chips": [
+              null,
               null,
               null,
               null,
@@ -6528,6 +6578,7 @@
               null,
               null,
               null,
+              null,
               null
             ]
           },
@@ -6564,6 +6615,7 @@
                 "",
                 []
               ],
+              null,
               null,
               null,
               null,
@@ -8795,7 +8847,7 @@
       "song": "Sabbra Cadabra",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.503,
+      "riffSaturationIndex": 1.485,
       "chips": [
         {
           "code": "I1",
@@ -8937,17 +8989,33 @@
           "code": "O1",
           "tier": 3,
           "start": 233.1,
-          "stop": 306.6,
-          "duration": 73.5,
+          "stop": 289.8,
+          "duration": 56.7,
           "lick": "B3"
+        },
+        {
+          "code": "O2",
+          "tier": 3,
+          "start": 289.8,
+          "stop": 306.6,
+          "duration": 16.8,
+          "lick": "O1"
         },
         {
           "code": "O3",
           "tier": 3,
           "start": 306.6,
+          "stop": 317.7,
+          "duration": 11.1,
+          "lick": "O2"
+        },
+        {
+          "code": "04",
+          "tier": 3,
+          "start": 317.7,
           "stop": null,
           "duration": null,
-          "lick": "O2"
+          "lick": "04"
         }
       ]
     }
