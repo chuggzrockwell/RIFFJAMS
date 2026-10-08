@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T18:23:02.689Z",
+  "updatedAt": "2026-10-08T18:24:16.306Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1565,8 +1565,7 @@
             [
               "V1",
               3,
-              "V1",
-              []
+              "V1"
             ],
             [
               "B1",
@@ -5955,6 +5954,16 @@
                 "name": "solo",
                 "start": 6,
                 "end": 8
+              },
+              {
+                "name": "bridge",
+                "start": 9,
+                "end": 12
+              },
+              {
+                "name": "outro",
+                "start": 13,
+                "end": 15
               }
             ]
           },
@@ -5965,13 +5974,15 @@
                 "I1",
                 1,
                 "I1",
-                3
+                3,
+                0
               ],
               [
                 "V1",
                 3,
                 "V1",
-                []
+                [],
+                27.6
               ],
               [
                 "B1",
@@ -8451,6 +8462,31 @@
           "stop": 335,
           "duration": 11.1,
           "lick": "B4"
+        }
+      ]
+    },
+    {
+      "album": "Sabbath Bloody Sabbath",
+      "song": "A National Acrobat",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 3,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 0,
+          "stop": 27.6,
+          "duration": 27.6,
+          "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 27.6,
+          "stop": null,
+          "duration": null,
+          "lick": "V1"
         }
       ]
     }
