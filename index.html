@@ -15180,7 +15180,38 @@ function onChipPointerUp(e) {
 /* ---- Arrangement Edit: grouped select (marquee / Shift+click) + group drag ---- */
 var arrGroupSel = {};
 var arrMarquee = null;
-function arrGroupOn() { return !!arrangementMode && !singleSongMode && sectionsMode === "edit"; }
+/* Arrangement, Riff, and Solo grids (Edit only). Single Song strip excluded. */
+function arrGroupOn() { return !singleSongMode && sectionsMode === "edit"; }
+/* Which map the grid edits (same precedence as moveSongMapChip / getEditSong). */
+function groupMapKind() { return usesArrangementMap() ? "arr" : (soloMode ? "solo" : "riff"); }
+function groupSlots(song) {
+  if (!song) return null;
+  var kind = groupMapKind();
+  if (kind === "arr") { ensureArrangementSlots(song); return song.chips; }
+  if (kind === "solo") { ensureSoloSlots(song); return song.licks; }
+  if (!song.sections) ensureSongSlots(song, SONG_SLOTS);
+  return song.sections;
+}
+function groupGrowAll(maxCi) {
+  var kind = groupMapKind();
+  if (kind === "riff") { ensureAllSongSlots(ALBUMS, maxCi + 1); return; }
+  var map = (kind === "arr") ? ARRANGEMENT_MAP : SOLO_MAP;
+  ((map && map.albums) || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){ if (s) growSongSlotsTo(s, maxCi); });
+  });
+}
+function groupPushHistory() {
+  var kind = groupMapKind();
+  if (kind === "arr") pushArrangementHistory();
+  else if (kind === "solo") pushSoloHistory();
+  else pushAlbumHistory();
+}
+function groupSave() {
+  var kind = groupMapKind();
+  if (kind === "arr") saveArrangementMap();
+  else if (kind === "solo") saveSoloMap();
+  else saveAlbums();
+}
 function arrGroupKeyOf(el) { return el.getAttribute("data-ai") + "|" + el.getAttribute("data-si") + "|" + el.getAttribute("data-ci"); }
 function arrGroupCount() { return Object.keys(arrGroupSel).length; }
 function arrGroupApply() {
@@ -15243,31 +15274,30 @@ function moveArrGroup(anchor, toAi, toSi, toCi, copy) {
   if (plan[0].ai === plan[0].toAi && plan[0].si === plan[0].toSi && plan[0].ci === plan[0].toCi) return false;
   var maxCi = 0;
   plan.forEach(function(m){ maxCi = Math.max(maxCi, m.ci, m.toCi); });
-  ((ARRANGEMENT_MAP && ARRANGEMENT_MAP.albums) || []).forEach(function(a){
-    (a.songs || []).forEach(function(s){ if (s) growSongSlotsTo(s, maxCi); });
-  });
+  groupGrowAll(maxCi);
   var items = [];
   plan.forEach(function(m){
     var s = getEditSong(m.ai, m.si);
-    var it = s && s.chips ? s.chips[m.ci] : null;
+    var sl = groupSlots(s);
+    var it = sl ? sl[m.ci] : null;
     if (isChipPair(it)) items.push({ m: m, item: it.slice() });
   });
   if (!items.length) return false;
-  pushArrangementHistory();
+  groupPushHistory();
   var vacated = [];
   if (!copy) {
     items.forEach(function(x){
-      getEditSong(x.m.ai, x.m.si).chips[x.m.ci] = null;
+      groupSlots(getEditSong(x.m.ai, x.m.si))[x.m.ci] = null;
       vacated.push({ ai: x.m.ai, si: x.m.si, ci: x.m.ci });
     });
   }
   var displaced = [];
   var newSel = {};
   items.forEach(function(x){
-    var ts = getEditSong(x.m.toAi, x.m.toSi);
-    var prev = ts.chips[x.m.toCi];
+    var ts = groupSlots(getEditSong(x.m.toAi, x.m.toSi));
+    var prev = ts[x.m.toCi];
     if (!copy && isChipPair(prev)) displaced.push({ ai: x.m.toAi, si: x.m.toSi, item: prev });
-    ts.chips[x.m.toCi] = x.item;
+    ts[x.m.toCi] = x.item;
     newSel[x.m.toAi + "|" + x.m.toSi + "|" + x.m.toCi] = true;
   });
   /* Chips that were in the way drop into the slots the group left (same song first). */
@@ -15275,26 +15305,26 @@ function moveArrGroup(anchor, toAi, toSi, toCi, copy) {
     var spot = null, i;
     for (i = 0; i < vacated.length; i++) {
       var v = vacated[i];
-      if (v.ai === d.ai && v.si === d.si && !isChipPair(getEditSong(v.ai, v.si).chips[v.ci])) { spot = v; break; }
+      if (v.ai === d.ai && v.si === d.si && !isChipPair(groupSlots(getEditSong(v.ai, v.si))[v.ci])) { spot = v; break; }
     }
     if (!spot) {
       for (i = 0; i < vacated.length; i++) {
         var v2 = vacated[i];
-        if (!isChipPair(getEditSong(v2.ai, v2.si).chips[v2.ci])) { spot = v2; break; }
+        if (!isChipPair(groupSlots(getEditSong(v2.ai, v2.si))[v2.ci])) { spot = v2; break; }
       }
     }
     if (spot) {
-      getEditSong(spot.ai, spot.si).chips[spot.ci] = d.item;
+      groupSlots(getEditSong(spot.ai, spot.si))[spot.ci] = d.item;
     } else {
-      var ds = getEditSong(d.ai, d.si);
+      var dSong = getEditSong(d.ai, d.si);
       var k = 0;
-      while (isChipPair(ds.chips[k])) k++;
-      growSongSlotsTo(ds, k);
-      ds.chips[k] = d.item;
+      while (isChipPair(groupSlots(dSong)[k])) k++;
+      growSongSlotsTo(dSong, k);
+      groupSlots(dSong)[k] = d.item;
     }
   });
   arrGroupSel = newSel;
-  saveArrangementMap();
+  groupSave();
   return true;
 }
 function arrMarqueeUpdate(e) {
@@ -15317,6 +15347,7 @@ function arrMarqueeUpdate(e) {
   document.querySelectorAll("#sectionsSheet .sec-chip[data-ci]").forEach(function(el){
     if (el.classList.contains("empty") || el.classList.contains("filtered-out")) return;
     var rc = el.getBoundingClientRect();
+    if (!rc.width || !rc.height) return; /* collapsed Solo cols / hidden */
     if (rc.right < l || rc.left > r || rc.bottom < t || rc.top > b) return;
     sel[arrGroupKeyOf(el)] = true;
   });
@@ -16106,6 +16137,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=389"></script>
+<script src="riffjams-admin.js?v=390"></script>
 </body>
 </html>
