@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:20:48.376Z",
+  "updatedAt": "2026-10-08T22:22:49.519Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1766,7 +1766,7 @@
             [
               "C1",
               2,
-              "KYTL-C1"
+              "KYTL-B1"
             ],
             [
               "S1",
@@ -1803,7 +1803,11 @@
               2,
               "KYTL-B4"
             ],
-            null,
+            [
+              "B5",
+              3,
+              "b5"
+            ],
             null,
             null,
             null
@@ -6882,7 +6886,7 @@
                 105
               ],
               [
-                "B1",
+                "c1",
                 2,
                 "KYTL-B1",
                 [],
@@ -6930,8 +6934,19 @@
                 [],
                 308.7
               ],
-              null,
-              null,
+              [
+                "b5",
+                3,
+                "b5",
+                [],
+                318.7,
+                328.7
+              ],
+              [
+                "B1",
+                2,
+                "KYTL-B1"
+              ],
               null,
               null,
               null,
@@ -6958,7 +6973,7 @@
                 "end": 5
               },
               {
-                "name": "solo",
+                "name": "solo 1",
                 "start": 6,
                 "end": 7
               },
@@ -6966,6 +6981,11 @@
                 "name": "bridge",
                 "start": 8,
                 "end": 11
+              },
+              {
+                "name": "solo 2",
+                "start": 12,
+                "end": 14
               }
             ]
           },
@@ -9667,7 +9687,7 @@
       "song": "Killing Yourself to Live",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.367,
+      "riffSaturationIndex": 2.356,
       "chips": [
         {
           "code": "I1",
@@ -9726,7 +9746,7 @@
           "lick": "KYTL-S1"
         },
         {
-          "code": "B1",
+          "code": "c1",
           "tier": 2,
           "start": 148,
           "stop": 162.5,
@@ -9777,9 +9797,17 @@
           "code": "B4",
           "tier": 2,
           "start": 308.7,
+          "stop": 318.7,
+          "duration": 10,
+          "lick": "KYTL-B4"
+        },
+        {
+          "code": "b5",
+          "tier": 3,
+          "start": 318.7,
           "stop": null,
           "duration": null,
-          "lick": "KYTL-B4"
+          "lick": "b5"
         }
       ]
     }
