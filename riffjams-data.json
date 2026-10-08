@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:36:07.488Z",
+  "updatedAt": "2026-10-08T22:37:14.457Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1849,8 +1849,7 @@
             [
               "S1",
               1,
-              "LFT-S1",
-              []
+              "LFT-S1"
             ],
             [
               "PC2",
@@ -1892,8 +1891,7 @@
             [
               "V1",
               3,
-              "",
-              []
+              "SAR-V1"
             ],
             [
               "C1",
@@ -7082,14 +7080,16 @@
                 [],
                 222.9
               ],
-              null,
-              null,
               [
                 "S1",
                 1,
                 "LFT-S1",
-                []
+                [],
+                237.8,
+                293.7
               ],
+              null,
+              null,
               null,
               null,
               null,
@@ -7127,6 +7127,11 @@
               {
                 "name": "VERSE 3",
                 "start": 7,
+                "end": 8
+              },
+              {
+                "name": "S",
+                "start": 9,
                 "end": 9
               }
             ]
@@ -7140,6 +7145,10 @@
                 "",
                 []
               ],
+              null,
+              null,
+              null,
+              null,
               [
                 "L1",
                 2,
@@ -7155,7 +7164,7 @@
               [
                 "V1",
                 3,
-                "",
+                "SAR-V1",
                 []
               ],
               [
@@ -7164,10 +7173,6 @@
                 "",
                 []
               ],
-              null,
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -9868,9 +9873,9 @@
     {
       "album": "Sabbath Bloody Sabbath",
       "song": "Looking for Today",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.6,
+      "endSec": 293.7,
+      "complete": true,
+      "riffSaturationIndex": 1.836,
       "chips": [
         {
           "code": "V1",
@@ -9940,9 +9945,17 @@
           "code": "C1",
           "tier": 3,
           "start": 222.9,
-          "stop": null,
-          "duration": null,
+          "stop": 237.8,
+          "duration": 14.9,
           "lick": "LFT-C1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 237.8,
+          "stop": 293.7,
+          "duration": 55.9,
+          "lick": "LFT-S1"
         }
       ]
     }
