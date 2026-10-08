@@ -4676,6 +4676,34 @@
       flex: 0 0 auto;
     }
   }
+
+  /* ====================================================================
+     MOBILE-ONLY LAYOUT  (gate: html.rj-mobile / RJ_MOBILE_MQ)
+     Phone portrait (≤599px wide) or phone landscape (touch, ≤500px tall,
+     ≤932px wide). Desktop windows and tablets never match.
+     Keep this media query identical to RJ_MOBILE_MQ (top of the main script).
+     Put every mobile-only tweak inside this block; it must stay last in <style>.
+     ==================================================================== */
+  @media (max-width: 599px), (pointer: coarse) and (max-height: 500px) and (max-width: 932px) {
+    /* No player on mobile: Song Map / Series player bar + Board window player bar */
+    #smPlayer, .sm-player,
+    body.sections-mode .sm-player,
+    body.sheet-mode .sm-player,
+    #boardPlayer, .board-player { display: none !important; }
+    /* No Edit mode on mobile: hide the Edit button and the Undo/Save/Repeat tools */
+    #secModes .sec-mode-btn[data-sec-mode="edit"],
+    #secEditTools { display: none !important; }
+    /* Single Song tab no longer leaves room for the 420px player */
+    .ss-section-tab { max-width: 100%; }
+    /* Single Song layout: keep its 8px side padding inside the sheet (the player gutter used to hide the overhang) */
+    body.sections-single-song .sections-layout.ss-layout { box-sizing: border-box; }
+    /* Landscape: drop the 118px right gutter reserved for the player dock (back to the 8px .wrap gutter) */
+    @media (orientation: landscape) and (max-height: 560px) {
+      body.sections-mode .wrap,
+      body.sheet-mode .wrap { padding-right: 8px; }
+    }
+  }
+  /* ==================== END MOBILE-ONLY LAYOUT ==================== */
 </style>
 </head>
 <body class="home-mode">
@@ -4926,6 +4954,83 @@
   </div>
 <div id="lb" class="lightbox hidden"></div>
 <script>
+/* ===== Mobile gate (one source for every mobile-only change) =====
+   Must match the MOBILE-ONLY LAYOUT media query at the end of the stylesheet.
+   html.rj-mobile is set while it matches; isMobileLayout() for JS checks. */
+var RJ_MOBILE_MQ = "(max-width: 599px), (pointer: coarse) and (max-height: 500px) and (max-width: 932px)";
+var rjMobileMql = null;
+try { rjMobileMql = window.matchMedia ? window.matchMedia(RJ_MOBILE_MQ) : null; } catch (eRjMq) { rjMobileMql = null; }
+function isMobileLayout() { return !!(rjMobileMql && rjMobileMql.matches); }
+function syncMobileLayoutClass() {
+  var on = isMobileLayout();
+  document.documentElement.classList.toggle("rj-mobile", on);
+  if (on) rjMobileSilenceAll();
+  else rjMobileRestoreSound();
+}
+/* Players are hidden on mobile, so nothing may make sound there: play → no-op,
+   load → cue, unMute → no-op, and the player stays muted. Restored if the layout leaves mobile. */
+function rjMobileGuardPlayer(p) {
+  if (!p || p.__rjMobileGuard) return p;
+  var orig = {};
+  ["playVideo", "loadVideoById", "unMute", "pauseVideo", "mute", "cueVideoById"].forEach(function(m){
+    if (typeof p[m] === "function") orig[m] = p[m];
+  });
+  if (!orig.playVideo) return p; /* API methods not attached yet — guard again on ready */
+  p.__rjMobileGuard = orig;
+  p.playVideo = function(){ if (isMobileLayout()) return; return orig.playVideo.apply(p, arguments); };
+  if (orig.loadVideoById) p.loadVideoById = function(){
+    if (isMobileLayout() && orig.cueVideoById) return orig.cueVideoById.apply(p, arguments);
+    return orig.loadVideoById.apply(p, arguments);
+  };
+  if (orig.unMute) p.unMute = function(){ if (isMobileLayout()) return; return orig.unMute.apply(p, arguments); };
+  if (isMobileLayout()) rjMobileSilencePlayer(p);
+  return p;
+}
+function rjMobileSilencePlayer(p) {
+  var g = p && p.__rjMobileGuard;
+  if (!g) return;
+  try { if (g.pauseVideo) g.pauseVideo.call(p); } catch (eRjPause) {}
+  try { if (g.mute) { g.mute.call(p); p.__rjMobileMuted = true; } } catch (eRjMute) {}
+}
+/* YT PLAYING on mobile (anything that slipped past the guard): stop it. Returns true when blocked. */
+function rjMobileBlockPlaying(p) {
+  if (!isMobileLayout()) return false;
+  rjMobileGuardPlayer(p);
+  rjMobileSilencePlayer(p);
+  return true;
+}
+function rjMobileSilenceAll() {
+  try { if (typeof smYtPlayer !== "undefined" && smYtPlayer) rjMobileSilencePlayer(rjMobileGuardPlayer(smYtPlayer)); } catch (eRjS1) {}
+  try { if (typeof boardYtPlayer !== "undefined" && boardYtPlayer) rjMobileSilencePlayer(rjMobileGuardPlayer(boardYtPlayer)); } catch (eRjS2) {}
+  try { if (typeof smMetroRunning !== "undefined" && smMetroRunning && typeof smMetroStop === "function") smMetroStop(); } catch (eRjS3) {}
+  try { if (typeof smStopTuner === "function" && typeof smPlayerMode !== "undefined" && smPlayerMode === "tuner") smStopTuner(); } catch (eRjS4) {}
+}
+function rjMobileRestoreSound() {
+  [typeof smYtPlayer !== "undefined" ? smYtPlayer : null, typeof boardYtPlayer !== "undefined" ? boardYtPlayer : null].forEach(function(p){
+    if (!p || !p.__rjMobileMuted || !p.__rjMobileGuard || !p.__rjMobileGuard.unMute) return;
+    p.__rjMobileMuted = false;
+    try { p.__rjMobileGuard.unMute.call(p); } catch (eRjUn) {}
+  });
+}
+/* No Edit mode on mobile: every edit entry point checks this (desktop: always false). */
+function rjMobileEditBlocked() { return isMobileLayout(); }
+var rjMobileEditSuspended = false; /* was in Edit when the layout became mobile → restore when it leaves */
+function rjMobileSyncEditMode() {
+  if (typeof sectionsMode === "undefined" || typeof setSectionsMode !== "function") return;
+  if (isMobileLayout()) {
+    if (sectionsMode === "edit") { rjMobileEditSuspended = true; setSectionsMode("view"); }
+  } else if (rjMobileEditSuspended) {
+    rjMobileEditSuspended = false;
+    if (sectionsMode === "view") setSectionsMode("edit");
+  }
+}
+if (rjMobileMql) {
+  if (rjMobileMql.addEventListener) rjMobileMql.addEventListener("change", rjMobileSyncEditMode);
+  else if (rjMobileMql.addListener) rjMobileMql.addListener(rjMobileSyncEditMode);
+  if (rjMobileMql.addEventListener) rjMobileMql.addEventListener("change", syncMobileLayoutClass);
+  else if (rjMobileMql.addListener) rjMobileMql.addListener(syncMobileLayoutClass);
+}
+if (isMobileLayout()) document.documentElement.classList.add("rj-mobile");
 
 var ALBUMS_DEFAULT = [
   { name: "Black Sabbath", cover: "covers/sabbath-hp.png?v=288", font: "font-paranoid", songs: [
@@ -5233,6 +5338,7 @@ function pushSoloHistory() {
   updateEditSaveUi();
 }
 function undoSoloMap() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (!soloHistory.length) return;
   SOLO_MAP = soloHistory.pop();
   closeChipEditor();
@@ -5241,6 +5347,7 @@ function undoSoloMap() {
   setSaveStatus("Undid");
 }
 function saveSoloMapNow() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   saveSoloMap();
   soloDirty = false;
   updateEditSaveUi();
@@ -5600,6 +5707,7 @@ function pushArrangementHistory() {
   updateEditSaveUi();
 }
 function undoArrangementMap() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (!arrangementHistory.length) return;
   ARRANGEMENT_MAP = arrangementHistory.pop();
   closeChipEditor();
@@ -5608,6 +5716,7 @@ function undoArrangementMap() {
   setSaveStatus("Undid");
 }
 function saveArrangementMapNow() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   saveArrangementMap();
   arrangementDirty = false;
   updateEditSaveUi();
@@ -6163,7 +6272,7 @@ function ssFitArrangementChips() {
   var padL = parseFloat(layoutCS.paddingLeft) || 0;
   var padR = parseFloat(layoutCS.paddingRight) || 0;
   /* Content width left for the strip so megachip + gap still fit. */
-  var availWrap = layout.clientWidth - padL - padR - megaW - gap;
+  var availWrap = layout.clientWidth - padL - padR - megaW - gap - (ssFitArrangementChips._refit || 0);
   /* wrap border-box = cols * chipW - chipGap + wrapPadX */
   var chipW = Math.min(preferred, (availWrap - wrapPadX + chipGap) / cols);
   if (!isFinite(chipW) || chipW < 10) chipW = 10;
@@ -6183,6 +6292,15 @@ function ssFitArrangementChips() {
   wrap.style.width = stripW + "px";
   wrap.style.maxWidth = stripW + "px";
   if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel();
+  /* Mobile only: the chip strip ends a little past stripW (the desktop player gutter used to hide
+     that), so NEXT could run off-screen once the player is gone. Shrink chips once until it fits. */
+  if (isMobileLayout() && panel && !ssFitArrangementChips._refit && chipW > 10) {
+    var overMob = panel.getBoundingClientRect().right - (layout.getBoundingClientRect().right - padR);
+    if (overMob > 0.5) {
+      ssFitArrangementChips._refit = overMob;
+      try { ssFitArrangementChips(); } finally { ssFitArrangementChips._refit = 0; }
+    }
+  }
 }
 /** Single Song: place NEXT SECTION panel — 5px right of last chip; top matches tab-crop gap below chips. */
 function ssPlaceNextPanel() {
@@ -7279,6 +7397,7 @@ function pushAlbumHistory() {
   updateEditSaveUi();
 }
 function undoAlbums() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (!albumHistory.length) return;
   ALBUMS = albumHistory.pop();
   closeChipEditor();
@@ -7287,6 +7406,7 @@ function undoAlbums() {
   setSaveStatus("Undid");
 }
 function saveAlbumsNow() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   saveAlbums();
   albumsDirty = false;
   updateEditSaveUi();
@@ -8686,7 +8806,7 @@ function rjToast(msg) {
 }
 /* —— Edit: Repeat (R) · Repeat ×N (Shift+R) · Unrepeat (U) on the group selection —— */
 function arrRepEditOn() {
-  return !!singleSongMode && sectionsMode === "edit" && document.body.classList.contains("sections-single-song");
+  return !rjMobileEditBlocked() && !!singleSongMode && sectionsMode === "edit" && document.body.classList.contains("sections-single-song");
 }
 function arrRepSelection() {
   var keys = Object.keys(arrGroupSel || {});
@@ -8736,6 +8856,7 @@ function arrRepCodesText(song, start, n) {
 }
 /** R: fold an exact repetition (I1 V1 I1 V1 → [I1 V1] ×2). */
 function arrRepeatFoldSelection() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (!arrRepEditOn()) return false;
   var s = arrRepSelection();
   if (s.error) { rjToast(s.error); return true; }
@@ -8767,6 +8888,7 @@ function arrRepeatFoldSelection() {
 }
 /** Shift+R: set ×N on the selected block, or repeat a selected unit N times (new passes have no times). */
 function arrRepeatSetCount() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (!arrRepEditOn()) return false;
   var s = arrRepSelection();
   if (s.error) { rjToast(s.error); return true; }
@@ -8834,6 +8956,7 @@ function arrRepeatSetCount() {
 }
 /** U: expand selected repeat blocks back into individual chips (times untouched). */
 function arrUnrepeatSelection() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (!arrRepEditOn()) return false;
   var s = arrRepSelection();
   if (s.error) { rjToast(s.error); return true; }
@@ -9151,6 +9274,7 @@ function beginSectionRulerPointer(e, lane, kind) {
   document.addEventListener("pointercancel", onSectionRulerPointerUp);
 }
 function openFreshSectionRulerRename(ai, si, start, end) {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   var row = document.querySelector('#sectionsSheet .song-row[data-ai="'+ai+'"][data-si="'+si+'"]');
   if (!row) return;
   var target = null;
@@ -9163,6 +9287,7 @@ function openFreshSectionRulerRename(ai, si, start, end) {
   if (nameBtn) beginSectionRulerRename(nameBtn);
 }
 function beginSectionRulerRename(nameBtn) {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   var ruler = nameBtn.closest(".song-sec-ruler");
   var row = nameBtn.closest(".song-row");
   if (!ruler || !row || ruler.querySelector("input.song-sec-name")) return;
@@ -9225,6 +9350,7 @@ function beginSectionRulerRename(nameBtn) {
   input.addEventListener("pointerdown", function(ev){ ev.stopPropagation(); });
 }
 function deleteSectionRulerAt(ai, si, ri) {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   var song = getEditSong(ai, si);
   if (!song) return;
   var rulers = readSectionRulers(song);
@@ -9236,6 +9362,7 @@ function deleteSectionRulerAt(ai, si, ri) {
   showSections(true);
 }
 function handleSectionRulerPointerDown(e) {
+  if (rjMobileEditBlocked()) return false; /* mobile: no editing */
   if (sectionsMode !== "edit") return false;
   if (e.pointerType === "mouse" && e.button !== 0) return false;
   if (e.target.closest(".song-sec-name") && e.target.tagName === "INPUT") return false;
@@ -9773,6 +9900,7 @@ function boardEnsureYt(cb) {
       playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1, playsinline: 1 },
       events: {
         onReady: function(){
+          rjMobileGuardPlayer(boardYtPlayer);
           if (vid) {
             try { boardYtPlayer.cueVideoById(vid); } catch (errCue) {}
           }
@@ -9781,6 +9909,7 @@ function boardEnsureYt(cb) {
         },
         onStateChange: function(e){
           if (!window.YT || !YT.PlayerState) return;
+          if (e.data === YT.PlayerState.PLAYING && rjMobileBlockPlaying(boardYtPlayer)) return;
           if (e.data === YT.PlayerState.PLAYING) {
             boardSetPlayIcon(true);
             boardStartTick();
@@ -10460,6 +10589,7 @@ function holdSongMapAnchor(a) {
 }
 
 function setSectionsMode(mode) {
+  if (mode === "edit" && rjMobileEditBlocked()) mode = "view"; /* mobile: View only (Edit is desktop/tablet) */
   var secVisibleAtStart = document.getElementById("sections") && !document.getElementById("sections").classList.contains("hidden");
   var modeAnchor = secVisibleAtStart ? captureSongMapAnchor() : null;
   if (mode === "edit") sectionsMode = "edit";
@@ -11196,8 +11326,9 @@ function smEnsureApi(cb) {
       width: "1",
       playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1, playsinline: 1 },
       events: {
-        onReady: function(){ cb && cb(); },
+        onReady: function(){ rjMobileGuardPlayer(smYtPlayer); cb && cb(); },
         onStateChange: function(e){
+          if (e.data === YT.PlayerState.PLAYING && rjMobileBlockPlaying(smYtPlayer)) return;
           if (e.data === YT.PlayerState.ENDED) {
             /* Single Song Loop to song end: wrap instead of advancing */
             if (smIsAudioLeader() && typeof ssLoopHandleEnded === "function" && ssLoopHandleEnded()) return;
@@ -11891,6 +12022,7 @@ function syncSsLinkUi() {
     + (editable ? "" : " · switch to Edit to change");
 }
 function toggleSsLink() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (sectionsMode !== "edit" || !ssLinkVisible()) return false;
   var name = ssLinkTargetName();
   var song = smFindArrangementSongByName(name);
@@ -12363,6 +12495,7 @@ function smStopTuner() {
 }
 
 function smStartTuner() {
+  if (isMobileLayout()) return; /* no player (or tuner/mic) on mobile */
   smTunerPaintIdle("Requesting mic…");
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     smTunerPaintIdle("Mic blocked");
@@ -12483,6 +12616,7 @@ function smMetroStop() {
 }
 
 function smMetroStart() {
+  if (isMobileLayout()) return; /* no player (or metronome) on mobile */
   var ctx = smMetroEnsureCtx();
   smMetroRunning = true;
   smMetroBeat = 0;
@@ -13394,6 +13528,7 @@ function ensureChipEditResizeObserver() {
   chipEditResizeObs.observe(ed);
 }
 function openChipEditor(anchor, state) {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (typeof closeSongMetaEditor === "function") closeSongMetaEditor();
   chipEditState = state;
   chipEditAnchor = anchor || null;
@@ -13639,6 +13774,7 @@ function addSongMetaField(kind) {
   placeSongMetaEditor(songMetaAnchor);
 }
 function openSongMetaEditor(anchor, ai, si) {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (sectionsMode !== "edit") return;
   closeChipEditor();
   var rowSong = getEditSong(ai, si);
@@ -13680,6 +13816,7 @@ function mergeSongMetaInto(targetAlbums, sourceAlbums) {
   });
 }
 function saveSongMetaEditor() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (!songMetaState) {
     closeSongMetaEditor();
     return;
@@ -13713,6 +13850,7 @@ function readChipEditPosList() {
   return posBases.map(function(n){ return normalizeSlot(n + posSuf, 1); });
 }
 function saveChipEditor() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (!chipEditState) return;
   var code = (document.getElementById("chipEditId").value || "").trim();
   if (!soloMode && !usesArrangementMap()) code = code.toUpperCase();
@@ -13804,6 +13942,7 @@ function saveChipEditor() {
   showSections(true);
 }
 function deleteChipEditor() {
+  if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (!chipEditState || chipEditState.isNew) return;
   var song = getEditSong(chipEditState.ai, chipEditState.si);
   if (!song) return;
@@ -13881,6 +14020,7 @@ function copyFromChipEditor() {
   return copySongSectionAt(chipEditState.ai, chipEditState.si, chipEditState.ci);
 }
 function pasteSongSectionAt(ai, si, ci) {
+  if (rjMobileEditBlocked()) return false; /* mobile: no editing */
   if (!sectionClipboard || !isChipPair(sectionClipboard)) return false;
   var song = getEditSong(ai, si);
   if (!song) return false;
@@ -15920,6 +16060,7 @@ function clearChipDragOver() {
   });
 }
 function moveSongMapChip(fromAi, fromSi, fromCi, toAi, toSi, toCi, copy) {
+  if (rjMobileEditBlocked()) return false; /* mobile: no editing */
   var fromSong = getEditSong(fromAi, fromSi);
   var toSong = getEditSong(toAi, toSi);
   if (!fromSong || !toSong) return false;
@@ -16122,7 +16263,7 @@ var arrGroupSel = {};
 var arrMarquee = null;
 /* Arrangement, Riff, and Solo grids (Edit only). Single Song strip excluded. */
 /* Arrangement/Riff/Solo Edit: select + group drag. Single Song Edit: select only (for Repeat / Unrepeat). */
-function arrGroupOn() { return sectionsMode === "edit" && (!singleSongMode || document.body.classList.contains("sections-single-song")); }
+function arrGroupOn() { return !rjMobileEditBlocked() && sectionsMode === "edit" && (!singleSongMode || document.body.classList.contains("sections-single-song")); }
 /* Which map the grid edits (same precedence as moveSongMapChip / getEditSong). */
 function groupMapKind() { return usesArrangementMap() ? "arr" : (soloMode ? "solo" : "riff"); }
 function groupSlots(song) {
@@ -16211,6 +16352,7 @@ function arrGroupPlan(anchor, toAi, toSi, toCi) {
   return plan;
 }
 function moveArrGroup(anchor, toAi, toSi, toCi, copy) {
+  if (rjMobileEditBlocked()) return false; /* mobile: no editing */
   var plan = arrGroupPlan(anchor, toAi, toSi, toCi);
   if (!plan || !plan.length) return false;
   if (plan[0].ai === plan[0].toAi && plan[0].si === plan[0].toSi && plan[0].ci === plan[0].toCi) return false;
@@ -17120,6 +17262,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=396"></script>
+<script src="riffjams-admin.js?v=397"></script>
 </body>
 </html>
