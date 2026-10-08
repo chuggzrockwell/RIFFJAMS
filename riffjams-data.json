@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:07:48.548Z",
+  "updatedAt": "2026-10-08T22:08:58.360Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1608,20 +1608,17 @@
             [
               "B6",
               3,
-              "B6",
-              []
+              "B6"
             ],
             [
               "B7",
               3,
-              "B7",
-              []
+              "B7"
             ],
             [
               "S3",
               3,
-              "S3",
-              []
+              "S3"
             ],
             [
               "V2",
@@ -6385,7 +6382,7 @@
                 3,
                 "V1",
                 [],
-                41
+                41.1
               ],
               [
                 "I1",
@@ -6537,25 +6534,29 @@
                 [],
                 334.9
               ],
-              null,
               [
                 "B6",
                 3,
                 "B6",
-                []
+                [],
+                348.6
               ],
               [
                 "B7",
                 3,
                 "B7",
-                []
+                [],
+                362.2
               ],
               [
                 "S3",
                 3,
                 "S3",
-                []
-              ]
+                [],
+                369.2,
+                372.5
+              ],
+              null
             ]
           },
           {
@@ -9178,9 +9179,9 @@
     {
       "album": "Sabbath Bloody Sabbath",
       "song": "A National Acrobat",
-      "endSec": null,
+      "endSec": 372.5,
       "complete": false,
-      "riffSaturationIndex": 2.511,
+      "riffSaturationIndex": 2.396,
       "chips": [
         {
           "code": "I1",
@@ -9210,16 +9211,16 @@
           "code": "V1",
           "tier": 3,
           "start": 41,
-          "stop": 41,
-          "duration": null,
+          "stop": 41.1,
+          "duration": 0.1,
           "lick": "V1"
         },
         {
           "code": "V1",
           "tier": 3,
-          "start": 41,
+          "start": 41.1,
           "stop": 47.7,
-          "duration": 6.7,
+          "duration": 6.6,
           "lick": "V1"
         },
         {
@@ -9378,9 +9379,33 @@
           "code": "B5",
           "tier": 2,
           "start": 334.9,
-          "stop": null,
-          "duration": null,
+          "stop": 348.6,
+          "duration": 13.7,
           "lick": "B5"
+        },
+        {
+          "code": "B6",
+          "tier": 3,
+          "start": 348.6,
+          "stop": 362.2,
+          "duration": 13.6,
+          "lick": "B6"
+        },
+        {
+          "code": "B7",
+          "tier": 3,
+          "start": 362.2,
+          "stop": 369.2,
+          "duration": 7,
+          "lick": "B7"
+        },
+        {
+          "code": "S3",
+          "tier": 3,
+          "start": 369.2,
+          "stop": 372.5,
+          "duration": 3.3,
+          "lick": "S3"
         }
       ]
     },
