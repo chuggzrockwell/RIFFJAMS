@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:06:44.389Z",
+  "updatedAt": "2026-10-08T22:07:48.548Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1593,20 +1593,17 @@
             [
               "B3",
               2,
-              "B3",
-              []
+              "B3"
             ],
             [
               "B4",
               2,
-              "B4",
-              []
+              "B4"
             ],
             [
               "B5",
               2,
-              "B5",
-              []
+              "B5"
             ],
             [
               "B6",
@@ -6510,33 +6507,37 @@
                 1,
                 "B1",
                 3,
-                136.1
+                240.2
+              ],
+              [
+                "B2",
+                2,
+                "B2",
+                3,
+                278.9
+              ],
+              [
+                "B3",
+                2,
+                "B3",
+                [],
+                292.2
+              ],
+              [
+                "B4",
+                2,
+                "B4",
+                [],
+                320.6
+              ],
+              [
+                "B5",
+                2,
+                "B5",
+                [],
+                334.9
               ],
               null,
-              [
-                "B2",
-                2,
-                "B2",
-                3
-              ],
-              [
-                "B3",
-                2,
-                "B3",
-                []
-              ],
-              [
-                "B4",
-                2,
-                "B4",
-                []
-              ],
-              [
-                "B5",
-                2,
-                "B5",
-                []
-              ],
               [
                 "B6",
                 3,
@@ -9179,7 +9180,7 @@
       "song": "A National Acrobat",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.498,
+      "riffSaturationIndex": 2.511,
       "chips": [
         {
           "code": "I1",
@@ -9329,14 +9330,6 @@
           "code": "B1",
           "tier": 1,
           "start": 136.1,
-          "stop": 136.1,
-          "duration": null,
-          "lick": "B1"
-        },
-        {
-          "code": "B1",
-          "tier": 1,
-          "start": 136.1,
           "stop": 214.3,
           "duration": 78.2,
           "lick": "B1"
@@ -9345,9 +9338,49 @@
           "code": "S1",
           "tier": 1,
           "start": 214.3,
+          "stop": 240.2,
+          "duration": 25.9,
+          "lick": "S1"
+        },
+        {
+          "code": "B1",
+          "tier": 1,
+          "start": 240.2,
+          "stop": 278.9,
+          "duration": 38.7,
+          "lick": "B1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 278.9,
+          "stop": 292.2,
+          "duration": 13.3,
+          "lick": "B2"
+        },
+        {
+          "code": "B3",
+          "tier": 2,
+          "start": 292.2,
+          "stop": 320.6,
+          "duration": 28.4,
+          "lick": "B3"
+        },
+        {
+          "code": "B4",
+          "tier": 2,
+          "start": 320.6,
+          "stop": 334.9,
+          "duration": 14.3,
+          "lick": "B4"
+        },
+        {
+          "code": "B5",
+          "tier": 2,
+          "start": 334.9,
           "stop": null,
           "duration": null,
-          "lick": "S1"
+          "lick": "B5"
         }
       ]
     },
