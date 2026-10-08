@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T17:58:18.946Z",
+  "updatedAt": "2026-10-08T17:59:25.794Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1494,15 +1494,7 @@
               "V1",
               "3S"
             ],
-            [
-              "PC1",
-              3,
-              "PC1",
-              [
-                1,
-                5
-              ]
-            ],
+            null,
             [
               "PC2",
               3,
@@ -1547,8 +1539,20 @@
               "",
               []
             ],
-            null,
-            null,
+            [
+              "C1",
+              3,
+              "PC1",
+              [
+                1,
+                5
+              ]
+            ],
+            [
+              "C2",
+              3,
+              "PC2"
+            ],
             null,
             null,
             null
@@ -5822,7 +5826,7 @@
                 0
               ],
               [
-                "PC1",
+                "C1",
                 3,
                 "PC1",
                 [
@@ -5832,9 +5836,11 @@
                 42.5
               ],
               [
-                "PC2",
+                "C2",
                 3,
-                "PC2"
+                "PC2",
+                1,
+                67
               ],
               [
                 "V1",
@@ -5844,16 +5850,20 @@
                 70.7
               ],
               [
-                "PC1",
+                "C1",
                 3,
                 "PC1",
                 [
                   1,
                   5
                 ],
-                113.4
+                42.5
               ],
-              null,
+              [
+                "C2",
+                3,
+                "PC2"
+              ],
               null,
               [
                 "S1",
@@ -8274,7 +8284,7 @@
       "song": "Sabbath Bloody Sabbath",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.503,
+      "riffSaturationIndex": 2.202,
       "chips": [
         {
           "code": "V1",
@@ -8285,28 +8295,36 @@
           "lick": "V1"
         },
         {
-          "code": "PC1",
+          "code": "C1",
           "tier": 3,
           "start": 42.5,
-          "stop": 70.7,
-          "duration": 28.2,
+          "stop": 42.5,
+          "duration": null,
           "lick": "PC1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 42.5,
+          "stop": 67,
+          "duration": 24.5,
+          "lick": "PC1"
+        },
+        {
+          "code": "C2",
+          "tier": 3,
+          "start": 67,
+          "stop": 70.7,
+          "duration": 3.7,
+          "lick": "PC2"
         },
         {
           "code": "V1",
           "tier": 1,
           "start": 70.7,
-          "stop": 113.4,
-          "duration": 42.7,
-          "lick": "V1"
-        },
-        {
-          "code": "PC1",
-          "tier": 3,
-          "start": 113.4,
           "stop": null,
           "duration": null,
-          "lick": "PC1"
+          "lick": "V1"
         }
       ]
     }
