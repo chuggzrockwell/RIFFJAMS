@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:18:10.198Z",
+  "updatedAt": "2026-10-08T22:19:40.368Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1781,20 +1781,17 @@
             [
               "B2",
               2,
-              "KYTL-B2",
-              []
+              "KYTL-B2"
             ],
             [
               "S2",
               1,
-              "KYTL-S2",
-              []
+              "KYTL-S2"
             ],
             [
               "B3",
               2,
-              "KYTL-B3",
-              []
+              "KYTL-B3"
             ],
             [
               "S3",
@@ -1805,8 +1802,7 @@
             [
               "B4",
               2,
-              "KYTL-B4",
-              []
+              "KYTL-B4"
             ],
             null,
             null,
@@ -6897,33 +6893,37 @@
                 "B2",
                 2,
                 "KYTL-B2",
-                []
-              ],
-              [
-                "S2",
-                1,
-                "KYTL-S2",
-                []
+                [],
+                162.5
               ],
               [
                 "B3",
                 2,
                 "KYTL-B3",
-                []
+                [],
+                186.8
               ],
+              [
+                "S2",
+                1,
+                "KYTL-S2",
+                [],
+                192.6
+              ],
+              [
+                "B4",
+                2,
+                "KYTL-B4",
+                [],
+                241.8
+              ],
+              null,
               [
                 "S3",
                 1,
                 "KYTL-S3",
                 []
               ],
-              [
-                "B4",
-                2,
-                "KYTL-B4",
-                []
-              ],
-              null,
               null,
               null,
               null,
@@ -6955,6 +6955,11 @@
                 "name": "solo",
                 "start": 6,
                 "end": 7
+              },
+              {
+                "name": "bridge",
+                "start": 8,
+                "end": 11
               }
             ]
           },
@@ -9656,7 +9661,7 @@
       "song": "Killing Yourself to Live",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.297,
+      "riffSaturationIndex": 2.386,
       "chips": [
         {
           "code": "I1",
@@ -9718,9 +9723,41 @@
           "code": "B1",
           "tier": 2,
           "start": 148,
+          "stop": 162.5,
+          "duration": 14.5,
+          "lick": "KYTL-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 162.5,
+          "stop": 186.8,
+          "duration": 24.3,
+          "lick": "KYTL-B2"
+        },
+        {
+          "code": "B3",
+          "tier": 2,
+          "start": 186.8,
+          "stop": 192.6,
+          "duration": 5.8,
+          "lick": "KYTL-B3"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 192.6,
+          "stop": 241.8,
+          "duration": 49.2,
+          "lick": "KYTL-S2"
+        },
+        {
+          "code": "B4",
+          "tier": 2,
+          "start": 241.8,
           "stop": null,
           "duration": null,
-          "lick": "KYTL-B1"
+          "lick": "KYTL-B4"
         }
       ]
     }
