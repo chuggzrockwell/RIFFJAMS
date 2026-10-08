@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:14:10.740Z",
+  "updatedAt": "2026-10-08T22:15:34.315Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1756,14 +1756,12 @@
             [
               "I1",
               2,
-              "KYTL-I1",
-              []
+              "KYTL-I1"
             ],
             [
               "V1",
               2,
-              "KYTL-V1",
-              []
+              "KYTL-V1"
             ],
             [
               "C1",
@@ -6846,13 +6844,15 @@
                 "I1",
                 2,
                 "KYTL-I1",
-                []
+                [],
+                3
               ],
               [
                 "V1",
                 2,
                 "KYTL-V1",
-                []
+                [],
+                33.7
               ],
               [
                 "C1",
@@ -6924,7 +6924,7 @@
             ],
             "sectionRulers": [
               {
-                "name": "Section",
+                "name": "i",
                 "start": 0,
                 "end": 0
               }
@@ -9620,6 +9620,31 @@
           "stop": 348.5,
           "duration": 19.6,
           "lick": "05"
+        }
+      ]
+    },
+    {
+      "album": "Sabbath Bloody Sabbath",
+      "song": "Killing Yourself to Live",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 2,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 3,
+          "stop": 33.7,
+          "duration": 30.7,
+          "lick": "KYTL-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 33.7,
+          "stop": null,
+          "duration": null,
+          "lick": "KYTL-V1"
         }
       ]
     }
