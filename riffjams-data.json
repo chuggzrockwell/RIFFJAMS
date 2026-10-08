@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T21:34:58.371Z",
+  "updatedAt": "2026-10-08T21:36:07.932Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -6188,7 +6188,9 @@
               [
                 "C1",
                 3,
-                "C1"
+                "C1",
+                1,
+                59.3
               ],
               [
                 "i3",
@@ -6201,12 +6203,33 @@
                 35.8
               ],
               [
+                "C1",
+                3,
+                "C1",
+                1,
+                71.1
+              ],
+              [
+                "i3",
+                1,
+                "I1",
+                [
+                  1,
+                  5
+                ],
+                77.1
+              ],
+              [
                 "V1",
                 2,
                 "V1",
                 4,
                 47.7
               ],
+              null,
+              null,
+              null,
+              null,
               [
                 "L2",
                 1,
@@ -6246,12 +6269,6 @@
                   2
                 ]
               ],
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
               null
             ],
             "sectionRulers": [
@@ -6263,7 +6280,7 @@
               {
                 "name": "VERSE 1",
                 "start": 3,
-                "end": 4
+                "end": 7
               }
             ]
           },
@@ -8672,7 +8689,7 @@
       "song": "Sabbra Cadabra",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 3,
+      "riffSaturationIndex": 2.388,
       "chips": [
         {
           "code": "I1",
@@ -8718,9 +8735,33 @@
           "code": "V1",
           "tier": 2,
           "start": 47.7,
+          "stop": 59.3,
+          "duration": 11.6,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 59.3,
+          "stop": 71.1,
+          "duration": 11.8,
+          "lick": "C1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 71.1,
+          "stop": 77.1,
+          "duration": 6,
+          "lick": "C1"
+        },
+        {
+          "code": "i3",
+          "tier": 1,
+          "start": 77.1,
           "stop": null,
           "duration": null,
-          "lick": "V1"
+          "lick": "I1"
         }
       ]
     }
