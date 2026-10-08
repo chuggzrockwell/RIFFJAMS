@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T18:35:40.366Z",
+  "updatedAt": "2026-10-08T18:36:44.085Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3177,7 +3177,7 @@
                 2,
                 "TW-I1",
                 "1S",
-                54.1
+                55
               ],
               [
                 "V1",
@@ -6397,7 +6397,7 @@
       "song": "The Wizard",
       "endSec": 257.3,
       "complete": true,
-      "riffSaturationIndex": 1.673,
+      "riffSaturationIndex": 1.677,
       "chips": [
         {
           "code": "I1",
@@ -6411,16 +6411,16 @@
           "code": "S1",
           "tier": 1,
           "start": 42.9,
-          "stop": 54.1,
-          "duration": 11.2,
+          "stop": 55,
+          "duration": 12.1,
           "lick": "TW-S1"
         },
         {
           "code": "I1",
           "tier": 2,
-          "start": 54.1,
+          "start": 55,
           "stop": 64.5,
-          "duration": 10.4,
+          "duration": 9.5,
           "lick": "TW-I1"
         },
         {
