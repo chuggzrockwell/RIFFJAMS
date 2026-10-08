@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:15:34.315Z",
+  "updatedAt": "2026-10-08T22:17:04.539Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1766,8 +1766,7 @@
             [
               "C1",
               2,
-              "KYTL-C1",
-              []
+              "KYTL-C1"
             ],
             [
               "S1",
@@ -6858,7 +6857,29 @@
                 "C1",
                 2,
                 "KYTL-C1",
-                []
+                [],
+                55.1
+              ],
+              [
+                "I1",
+                2,
+                "KYTL-I1",
+                [],
+                69.3
+              ],
+              [
+                "V1",
+                2,
+                "KYTL-V1",
+                [],
+                33.7
+              ],
+              [
+                "C1",
+                2,
+                "KYTL-C1",
+                [],
+                55.1
               ],
               [
                 "S1",
@@ -6917,9 +6938,6 @@
               null,
               null,
               null,
-              null,
-              null,
-              null,
               null
             ],
             "sectionRulers": [
@@ -6927,6 +6945,16 @@
                 "name": "i",
                 "start": 0,
                 "end": 0
+              },
+              {
+                "name": "verse 1",
+                "start": 1,
+                "end": 2
+              },
+              {
+                "name": "verse 2",
+                "start": 3,
+                "end": 5
               }
             ]
           },
@@ -9642,9 +9670,41 @@
           "code": "V1",
           "tier": 2,
           "start": 33.7,
-          "stop": null,
+          "stop": 33.7,
           "duration": null,
           "lick": "KYTL-V1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 33.7,
+          "stop": 55.1,
+          "duration": 21.4,
+          "lick": "KYTL-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 2,
+          "start": 55.1,
+          "stop": 55.1,
+          "duration": null,
+          "lick": "KYTL-C1"
+        },
+        {
+          "code": "C1",
+          "tier": 2,
+          "start": 55.1,
+          "stop": 69.3,
+          "duration": 14.2,
+          "lick": "KYTL-C1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 69.3,
+          "stop": null,
+          "duration": null,
+          "lick": "KYTL-I1"
         }
       ]
     }
