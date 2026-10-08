@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:10:37.247Z",
+  "updatedAt": "2026-10-08T22:11:50.192Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -6563,6 +6563,16 @@
                 "name": "verse 1",
                 "start": 0,
                 "end": 7
+              },
+              {
+                "name": "verse 2",
+                "start": 8,
+                "end": 17
+              },
+              {
+                "name": "Bridge",
+                "start": 18,
+                "end": 21
               }
             ]
           },
