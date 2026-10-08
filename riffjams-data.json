@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:23:52.633Z",
+  "updatedAt": "2026-10-08T22:29:32.126Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1803,11 +1803,7 @@
               3,
               "b5"
             ],
-            [
-              "B5",
-              3,
-              "b5"
-            ],
+            null,
             null,
             null,
             null
@@ -6939,45 +6935,14 @@
                 3,
                 "b5",
                 [],
-                318.7
-              ],
-              [
-                "B1",
-                2,
-                "KYTL-B1",
-                [],
-                null,
-                null
-              ],
-              [
-                "B2",
-                2,
-                "KYTL-B2",
-                [],
-                null,
-                null
-              ],
-              [
-                "B3",
-                2,
-                "KYTL-B3",
-                [],
-                null,
-                null
-              ],
-              [
-                "B4",
-                2,
-                "KYTL-B4",
-                [],
-                null,
+                318.7,
                 328.7
               ],
-              [
-                "B5",
-                3,
-                "b5"
-              ],
+              null,
+              null,
+              null,
+              null,
+              null,
               null,
               null,
               null,
@@ -9712,9 +9677,9 @@
     {
       "album": "Sabbath Bloody Sabbath",
       "song": "Killing Yourself to Live",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 2.356,
+      "endSec": 328.7,
+      "complete": true,
+      "riffSaturationIndex": 2.314,
       "chips": [
         {
           "code": "I1",
@@ -9832,8 +9797,8 @@
           "code": "b4",
           "tier": 3,
           "start": 318.7,
-          "stop": null,
-          "duration": null,
+          "stop": 328.7,
+          "duration": 10,
           "lick": "b5"
         }
       ]
