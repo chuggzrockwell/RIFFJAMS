@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:39:22.957Z",
+  "updatedAt": "2026-10-08T22:40:32.765Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1894,8 +1894,7 @@
             [
               "C1",
               3,
-              "",
-              []
+              "SAR-C1"
             ],
             [
               "I3",
@@ -7169,6 +7168,35 @@
                 1,
                 68.6
               ],
+              [
+                "I3",
+                3,
+                "I3",
+                1,
+                75.1
+              ],
+              [
+                "V1",
+                3,
+                "SAR-V1",
+                [],
+                81.8
+              ],
+              [
+                "C1",
+                3,
+                "SAR-C1",
+                [],
+                109.1
+              ],
+              [
+                "I2",
+                3,
+                "I2",
+                1,
+                123.1
+              ],
+              null,
               null,
               [
                 "L1",
@@ -7182,21 +7210,6 @@
                 "",
                 []
               ],
-              [
-                "V1",
-                3,
-                "SAR-V1",
-                []
-              ],
-              [
-                "C1",
-                3,
-                "",
-                []
-              ],
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -7214,6 +7227,23 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "INTRO",
+                "start": 0,
+                "end": 4
+              },
+              {
+                "name": "V",
+                "start": 5,
+                "end": 5
+              },
+              {
+                "name": "C",
+                "start": 6,
+                "end": 6
+              }
             ]
           }
         ]
@@ -9985,7 +10015,7 @@
       "song": "Spiral Architect",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.318,
+      "riffSaturationIndex": 1.734,
       "chips": [
         {
           "code": "I1",
@@ -10015,6 +10045,38 @@
           "code": "I2",
           "tier": 3,
           "start": 68.6,
+          "stop": 75.1,
+          "duration": 6.5,
+          "lick": "I2"
+        },
+        {
+          "code": "I3",
+          "tier": 3,
+          "start": 75.1,
+          "stop": 81.8,
+          "duration": 6.7,
+          "lick": "I3"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 81.8,
+          "stop": 109.1,
+          "duration": 27.3,
+          "lick": "SAR-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 109.1,
+          "stop": 123.1,
+          "duration": 14,
+          "lick": "SAR-C1"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 123.1,
           "stop": null,
           "duration": null,
           "lick": "I2"
