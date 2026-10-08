@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T18:36:44.085Z",
+  "updatedAt": "2026-10-08T21:31:04.655Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -6135,7 +6135,8 @@
                 [
                   1,
                   5
-                ]
+                ],
+                0
               ],
               [
                 "L1",
@@ -8590,6 +8591,23 @@
           "code": "I1",
           "tier": 1,
           "start": 74.8,
+          "stop": null,
+          "duration": null,
+          "lick": "I1"
+        }
+      ]
+    },
+    {
+      "album": "Sabbath Bloody Sabbath",
+      "song": "Sabbra Cadabra",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 0,
           "stop": null,
           "duration": null,
           "lick": "I1"
