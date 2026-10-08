@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T18:21:16.861Z",
+  "updatedAt": "2026-10-08T18:23:02.689Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -5942,9 +5942,19 @@
             ],
             "sectionRulers": [
               {
-                "name": "Section",
+                "name": "verse 1",
                 "start": 0,
                 "end": 2
+              },
+              {
+                "name": "verse 2",
+                "start": 3,
+                "end": 5
+              },
+              {
+                "name": "solo",
+                "start": 6,
+                "end": 8
               }
             ]
           },
