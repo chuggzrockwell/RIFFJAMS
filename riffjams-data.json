@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T18:05:02.614Z",
+  "updatedAt": "2026-10-08T18:21:16.861Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -660,7 +660,6 @@
               2,
               "FOB-L1"
             ],
-            null,
             [
               "S2",
               1,
@@ -686,6 +685,7 @@
               3,
               "FOB-B1"
             ],
+            null,
             null
           ]
         }
@@ -5939,6 +5939,13 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "Section",
+                "start": 0,
+                "end": 2
+              }
             ]
           },
           {
