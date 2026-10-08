@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T21:42:19.883Z",
+  "updatedAt": "2026-10-08T21:43:31.465Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -6354,7 +6354,7 @@
                 3,
                 "O2",
                 [],
-                null
+                306.6
               ],
               null
             ],
@@ -8795,7 +8795,7 @@
       "song": "Sabbra Cadabra",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.662,
+      "riffSaturationIndex": 1.503,
       "chips": [
         {
           "code": "I1",
@@ -8937,9 +8937,17 @@
           "code": "O1",
           "tier": 3,
           "start": 233.1,
+          "stop": 306.6,
+          "duration": 73.5,
+          "lick": "B3"
+        },
+        {
+          "code": "O3",
+          "tier": 3,
+          "start": 306.6,
           "stop": null,
           "duration": null,
-          "lick": "B3"
+          "lick": "O2"
         }
       ]
     }
