@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:42:54.249Z",
+  "updatedAt": "2026-10-08T22:44:07.122Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -7240,8 +7240,40 @@
                 1,
                 "SAR-I1",
                 [],
-                0
+                233.2
               ],
+              [
+                "V1",
+                3,
+                "SAR-V1",
+                [],
+                239.9
+              ],
+              [
+                "C1",
+                3,
+                "SAR-C1",
+                [],
+                267.3
+              ],
+              null,
+              null,
+              null,
+              [
+                "I2",
+                3,
+                "I2",
+                1,
+                45.2
+              ],
+              [
+                "I3",
+                3,
+                "I3",
+                1,
+                64.8
+              ],
+              null,
               [
                 "L1",
                 2,
@@ -7254,14 +7286,6 @@
                 "",
                 []
               ],
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -7285,9 +7309,14 @@
                 "end": 11
               },
               {
-                "name": "B",
+                "name": "BRIDGE",
                 "start": 12,
-                "end": 12
+                "end": 13
+              },
+              {
+                "name": "VERSE 3",
+                "start": 14,
+                "end": 15
               }
             ]
           }
@@ -10060,16 +10089,8 @@
       "song": "Spiral Architect",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.457,
+      "riffSaturationIndex": 1.388,
       "chips": [
-        {
-          "code": "I1",
-          "tier": 1,
-          "start": 0,
-          "stop": 0,
-          "duration": null,
-          "lick": "SAR-I1"
-        },
         {
           "code": "I1",
           "tier": 1,
@@ -10082,9 +10103,25 @@
           "code": "I2",
           "tier": 3,
           "start": 45.2,
+          "stop": 45.2,
+          "duration": null,
+          "lick": "I2"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 45.2,
           "stop": 64.8,
           "duration": 19.6,
           "lick": "I2"
+        },
+        {
+          "code": "I3",
+          "tier": 3,
+          "start": 64.8,
+          "stop": 64.8,
+          "duration": null,
+          "lick": "I3"
         },
         {
           "code": "I3",
@@ -10170,9 +10207,33 @@
           "code": "B1",
           "tier": 3,
           "start": 197.6,
+          "stop": 233.2,
+          "duration": 35.6,
+          "lick": "B1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 233.2,
+          "stop": 239.9,
+          "duration": 6.7,
+          "lick": "SAR-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 239.9,
+          "stop": 267.3,
+          "duration": 27.4,
+          "lick": "SAR-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 267.3,
           "stop": null,
           "duration": null,
-          "lick": "B1"
+          "lick": "SAR-C1"
         }
       ]
     }
