@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:41:45.098Z",
+  "updatedAt": "2026-10-08T22:42:54.249Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1901,7 +1901,11 @@
               3,
               "I3"
             ],
-            null,
+            [
+              "B1",
+              3,
+              "B1"
+            ],
             null,
             null,
             null,
@@ -7217,9 +7221,27 @@
                 [],
                 163.6
               ],
-              null,
-              null,
-              null,
+              [
+                "I2",
+                3,
+                "I2",
+                1,
+                184.3
+              ],
+              [
+                "B1",
+                3,
+                "B1",
+                1,
+                197.6
+              ],
+              [
+                "I1",
+                1,
+                "SAR-I1",
+                [],
+                0
+              ],
               [
                 "L1",
                 2,
@@ -7253,14 +7275,19 @@
                 "end": 4
               },
               {
-                "name": "V",
+                "name": "verse 1",
                 "start": 5,
-                "end": 5
+                "end": 8
               },
               {
-                "name": "C",
-                "start": 6,
-                "end": 8
+                "name": "verse 2",
+                "start": 9,
+                "end": 11
+              },
+              {
+                "name": "B",
+                "start": 12,
+                "end": 12
               }
             ]
           }
@@ -10033,8 +10060,16 @@
       "song": "Spiral Architect",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.553,
+      "riffSaturationIndex": 1.457,
       "chips": [
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 0,
+          "stop": 0,
+          "duration": null,
+          "lick": "SAR-I1"
+        },
         {
           "code": "I1",
           "tier": 1,
@@ -10119,9 +10154,25 @@
           "code": "C1",
           "tier": 3,
           "start": 163.6,
+          "stop": 184.3,
+          "duration": 20.7,
+          "lick": "SAR-C1"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 184.3,
+          "stop": 197.6,
+          "duration": 13.3,
+          "lick": "I2"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 197.6,
           "stop": null,
           "duration": null,
-          "lick": "SAR-C1"
+          "lick": "B1"
         }
       ]
     }
