@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:44:07.122Z",
+  "updatedAt": "2026-10-08T22:45:11.335Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1876,16 +1876,11 @@
               "SAR-I1"
             ],
             [
-              "L1",
-              2,
-              "",
-              []
-            ],
-            [
               "I2",
               3,
               "I2"
             ],
+            null,
             [
               "V1",
               3,
@@ -1906,7 +1901,11 @@
               3,
               "B1"
             ],
-            null,
+            [
+              "O1",
+              3,
+              "O1"
+            ],
             null,
             null,
             null,
@@ -7256,36 +7255,27 @@
                 [],
                 267.3
               ],
-              null,
-              null,
-              null,
               [
                 "I2",
                 3,
                 "I2",
                 1,
-                45.2
+                281.1
               ],
               [
-                "I3",
+                "O1",
                 3,
-                "I3",
+                "O1",
                 1,
-                64.8
+                300.8,
+                327
               ],
               null,
-              [
-                "L1",
-                2,
-                "",
-                []
-              ],
-              [
-                "I2",
-                3,
-                "",
-                []
-              ],
+              null,
+              null,
+              null,
+              null,
+              null,
               null,
               null,
               null,
@@ -7316,7 +7306,7 @@
               {
                 "name": "VERSE 3",
                 "start": 14,
-                "end": 15
+                "end": 17
               }
             ]
           }
@@ -10087,9 +10077,9 @@
     {
       "album": "Sabbath Bloody Sabbath",
       "song": "Spiral Architect",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.388,
+      "endSec": 327,
+      "complete": true,
+      "riffSaturationIndex": 1.317,
       "chips": [
         {
           "code": "I1",
@@ -10103,25 +10093,9 @@
           "code": "I2",
           "tier": 3,
           "start": 45.2,
-          "stop": 45.2,
-          "duration": null,
-          "lick": "I2"
-        },
-        {
-          "code": "I2",
-          "tier": 3,
-          "start": 45.2,
           "stop": 64.8,
           "duration": 19.6,
           "lick": "I2"
-        },
-        {
-          "code": "I3",
-          "tier": 3,
-          "start": 64.8,
-          "stop": 64.8,
-          "duration": null,
-          "lick": "I3"
         },
         {
           "code": "I3",
@@ -10231,9 +10205,25 @@
           "code": "C1",
           "tier": 3,
           "start": 267.3,
-          "stop": null,
-          "duration": null,
+          "stop": 281.1,
+          "duration": 13.8,
           "lick": "SAR-C1"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 281.1,
+          "stop": 300.8,
+          "duration": 19.7,
+          "lick": "I2"
+        },
+        {
+          "code": "O1",
+          "tier": 3,
+          "start": 300.8,
+          "stop": 327,
+          "duration": 26.2,
+          "lick": "O1"
         }
       ]
     }
