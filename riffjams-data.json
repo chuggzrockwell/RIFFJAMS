@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:38:15.028Z",
+  "updatedAt": "2026-10-08T22:39:22.957Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1897,7 +1897,11 @@
               "",
               []
             ],
-            null,
+            [
+              "I3",
+              3,
+              "I3"
+            ],
             null,
             null,
             null,
@@ -7147,10 +7151,24 @@
               [
                 "I2",
                 3,
-                "I2"
+                "I2",
+                1,
+                45.2
               ],
-              null,
-              null,
+              [
+                "I3",
+                3,
+                "I3",
+                1,
+                64.8
+              ],
+              [
+                "I2",
+                3,
+                "I2",
+                1,
+                68.6
+              ],
               null,
               [
                 "L1",
@@ -9967,15 +9985,39 @@
       "song": "Spiral Architect",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": null,
+      "riffSaturationIndex": 2.318,
       "chips": [
         {
           "code": "I1",
           "tier": 1,
           "start": 0,
+          "stop": 45.2,
+          "duration": 45.2,
+          "lick": "SAR-I1"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 45.2,
+          "stop": 64.8,
+          "duration": 19.6,
+          "lick": "I2"
+        },
+        {
+          "code": "I3",
+          "tier": 3,
+          "start": 64.8,
+          "stop": 68.6,
+          "duration": 3.8,
+          "lick": "I3"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 68.6,
           "stop": null,
           "duration": null,
-          "lick": "SAR-I1"
+          "lick": "I2"
         }
       ]
     }
