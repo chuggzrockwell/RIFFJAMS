@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T18:00:27.918Z",
+  "updatedAt": "2026-10-08T18:01:41.906Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -5894,14 +5894,24 @@
                 "B2",
                 2,
                 "B2",
-                "1O"
+                "1O",
+                197.1
               ],
               [
                 "B3",
                 3,
                 "B3",
-                "3S"
+                "3S",
+                232.3
               ],
+              [
+                "B2",
+                2,
+                "B2",
+                "1O",
+                245.9
+              ],
+              null,
               [
                 "B4",
                 3,
@@ -5923,8 +5933,6 @@
                   5
                 ]
               ],
-              null,
-              null,
               null,
               null,
               null
@@ -8294,7 +8302,7 @@
       "song": "Sabbath Bloody Sabbath",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.337,
+      "riffSaturationIndex": 2.125,
       "chips": [
         {
           "code": "V1",
@@ -8364,9 +8372,33 @@
           "code": "B1",
           "tier": 3,
           "start": 180.6,
+          "stop": 197.1,
+          "duration": 16.5,
+          "lick": "B1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 197.1,
+          "stop": 232.3,
+          "duration": 35.2,
+          "lick": "B2"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 232.3,
+          "stop": 245.9,
+          "duration": 13.6,
+          "lick": "B3"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 245.9,
           "stop": null,
           "duration": null,
-          "lick": "B1"
+          "lick": "B2"
         }
       ]
     }
