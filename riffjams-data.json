@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:08:58.360Z",
+  "updatedAt": "2026-10-08T22:10:37.247Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -6417,14 +6417,14 @@
                 1,
                 "I1",
                 3,
-                74.8
+                74.9
               ],
               [
                 "V1",
                 3,
                 "V1",
                 [],
-                41
+                88.6
               ],
               [
                 "I1",
@@ -6557,6 +6557,13 @@
                 372.5
               ],
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "verse 1",
+                "start": 0,
+                "end": 7
+              }
             ]
           },
           {
@@ -9180,7 +9187,7 @@
       "album": "Sabbath Bloody Sabbath",
       "song": "A National Acrobat",
       "endSec": 372.5,
-      "complete": false,
+      "complete": true,
       "riffSaturationIndex": 2.396,
       "chips": [
         {
@@ -9203,17 +9210,9 @@
           "code": "I1",
           "tier": 1,
           "start": 34.2,
-          "stop": 41,
-          "duration": 6.8,
-          "lick": "I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 41,
           "stop": 41.1,
-          "duration": 0.1,
-          "lick": "V1"
+          "duration": 6.9,
+          "lick": "I1"
         },
         {
           "code": "V1",
@@ -9259,17 +9258,25 @@
           "code": "I1",
           "tier": 1,
           "start": 74.8,
-          "stop": 74.8,
-          "duration": null,
+          "stop": 74.9,
+          "duration": 0.1,
           "lick": "I1"
         },
         {
           "code": "I1",
           "tier": 1,
-          "start": 74.8,
-          "stop": 88.7,
-          "duration": 13.9,
+          "start": 74.9,
+          "stop": 88.6,
+          "duration": 13.7,
           "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 88.6,
+          "stop": 88.7,
+          "duration": 0.1,
+          "lick": "V1"
         },
         {
           "code": "V1",
