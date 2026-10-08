@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T18:02:54.677Z",
+  "updatedAt": "2026-10-08T18:03:55.641Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1536,8 +1536,7 @@
             [
               "S2",
               2,
-              "",
-              []
+              "SBS-S2"
             ],
             [
               "C1",
@@ -5916,19 +5915,21 @@
                 3,
                 "B3",
                 "3S",
-                232.2
+                280.3
               ],
               [
                 "B4",
                 3,
                 "B4",
-                "1O"
+                "1O",
+                290.3
               ],
               [
                 "S2",
                 2,
-                "",
-                []
+                "SBS-S2",
+                [],
+                311.1
               ],
               [
                 "PC2",
@@ -8308,7 +8309,7 @@
       "song": "Sabbath Bloody Sabbath",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.121,
+      "riffSaturationIndex": 1.997,
       "chips": [
         {
           "code": "V1",
@@ -8386,17 +8387,9 @@
           "code": "B2",
           "tier": 2,
           "start": 197.9,
-          "stop": 232.2,
-          "duration": 34.3,
-          "lick": "B2"
-        },
-        {
-          "code": "B3",
-          "tier": 3,
-          "start": 232.2,
           "stop": 232.3,
-          "duration": 0.1,
-          "lick": "B3"
+          "duration": 34.4,
+          "lick": "B2"
         },
         {
           "code": "B3",
@@ -8410,9 +8403,33 @@
           "code": "B2",
           "tier": 2,
           "start": 245.9,
+          "stop": 280.3,
+          "duration": 34.4,
+          "lick": "B2"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 280.3,
+          "stop": 290.3,
+          "duration": 10,
+          "lick": "B3"
+        },
+        {
+          "code": "B4",
+          "tier": 3,
+          "start": 290.3,
+          "stop": 311.1,
+          "duration": 20.8,
+          "lick": "B4"
+        },
+        {
+          "code": "S2",
+          "tier": 2,
+          "start": 311.1,
           "stop": null,
           "duration": null,
-          "lick": "B2"
+          "lick": "SBS-S2"
         }
       ]
     }
