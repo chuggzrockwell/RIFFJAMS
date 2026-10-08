@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T18:24:16.306Z",
+  "updatedAt": "2026-10-08T18:25:19.219Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -5985,6 +5985,29 @@
                 27.6
               ],
               [
+                "I1",
+                1,
+                "I1",
+                3,
+                34.2
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                [],
+                41
+              ],
+              [
+                "I1",
+                1,
+                "I1",
+                3,
+                47.7
+              ],
+              null,
+              null,
+              [
                 "B1",
                 1,
                 "B1",
@@ -6041,11 +6064,6 @@
                 "S3",
                 []
               ],
-              null,
-              null,
-              null,
-              null,
-              null,
               null,
               null,
               null
@@ -8470,7 +8488,7 @@
       "song": "A National Acrobat",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 3,
+      "riffSaturationIndex": 2.442,
       "chips": [
         {
           "code": "I1",
@@ -8484,9 +8502,33 @@
           "code": "V1",
           "tier": 3,
           "start": 27.6,
+          "stop": 34.2,
+          "duration": 6.6,
+          "lick": "V1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 34.2,
+          "stop": 41,
+          "duration": 6.8,
+          "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 41,
+          "stop": 47.7,
+          "duration": 6.7,
+          "lick": "V1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 47.7,
           "stop": null,
           "duration": null,
-          "lick": "V1"
+          "lick": "I1"
         }
       ]
     }
