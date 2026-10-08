@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:29:32.126Z",
+  "updatedAt": "2026-10-08T22:31:08.327Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1834,8 +1834,7 @@
             [
               "V1",
               2,
-              "LFT-V1",
-              []
+              "LFT-V1"
             ],
             [
               "PC1",
@@ -1845,9 +1844,8 @@
             ],
             [
               "C1",
-              1,
-              "LFT-C1",
-              []
+              3,
+              "LFT-PC1"
             ],
             [
               "S1",
@@ -7022,14 +7020,24 @@
                 "V1",
                 2,
                 "LFT-V1",
-                []
+                [],
+                0
+              ],
+              [
+                "C1",
+                3,
+                "LFT-PC1",
+                [],
+                45.8
               ],
               [
                 "PC1",
                 2,
-                "LFT-PC1",
-                []
+                "LFT-PC1"
               ],
+              null,
+              null,
+              null,
               [
                 "C1",
                 1,
@@ -7042,10 +7050,6 @@
                 "LFT-S1",
                 []
               ],
-              null,
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -9800,6 +9804,31 @@
           "stop": 328.7,
           "duration": 10,
           "lick": "b5"
+        }
+      ]
+    },
+    {
+      "album": "Sabbath Bloody Sabbath",
+      "song": "Looking for Today",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 2,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 0,
+          "stop": 45.8,
+          "duration": 45.8,
+          "lick": "LFT-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 45.8,
+          "stop": null,
+          "duration": null,
+          "lick": "LFT-PC1"
         }
       ]
     }
