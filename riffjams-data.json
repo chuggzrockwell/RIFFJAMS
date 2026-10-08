@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:37:14.457Z",
+  "updatedAt": "2026-10-08T22:38:15.028Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -1873,8 +1873,7 @@
             [
               "I1",
               1,
-              "",
-              []
+              "SAR-I1"
             ],
             [
               "L1",
@@ -1885,8 +1884,7 @@
             [
               "I2",
               3,
-              "",
-              []
+              "I2"
             ],
             [
               "V1",
@@ -7142,10 +7140,15 @@
               [
                 "I1",
                 1,
-                "",
-                []
+                "SAR-I1",
+                [],
+                0
               ],
-              null,
+              [
+                "I2",
+                3,
+                "I2"
+              ],
               null,
               null,
               null,
@@ -9956,6 +9959,23 @@
           "stop": 293.7,
           "duration": 55.9,
           "lick": "LFT-S1"
+        }
+      ]
+    },
+    {
+      "album": "Sabbath Bloody Sabbath",
+      "song": "Spiral Architect",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "SAR-I1"
         }
       ]
     }
