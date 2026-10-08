@@ -6611,6 +6611,10 @@ function wireWizardO1Lick(songsOwner) {
   });
 }
 window.wireWizardO1Lick = wireWizardO1Lick;
+/** "04" typed with a digit zero is the outro O4: /^0\d+$/ → "O" + digits (codes and lick ids). */
+function fixZeroOCode(v) {
+  return (typeof v === "string" && /^0\d+$/.test(v)) ? "O" + v.slice(1) : v;
+}
 function wireNibV2Lick(songsOwner) {
   var albums = (songsOwner && songsOwner.albums) ? songsOwner.albums : songsOwner;
   (albums || []).forEach(function(a){
@@ -6620,6 +6624,10 @@ function wireNibV2Lick(songsOwner) {
       ["sections", "chips"].forEach(function(field){
         (s[field] || []).forEach(function(pair){
           if (isChipPair(pair) && typeof pair[0] === "string" && /^[a-z]/.test(pair[0])) pair[0] = pair[0].toUpperCase();
+          if (isChipPair(pair)) {
+            pair[0] = fixZeroOCode(pair[0]);
+            if (pair.length > 2) pair[2] = fixZeroOCode(pair[2]);
+          }
         });
       });
     });
@@ -13477,6 +13485,7 @@ function saveChipEditor() {
   if (!chipEditState) return;
   var code = (document.getElementById("chipEditId").value || "").trim();
   if (!soloMode && !usesArrangementMap()) code = code.toUpperCase();
+  if (!soloMode || usesArrangementMap()) code = fixZeroOCode(code);
   if (!code) { document.getElementById("chipEditId").focus(); return; }
   var tierBtn = document.querySelector("#chipEditTiers .tier-pick.on");
   var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : slotBase(chipEditState.tier || 3);
@@ -13485,6 +13494,7 @@ function saveChipEditor() {
   var song = getEditSong(ai, si);
   if (!song) return;
   var lick = (document.getElementById("chipEditLick").value || "").trim();
+  if (!soloMode || usesArrangementMap()) lick = fixZeroOCode(lick);
   if ((soloMode || usesArrangementMap()) && !lick) lick = code;
   var posList = readChipEditPosList();
   var startSec = null;
@@ -13620,6 +13630,7 @@ function copyFromChipEditor() {
   if (chipEditState.isNew) {
     var code = (document.getElementById("chipEditId").value || "").trim();
     if (!soloMode && !usesArrangementMap()) code = code.toUpperCase();
+    if (!soloMode || usesArrangementMap()) code = fixZeroOCode(code);
     if (!code) return false;
     var tierBtn = document.querySelector("#chipEditTiers .tier-pick.on");
     var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"),10) : slotBase(chipEditState.tier || 3);
@@ -16845,6 +16856,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=392"></script>
+<script src="riffjams-admin.js?v=393"></script>
 </body>
 </html>
