@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:45:11.335Z",
+  "updatedAt": "2026-10-08T22:46:15.443Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -30,6 +30,9 @@
         {
           "song": "Black Sabbath",
           "sections": [
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -98,6 +101,9 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
@@ -140,6 +146,9 @@
               "BWS-O1",
               []
             ],
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -202,12 +211,18 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Wicked World",
           "sections": [
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -240,6 +255,9 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
@@ -259,12 +277,18 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Warning",
           "sections": [
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -345,6 +369,9 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
@@ -385,6 +412,9 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
@@ -401,6 +431,9 @@
               2,
               "PC-S1"
             ],
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -478,6 +511,9 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
@@ -515,6 +551,9 @@
               3,
               "EF-B4"
             ],
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -573,6 +612,9 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
@@ -611,6 +653,9 @@
               3,
               "D"
             ],
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -686,6 +731,9 @@
               "FOB-B1"
             ],
             null,
+            null,
+            null,
+            null,
             null
           ]
         }
@@ -729,6 +777,9 @@
               "",
               []
             ],
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -781,6 +832,9 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
@@ -793,6 +847,9 @@
               "",
               []
             ],
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -854,12 +911,18 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Orchid",
           "sections": [
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -940,12 +1003,18 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Solitude",
           "sections": [
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -1031,6 +1100,9 @@
               "",
               []
             ],
+            null,
+            null,
+            null,
             null,
             null,
             null
@@ -1136,6 +1208,9 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
@@ -1180,6 +1255,9 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ],
           "keys": [
@@ -1206,12 +1284,18 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "FX",
           "sections": [
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -1259,6 +1343,9 @@
               "B1",
               []
             ],
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -1335,6 +1422,9 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ],
           "keys": [
@@ -1403,12 +1493,18 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Laguna Sunrise",
           "sections": [
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -1456,12 +1552,18 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
         {
           "song": "Under the Sun",
           "sections": [
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -1552,6 +1654,9 @@
             ],
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
@@ -1567,7 +1672,8 @@
             [
               "V1",
               3,
-              "V1"
+              "V1",
+              []
             ],
             [
               "B1",
@@ -1593,38 +1699,48 @@
             [
               "B3",
               2,
-              "B3"
+              "B3",
+              []
             ],
             [
               "B4",
               2,
-              "B4"
+              "B4",
+              []
             ],
             [
               "B5",
               2,
-              "B5"
+              "B5",
+              []
             ],
             [
               "B6",
               3,
-              "B6"
+              "B6",
+              []
             ],
             [
               "B7",
               3,
-              "B7"
+              "B7",
+              []
             ],
             [
               "S3",
               3,
-              "S3"
+              "S3",
+              []
             ],
             [
               "V2",
               3,
-              "V1"
+              "V1",
+              []
             ],
+            null,
+            null,
+            null,
             null,
             null
           ]
@@ -1632,6 +1748,9 @@
         {
           "song": "Fluff",
           "sections": [
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -1736,18 +1855,39 @@
               []
             ],
             [
+              "O4",
+              3,
+              "O4",
+              []
+            ],
+            [
+              "O5",
+              3,
+              "O5",
+              []
+            ],
+            [
               "04",
               3,
-              "04",
+              "04"
+            ],
+            [
+              "O4",
+              3,
+              "O4",
+              []
+            ],
+            [
+              "O5",
+              3,
+              "O5",
               []
             ],
             [
               "05",
               3,
-              "05",
-              []
-            ],
-            null
+              "05"
+            ]
           ]
         },
         {
@@ -1756,53 +1896,66 @@
             [
               "I1",
               2,
-              "KYTL-I1"
+              "KYTL-I1",
+              []
             ],
             [
               "V1",
               2,
-              "KYTL-V1"
+              "KYTL-V1",
+              []
             ],
             [
               "C1",
               2,
-              "KYTL-B1"
+              "KYTL-C1",
+              []
             ],
             [
               "S1",
               1,
-              "KYTL-S1"
+              "KYTL-S1",
+              []
             ],
             [
               "B1",
               2,
-              "KYTL-B2"
+              "KYTL-B1",
+              []
             ],
             [
               "B2",
               2,
-              "KYTL-B3"
+              "KYTL-B2",
+              []
             ],
             [
               "S2",
               1,
-              "KYTL-S2"
+              "KYTL-S2",
+              []
             ],
             [
               "B3",
               2,
-              "KYTL-B4"
+              "KYTL-B3",
+              []
             ],
             [
               "S3",
               1,
-              "KYTL-S3"
+              "KYTL-S3",
+              []
             ],
             [
               "B4",
-              3,
-              "b5"
+              2,
+              "KYTL-B4",
+              []
             ],
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -1825,6 +1978,9 @@
             null,
             null,
             null,
+            null,
+            null,
+            null,
             null
           ]
         },
@@ -1834,28 +1990,35 @@
             [
               "V1",
               2,
-              "LFT-V1"
+              "LFT-V1",
+              []
             ],
             [
               "PC1",
-              3,
-              "LFT-PC1"
+              2,
+              "LFT-PC1",
+              []
             ],
             [
               "C1",
-              3,
-              "LFT-C1"
+              1,
+              "LFT-C1",
+              []
             ],
             [
               "S1",
               1,
-              "LFT-S1"
+              "LFT-S1",
+              []
             ],
             [
               "PC2",
               3,
               "PC2"
             ],
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -1873,39 +2036,49 @@
             [
               "I1",
               1,
-              "SAR-I1"
-            ],
-            [
-              "I2",
-              3,
-              "I2"
+              "SAR-I1",
+              []
             ],
             null,
             [
+              "I2",
+              3,
+              "I2",
+              []
+            ],
+            [
               "V1",
               3,
-              "SAR-V1"
+              "SAR-V1",
+              []
             ],
             [
               "C1",
               3,
-              "SAR-C1"
+              "SAR-C1",
+              []
             ],
             [
               "I3",
               3,
-              "I3"
+              "I3",
+              []
             ],
             [
               "B1",
               3,
-              "B1"
+              "B1",
+              []
             ],
             [
               "O1",
               3,
-              "O1"
+              "O1",
+              []
             ],
+            null,
+            null,
+            null,
             null,
             null,
             null,
@@ -6782,22 +6955,33 @@
                 306.6
               ],
               [
-                "04",
+                "O4",
                 3,
-                "04",
+                "O4",
                 [],
                 317.7
+              ],
+              [
+                "O5",
+                3,
+                "O5",
+                [],
+                328.9,
+                null
+              ],
+              [
+                "04",
+                3,
+                "04"
               ],
               [
                 "05",
                 3,
                 "05",
                 [],
-                328.9,
+                null,
                 348.5
               ],
-              null,
-              null,
               null,
               null,
               null,
@@ -6885,7 +7069,7 @@
                 105
               ],
               [
-                "c1",
+                "C1",
                 2,
                 "KYTL-B1",
                 [],
@@ -6934,7 +7118,7 @@
                 308.7
               ],
               [
-                "b4",
+                "B4",
                 3,
                 "b5",
                 [],
@@ -7268,7 +7452,7 @@
                 "O1",
                 1,
                 300.8,
-                327
+                null
               ],
               null,
               null,
@@ -9839,20 +10023,20 @@
           "lick": "O2"
         },
         {
-          "code": "04",
+          "code": "O4",
           "tier": 3,
           "start": 317.7,
           "stop": 328.9,
           "duration": 11.2,
-          "lick": "04"
+          "lick": "O4"
         },
         {
-          "code": "05",
+          "code": "O5",
           "tier": 3,
           "start": 328.9,
           "stop": 348.5,
           "duration": 19.6,
-          "lick": "05"
+          "lick": "O5"
         }
       ]
     },
@@ -9920,7 +10104,7 @@
           "lick": "KYTL-S1"
         },
         {
-          "code": "c1",
+          "code": "C1",
           "tier": 2,
           "start": 148,
           "stop": 162.5,
@@ -9976,7 +10160,7 @@
           "lick": "KYTL-B4"
         },
         {
-          "code": "b4",
+          "code": "B4",
           "tier": 3,
           "start": 318.7,
           "stop": 328.7,
@@ -10077,9 +10261,9 @@
     {
       "album": "Sabbath Bloody Sabbath",
       "song": "Spiral Architect",
-      "endSec": 327,
-      "complete": true,
-      "riffSaturationIndex": 1.317,
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1.345,
       "chips": [
         {
           "code": "I1",
@@ -10221,8 +10405,8 @@
           "code": "O1",
           "tier": 3,
           "start": 300.8,
-          "stop": 327,
-          "duration": 26.2,
+          "stop": null,
+          "duration": null,
           "lick": "O1"
         }
       ]
