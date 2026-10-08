@@ -315,6 +315,7 @@
     padding: 4px;
   }
   .map-tools-dd.open .map-tools-menu { display: flex; flex-direction: column; gap: 2px; }
+  .map-sort-dd[hidden] { display: none !important; }
   .map-tools-item {
     appearance: none;
     display: flex;
@@ -4722,6 +4723,14 @@
         </div>
       </div>
       <button type="button" class="sec-mode-btn sec-link-btn on" id="secLinkBtn" hidden aria-pressed="true" title="Link Single Song ↔ Arrangement">L</button>
+      <div class="map-mode-dd map-tools-dd map-sort-dd" id="mapSortDd" hidden>
+        <button type="button" class="map-tools-btn" id="mapSortBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="mapSortMenu" title="Sort songs (display only)">Sort: Album</button>
+        <div class="map-tools-menu" id="mapSortMenu" role="menu">
+          <button type="button" class="map-tools-item" data-map-sort="album" role="menuitemradio" aria-checked="true" title="Album release order, then track listing">Album</button>
+          <button type="button" class="map-tools-item" data-map-sort="rsi" role="menuitemradio" aria-checked="false" title="RSI, highest first (no score at the bottom)">RSI</button>
+          <button type="button" class="map-tools-item" data-map-sort="arsi" role="menuitemradio" aria-checked="false" title="aRSI, highest first (no score at the bottom)">aRSI</button>
+        </div>
+      </div>
       <div class="ss-nav-picker-host" id="ssSongPickerHost" hidden></div>
       <span class="sec-edit-tools" id="secEditTools" hidden>
         <button type="button" class="sec-tool-btn" id="secUndoBtn" title="Undo (Ctrl+Z)">Undo</button>
@@ -7316,6 +7325,7 @@ function updateEditSaveUi() {
   if (saveBtn) saveBtn.disabled = false;
   syncArrRepeatButtons();
   if (typeof syncSsLinkUi === "function") syncSsLinkUi();
+  if (typeof syncMapSortUi === "function") syncMapSortUi();
   var keys = document.getElementById("sectionsKeys");
   if (keys && document.body.className.indexOf("sections-mode") >= 0) {
     if (arrangementMode) {
@@ -8251,7 +8261,112 @@ function handleAlbumSlashFilterShortcut(e) {
   return true;
 }
 
+/* Song Map Sort (Riff / Solo / Arrangement): display-only row order. Data and saved order never change. */
+var MAP_SORT_KEY = "riffjams-map-sort";
+var MAP_SORT_LABELS = { album: "Album", rsi: "RSI", arsi: "aRSI" };
+var mapSortMode = "album";
+try { var _msk = localStorage.getItem(MAP_SORT_KEY); if (_msk === "rsi" || _msk === "arsi") mapSortMode = _msk; } catch (eMapSort) {}
+var mapSortLast = null; /* { mode, view, names[] } — reused while a drag is in progress */
+var mapSortStale = false;
+function mapSortVisible() {
+  var v = songMapViewValue();
+  return document.body.classList.contains("sections-mode") && (v === "riff" || v === "solo" || v === "arrangement");
+}
+function mapSortActive() {
+  return mapSortMode !== "album" && !singleSongMode && mapSortVisible();
+}
+function mapSortBusy() {
+  return !!((typeof chipDrag !== "undefined" && chipDrag)
+    || (typeof sectionRulerDrag !== "undefined" && sectionRulerDrag)
+    || (typeof arrMarquee !== "undefined" && arrMarquee)
+    || (typeof pointerDragActive !== "undefined" && pointerDragActive));
+}
+/* Returns { "ai|si": rank (1-based) } for the rows of sourceAlbums. Scores = RSI/aRSI column labels (Arrangement chips). */
+function mapSortRankFor(sourceAlbums) {
+  var list = [];
+  (sourceAlbums || []).forEach(function(album, ai){
+    (album && album.songs || []).forEach(function(s, si){
+      if (s) list.push({ key: ai + "|" + si, name: s.song, idx: list.length, score: null });
+    });
+  });
+  var view = songMapViewValue();
+  var useLast = mapSortBusy() && mapSortLast && mapSortLast.mode === mapSortMode && mapSortLast.view === view;
+  if (useLast) {
+    var pos = {};
+    mapSortLast.names.forEach(function(n, i){ if (!(n in pos)) pos[n] = i; });
+    list.sort(function(a, b){
+      var pa = (a.name in pos) ? pos[a.name] : 1e9, pb = (b.name in pos) ? pos[b.name] : 1e9;
+      return (pa - pb) || (a.idx - b.idx);
+    });
+    mapSortStale = true;
+  } else {
+    refreshSongRsiLabels();
+    var scores = (mapSortMode === "arsi") ? songARsiLabelByName : songRsiLabelByName;
+    list.forEach(function(x){
+      var v = parseFloat(scores[x.name]);
+      x.score = isFinite(v) ? v : null;
+    });
+    list.sort(function(a, b){
+      if ((a.score == null) !== (b.score == null)) return a.score == null ? 1 : -1;
+      if (a.score != null && a.score !== b.score) return b.score - a.score;
+      return a.idx - b.idx;
+    });
+    mapSortLast = { mode: mapSortMode, view: view, names: list.map(function(x){ return x.name; }) };
+    mapSortStale = false;
+  }
+  var rank = {};
+  list.forEach(function(x, i){ rank[x.key] = i + 1; });
+  return rank;
+}
+function setMapSortOpen(open) {
+  var dd = document.getElementById("mapSortDd");
+  var btn = document.getElementById("mapSortBtn");
+  if (dd) dd.classList.toggle("open", !!open);
+  if (btn) btn.setAttribute("aria-expanded", open ? "true" : "false");
+}
+function mapSortIsOpen() {
+  var dd = document.getElementById("mapSortDd");
+  return !!(dd && dd.classList.contains("open"));
+}
+function syncMapSortUi() {
+  var dd = document.getElementById("mapSortDd");
+  var btn = document.getElementById("mapSortBtn");
+  if (!dd || !btn) return;
+  var vis = mapSortVisible();
+  dd.hidden = !vis;
+  if (!vis) setMapSortOpen(false);
+  btn.textContent = "Sort: " + (MAP_SORT_LABELS[mapSortMode] || "Album");
+  dd.querySelectorAll("[data-map-sort]").forEach(function(it){
+    var on = it.getAttribute("data-map-sort") === mapSortMode;
+    it.classList.toggle("on", on);
+    it.setAttribute("aria-checked", on ? "true" : "false");
+  });
+}
+function setMapSort(mode) {
+  if (mode !== "rsi" && mode !== "arsi") mode = "album";
+  setMapSortOpen(false);
+  if (mode === mapSortMode) { syncMapSortUi(); return; }
+  mapSortMode = mode;
+  mapSortLast = null;
+  try { localStorage.setItem(MAP_SORT_KEY, mode); } catch (eMapSortSet) {}
+  var sec = document.getElementById("sections");
+  var anchor = (sec && !sec.classList.contains("hidden")) ? captureSongMapAnchor() : null;
+  if (sec && !sec.classList.contains("hidden")) showSections(true);
+  if (anchor) holdSongMapAnchor(anchor);
+  syncMapSortUi();
+}
+/* A refresh that landed mid-drag kept the old order: re-sort once the pointer is released. */
+document.addEventListener("pointerup", function(){
+  if (!mapSortStale) return;
+  setTimeout(function(){
+    if (!mapSortStale || mapSortBusy()) return;
+    var sec = document.getElementById("sections");
+    if (sec && !sec.classList.contains("hidden") && mapSortActive()) showSections(true);
+    else mapSortStale = false;
+  }, 0);
+});
 function setMapToolsOpen(open) {
+  if (open && typeof setMapSortOpen === "function") setMapSortOpen(false);
   var dd = document.getElementById("mapToolsDd");
   var btn = document.getElementById("mapToolsBtn");
   if (dd) dd.classList.toggle("open", !!open);
@@ -9265,10 +9380,13 @@ function showSections(keepScroll) {
   var singleFocus = singleSongMode ? resolveSingleSongName(singleSongPickerAlbums()) : "";
   if (singleSongMode && singleFocus) setSingleSongFocus(singleFocus);
   var html = "";
+  var mapSortRank = (!singleSongMode && mapSortActive()) ? mapSortRankFor(sourceAlbums) : null;
+  var mapSortRows = mapSortRank ? [] : null;
   if (!singleSongMode) html = sourceAlbums.map(function(album, ai){
     var rows = (album.songs || []).map(function(s, si){
       if (singleSongMode && singleFocus && s.song !== singleFocus) return "";
       rowN += 1;
+      var rowLabel = mapSortRank ? (mapSortRank[ai + "|" + si] || rowN) : rowN;
       var chipArr = [];
       var ci;
       if (arrangementMode) {
@@ -9322,7 +9440,8 @@ function showSections(keepScroll) {
       }
       var chips = chipArr.join("");
       var np = (album.font === 'font-sbs') ? 'np-sbs' : (album.font === 'font-mor') ? 'np-mor' : (album.font === 'font-vol4') ? 'np-vol4' : 'np-paranoid';
-      var thumb = album.cover ? '<img class="song-thumb '+np+'" src="'+album.cover+'" alt="">' : '<span class="song-thumb empty '+np+'" aria-hidden="true"></span>';
+      var sortAlbumAttr = mapSortRank ? String((album && album.name) || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;") : "";
+      var thumb = album.cover ? '<img class="song-thumb '+np+'" src="'+album.cover+'" alt=""'+(mapSortRank ? ' title="'+sortAlbumAttr+'"' : '')+'>' : '<span class="song-thumb empty '+np+'" aria-hidden="true"></span>';
       var stUrl = smSongsterrUrl(s.song);
       var songsterrBtn = "";
       if (stUrl) {
@@ -9332,12 +9451,21 @@ function showSections(keepScroll) {
       }
       var nameTitle = (sectionsMode === "edit") ? ' title="Edit key, tuning, and BPM"' : "";
       var metaStrip = (sectionsMode === "view" && showMetaCols) ? songMetaStripHtml(s.song) : "";
-      return '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"><div class="row-num '+np+'">'+rowN+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-chip-col">'+sectionRulerLaneHtml(s, maxCols)+'<div class="song-secs">'+chips+'</div></div></div>';
+      var rowHtml = '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"'+(mapSortRank ? ' data-album="'+sortAlbumAttr+'"' : '')+'><div class="row-num '+np+'">'+rowLabel+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-chip-col">'+sectionRulerLaneHtml(s, maxCols)+'<div class="song-secs">'+chips+'</div></div></div>';
+      if (mapSortRows) { mapSortRows.push({ rank: rowLabel, html: rowHtml }); return ""; }
+      return rowHtml;
     }).join("");
+    if (mapSortRows) return "";
     var albumName = (album && album.name) ? String(album.name).replace(/"/g, "&quot;") : "";
     if (singleSongMode && !rows) return "";
     return '<div class="album-block" data-ai="'+ai+'" data-album="'+albumName+'"><div class="album-songs">'+rows+'</div></div>';
   }).join("");
+  /* Sorted (RSI/aRSI): one flat list across albums; album filter applies per row (data-album). */
+  if (mapSortRows) {
+    mapSortRows.sort(function(a, b){ return a.rank - b.rank; });
+    html = '<div class="album-block map-sorted" data-album=""><div class="album-songs">'
+      + mapSortRows.map(function(r){ return r.html; }).join("") + '</div></div>';
+  }
   /* Single Song: NEXT megachip + countdown only. Arrangement: + Current Section chip.
      Prefer singleSongMode — arrangementMode can stay true underneath Single Song. */
   var nextCueHtml = singleSongMode
@@ -10105,11 +10233,16 @@ function applySecFilters() {
     var albumName = block.getAttribute("data-album") || "";
     // Album filter = include: when any checked, only those albums show
     var albumOn = Object.keys(secAlbumFilter).some(function(k){ return secAlbumFilter[k]; });
-    var albumOk = !active || !albumOn || !!secAlbumFilter[albumName];
+    var sortedBlock = block.classList.contains("map-sorted");
+    var albumOk = sortedBlock || !active || !albumOn || !!secAlbumFilter[albumName];
     block.classList.toggle("filtered-out", active && !albumOk);
     if (!albumOk) return;
     var anySongVisible = false;
     block.querySelectorAll(".song-row").forEach(function(row){
+      if (sortedBlock && active && albumOn && !secAlbumFilter[row.getAttribute("data-album") || ""]) {
+        row.classList.add("filtered-out");
+        return;
+      }
       var rowHasVisible = false;
       row.querySelectorAll(".sec-chip").forEach(function(chip){
         if (chip.classList.contains("empty")) {
@@ -15536,6 +15669,7 @@ document.addEventListener("click", function(e){
   document.querySelectorAll(".filter-dd.open").forEach(function(el){ el.classList.remove("open"); });
 });
 document.addEventListener("click", function(e){
+  if (!(e.target.closest && e.target.closest("#mapSortDd"))) setMapSortOpen(false);
   if (e.target.closest && e.target.closest("#mapToolsDd")) return;
   setMapToolsOpen(false);
 });
@@ -15569,6 +15703,18 @@ document.getElementById("secModes").onclick = function(e){
   if (e.target.closest("#mapToolsBtn")) {
     e.preventDefault();
     setMapToolsOpen(!mapToolsIsOpen());
+    return;
+  }
+  if (e.target.closest("#mapSortBtn")) {
+    e.preventDefault();
+    var sortOpen = !mapSortIsOpen();
+    if (sortOpen) setMapToolsOpen(false);
+    setMapSortOpen(sortOpen);
+    return;
+  }
+  var sortItem = e.target.closest("[data-map-sort]");
+  if (sortItem) {
+    setMapSort(sortItem.getAttribute("data-map-sort"));
     return;
   }
   if (e.target.closest("#secPeekBtn")) {
@@ -16920,6 +17066,7 @@ document.addEventListener("keydown", function(e){
     }
     if (k === "escape" || e.key === "Escape") {
       if (mapToolsIsOpen()) { setMapToolsOpen(false); return; }
+      if (mapSortIsOpen()) { setMapSortOpen(false); return; }
       // Chip edit popup already handled above; Esc does nothing else on Song Map
       return;
     }
@@ -16973,6 +17120,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=395"></script>
+<script src="riffjams-admin.js?v=396"></script>
 </body>
 </html>
