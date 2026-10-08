@@ -7378,6 +7378,7 @@ function parseChipTimeInput(raw) {
 }
 function formatChipTime(sec) {
   if (sec == null || !isFinite(sec) || sec < 0) return "";
+  sec = Math.round(sec * 10) / 10; /* 83.96 → 1:24 (was "1:23.10" = 83.1s) */
   var whole = Math.floor(sec);
   var m = Math.floor(whole / 60);
   var s = whole % 60;
@@ -10700,7 +10701,7 @@ function ssLoopEndAt(r) {
   return dur > r.start + 1 ? dur - 0.3 : null;
 }
 function ssLoopPlayerTime() {
-  try { return (smYtPlayer && smYtPlayer.getCurrentTime) ? (smYtPlayer.getCurrentTime() || 0) : 0; } catch (eT) { return 0; }
+  try { return (smYtPlayer && smYtPlayer.getCurrentTime) ? smPlayerTimeNow() : 0; } catch (eT) { return 0; }
 }
 function syncSsLoopUi() {
   var active = ssLoopIsActive();
@@ -11028,14 +11029,54 @@ function smTogglePlay() {
     smYtPlayer.playVideo();
   });
 }
+/* Smooth player clock. YT getCurrentTime() only refreshes every ~250ms, so between reads
+   extrapolate from the last read with performance.now() × playback rate (playing only).
+   Tiny backward corrections are held so the now-chip never flickers back at a boundary. */
+var smClock = { raw: null, at: 0, est: 0 };
+function smPlayerTimeNow() {
+  if (!smYtPlayer || !smYtPlayer.getCurrentTime) return 0;
+  var raw = 0;
+  try { raw = smYtPlayer.getCurrentTime() || 0; } catch (eRaw) { return 0; }
+  var now = (window.performance && performance.now) ? performance.now() : Date.now();
+  var state = null;
+  try { if (smYtPlayer.getPlayerState) state = smYtPlayer.getPlayerState(); } catch (eSt) {}
+  var playing = (state == null) ? !!smPlaying : (state === 1);
+  if (smClock.raw === null || raw !== smClock.raw) { smClock.raw = raw; smClock.at = now; }
+  if (!playing) { smClock.at = now; smClock.est = raw; return raw; }
+  var rate = 1;
+  try { if (smYtPlayer.getPlaybackRate) rate = smYtPlayer.getPlaybackRate() || 1; } catch (eRate) {}
+  var dt = (now - smClock.at) / 1000;
+  if (dt < 0) dt = 0;
+  if (dt > 0.6) dt = 0.6; /* stalled reads: never run more than 0.6s ahead */
+  var est = raw + dt * rate;
+  if (est < smClock.est && smClock.est - est < 0.35) est = smClock.est;
+  smClock.est = est;
+  return est;
+}
+/* Per-frame driver while playing: now-chip, megachip, countdown, NEXT, tab swap, Loop wrap. */
+var smCueRafId = 0;
+function smCueFrame() {
+  smCueRafId = 0;
+  if (!smTickTimer) return;
+  if (!smSeeking && smYtPlayer && smYtPlayer.getCurrentTime) {
+    if (typeof ssLoop !== "undefined" && ssLoop.on && typeof ssLoopCheck === "function") ssLoopCheck();
+    var bc = document.body.classList;
+    if ((bc.contains("sections-arrange") || bc.contains("sections-single-song")) && typeof smUpdateArrNextCue === "function") {
+      smUpdateArrNextCue(false);
+    }
+  }
+  smCueRafId = requestAnimationFrame(smCueFrame);
+}
 function smStartTick() {
   smStopTick();
   smTickTimer = setInterval(smTick, 250);
   smTick();
+  if (!smCueRafId && typeof requestAnimationFrame === "function") smCueRafId = requestAnimationFrame(smCueFrame);
 }
 function smStopTick() {
   if (smTickTimer) clearInterval(smTickTimer);
   smTickTimer = null;
+  if (smCueRafId) { try { cancelAnimationFrame(smCueRafId); } catch (eRaf) {} smCueRafId = 0; }
 }
 function smFindArrangementSongByName(songName) {
   if (!songName || !ARRANGEMENT_MAP || !ARRANGEMENT_MAP.albums) return null;
@@ -11096,6 +11137,8 @@ function smPaintArrCueChip(el, baseClass, item, emptyText) {
   el.textContent = item.code;
 }
 
+var smArrCueSig = "";
+var smArrCueSigPanel = null;
 function smUpdateArrNextCue(force) {
   var panel = document.getElementById("smArrNextPanel");
   var curEl = document.getElementById("smArrCurChip");
@@ -11120,10 +11163,7 @@ function smUpdateArrNextCue(force) {
   if (!songName) songName = curTrack && curTrack.song ? curTrack.song : "";
   var song = smFindArrangementSongByName(songName);
   var timed = smCollectTimedArrChips(song);
-  var t = 0;
-  try {
-    if (smYtPlayer && smYtPlayer.getCurrentTime) t = smYtPlayer.getCurrentTime() || 0;
-  } catch (eT) { t = 0; }
+  var t = smPlayerTimeNow();
   var pick = smPickArrNextCue(timed, t);
   /* Single Song Loop: inside the loop, NEXT after the last looped chip is the loop start. */
   var loopWrapAt = null;
@@ -11137,6 +11177,20 @@ function smUpdateArrNextCue(force) {
       }
     }
   }
+  /* Runs every frame while playing: skip DOM writes unless something visible changed. */
+  var sigRemain = "";
+  if (!pick.empty) {
+    var sigAt = pick.next ? ((loopWrapAt != null) ? loopWrapAt : pick.next.start) : songArrangementEndSec(song);
+    if (sigAt != null) {
+      var sigRem = sigAt - t;
+      sigRemain = (sigRem > 0 ? Math.ceil(sigRem) : 0) + (sigRem <= 5 ? "u" : "") + (sigRem <= 2 ? "s" : "");
+    }
+  }
+  var cueSig = [songName, inSingle ? 1 : 0, inArrange ? 1 : 0, pick.empty ? 1 : 0,
+    pick.current ? pick.current.ci : -1, pick.next ? pick.next.ci : -1, loopWrapAt != null ? 1 : 0, sigRemain].join("|");
+  if (!force && cueSig === smArrCueSig && panel === smArrCueSigPanel && !ssSelectedArrangementSection) return;
+  smArrCueSig = cueSig;
+  smArrCueSigPanel = panel;
   var emptyMsg = "Set times on chips";
   var endMsg = "End";
   if (pick.empty) {
@@ -14925,7 +14979,7 @@ document.getElementById("chipEditLick").addEventListener("keydown", function(e){
   function smGrabPlayerTimeInto(inputId) {
     var sec = null;
     try {
-      if (smYtPlayer && smYtPlayer.getCurrentTime) sec = smYtPlayer.getCurrentTime();
+      if (smYtPlayer && smYtPlayer.getCurrentTime) sec = smPlayerTimeNow();
     } catch (errT) { sec = null; }
     if (sec == null || !isFinite(sec) || sec < 0) {
       alert("Song Map player time is not available yet — play or cue a track first.");
@@ -16137,6 +16191,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=390"></script>
+<script src="riffjams-admin.js?v=391"></script>
 </body>
 </html>
