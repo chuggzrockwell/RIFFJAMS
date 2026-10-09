@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-08T22:46:15.443Z",
+  "updatedAt": "2026-10-09T01:30:43.427Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -190,8 +190,7 @@
             [
               "C1",
               3,
-              "NIB-C1",
-              []
+              "NIB-C1"
             ],
             [
               "S2",
@@ -2073,8 +2072,7 @@
             [
               "O1",
               3,
-              "O1",
-              []
+              "O1"
             ],
             null,
             null,
@@ -3656,7 +3654,9 @@
               [
                 "C1",
                 3,
-                "NIB-C1"
+                "NIB-C1",
+                1,
+                116.1
               ],
               [
                 "V1",
@@ -7452,7 +7452,7 @@
                 "O1",
                 1,
                 300.8,
-                null
+                327
               ],
               null,
               null,
@@ -7698,7 +7698,7 @@
       "song": "N.I.B.",
       "endSec": 360.3,
       "complete": true,
-      "riffSaturationIndex": 2.807,
+      "riffSaturationIndex": 2.614,
       "chips": [
         {
           "code": "V1",
@@ -7720,9 +7720,17 @@
           "code": "V1",
           "tier": 1,
           "start": 88.6,
-          "stop": 145.9,
-          "duration": 57.3,
+          "stop": 116.1,
+          "duration": 27.5,
           "lick": "NIB-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 116.1,
+          "stop": 145.9,
+          "duration": 29.8,
+          "lick": "NIB-C1"
         },
         {
           "code": "V1",
@@ -10261,9 +10269,9 @@
     {
       "album": "Sabbath Bloody Sabbath",
       "song": "Spiral Architect",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.345,
+      "endSec": 327,
+      "complete": true,
+      "riffSaturationIndex": 1.317,
       "chips": [
         {
           "code": "I1",
@@ -10405,8 +10413,8 @@
           "code": "O1",
           "tier": 3,
           "start": 300.8,
-          "stop": null,
-          "duration": null,
+          "stop": 327,
+          "duration": 26.2,
           "lick": "O1"
         }
       ]
