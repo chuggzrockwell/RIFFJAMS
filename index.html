@@ -6850,7 +6850,7 @@ function wireNibV2Lick(songsOwner) {
     (a.songs || []).forEach(function(s){
       if (!s || s.song !== "Supernaut") return;
       /* Supernaut had bare I1/V1/S1 ids, which resolve to the shared user-tabs placeholders */
-      var snLinks = { "I1": "SN-I1" };
+      var snLinks = { "I1": "SN-I1", "V1": "SN-V1" };
       ["sections", "chips", "ssChips"].forEach(function(field){
         (s[field] || []).forEach(function(pair){
           if (!isChipPair(pair) || !snLinks[pair[0]]) return;
@@ -17298,6 +17298,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=399"></script>
+<script src="riffjams-admin.js?v=400"></script>
 </body>
 </html>
