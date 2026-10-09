@@ -6311,6 +6311,54 @@ function ssFitArrangementChips() {
     }
   }
 }
+/** Distance (px) from the panel's top edge to the top of the NEXT SECTION glyph ink. */
+function ssNextLabelInkOffset(panel) {
+  var lbl = panel && panel.querySelector(".sm-arr-next-label");
+  if (!lbl || !lbl.offsetHeight) return 0;
+  try {
+    var cs = getComputedStyle(lbl);
+    var txt = String(lbl.textContent || "");
+    if (cs.textTransform === "uppercase") txt = txt.toUpperCase();
+    var c = ssNextLabelInkOffset._c || (ssNextLabelInkOffset._c = document.createElement("canvas").getContext("2d"));
+    c.font = cs.fontStyle + " " + cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+    var m = c.measureText(txt);
+    if (!isFinite(m.fontBoundingBoxAscent)) return 0;
+    /* actualBoundingBoxAscent is rounded/loose, so rasterize the label and find the first inked row. */
+    var fA0 = Math.ceil(m.fontBoundingBoxAscent), fD0 = Math.ceil(m.fontBoundingBoxDescent || 0);
+    var cw = Math.max(1, Math.ceil(m.width) + 4), ch = fA0 + fD0 + 20;
+    var cv = c.canvas;
+    if (cv.width !== cw || cv.height !== ch) { cv.width = cw; cv.height = ch; }
+    c.font = cs.fontStyle + " " + cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+    c.clearRect(0, 0, cw, ch);
+    c.fillStyle = "#fff";
+    c.textBaseline = "alphabetic";
+    var baseY = fA0 + 10;
+    c.fillText(txt, 2, baseY);
+    var data = c.getImageData(0, 0, cw, ch).data, inkRow = -1;
+    for (var y = 0; y < ch && inkRow < 0; y++) {
+      for (var x = 0; x < cw; x++) { if (data[(y * cw + x) * 4 + 3] >= 128) { inkRow = y; break; } }
+    }
+    if (inkRow < 0) return 0;
+    var inkAscent = baseY - inkRow;
+    var lr = lbl.getBoundingClientRect();
+    var pr = panel.getBoundingClientRect();
+    var bt = parseFloat(cs.borderTopWidth) || 0, pt = parseFloat(cs.paddingTop) || 0;
+    var lineH = lbl.clientHeight - pt - (parseFloat(cs.paddingBottom) || 0);
+    /* single line: baseline = line top + half-leading + font ascent */
+    var fA = m.fontBoundingBoxAscent, fD = m.fontBoundingBoxDescent || 0;
+    var baseline = (lr.top - pr.top) + bt + pt + (lineH - (fA + fD)) / 2 + fA;
+    var off = baseline - inkAscent;
+    return (isFinite(off) && off > -40 && off < 40) ? off : 0;
+  } catch (eInk) { return 0; }
+}
+/* Re-align once web fonts finish loading (glyph metrics change). */
+if (document.fonts && !window._ssNextFontHook) {
+  window._ssNextFontHook = true;
+  try {
+    document.fonts.ready.then(function(){ if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel(); });
+    document.fonts.addEventListener("loadingdone", function(){ if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel(); });
+  } catch (eFh) {}
+}
 /** Single Song: place NEXT SECTION panel — 5px right of last chip; top matches tab-crop gap below chips. */
 function ssPlaceNextPanel() {
   if (typeof singleSongMode !== "undefined" && !singleSongMode) return;
@@ -6364,7 +6412,13 @@ function ssPlaceNextPanel() {
     var tabPadT = tab ? (parseFloat(getComputedStyle(tab).paddingTop) || 8) : 8;
     top = Math.round(chipsBottom - layoutRect.top + wrapPadB + layoutGap + tabPadT);
   }
-  if (isFinite(top) && top >= 0) panel.style.top = top + "px";
+  if (isFinite(top) && top >= 0) {
+    /* Desktop: line up the top of the visible NEXT SECTION letters (cap height, not the line
+       box) with the top of the tab crop. Font line metrics differ per OS (Windows vs Linux),
+       so measure the glyphs at runtime instead of hard-coding an offset. */
+    if (!isMobileLayout()) top -= ssNextLabelInkOffset(panel);
+    panel.style.top = Math.round(top) + "px";
+  }
 
   if (tab && tab.classList.contains("ss-tab-below-cue")) {
     var panelBottom = panel.getBoundingClientRect().bottom;
@@ -17298,6 +17352,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=401"></script>
+<script src="riffjams-admin.js?v=402"></script>
 </body>
 </html>
