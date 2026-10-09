@@ -3920,8 +3920,8 @@
   /* Stay under the chip strip (before megachip). Wide crops scale down to fit. */
   body.sections-mode.sections-single-song .ss-section-tab {
     flex: 0 0 auto;
-    width: min(calc(var(--ss-cols) * var(--ss-chip-w)), 100%);
-    max-width: calc(var(--ss-cols) * var(--ss-chip-w));
+    width: min(var(--ss-col-w, calc(var(--ss-cols) * var(--ss-chip-w))), 100%);
+    max-width: var(--ss-col-w, calc(var(--ss-cols) * var(--ss-chip-w)));
     align-self: flex-start;
   }
   .ss-section-tab img.ss-tab-img {
@@ -3963,7 +3963,7 @@
   .ss-notes {
     flex: 0 0 auto;
     width: auto;
-    max-width: min(calc(var(--ss-cols) * var(--ss-chip-w)), 100%);
+    max-width: min(var(--ss-col-w, calc(var(--ss-cols) * var(--ss-chip-w))), 100%);
     align-self: flex-start;
     box-sizing: border-box;
     padding: 6px 4px 10px;
@@ -6291,6 +6291,15 @@ function ssFitArrangementChips() {
   var stripW = cols * chipW - chipGap + wrapPadX;
   wrap.style.width = stripW + "px";
   wrap.style.maxWidth = stripW + "px";
+  /* Desktop: the left column (tab + notes) and the NEXT panel are anchored to the full width
+     left of the megachip, not to the end of the chip row, so songs with few chips (e.g.
+     Wasp/Behind the Wall of Sleep) lay out exactly like songs that fill the strip (The Wizard). */
+  if (!isMobileLayout()) {
+    var colW = Math.max(cols * chipW, Math.floor(availWrap - wrapPadX + chipGap));
+    layout.style.setProperty("--ss-col-w", colW + "px");
+  } else {
+    layout.style.removeProperty("--ss-col-w");
+  }
   if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel();
   /* Mobile only: the chip strip ends a little past stripW (the desktop player gutter used to hide
      that), so NEXT could run off-screen once the player is gone. Shrink chips once until it fits. */
@@ -6319,6 +6328,15 @@ function ssPlaceNextPanel() {
   var edgeEl = lastChip || wrap;
   var edgeRect = edgeEl.getBoundingClientRect();
   var left = Math.round(edgeRect.right - layoutRect.left + gap);
+  if (!isMobileLayout()) {
+    /* Desktop: fixed right-side anchor (same spot whatever the chip count) — panel's right
+       edge sits on the layout's content edge; never left of the chip row. */
+    var lcs = getComputedStyle(layout);
+    var megaWp = parseFloat(lcs.getPropertyValue("--ss-mega-w")) || 360;
+    /* = where a strip that fills the column ends (last chip sits 4px inside the wrap's right padding) + gap */
+    var fixedLeft = Math.round(layout.clientWidth - (parseFloat(lcs.paddingRight) || 0) - megaWp - 4);
+    left = Math.max(left, fixedLeft);
+  }
   if (isFinite(left) && left > 0) panel.style.left = left + "px";
 
   var secs = wrap.querySelector(".song-secs");
@@ -6393,9 +6411,16 @@ function ssPlaceSectionTab() {
   var cols = parseFloat(getComputedStyle(layout).getPropertyValue("--ss-cols")) || 1;
   if (!(cols > 0)) cols = 1;
   var inlineLimit = cols * chipW;
+  if (!isMobileLayout()) {
+    var colWv = parseFloat(getComputedStyle(layout).getPropertyValue("--ss-col-w"));
+    if (colWv > inlineLimit) inlineLimit = colWv;
+  }
   /* Fit-to-strip height; only park under countdown when that would be unreadably short. */
   var fitH = inlineLimit * (img.naturalHeight / img.naturalWidth);
-  var isUltraWide = fitH < 90;
+  /* Desktop: the column is fixed and the crop scales to fit it, so it can never overlap the NEXT
+     panel — always keep it left under the chips (parking it under the countdown only made it
+     smaller). Mobile keeps the old ultra-wide rule. */
+  var isUltraWide = isMobileLayout() && fitH < 90;
   if (isUltraWide) el.classList.add("ss-tab-below-cue");
   else el.classList.remove("ss-tab-below-cue");
   if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel();
@@ -17262,6 +17287,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=397"></script>
+<script src="riffjams-admin.js?v=398"></script>
 </body>
 </html>
