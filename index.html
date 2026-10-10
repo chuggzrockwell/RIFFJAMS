@@ -6956,15 +6956,17 @@ function wireNibV2Lick(songsOwner) {
       ["sections", "chips", "ssChips"].forEach(function(field){
         (s[field] || []).forEach(function(pair){
           if (isChipPair(pair) && pair[0] === "C1" && (!pair[2] || pair[2] === "C1")) pair[2] = "SL-C1";
+          if (isChipPair(pair) && pair[0] === "B3" && (!pair[2] || pair[2] === "B3")) pair[2] = "SL-B3";
         });
       });
       if (Array.isArray(s.sections) && s.sections.some(function(p){ return isChipPair(p) && p[0] === "V1"; })) {
-        var hasC1 = s.sections.some(function(p){ return isChipPair(p) && p[0] === "C1"; });
-        if (!hasC1) {
+        [["C1", 3, "SL-C1", []], ["B3", 3, "SL-B3", []]].forEach(function(want){
+          var has = s.sections.some(function(p){ return isChipPair(p) && p[0] === want[0]; });
+          if (has) return;
           var slot = -1;
           for (var k = 0; k < s.sections.length; k++) { if (!isChipPair(s.sections[k])) { slot = k; break; } }
-          if (slot < 0) s.sections.push(["C1", 3, "SL-C1", []]); else s.sections[slot] = ["C1", 3, "SL-C1", []];
-        }
+          if (slot < 0) s.sections.push(want.slice()); else s.sections[slot] = want.slice();
+        });
       }
     });
     (a.songs || []).forEach(function(s){
@@ -17435,6 +17437,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=422"></script>
+<script src="riffjams-admin.js?v=423"></script>
 </body>
 </html>
