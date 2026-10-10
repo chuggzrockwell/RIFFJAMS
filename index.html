@@ -4774,6 +4774,7 @@
       <div class="sec-filter-group" id="secExcludeFilters"></div>
       <div class="sec-filter-group" id="secTierFilters"></div>
       <div class="sec-filter-group" id="secPosFilters"></div>
+      <div class="sec-filter-group" id="secLearnedFilters"></div>
       <button type="button" class="sec-filter-clear" id="secFilterClear">Clear</button>
     </div>
     <div class="sheet stage" id="sectionsSheet"></div>
@@ -6144,6 +6145,10 @@ function ssEscText(s) {
 }
 function buildSingleSongPickerHtml(focusName) {
   var entries = listSingleSongEntries(singleSongPickerAlbums());
+  /* Learned filter on: list only learned songs (keep the current song so the label stays right). */
+  if (secLearnedFilter) {
+    entries = entries.filter(function(e){ return e.song === focusName || songIsLearned(e.song); });
+  }
   if (!entries.length) {
     return '<div class="ss-song-picker" id="ssSongPicker"><button type="button" class="ss-song-btn" id="ssSongBtn" disabled>'
       + '<span class="ss-song-art empty" aria-hidden="true"></span>'
@@ -9668,7 +9673,7 @@ function showSections(keepScroll) {
       }
       var nameTitle = (sectionsMode === "edit") ? ' title="Edit key, tuning, and BPM"' : "";
       var metaStrip = (sectionsMode === "view" && showMetaCols) ? songMetaStripHtml(s.song) : "";
-      var rowHtml = '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'"'+(mapSortRank ? ' data-album="'+sortAlbumAttr+'"' : '')+'><div class="row-num '+np+'">'+rowLabel+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-chip-col">'+sectionRulerLaneHtml(s, maxCols)+'<div class="song-secs">'+chips+'</div></div></div>';
+      var rowHtml = '<div class="song-row '+np+'" data-ai="'+ai+'" data-si="'+si+'" data-song="'+String(s.song).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;")+'"'+(mapSortRank ? ' data-album="'+sortAlbumAttr+'"' : '')+'><div class="row-num '+np+'">'+rowLabel+'</div>'+thumb+songsterrBtn+'<div class="song-name-wrap '+np+'-wrap"'+nameTitle+'><div class="song-name '+np+'">'+s.song+'</div></div>'+metaStrip+'<div class="song-chip-col">'+sectionRulerLaneHtml(s, maxCols)+'<div class="song-secs">'+chips+'</div></div></div>';
       if (mapSortRows) { mapSortRows.push({ rank: rowLabel, html: rowHtml }); return ""; }
       return rowHtml;
     }).join("");
@@ -9780,6 +9785,13 @@ var secPosDFilter = false;
 var secPosSFilter = false;
 var secExcludeTypes = {};
 var secAlbumFilter = {};
+/* Learned filter: only songs with at least one Arrangement chip (Arrangement = source of truth,
+   same as RSI/filters; applies to Arrangement, Riff and Solo rows + the Single Song picker). */
+var secLearnedFilter = false;
+function songIsLearned(songName) {
+  var s = (typeof smFindArrangementSongByName === "function") ? smFindArrangementSongByName(songName) : null;
+  return !!(s && (s.chips || []).some(function(pair){ return isChipPair(pair); }));
+}
 var playQueue = [];
 var PLAY_QUEUE_KEY = "lick-play-queue";
 var playChannel = null;
@@ -10392,6 +10404,12 @@ function buildSecFilters() {
     posHost.innerHTML = buildFilterDd("posDd", "Any position", posItems, posKeys);
   }
 
+  var learnedHost = document.getElementById("secLearnedFilters");
+  if (learnedHost) {
+    var learnedItems = '<label class="filter-dd-item"><input type="checkbox" data-filter-learned="1"'+(secLearnedFilter?" checked":"")+'><span>Learned</span></label>';
+    learnedHost.innerHTML = buildFilterDd("learnedDd", "All songs", learnedItems, secLearnedFilter ? ["Learned"] : []);
+  }
+
   if (openId) {
     var reopen = document.getElementById(openId);
     if (reopen) reopen.classList.add("open");
@@ -10403,7 +10421,7 @@ function secFiltersActive() {
   var p = Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; }) || secPosOFilter || secPosPFilter || secPosDFilter || secPosSFilter;
   var x = Object.keys(secExcludeTypes).some(function(k){ return secExcludeTypes[k]; });
   var a = Object.keys(secAlbumFilter).some(function(k){ return secAlbumFilter[k]; });
-  return t || r || p || x || a;
+  return t || r || p || x || a || !!secLearnedFilter;
 }
 function chipMatchesPosFilter(pos) {
   pos = normalizeSlot(pos, 1);
@@ -10460,6 +10478,11 @@ function applySecFilters() {
     block.querySelectorAll(".song-row").forEach(function(row){
       if (sortedBlock && active && albumOn && !secAlbumFilter[row.getAttribute("data-album") || ""]) {
         row.classList.add("filtered-out");
+        return;
+      }
+      if (active && secLearnedFilter && !songIsLearned(row.getAttribute("data-song") || "")) {
+        row.classList.add("filtered-out");
+        row.querySelectorAll(".sec-chip:not(.empty)").forEach(function(chip){ chip.classList.add("filtered-out"); });
         return;
       }
       var rowHasVisible = false;
@@ -10574,6 +10597,7 @@ function clearSecFilters() {
   secPosSFilter = false;
   secExcludeTypes = {};
   secAlbumFilter = {};
+  secLearnedFilter = false;
   document.querySelectorAll(".filter-dd.open").forEach(function(el){ el.classList.remove("open"); });
   document.querySelectorAll("#sectionsSheet .filtered-out").forEach(function(el){
     el.classList.remove("filtered-out");
@@ -15847,7 +15871,10 @@ document.getElementById("secFilters").onclick = function(e){
     var pp = inp.getAttribute("data-filter-pos-p");
     var pd = inp.getAttribute("data-filter-pos-d");
     var ps = inp.getAttribute("data-filter-pos-s");
-    if (album != null) {
+    var lrn = inp.getAttribute("data-filter-learned");
+    if (lrn) {
+      secLearnedFilter = !!inp.checked;
+    } else if (album != null) {
       if (inp.checked) secAlbumFilter[album] = true;
       else delete secAlbumFilter[album];
     } else if (t) {
@@ -17352,6 +17379,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=402"></script>
+<script src="riffjams-admin.js?v=403"></script>
 </body>
 </html>
