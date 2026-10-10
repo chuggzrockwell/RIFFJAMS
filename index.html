@@ -6957,10 +6957,11 @@ function wireNibV2Lick(songsOwner) {
         (s[field] || []).forEach(function(pair){
           if (isChipPair(pair) && pair[0] === "C1" && (!pair[2] || pair[2] === "C1")) pair[2] = "SL-C1";
           if (isChipPair(pair) && pair[0] === "B3" && (!pair[2] || pair[2] === "B3")) pair[2] = "SL-B3";
+          if (isChipPair(pair) && pair[0] === "B4" && (!pair[2] || pair[2] === "B4")) pair[2] = "SL-B4";
         });
       });
       if (Array.isArray(s.sections) && s.sections.some(function(p){ return isChipPair(p) && p[0] === "V1"; })) {
-        [["C1", 3, "SL-C1", []], ["B3", 3, "SL-B3", []]].forEach(function(want){
+        [["C1", 3, "SL-C1", []], ["B3", 3, "SL-B3", []], ["B4", 3, "SL-B4", []]].forEach(function(want){
           var has = s.sections.some(function(p){ return isChipPair(p) && p[0] === want[0]; });
           if (has) return;
           var slot = -1;
@@ -17437,6 +17438,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=424"></script>
+<script src="riffjams-admin.js?v=425"></script>
 </body>
 </html>
