@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-10T14:42:09.503Z",
+  "updatedAt": "2026-10-10T14:52:03.078Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -844,8 +844,7 @@
             [
               "V1",
               2,
-              "",
-              []
+              "EMB-V1"
             ],
             null,
             null,
@@ -871,31 +870,31 @@
             [
               "I1",
               1,
-              "COTG-I1",
+              "",
               3
             ],
             [
               "I2",
               3,
-              "COTG-I2",
+              "",
               []
             ],
             [
               "B1",
-              1,
-              "COTG-B1",
-              "1O"
+              2,
+              "",
+              []
             ],
             [
               "B2",
               3,
-              "COTG-B2",
+              "",
               []
             ],
             [
               "S1",
               1,
-              "COTG-S1",
+              "",
               []
             ],
             [
@@ -904,18 +903,8 @@
               "",
               []
             ],
-            [
-              "V1",
-              1,
-              "COTG-V1",
-              3
-            ],
-            [
-              "O1",
-              3,
-              "COTG-O1",
-              []
-            ],
+            null,
+            null,
             null,
             null,
             null,
@@ -5000,8 +4989,9 @@
               [
                 "V1",
                 2,
-                "",
-                []
+                "EMB-V1",
+                [],
+                5.3
               ],
               null,
               null,
@@ -5039,31 +5029,31 @@
               [
                 "I1",
                 1,
-                "COTG-I1",
+                "",
                 3
               ],
               [
                 "I2",
                 3,
-                "COTG-I2",
+                "",
                 []
               ],
               [
                 "B1",
-                1,
-                "COTG-B1",
-                "1O"
+                2,
+                "",
+                []
               ],
               [
                 "B2",
                 3,
-                "COTG-B2",
+                "",
                 []
               ],
               [
                 "S1",
                 1,
-                "COTG-S1",
+                "",
                 []
               ],
               [
@@ -8713,6 +8703,23 @@
           "stop": 365.5,
           "duration": 23.5,
           "lick": "FOB-O1"
+        }
+      ]
+    },
+    {
+      "album": "Master of Reality",
+      "song": "Embryo",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 5.3,
+          "stop": null,
+          "duration": null,
+          "lick": "EMB-V1"
         }
       ]
     },
