@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-10T14:52:03.078Z",
+  "updatedAt": "2026-10-10T14:57:47.038Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -796,26 +796,26 @@
           "sections": [
             [
               "I1",
-              2,
-              "AF-I1",
+              1,
+              "",
               []
             ],
             [
               "V1",
-              1,
-              "AF-V1",
+              2,
+              "",
               "4S"
             ],
             [
               "B1",
               3,
-              "AF-B1",
+              "",
               []
             ],
             [
               "B2",
-              3,
-              "AF-B2",
+              2,
+              "",
               []
             ],
             [
@@ -824,12 +824,7 @@
               "",
               []
             ],
-            [
-              "B3",
-              2,
-              "AF-B3",
-              []
-            ],
+            null,
             null,
             null,
             null,
@@ -849,7 +844,8 @@
             [
               "V1",
               2,
-              "EMB-V1"
+              "EMB-V1",
+              []
             ],
             null,
             null,
@@ -875,31 +871,31 @@
             [
               "I1",
               1,
-              "COTG-I1",
+              "",
               3
             ],
             [
               "I2",
               3,
-              "COTG-I2",
+              "",
               []
             ],
             [
               "B1",
-              1,
-              "COTG-B1",
-              "1O"
+              2,
+              "",
+              []
             ],
             [
               "B2",
               3,
-              "COTG-B2",
+              "",
               []
             ],
             [
               "S1",
               1,
-              "COTG-S1",
+              "",
               []
             ],
             [
@@ -4944,26 +4940,26 @@
             "chips": [
               [
                 "I1",
-                2,
-                "AF-I1",
+                1,
+                "",
                 []
               ],
               [
                 "V1",
-                1,
-                "AF-V1",
+                2,
+                "",
                 "4S"
               ],
               [
                 "B1",
                 3,
-                "AF-B1",
+                "",
                 []
               ],
               [
                 "B2",
-                3,
-                "AF-B2",
+                2,
+                "",
                 []
               ],
               [
@@ -5006,7 +5002,8 @@
                 2,
                 "EMB-V1",
                 [],
-                5.3
+                5.3,
+                27
               ],
               null,
               null,
@@ -5044,31 +5041,31 @@
               [
                 "I1",
                 1,
-                "COTG-I1",
+                "",
                 3
               ],
               [
                 "I2",
                 3,
-                "COTG-I2",
+                "",
                 []
               ],
               [
                 "B1",
-                1,
-                "COTG-B1",
-                "1O"
+                2,
+                "",
+                []
               ],
               [
                 "B2",
                 3,
-                "COTG-B2",
+                "",
                 []
               ],
               [
                 "S1",
                 1,
-                "COTG-S1",
+                "",
                 []
               ],
               [
@@ -5077,8 +5074,17 @@
                 "",
                 []
               ],
-              null,
-              null,
+              [
+                "V1",
+                1,
+                "COTG-V1",
+                3
+              ],
+              [
+                "O1",
+                3,
+                "COTG-O1"
+              ],
               null,
               null,
               null,
@@ -8724,16 +8730,16 @@
     {
       "album": "Master of Reality",
       "song": "Embryo",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": null,
+      "endSec": 27,
+      "complete": true,
+      "riffSaturationIndex": 2,
       "chips": [
         {
           "code": "V1",
           "tier": 2,
           "start": 5.3,
-          "stop": null,
-          "duration": null,
+          "stop": 27,
+          "duration": 21.7,
           "lick": "EMB-V1"
         }
       ]
