@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-10T20:28:35.140Z",
+  "updatedAt": "2026-10-10T20:29:35.567Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3957,8 +3957,21 @@
                 1,
                 155.3
               ],
-              null,
-              null,
+              [
+                "V1",
+                3,
+                "EW-V1",
+                1,
+                162.3
+              ],
+              [
+                "C1",
+                3,
+                "EW-C1",
+                1,
+                169.3,
+                198
+              ],
               null,
               null,
               null,
@@ -3972,6 +3985,23 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "INTRO",
+                "start": 0,
+                "end": 0
+              },
+              {
+                "name": "VERSE 1",
+                "start": 1,
+                "end": 4
+              },
+              {
+                "name": "Section",
+                "start": 5,
+                "end": 9
+              }
             ]
           },
           {
@@ -10571,9 +10601,9 @@
     {
       "album": "Black Sabbath",
       "song": "Evil Woman",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.052,
+      "endSec": 198,
+      "complete": true,
+      "riffSaturationIndex": 1.041,
       "chips": [
         {
           "code": "I1",
@@ -10683,9 +10713,25 @@
           "code": "V2",
           "tier": 3,
           "start": 155.3,
-          "stop": null,
-          "duration": null,
+          "stop": 162.3,
+          "duration": 7,
           "lick": "EW-V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 162.3,
+          "stop": 169.3,
+          "duration": 7,
+          "lick": "EW-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 169.3,
+          "stop": 198,
+          "duration": 28.7,
+          "lick": "EW-C1"
         }
       ]
     }
