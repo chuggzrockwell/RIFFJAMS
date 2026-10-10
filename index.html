@@ -9787,7 +9787,13 @@ var secExcludeTypes = {};
 var secAlbumFilter = {};
 /* Learned filter: only songs with at least one Arrangement chip (Arrangement = source of truth,
    same as RSI/filters; applies to Arrangement, Riff and Solo rows + the Single Song picker). */
+var SEC_LEARNED_KEY = "rj-filter-learned";
 var secLearnedFilter = false;
+try { secLearnedFilter = localStorage.getItem(SEC_LEARNED_KEY) === "1"; } catch (eLk) {}
+function setSecLearnedFilter(on) {
+  secLearnedFilter = !!on;
+  try { localStorage.setItem(SEC_LEARNED_KEY, secLearnedFilter ? "1" : "0"); } catch (eLs) {}
+}
 function songIsLearned(songName) {
   var s = (typeof smFindArrangementSongByName === "function") ? smFindArrangementSongByName(songName) : null;
   return !!(s && (s.chips || []).some(function(pair){ return isChipPair(pair); }));
@@ -10597,7 +10603,7 @@ function clearSecFilters() {
   secPosSFilter = false;
   secExcludeTypes = {};
   secAlbumFilter = {};
-  secLearnedFilter = false;
+  setSecLearnedFilter(false);
   document.querySelectorAll(".filter-dd.open").forEach(function(el){ el.classList.remove("open"); });
   document.querySelectorAll("#sectionsSheet .filtered-out").forEach(function(el){
     el.classList.remove("filtered-out");
@@ -15873,7 +15879,7 @@ document.getElementById("secFilters").onclick = function(e){
     var ps = inp.getAttribute("data-filter-pos-s");
     var lrn = inp.getAttribute("data-filter-learned");
     if (lrn) {
-      secLearnedFilter = !!inp.checked;
+      setSecLearnedFilter(inp.checked);
     } else if (album != null) {
       if (inp.checked) secAlbumFilter[album] = true;
       else delete secAlbumFilter[album];
@@ -17379,6 +17385,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=403"></script>
+<script src="riffjams-admin.js?v=404"></script>
 </body>
 </html>
