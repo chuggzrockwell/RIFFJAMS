@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-10T20:26:34.180Z",
+  "updatedAt": "2026-10-10T20:27:34.528Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -265,10 +265,13 @@
             [
               "S1",
               3,
-              "EW-S1",
-              []
+              "EW-S1"
             ],
-            null,
+            [
+              "C2",
+              3,
+              "C2"
+            ],
             null,
             null,
             null,
@@ -3905,15 +3908,39 @@
                 1,
                 71.6
               ],
-              null,
-              null,
+              [
+                "V1",
+                3,
+                "EW-V1",
+                1,
+                78.5
+              ],
+              [
+                "C1",
+                3,
+                "EW-C1",
+                1,
+                85.5
+              ],
+              [
+                "C2",
+                3,
+                "C2"
+              ],
               [
                 "S1",
                 3,
-                "EW-S1"
+                "EW-S1",
+                1,
+                99.4
               ],
-              null,
-              null,
+              [
+                "V1",
+                3,
+                "EW-V1",
+                1,
+                78.5
+              ],
               null,
               null,
               null,
@@ -10532,7 +10559,7 @@
       "song": "Evil Woman",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.113,
+      "riffSaturationIndex": 1.081,
       "chips": [
         {
           "code": "I1",
@@ -10586,9 +10613,41 @@
           "code": "V2",
           "tier": 3,
           "start": 71.6,
+          "stop": 78.5,
+          "duration": 6.9,
+          "lick": "EW-V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 78.5,
+          "stop": 78.5,
+          "duration": null,
+          "lick": "EW-V1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 78.5,
+          "stop": 85.5,
+          "duration": 7,
+          "lick": "EW-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 85.5,
+          "stop": 99.4,
+          "duration": 13.9,
+          "lick": "EW-C1"
+        },
+        {
+          "code": "S1",
+          "tier": 3,
+          "start": 99.4,
           "stop": null,
           "duration": null,
-          "lick": "EW-V2"
+          "lick": "EW-S1"
         }
       ]
     }
