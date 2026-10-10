@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-10T20:25:18.296Z",
+  "updatedAt": "2026-10-10T20:26:34.180Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -3896,22 +3896,22 @@
                 3,
                 "EW-V1",
                 1,
-                47
+                57.5
               ],
               [
-                "C1",
+                "V2",
                 3,
-                "EW-C1",
+                "EW-V2",
                 1,
-                43.5
+                71.6
               ],
+              null,
               null,
               [
                 "S1",
                 3,
                 "EW-S1"
               ],
-              null,
               null,
               null,
               null,
@@ -10532,7 +10532,7 @@
       "song": "Evil Woman",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.172,
+      "riffSaturationIndex": 1.113,
       "chips": [
         {
           "code": "I1",
@@ -10570,25 +10570,25 @@
           "code": "C1",
           "tier": 3,
           "start": 43.5,
-          "stop": 43.5,
-          "duration": null,
-          "lick": "EW-C1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 43.5,
-          "stop": 47,
-          "duration": 3.5,
+          "stop": 57.5,
+          "duration": 14,
           "lick": "EW-C1"
         },
         {
           "code": "V1",
           "tier": 3,
-          "start": 47,
+          "start": 57.5,
+          "stop": 71.6,
+          "duration": 14.1,
+          "lick": "EW-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 71.6,
           "stop": null,
           "duration": null,
-          "lick": "EW-V1"
+          "lick": "EW-V2"
         }
       ]
     }
