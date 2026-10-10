@@ -11,6 +11,12 @@
   var pendingImage = null;
   var pendingPreviewUrl = "";
   var sharedData = { version: 1, updatedAt: null, assets: {} };
+  /* Sync protocol: 2 = rebase onto the repo copy and push only this tab's own edits.
+     Written to the manifest as minClientVersion; a tab older than that refuses to commit. */
+  var CLIENT_VERSION = 2;
+  var PENDING_KEY = "riffjams-pending-sync-v1";
+  var tabBase = null;      /* per-tab snapshot (JSON per song) of what this tab last loaded/committed */
+  var loadingShared = true;
 
   window.RIFFJAMS_ASSETS = window.RIFFJAMS_ASSETS || {};
 
@@ -243,45 +249,6 @@
     return found;
   }
 
-  async function commitAttachment(imageBlob, imagePath, manifest, message, deletePaths) {
-    var prefix = "/repos/" + REPO_OWNER + "/" + REPO_NAME;
-    var ref = await github(prefix + "/git/ref/heads/" + REPO_BRANCH);
-    var parentSha = ref.object.sha;
-    var parent = await github(prefix + "/git/commits/" + parentSha);
-    var imageBase64 = arrayBufferToBase64(await imageBlob.arrayBuffer());
-    var imageGitBlob = await github(prefix + "/git/blobs", {
-      method: "POST",
-      body: JSON.stringify({ content: imageBase64, encoding: "base64" })
-    });
-    var dataGitBlob = await github(prefix + "/git/blobs", {
-      method: "POST",
-      body: JSON.stringify({ content: textToBase64(JSON.stringify(manifest, null, 2) + "\n"), encoding: "base64" })
-    });
-    var treeEntries = [
-      { path: imagePath, mode: "100644", type: "blob", sha: imageGitBlob.sha },
-      { path: DATA_PATH, mode: "100644", type: "blob", sha: dataGitBlob.sha }
-    ];
-    (deletePaths || []).forEach(function (path) {
-      if (path && path !== imagePath) treeEntries.push({ path: path, mode: "100644", type: "blob", sha: null });
-    });
-    var tree = await github(prefix + "/git/trees", {
-      method: "POST",
-      body: JSON.stringify({
-        base_tree: parent.tree.sha,
-        tree: treeEntries
-      })
-    });
-    var commit = await github(prefix + "/git/commits", {
-      method: "POST",
-      body: JSON.stringify({ message: message, tree: tree.sha, parents: [parentSha] })
-    });
-    await github(prefix + "/git/refs/heads/" + REPO_BRANCH, {
-      method: "PATCH",
-      body: JSON.stringify({ sha: commit.sha, force: false })
-    });
-    return commit;
-  }
-
   async function attachAndSave() {
     var button = qs("chipAttachSave");
     try {
@@ -290,36 +257,33 @@
       var draft = readDraft();
       var next = buildNextState(draft);
       var imagePath = IMAGE_DIR + "/" + draft.lick + ".png";
-      var nextAssets = Object.assign({}, sharedData.assets || {}, window.RIFFJAMS_ASSETS || {});
+      var deleteAssets = [];
       var deletePaths = [];
       if (next.previousLick && next.previousLick !== draft.lick && !tabIsStillLinked(next.albums, next.soloMap, next.previousLick)) {
-        var previousPath = nextAssets[next.previousLick] || "";
+        var previousPath = (sharedData.assets || {})[next.previousLick] || (window.RIFFJAMS_ASSETS || {})[next.previousLick] || "";
         if (previousPath.indexOf(IMAGE_DIR + "/") === 0) deletePaths.push(previousPath);
-        delete nextAssets[next.previousLick];
+        deleteAssets.push(next.previousLick);
       }
-      nextAssets[draft.lick] = imagePath;
-      var arrPack = (typeof window.exportArrangementForRepo === "function")
-        ? window.exportArrangementForRepo()
-        : { arrangementMap: sharedData.arrangementMap || null, arrangementTimings: sharedData.arrangementTimings || [] };
-      var manifest = {
-        version: 1,
-        updatedAt: new Date().toISOString(),
-        assets: nextAssets,
-        albums: next.albums,
-        soloMap: next.soloMap,
-        arrangementMap: arrPack.arrangementMap || null,
-        arrangementTimings: arrPack.arrangementTimings || []
-      };
+      var addAssets = {};
+      addAssets[draft.lick] = imagePath;
       button.disabled = true;
       button.textContent = "Attaching…";
       setMessage("Saving screenshot and chip to GitHub…");
-      await commitAttachment(pendingImage, imagePath, manifest, "Attach " + draft.lick + " tab", deletePaths);
-      sharedData = manifest;
-      window.RIFFJAMS_ASSETS = nextAssets;
       window.ALBUMS = next.albums;
       window.SOLO_MAP = next.soloMap;
       window.saveAlbums();
       window.saveSoloMap();
+      var imageBase64 = arrayBufferToBase64(await pendingImage.arrayBuffer());
+      var result = await commitWithRebase({
+        message: "Attach " + draft.lick + " tab",
+        imagePath: imagePath,
+        imageBase64: imageBase64,
+        deletePaths: deletePaths,
+        addAssets: addAssets,
+        deleteAssets: deleteAssets,
+        force: true
+      });
+      window.RIFFJAMS_ASSETS = Object.assign({}, result.manifest.assets || {});
       clearPendingImage();
       window.setSaveStatus("Attached. Publishing…");
       window.closeChipEditor();
@@ -333,55 +297,318 @@
   }
 
 
-  async function commitManifestOnly(manifest, message) {
+  /* ---------- Rebase-safe sync ----------
+     Each tab remembers (tabBase) exactly what it loaded from the repo or last committed, per song.
+     A commit re-reads riffjams-data.json from the branch head and replaces ONLY the songs this tab
+     changed since then; every other song stays as the repo has it. So a tab holding old data can
+     never overwrite newer crop links/tiers it did not edit itself. */
+  function albumKey(a) { return String((a && a.name) || ""); }
+  function songKeyOf(a, s) { return albumKey(a) + "|" + String((s && s.song) || ""); }
+  function mapSongs(albums, cb) {
+    (albums || []).forEach(function (a) {
+      (a && a.songs || []).forEach(function (s) { if (s && s.song) cb(a, s); });
+    });
+  }
+  function currentMaps() {
+    return {
+      albums: window.ALBUMS || [],
+      solo: (window.SOLO_MAP && window.SOLO_MAP.albums) || [],
+      arr: (window.ARRANGEMENT_MAP && window.ARRANGEMENT_MAP.albums) || []
+    };
+  }
+  function snapshotOf(albums) {
+    var out = {};
+    mapSongs(albums, function (a, s) { out[songKeyOf(a, s)] = JSON.stringify(s); });
+    return out;
+  }
+  function takeTabBase() {
+    var m = currentMaps();
+    tabBase = { albums: snapshotOf(m.albums), solo: snapshotOf(m.solo), arr: snapshotOf(m.arr) };
+  }
+  function readPending() {
+    try {
+      var p = JSON.parse(localStorage.getItem(PENDING_KEY) || "null");
+      if (p && typeof p === "object") return { albums: p.albums || {}, solo: p.solo || {}, arr: p.arr || {} };
+    } catch (e) {}
+    return { albums: {}, solo: {}, arr: {} };
+  }
+  function writePending(p) {
+    try {
+      if (!Object.keys(p.albums).length && !Object.keys(p.solo).length && !Object.keys(p.arr).length) localStorage.removeItem(PENDING_KEY);
+      else localStorage.setItem(PENDING_KEY, JSON.stringify(p));
+    } catch (e) {}
+  }
+  /** Songs this tab changed since tabBase (any edit path: editor, drag, undo, rulers, times, links). */
+  function changedSongs() {
+    var out = { albums: {}, solo: {}, arr: {} };
+    if (!tabBase) return out;
+    var m = currentMaps();
+    ["albums", "solo", "arr"].forEach(function (k) {
+      mapSongs(m[k], function (a, s) {
+        var key = songKeyOf(a, s);
+        if (tabBase[k][key] !== JSON.stringify(s)) out[k][key] = true;
+      });
+    });
+    return out;
+  }
+  /** Pending = this tab's changes + unsynced changes carried over from an earlier session. */
+  function pendingSongs() {
+    var ch = changedSongs();
+    var carried = readPending();
+    ["albums", "solo", "arr"].forEach(function (k) {
+      Object.keys(carried[k]).forEach(function (key) { ch[k][key] = true; });
+    });
+    return ch;
+  }
+  function recordPending() {
+    if (loadingShared || !tabBase) return;
+    var ch = changedSongs();
+    var p = readPending();
+    ["albums", "solo", "arr"].forEach(function (k) {
+      Object.keys(ch[k]).forEach(function (key) {
+        /* keep the repo version the edit was made against, for a 3-way merge after reload */
+        if (p[k][key]) return;
+        var b = tabBase[k][key];
+        p[k][key] = (typeof b === "string" && b !== "__pending__") ? b : true;
+      });
+    });
+    writePending(p);
+  }
+  function hasAny(p) {
+    return !!(Object.keys(p.albums).length || Object.keys(p.solo).length || Object.keys(p.arr).length);
+  }
+  function findSong(albums, key) {
+    var hit = null;
+    mapSongs(albums, function (a, s) { if (!hit && songKeyOf(a, s) === key) hit = s; });
+    return hit;
+  }
+  var CHIP_FIELDS = { sections: 1, chips: 1, licks: 1, ssChips: 1 };
+  function same(a, b) {
+    return JSON.stringify(a == null ? null : a) === JSON.stringify(b == null ? null : b);
+  }
+  /** 3-way merge of one song: take this tab's value only where it differs from what the tab
+   *  started from (per chip slot for chip lists, per field otherwise); keep the repo elsewhere. */
+  function mergeSong(baseSong, localSong, repoSong) {
+    if (!repoSong) return clone(localSong);
+    if (!baseSong) return clone(localSong);
+    var out = clone(repoSong);
+    var keys = {};
+    [baseSong, localSong, repoSong].forEach(function (o) { Object.keys(o || {}).forEach(function (k) { keys[k] = 1; }); });
+    Object.keys(keys).forEach(function (k) {
+      var b = baseSong[k], l = localSong[k];
+      if (CHIP_FIELDS[k] && (Array.isArray(l) || Array.isArray(b))) {
+        var bl = Array.isArray(b) ? b : [], ll = Array.isArray(l) ? l : [];
+        var rl = Array.isArray(out[k]) ? out[k] : (out[k] = []);
+        var n = Math.max(bl.length, ll.length);
+        for (var i = 0; i < n; i++) {
+          if (same(bl[i], ll[i])) continue;
+          while (rl.length <= i) rl.push(null);
+          rl[i] = ll[i] == null ? null : clone(ll[i]);
+        }
+        return;
+      }
+      if (same(b, l)) return;
+      if (l === undefined) delete out[k];
+      else out[k] = clone(l);
+    });
+    return out;
+  }
+  /** Overlay this tab's edits for the pending songs onto the repo copy (3-way vs tabBase). */
+  function overlayMerged(targetAlbums, localAlbums, keys, baseSnap) {
+    Object.keys(keys).forEach(function (key) {
+      var local = findSong(localAlbums, key);
+      if (!local) return;
+      var baseRaw = baseSnap && baseSnap[key];
+      var base = (typeof baseRaw === "string" && baseRaw !== "__pending__") ? JSON.parse(baseRaw) : null;
+      var done = false;
+      (targetAlbums || []).forEach(function (a) {
+        (a && a.songs || []).forEach(function (s, i) {
+          if (!done && s && s.song && songKeyOf(a, s) === key) { a.songs[i] = mergeSong(base, local, s); done = true; }
+        });
+      });
+      if (done) return;
+      var albumName = key.split("|")[0];
+      var album = (targetAlbums || []).filter(function (a) { return albumKey(a) === albumName; })[0];
+      if (album) (album.songs || (album.songs = [])).push(clone(local));
+    });
+  }
+  function timingKey(t) { return String((t && t.album) || "") + "|" + String((t && t.song) || ""); }
+
+  async function readRepoHead() {
     var prefix = "/repos/" + REPO_OWNER + "/" + REPO_NAME;
     var ref = await github(prefix + "/git/ref/heads/" + REPO_BRANCH);
     var parentSha = ref.object.sha;
     var parent = await github(prefix + "/git/commits/" + parentSha);
-    var dataGitBlob = await github(prefix + "/git/blobs", {
-      method: "POST",
-      body: JSON.stringify({ content: textToBase64(JSON.stringify(manifest, null, 2) + "\n"), encoding: "base64" })
+    var tree = await github(prefix + "/git/trees/" + parent.tree.sha);
+    var entry = (tree.tree || []).filter(function (t) { return t.path === DATA_PATH; })[0];
+    var data = null;
+    if (entry) {
+      var blob = await github(prefix + "/git/blobs/" + entry.sha);
+      var bin = atob(String(blob.content || "").replace(/\s+/g, ""));
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      data = JSON.parse(new TextDecoder().decode(bytes));
+    }
+    return { parentSha: parentSha, parent: parent, data: data };
+  }
+
+  /** Re-read the repo head, overlay only this tab's pending songs, commit (retrying if the branch moved). */
+  async function commitWithRebase(opts) {
+    opts = opts || {};
+    var prefix = "/repos/" + REPO_OWNER + "/" + REPO_NAME;
+    var lastError = null;
+    for (var attempt = 0; attempt < 3; attempt++) {
+      var head = await readRepoHead();
+      var repo = head.data || { version: 1, assets: {}, albums: [], soloMap: { albums: [] }, arrangementMap: { albums: [] }, arrangementTimings: [] };
+      if (Number(repo.minClientVersion || 0) > CLIENT_VERSION) {
+        throw new Error("This RIFFJAMS tab is out of date. Reload the page before saving.");
+      }
+      var pend = pendingSongs();
+      if (!opts.force && !hasAny(pend)) {
+        refreshUntouchedFromRepo(repo);
+        return { ok: true, skipped: true, manifest: repo };
+      }
+      var m = currentMaps();
+      var manifest = clone(repo);
+      manifest.version = 1;
+      manifest.albums = manifest.albums || [];
+      manifest.soloMap = manifest.soloMap || { albums: [] };
+      manifest.soloMap.albums = manifest.soloMap.albums || [];
+      manifest.arrangementMap = manifest.arrangementMap || { albums: [] };
+      manifest.arrangementMap.albums = manifest.arrangementMap.albums || [];
+      overlayMerged(manifest.albums, m.albums, pend.albums, tabBase && tabBase.albums);
+      overlayMerged(manifest.soloMap.albums, m.solo, pend.solo, tabBase && tabBase.solo);
+      if (typeof window.purgeRetiredSoloLicksFromAlbums === "function") {
+        window.purgeRetiredSoloLicksFromAlbums(manifest.soloMap.albums);
+      }
+      overlayMerged(manifest.arrangementMap.albums, m.arr, pend.arr, tabBase && tabBase.arr);
+      if (Object.keys(pend.arr).length && typeof window.exportArrangementForRepo === "function") {
+        var exported = (typeof window.buildArrangementTimings === "function")
+          ? (window.buildArrangementTimings({ albums: manifest.arrangementMap.albums }) || [])
+          : (window.exportArrangementForRepo().arrangementTimings || []);
+        var timings = (manifest.arrangementTimings || []).filter(function (t) { return !pend.arr[timingKey(t)]; });
+        exported.forEach(function (t) { if (pend.arr[timingKey(t)]) timings.push(clone(t)); });
+        manifest.arrangementTimings = timings;
+      }
+      manifest.assets = Object.assign({}, repo.assets || {}, opts.addAssets || {});
+      (opts.deleteAssets || []).forEach(function (k) { delete manifest.assets[k]; });
+      manifest.updatedAt = new Date().toISOString();
+      manifest.minClientVersion = Math.max(Number(repo.minClientVersion || 0), CLIENT_VERSION);
+      var committedSnap = {
+        albums: snapshotOf(m.albums), solo: snapshotOf(m.solo), arr: snapshotOf(m.arr)
+      };
+      try {
+        var treeEntries = [];
+        if (opts.imagePath && opts.imageBase64) {
+          var imageGitBlob = await github(prefix + "/git/blobs", {
+            method: "POST",
+            body: JSON.stringify({ content: opts.imageBase64, encoding: "base64" })
+          });
+          treeEntries.push({ path: opts.imagePath, mode: "100644", type: "blob", sha: imageGitBlob.sha });
+        }
+        var dataGitBlob = await github(prefix + "/git/blobs", {
+          method: "POST",
+          body: JSON.stringify({ content: textToBase64(JSON.stringify(manifest, null, 2) + "\n"), encoding: "base64" })
+        });
+        treeEntries.push({ path: DATA_PATH, mode: "100644", type: "blob", sha: dataGitBlob.sha });
+        (opts.deletePaths || []).forEach(function (path) {
+          if (path && path !== opts.imagePath) treeEntries.push({ path: path, mode: "100644", type: "blob", sha: null });
+        });
+        var tree = await github(prefix + "/git/trees", {
+          method: "POST",
+          body: JSON.stringify({ base_tree: head.parent.tree.sha, tree: treeEntries })
+        });
+        var commit = await github(prefix + "/git/commits", {
+          method: "POST",
+          body: JSON.stringify({ message: opts.message || "Sync", tree: tree.sha, parents: [head.parentSha] })
+        });
+        await github(prefix + "/git/refs/heads/" + REPO_BRANCH, {
+          method: "PATCH",
+          body: JSON.stringify({ sha: commit.sha, force: false })
+        });
+      } catch (err) {
+        lastError = err;
+        if (/fast forward|fast-forward|Update is not a fast forward|Reference cannot be updated/i.test(err.message || "")) continue;
+        throw err;
+      }
+      /* Committed: the pending songs as committed become this tab's base; clear carried flags
+         for songs that have not changed again while the commit was in flight. */
+      var now = currentMaps();
+      var nowSnap = { albums: snapshotOf(now.albums), solo: snapshotOf(now.solo), arr: snapshotOf(now.arr) };
+      var carried = readPending();
+      ["albums", "solo", "arr"].forEach(function (k) {
+        Object.keys(pend[k]).forEach(function (key) {
+          if (tabBase) tabBase[k][key] = committedSnap[k][key];
+          if (nowSnap[k][key] === committedSnap[k][key]) delete carried[k][key];
+        });
+      });
+      writePending(carried);
+      sharedData = manifest;
+      refreshUntouchedFromRepo(manifest);
+      return { ok: true, manifest: manifest };
+    }
+    throw lastError || new Error("Could not save: the repo kept changing. Try again.");
+  }
+
+  /** Songs this tab has not touched take the repo's version (keeps open tabs current). */
+  function refreshUntouchedFromRepo(repo) {
+    if (!repo || !tabBase) return;
+    var changed = false;
+    loadingShared = true;
+    try {
+      var pend = pendingSongs();
+      var fresh = buildFreshMaps(repo);
+      var m = currentMaps();
+      [["albums", fresh.albums, m.albums], ["solo", fresh.solo, m.solo], ["arr", fresh.arr, m.arr]].forEach(function (row) {
+        var k = row[0], src = row[1], dst = row[2];
+        if (!src) return;
+        var srcSnap = snapshotOf(src);
+        mapSongs(dst, function (a, s) {
+          var key = songKeyOf(a, s);
+          if (pend[k][key] || !srcSnap[key] || srcSnap[key] === JSON.stringify(s)) return;
+          var idx = a.songs.indexOf(s);
+          a.songs[idx] = JSON.parse(srcSnap[key]);
+          tabBase[k][key] = srcSnap[key];
+          changed = true;
+        });
+      });
+      if (changed) {
+        if (typeof window.saveAlbums === "function") window.saveAlbums();
+        if (typeof window.saveSoloMap === "function") window.saveSoloMap();
+        if (typeof window.saveArrangementMap === "function") window.saveArrangementMap();
+      }
+    } catch (e) {
+      console.warn("RIFFJAMS refresh from repo failed", e);
+    } finally {
+      loadingShared = false;
+    }
+    if (changed && document.body.classList.contains("sections-mode") && typeof window.showSections === "function") {
+      window.showSections(true);
+    }
+  }
+
+  /** The repo manifest shaped the way this page shows it (same normalization as a fresh browser). */
+  function buildFreshMaps(data) {
+    var out = { albums: null, solo: null, arr: null };
+    if (Array.isArray(data.albums) && data.albums.length) {
+      out.albums = clone(data.albums);
+      if (typeof window.ensureAllSongSlots === "function") window.ensureAllSongSlots(out.albums);
+    }
+    if (data.soloMap && Array.isArray(data.soloMap.albums)) out.solo = clone(data.soloMap.albums);
+    if (data.arrangementMap && data.arrangementMap.albums && typeof window.normalizeArrangementMap === "function") {
+      out.arr = window.normalizeArrangementMap(clone(data.arrangementMap), window.ALBUMS_DEFAULT || window.ALBUMS).albums;
+    }
+    [out.albums, out.arr].forEach(function (list) {
+      if (!list) return;
+      if (typeof window.wireWizardO1Lick === "function") window.wireWizardO1Lick(list);
+      if (typeof window.wireNibV2Lick === "function") window.wireNibV2Lick(list);
     });
-    var tree = await github(prefix + "/git/trees", {
-      method: "POST",
-      body: JSON.stringify({
-        base_tree: parent.tree.sha,
-        tree: [{ path: DATA_PATH, mode: "100644", type: "blob", sha: dataGitBlob.sha }]
-      })
-    });
-    var commit = await github(prefix + "/git/commits", {
-      method: "POST",
-      body: JSON.stringify({ message: message, tree: tree.sha, parents: [parentSha] })
-    });
-    await github(prefix + "/git/refs/heads/" + REPO_BRANCH, {
-      method: "PATCH",
-      body: JSON.stringify({ sha: commit.sha, force: false })
-    });
-    return commit;
+    return out;
   }
 
   var arrangementSyncTimer = null;
   var arrangementSyncInFlight = false;
   var arrangementSyncQueued = null;
-
-  function buildManifestWithArrangement() {
-    var arrPack = (typeof window.exportArrangementForRepo === "function")
-      ? window.exportArrangementForRepo()
-      : { arrangementMap: null, arrangementTimings: [] };
-    var soloOut = clone(window.SOLO_MAP || sharedData.soloMap || { albums: [] });
-    if (typeof window.purgeRetiredSoloLicksFromAlbums === "function" && soloOut && soloOut.albums) {
-      window.purgeRetiredSoloLicksFromAlbums(soloOut.albums);
-    }
-    return {
-      version: 1,
-      updatedAt: new Date().toISOString(),
-      assets: Object.assign({}, sharedData.assets || {}, window.RIFFJAMS_ASSETS || {}),
-      albums: clone(window.ALBUMS || sharedData.albums || []),
-      soloMap: soloOut,
-      arrangementMap: arrPack.arrangementMap || null,
-      arrangementTimings: arrPack.arrangementTimings || []
-    };
-  }
 
   async function syncArrangementToRepoNow(opts) {
     opts = opts || {};
@@ -399,7 +626,6 @@
     }
     arrangementSyncInFlight = true;
     try {
-      var manifest = buildManifestWithArrangement();
       var songLabel = opts.song ? String(opts.song) : "arrangement";
       var isRulers = opts.reason === "section-rulers";
       var isChip = opts.reason === "chip-save" || opts.reason === "chip-delete";
@@ -413,8 +639,13 @@
           ? "Syncing section rulers to GitHub…"
           : (isChip ? "Syncing chip positions to GitHub…" : "Syncing start/stop times to GitHub…"));
       }
-      await commitManifestOnly(manifest, msg);
-      sharedData = manifest;
+      if (opts.reason === "pending") msg = "Sync unsaved edits (" + songLabel + ")";
+      var result = await commitWithRebase({ message: msg });
+      var manifest = result.manifest || {};
+      if (result.skipped) {
+        if (!opts.quiet && typeof window.setSaveStatus === "function") window.setSaveStatus("Already up to date");
+        return { ok: true, skipped: true, timings: manifest.arrangementTimings };
+      }
       if (!opts.quiet && typeof window.setSaveStatus === "function") {
         if (isRulers) window.setSaveStatus("Section rulers synced to repo");
         else if (isChip) window.setSaveStatus("Chip positions synced to repo");
@@ -523,51 +754,11 @@
     });
   }
 
-  /** Prefer local chip rows that already store an explicit position (pair[3]), so a refresh
-   *  of riffjams-data.json does not wipe chip-editor saves that have not been pushed yet. */
-  function mergeChipsPreferLocalPos(remoteAlbums, localAlbums, field) {
-    if (!Array.isArray(remoteAlbums) || !remoteAlbums.length) return localAlbums || remoteAlbums;
-    if (!Array.isArray(localAlbums) || !localAlbums.length) return remoteAlbums;
-    var localBySong = {};
-    localAlbums.forEach(function (a) {
-      (a.songs || []).forEach(function (s) {
-        if (s && s.song) localBySong[s.song] = s;
-      });
-    });
-    remoteAlbums.forEach(function (a) {
-      (a.songs || []).forEach(function (s) {
-        if (!s || !s.song) return;
-        var loc = localBySong[s.song];
-        if (!loc) return;
-        var localField = loc[field] || [];
-        var remoteField = s[field] || (s[field] = []);
-        var byCode = {};
-        localField.forEach(function (p) {
-          if (p && p[0]) byCode[String(p[0])] = p;
-        });
-        remoteField.forEach(function (p, i) {
-          if (!p || !p[0]) return;
-          var lp = byCode[String(p[0])];
-          if (!lp) return;
-          if (lp.length > 3) remoteField[i] = clone(lp);
-        });
-        /* Also keep local-only chips that only exist locally with an explicit pos */
-        localField.forEach(function (lp, i) {
-          if (!lp || !lp[0] || lp.length <= 3) return;
-          if (typeof window.isRetiredSoloLick === "function" && window.isRetiredSoloLick(lp)) return;
-          var code = String(lp[0]);
-          var found = remoteField.some(function (p) { return p && String(p[0]) === code; });
-          if (!found) {
-            if (i < remoteField.length && !remoteField[i]) remoteField[i] = clone(lp);
-            else remoteField.push(clone(lp));
-          }
-        });
-      });
-    });
-    return remoteAlbums;
-  }
-
+  /** Repo is the source of truth. Local copies only win for songs this browser edited and has
+   *  not synced yet (riffjams-pending-sync-v1); everything else comes from riffjams-data.json. */
   async function loadSharedData() {
+    loadingShared = true;
+    var pend = readPending();
     try {
       var response = await fetch(DATA_PATH + "?v=" + Date.now(), { cache: "no-store" });
       if (!response.ok) return;
@@ -575,74 +766,84 @@
       if (!data || data.version !== 1) return;
       sharedData = data;
       window.RIFFJAMS_ASSETS = Object.assign({}, data.assets || {});
-      if (Array.isArray(data.albums) && data.albums.length) {
+      var fresh = buildFreshMaps(data);
+      if (fresh.albums) {
         var localAlbums = window.ALBUMS;
-        var nextAlbums = clone(data.albums);
-        if (typeof window.mergeSongMetaInto === "function") {
-          window.mergeSongMetaInto(nextAlbums, localAlbums);
-        }
-        mergeChipsPreferLocalPos(nextAlbums, localAlbums, "sections");
-        window.ALBUMS = nextAlbums;
+        if (typeof window.mergeSongMetaInto === "function") window.mergeSongMetaInto(fresh.albums, localAlbums);
+        overlayMerged(fresh.albums, localAlbums, pend.albums, pend.albums);
+        window.ALBUMS = fresh.albums;
         window.ensureAllSongSlots(window.ALBUMS);
         window.saveAlbums();
       }
-      if (data.soloMap && Array.isArray(data.soloMap.albums)) {
-        var localSolo = window.SOLO_MAP;
+      if (fresh.solo) {
         var nextSolo = clone(data.soloMap);
-        if (nextSolo && nextSolo.albums) {
-          mergeChipsPreferLocalPos(nextSolo.albums, (localSolo && localSolo.albums) || [], "licks");
-        }
+        nextSolo.albums = fresh.solo;
+        overlayMerged(nextSolo.albums, (window.SOLO_MAP && window.SOLO_MAP.albums) || [], pend.solo, pend.solo);
         window.SOLO_MAP = nextSolo;
         window.saveSoloMap();
       }
-      if (data.arrangementMap && data.arrangementMap.albums) {
+      if (fresh.arr) {
         sharedData.arrangementMap = data.arrangementMap;
         sharedData.arrangementTimings = data.arrangementTimings || [];
-        try {
-          var localRaw = localStorage.getItem("lick-arrangement-map-v1");
-          var localEmpty = !localRaw || localRaw === "null";
-          if (typeof window.normalizeArrangementMap === "function") {
-            var remoteArr = window.normalizeArrangementMap(clone(data.arrangementMap), window.ALBUMS_DEFAULT || window.ALBUMS);
-            if (localEmpty) {
-              /* Fresh browser: take full shared arrangement (chips + sectionRulers). */
-              window.ARRANGEMENT_MAP = remoteArr;
-              if (typeof window.saveArrangementMap === "function") window.saveArrangementMap();
-            } else if (window.ARRANGEMENT_MAP && typeof window.mergeArrangementSectionRulers === "function") {
-              /* Stale local map: keep chips, fill missing sectionRulers from repo. */
-              if (window.mergeArrangementSectionRulers(window.ARRANGEMENT_MAP, remoteArr)) {
-                if (typeof window.saveArrangementMap === "function") window.saveArrangementMap();
-              }
-            }
-          }
-        } catch (eArrHydrate) {}
+        var nextArr = { albums: fresh.arr };
+        overlayMerged(nextArr.albums, (window.ARRANGEMENT_MAP && window.ARRANGEMENT_MAP.albums) || [], pend.arr, pend.arr);
+        window.ARRANGEMENT_MAP = nextArr;
+        if (typeof window.saveArrangementMap === "function") window.saveArrangementMap();
       }
-      if (typeof window.wireWizardO1Lick === "function") {
-        window.wireWizardO1Lick(window.ALBUMS);
-        window.wireWizardO1Lick(window.ARRANGEMENT_MAP);
-      }
-      if (typeof window.wireNibV2Lick === "function") {
-        window.wireNibV2Lick(window.ALBUMS);
-        window.wireNibV2Lick(window.ARRANGEMENT_MAP);
-      }
+      /* Base = the repo as loaded; carried-over pending songs show up as changes vs that base. */
+      var m = currentMaps();
+      tabBase = { albums: snapshotOf(fresh.albums || m.albums), solo: snapshotOf(fresh.solo || m.solo), arr: snapshotOf(fresh.arr || m.arr) };
+      ["albums", "solo", "arr"].forEach(function (k) {
+        Object.keys(pend[k]).forEach(function (key) {
+          var src = k === "albums" ? fresh.albums : (k === "solo" ? fresh.solo : fresh.arr);
+          var s = src && findSong(src, key);
+          if (s) tabBase[k][key] = (typeof pend[k][key] === "string") ? pend[k][key] : "__pending__";
+        });
+      });
       if (document.body.classList.contains("sections-mode")) window.showSections(true);
       if (document.body.classList.contains("sheet-mode") && window.currentLetter) window.showSeries(window.currentLetter);
     } catch (e) {
       console.warn("RIFFJAMS shared data could not be loaded", e);
+    } finally {
+      loadingShared = false;
+      if (!tabBase) takeTabBase();
     }
+    /* Push edits left unsynced by an earlier session (only those songs). */
+    if (TOKEN && hasAny(readPending())) {
+      scheduleArrangementSync({ quiet: true, reason: "pending", song: "unsaved edits" });
+    }
+  }
+
+  /* Remember which songs this tab edits (any save path), so they survive a reload until synced. */
+  ["saveAlbums", "saveSoloMap", "saveArrangementMap"].forEach(function (name) {
+    var orig = window[name];
+    if (typeof orig !== "function") return;
+    window[name] = function () {
+      var r = orig.apply(this, arguments);
+      try { recordPending(); } catch (e) {}
+      return r;
+    };
+  });
+  /* Another tab's localStorage write is that tab's edit (it syncs it itself): adopt it into this
+     tab's base so this tab never re-pushes it. */
+  if (typeof window.pullAlbumsFromStorage === "function") {
+    var origPull = window.pullAlbumsFromStorage;
+    window.pullAlbumsFromStorage = function () {
+      var before = tabBase ? changedSongs().albums : {};
+      var r = origPull.apply(this, arguments);
+      if (r && tabBase) {
+        mapSongs(window.ALBUMS, function (a, s) {
+          var key = songKeyOf(a, s);
+          if (!before[key]) tabBase.albums[key] = JSON.stringify(s);
+        });
+      }
+      return r;
+    };
   }
 
   injectEditor();
   loadStoredToken();
   loadSharedData();
-  /* After local arrangement loads, push start/implied-stop times to the repo when GitHub is connected */
-  setTimeout(function () {
-    if (TOKEN && typeof window.exportArrangementForRepo === "function") {
-      var pack = window.exportArrangementForRepo();
-      if (pack && pack.arrangementTimings && pack.arrangementTimings.length) {
-        scheduleArrangementSync({ quiet: true, reason: "startup", song: "startup" });
-      }
-    }
-  }, 2500);
 
   var originalOpen = window.openChipEditor;
   window.openChipEditor = function (anchor, state) {
