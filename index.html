@@ -6936,6 +6936,22 @@ function wireNibV2Lick(songsOwner) {
       }
     });
     (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "After Forever") return;
+      ["sections", "chips", "ssChips"].forEach(function(field){
+        (s[field] || []).forEach(function(pair){
+          if (isChipPair(pair) && pair[0] === "B3" && (!pair[2] || pair[2] === "B3")) pair[2] = "AF-B3";
+        });
+      });
+      if (Array.isArray(s.sections) && s.sections.some(function(p){ return isChipPair(p) && p[0] === "I1"; })) {
+        var hasB3 = s.sections.some(function(p){ return isChipPair(p) && p[0] === "B3"; });
+        if (!hasB3) {
+          var slot = -1;
+          for (var k = 0; k < s.sections.length; k++) { if (!isChipPair(s.sections[k])) { slot = k; break; } }
+          if (slot < 0) s.sections.push(["B3", 2, "AF-B3", []]); else s.sections[slot] = ["B3", 2, "AF-B3", []];
+        }
+      }
+    });
+    (a.songs || []).forEach(function(s){
       if (!s || s.song !== "Paranoid") return;
       ["sections", "chips"].forEach(function(field){
         (s[field] || []).forEach(function(pair){
@@ -17403,6 +17419,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=416"></script>
+<script src="riffjams-admin.js?v=417"></script>
 </body>
 </html>
