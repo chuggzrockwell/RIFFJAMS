@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-10T15:41:28.645Z",
+  "updatedAt": "2026-10-10T20:24:00.249Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -245,8 +245,7 @@
             [
               "I1",
               2,
-              "EW-I1",
-              []
+              "EW-I1"
             ],
             [
               "V1",
@@ -3860,11 +3859,33 @@
           {
             "song": "Evil Woman",
             "chips": [
-              null,
-              null,
-              null,
-              null,
-              null,
+              [
+                "I1",
+                2,
+                "EW-I1",
+                1,
+                0
+              ],
+              [
+                "V1",
+                3,
+                "EW-V1"
+              ],
+              [
+                "V2",
+                3,
+                "EW-V2"
+              ],
+              [
+                "C1",
+                3,
+                "EW-C1"
+              ],
+              [
+                "S1",
+                3,
+                "EW-S1"
+              ],
               null,
               null,
               null,
@@ -10482,6 +10503,23 @@
           "stop": 327,
           "duration": 26.2,
           "lick": "O1"
+        }
+      ]
+    },
+    {
+      "album": "Black Sabbath",
+      "song": "Evil Woman",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "EW-I1"
         }
       ]
     }
