@@ -6952,6 +6952,22 @@ function wireNibV2Lick(songsOwner) {
       }
     });
     (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "Sweet Leaf") return;
+      ["sections", "chips", "ssChips"].forEach(function(field){
+        (s[field] || []).forEach(function(pair){
+          if (isChipPair(pair) && pair[0] === "C1" && (!pair[2] || pair[2] === "C1")) pair[2] = "SL-C1";
+        });
+      });
+      if (Array.isArray(s.sections) && s.sections.some(function(p){ return isChipPair(p) && p[0] === "V1"; })) {
+        var hasC1 = s.sections.some(function(p){ return isChipPair(p) && p[0] === "C1"; });
+        if (!hasC1) {
+          var slot = -1;
+          for (var k = 0; k < s.sections.length; k++) { if (!isChipPair(s.sections[k])) { slot = k; break; } }
+          if (slot < 0) s.sections.push(["C1", 3, "SL-C1", []]); else s.sections[slot] = ["C1", 3, "SL-C1", []];
+        }
+      }
+    });
+    (a.songs || []).forEach(function(s){
       if (!s || s.song !== "Paranoid") return;
       ["sections", "chips"].forEach(function(field){
         (s[field] || []).forEach(function(pair){
@@ -17419,6 +17435,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=419"></script>
+<script src="riffjams-admin.js?v=420"></script>
 </body>
 </html>
