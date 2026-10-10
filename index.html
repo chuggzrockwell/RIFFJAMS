@@ -6918,6 +6918,22 @@ function wireNibV2Lick(songsOwner) {
       });
     });
     (a.songs || []).forEach(function(s){
+      if (!s || s.song !== "Children of the Grave") return;
+      ["sections", "chips", "ssChips"].forEach(function(field){
+        (s[field] || []).forEach(function(pair){
+          if (isChipPair(pair) && pair[0] === "V1" && (!pair[2] || pair[2] === "V1")) pair[2] = "COTG-V1";
+        });
+      });
+      if (Array.isArray(s.sections) && s.sections.some(function(p){ return isChipPair(p) && p[0] === "I1"; })) {
+        var hasV1 = s.sections.some(function(p){ return isChipPair(p) && p[0] === "V1"; });
+        if (!hasV1) {
+          var slot = -1;
+          for (var k = 0; k < s.sections.length; k++) { if (!isChipPair(s.sections[k])) { slot = k; break; } }
+          if (slot < 0) s.sections.push(["V1", 1, "COTG-V1", 3]); else s.sections[slot] = ["V1", 1, "COTG-V1", 3];
+        }
+      }
+    });
+    (a.songs || []).forEach(function(s){
       if (!s || s.song !== "Paranoid") return;
       ["sections", "chips"].forEach(function(field){
         (s[field] || []).forEach(function(pair){
@@ -17385,6 +17401,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=406"></script>
+<script src="riffjams-admin.js?v=407"></script>
 </body>
 </html>
