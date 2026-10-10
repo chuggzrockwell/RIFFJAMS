@@ -242,7 +242,12 @@
         {
           "song": "Evil Woman",
           "sections": [
-            null,
+            [
+              "I1",
+              2,
+              "EW-I1",
+              []
+            ],
             null,
             null,
             null,
