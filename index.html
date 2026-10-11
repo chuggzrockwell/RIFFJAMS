@@ -10522,8 +10522,8 @@ function chipMatchesFilter(chip) {
 function applySecFilters() {
   var sheet = document.getElementById("sectionsSheet");
   if (!sheet) return;
-  // Riff/Solo Edit: show every chip while editing. Arrangement: filters apply in View/Edit/Play.
-  var active = secFiltersActive() && (sectionsMode !== "edit" || !!arrangementMode);
+  // Filters apply in View/Edit/Play, same as Arrangement already did.
+  var active = secFiltersActive();
   var shown = 0;
   sheet.querySelectorAll(".album-block").forEach(function(block){
     var albumName = block.getAttribute("data-album") || "";
