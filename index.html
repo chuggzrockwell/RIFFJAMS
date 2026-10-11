@@ -13136,6 +13136,7 @@ function placeHighlightTip(anchor) {
   tip.style.maxHeight = "";
   tip.classList.add("open");
   tip.setAttribute("aria-hidden", "false");
+  if (!isMobileLayout()) { placeHighlightTipBelowGrid(tip, wrap, anchor, pad); return; }
   /* Dock in empty space to the right of the chip grid */
   var left = Math.round(wr.right + pad);
   var availW = Math.max(160, window.innerWidth - left - pad);
@@ -13159,6 +13160,62 @@ function placeHighlightTip(anchor) {
   if (top + th > window.innerHeight - pad) top = Math.max(pad, window.innerHeight - th - pad);
   tip.style.left = left + "px";
   tip.style.top = top + "px";
+}
+/* Desktop Peek: dock the tab crop directly under the Song Map chip grid, left-aligned with the
+   section columns. If the grid runs past the viewport bottom (long/scrolled map) there is no
+   room below it, so pin to the viewport bottom instead (the tip is position:fixed) — and flip to
+   the top if that would cover the hovered chip. */
+function placeHighlightTipBelowGrid(tip, wrap, anchor, pad) {
+  var sheet = document.getElementById("sectionsSheet");
+  var sr = sheet ? sheet.getBoundingClientRect() : wrap.getBoundingClientRect();
+  var rows = [].filter.call(wrap.querySelectorAll(".song-row"), function(r){
+    return r.offsetParent && !r.classList.contains("filtered-out") && !r.closest(".filtered-out");
+  });
+  var gridBottom = 0, colLeft = null;
+  rows.forEach(function(r){
+    var rr = r.getBoundingClientRect();
+    if (rr.height > 0 && rr.bottom > gridBottom) gridBottom = rr.bottom;
+    if (colLeft == null) {
+      var col = r.querySelector(".song-chip-col");
+      if (col) colLeft = col.getBoundingClientRect().left;
+    }
+  });
+  if (!rows.length) gridBottom = wrap.getBoundingClientRect().bottom;
+  var glow = 18; /* tip padding = glow room; line the crop (not the padding) up with the column */
+  var left = Math.round((colLeft != null ? colLeft : wrap.getBoundingClientRect().left) - glow);
+  left = Math.max(pad, Math.round(sr.left), Math.min(left, window.innerWidth - 200));
+  var availW = Math.max(200, window.innerWidth - left - pad);
+  tip.style.maxWidth = availW + "px";
+  tip.style.maxHeight = "";
+  var img = tip.querySelector("img.peek-tab");
+  if (img) { img.style.width = "auto"; img.style.height = "auto"; img.style.maxWidth = "none"; img.style.maxHeight = "none"; }
+  var vh = window.innerHeight;
+  var th = tip.offsetHeight || 120;
+  /* Tip box starts 4px under the last row, so the crop itself sits ~22px under the chips and
+     the transparent glow padding never overlaps (or steals hover from) the bottom row. */
+  var below = Math.round(gridBottom + 4);
+  var top, maxH;
+  if (below + Math.min(th, 160) <= vh - pad) {
+    top = Math.max(pad, below);
+    maxH = vh - top - pad; /* tall crops scroll inside the tip (existing behaviour) */
+  } else {
+    /* Pinned: bottom of the viewport, or the top when the hovered chip leaves more room above.
+       Never cover the hovered chip itself (the tip would steal the hover). */
+    var ar = anchor && anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : null;
+    /* tip box (incl. its transparent glow padding) must clear the hovered chip by 6px */
+    var spaceBelow = ar ? vh - pad - (ar.bottom + 6) : vh - 2 * pad;
+    var spaceAbove = ar ? (ar.top - 6) - pad : 0;
+    if (spaceBelow >= Math.min(th, 160) || spaceBelow >= spaceAbove) {
+      maxH = Math.min(th, Math.round(vh * 0.6), spaceBelow);
+      top = vh - maxH - pad;
+    } else {
+      maxH = Math.min(th, Math.round(vh * 0.6), spaceAbove);
+      top = pad;
+    }
+  }
+  tip.style.maxHeight = Math.max(80, Math.floor(maxH)) + "px";
+  tip.style.left = left + "px";
+  tip.style.top = Math.round(top) + "px";
 }
 function showHighlightTip(chip) {
   if (!highlightMode || !chip || chip.classList.contains("empty")) return;
@@ -17439,6 +17496,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=435"></script>
+<script src="riffjams-admin.js?v=436"></script>
 </body>
 </html>
