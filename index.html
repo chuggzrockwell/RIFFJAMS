@@ -13239,12 +13239,17 @@ function placeHighlightTip(anchor) {
   var img = tip.querySelector("img.peek-tab");
   if (img) {
     if (isHalfSizePeekCrop(anchor && anchor.getAttribute && anchor.getAttribute("data-lick")) && img.naturalWidth) {
+      /* object-fit is "none" by default (never scale peek tabs down), which keeps the
+         image at native size and clips it to the box — so scaling down also needs
+         "contain" or the shrunk box just crops to its top-left corner. */
       img.style.width = (img.naturalWidth / 2) + "px";
       img.style.height = (img.naturalHeight / 2) + "px";
+      img.style.objectFit = "contain";
     } else {
       /* Native size — never scale peek tabs down; tip scrolls if needed */
       img.style.width = "auto";
       img.style.height = "auto";
+      img.style.objectFit = "";
     }
     img.style.maxWidth = "none";
     img.style.maxHeight = "none";
@@ -13288,9 +13293,11 @@ function placeHighlightTipBelowGrid(tip, wrap, anchor, pad) {
     if (isHalfSizePeekCrop(anchor && anchor.getAttribute && anchor.getAttribute("data-lick")) && img.naturalWidth) {
       img.style.width = (img.naturalWidth / 2) + "px";
       img.style.height = (img.naturalHeight / 2) + "px";
+      img.style.objectFit = "contain";
     } else {
       img.style.width = "auto";
       img.style.height = "auto";
+      img.style.objectFit = "";
     }
     img.style.maxWidth = "none";
     img.style.maxHeight = "none";
