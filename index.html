@@ -13228,9 +13228,14 @@ function placeHighlightTip(anchor) {
   var glowPad = 36;
   var img = tip.querySelector("img.peek-tab");
   if (img) {
-    /* Native size — never scale peek tabs down; tip scrolls if needed */
-    img.style.width = "auto";
-    img.style.height = "auto";
+    if (isHalfSizePeekCrop(anchor && anchor.getAttribute && anchor.getAttribute("data-lick")) && img.naturalWidth) {
+      img.style.width = (img.naturalWidth / 2) + "px";
+      img.style.height = (img.naturalHeight / 2) + "px";
+    } else {
+      /* Native size — never scale peek tabs down; tip scrolls if needed */
+      img.style.width = "auto";
+      img.style.height = "auto";
+    }
     img.style.maxWidth = "none";
     img.style.maxHeight = "none";
   }
@@ -13269,7 +13274,17 @@ function placeHighlightTipBelowGrid(tip, wrap, anchor, pad) {
   tip.style.maxWidth = availW + "px";
   tip.style.maxHeight = "";
   var img = tip.querySelector("img.peek-tab");
-  if (img) { img.style.width = "auto"; img.style.height = "auto"; img.style.maxWidth = "none"; img.style.maxHeight = "none"; }
+  if (img) {
+    if (isHalfSizePeekCrop(anchor && anchor.getAttribute && anchor.getAttribute("data-lick")) && img.naturalWidth) {
+      img.style.width = (img.naturalWidth / 2) + "px";
+      img.style.height = (img.naturalHeight / 2) + "px";
+    } else {
+      img.style.width = "auto";
+      img.style.height = "auto";
+    }
+    img.style.maxWidth = "none";
+    img.style.maxHeight = "none";
+  }
   var vh = window.innerHeight;
   var th = tip.offsetHeight || 120;
   /* Tip box starts 4px under the last row, so the crop itself sits ~22px under the chips and
@@ -13319,6 +13334,10 @@ function showHighlightTip(chip) {
     };
   }
   placeHighlightTip(chip);
+}
+/* Wasp/Behind the Wall of Sleep's Peek tab crop displays at half size (requested Oct 2026). */
+function isHalfSizePeekCrop(lick) {
+  return typeof lick === "string" && lick.indexOf("BWS-") === 0;
 }
 function lickSrc(id) {
   if (!id) return "";
