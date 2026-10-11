@@ -2120,6 +2120,127 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Sabotage",
+      "cover": "covers/sabotage.jpg",
+      "font": "font-sabotage",
+      "songs": [
+        {
+          "song": "Hole in the Sky",
+          "sections": []
+        },
+        {
+          "song": "Don't Start (Too Late)",
+          "sections": []
+        },
+        {
+          "song": "Symptom of the Universe",
+          "sections": []
+        },
+        {
+          "song": "Megalomania",
+          "sections": []
+        },
+        {
+          "song": "The Thrill of It All",
+          "sections": []
+        },
+        {
+          "song": "Supertzar",
+          "sections": []
+        },
+        {
+          "song": "Am I Going Insane (Radio)",
+          "sections": []
+        },
+        {
+          "song": "The Writ",
+          "sections": []
+        }
+      ]
+    },
+    {
+      "name": "Technical Ecstasy",
+      "cover": "covers/te.jpg",
+      "font": "font-te",
+      "songs": [
+        {
+          "song": "Back Street Kids",
+          "sections": []
+        },
+        {
+          "song": "You Won't Change Me",
+          "sections": []
+        },
+        {
+          "song": "It's Alright",
+          "sections": []
+        },
+        {
+          "song": "Gypsy",
+          "sections": []
+        },
+        {
+          "song": "All Moving Parts (Stand Still)",
+          "sections": []
+        },
+        {
+          "song": "Rock 'n' Roll Doctor",
+          "sections": []
+        },
+        {
+          "song": "She's Gone",
+          "sections": []
+        },
+        {
+          "song": "Dirty Women",
+          "sections": []
+        }
+      ]
+    },
+    {
+      "name": "Never Say Die!",
+      "cover": "covers/nsd.jpg",
+      "font": "font-nsd",
+      "songs": [
+        {
+          "song": "Never Say Die",
+          "sections": []
+        },
+        {
+          "song": "Johnny Blade",
+          "sections": []
+        },
+        {
+          "song": "Junior's Eyes",
+          "sections": []
+        },
+        {
+          "song": "A Hard Road",
+          "sections": []
+        },
+        {
+          "song": "Shock Wave",
+          "sections": []
+        },
+        {
+          "song": "Air Dance",
+          "sections": []
+        },
+        {
+          "song": "Over to You",
+          "sections": []
+        },
+        {
+          "song": "Breakout",
+          "sections": []
+        },
+        {
+          "song": "Swinging the Chain",
+          "sections": []
+        }
+      ]
     }
   ],
   "soloMap": {
@@ -3341,6 +3462,127 @@
           },
           {
             "song": "Spiral Architect",
+            "licks": []
+          }
+        ]
+      },
+      {
+        "name": "Sabotage",
+        "cover": "covers/sabotage.jpg",
+        "font": "font-sabotage",
+        "songs": [
+          {
+            "song": "Hole in the Sky",
+            "licks": []
+          },
+          {
+            "song": "Don't Start (Too Late)",
+            "licks": []
+          },
+          {
+            "song": "Symptom of the Universe",
+            "licks": []
+          },
+          {
+            "song": "Megalomania",
+            "licks": []
+          },
+          {
+            "song": "The Thrill of It All",
+            "licks": []
+          },
+          {
+            "song": "Supertzar",
+            "licks": []
+          },
+          {
+            "song": "Am I Going Insane (Radio)",
+            "licks": []
+          },
+          {
+            "song": "The Writ",
+            "licks": []
+          }
+        ]
+      },
+      {
+        "name": "Technical Ecstasy",
+        "cover": "covers/te.jpg",
+        "font": "font-te",
+        "songs": [
+          {
+            "song": "Back Street Kids",
+            "licks": []
+          },
+          {
+            "song": "You Won't Change Me",
+            "licks": []
+          },
+          {
+            "song": "It's Alright",
+            "licks": []
+          },
+          {
+            "song": "Gypsy",
+            "licks": []
+          },
+          {
+            "song": "All Moving Parts (Stand Still)",
+            "licks": []
+          },
+          {
+            "song": "Rock 'n' Roll Doctor",
+            "licks": []
+          },
+          {
+            "song": "She's Gone",
+            "licks": []
+          },
+          {
+            "song": "Dirty Women",
+            "licks": []
+          }
+        ]
+      },
+      {
+        "name": "Never Say Die!",
+        "cover": "covers/nsd.jpg",
+        "font": "font-nsd",
+        "songs": [
+          {
+            "song": "Never Say Die",
+            "licks": []
+          },
+          {
+            "song": "Johnny Blade",
+            "licks": []
+          },
+          {
+            "song": "Junior's Eyes",
+            "licks": []
+          },
+          {
+            "song": "A Hard Road",
+            "licks": []
+          },
+          {
+            "song": "Shock Wave",
+            "licks": []
+          },
+          {
+            "song": "Air Dance",
+            "licks": []
+          },
+          {
+            "song": "Over to You",
+            "licks": []
+          },
+          {
+            "song": "Breakout",
+            "licks": []
+          },
+          {
+            "song": "Swinging the Chain",
             "licks": []
           }
         ]
@@ -7655,6 +7897,127 @@
                 "end": 17
               }
             ]
+          }
+        ]
+      },
+      {
+        "name": "Sabotage",
+        "cover": "covers/sabotage.jpg",
+        "font": "font-sabotage",
+        "songs": [
+          {
+            "song": "Hole in the Sky",
+            "chips": []
+          },
+          {
+            "song": "Don't Start (Too Late)",
+            "chips": []
+          },
+          {
+            "song": "Symptom of the Universe",
+            "chips": []
+          },
+          {
+            "song": "Megalomania",
+            "chips": []
+          },
+          {
+            "song": "The Thrill of It All",
+            "chips": []
+          },
+          {
+            "song": "Supertzar",
+            "chips": []
+          },
+          {
+            "song": "Am I Going Insane (Radio)",
+            "chips": []
+          },
+          {
+            "song": "The Writ",
+            "chips": []
+          }
+        ]
+      },
+      {
+        "name": "Technical Ecstasy",
+        "cover": "covers/te.jpg",
+        "font": "font-te",
+        "songs": [
+          {
+            "song": "Back Street Kids",
+            "chips": []
+          },
+          {
+            "song": "You Won't Change Me",
+            "chips": []
+          },
+          {
+            "song": "It's Alright",
+            "chips": []
+          },
+          {
+            "song": "Gypsy",
+            "chips": []
+          },
+          {
+            "song": "All Moving Parts (Stand Still)",
+            "chips": []
+          },
+          {
+            "song": "Rock 'n' Roll Doctor",
+            "chips": []
+          },
+          {
+            "song": "She's Gone",
+            "chips": []
+          },
+          {
+            "song": "Dirty Women",
+            "chips": []
+          }
+        ]
+      },
+      {
+        "name": "Never Say Die!",
+        "cover": "covers/nsd.jpg",
+        "font": "font-nsd",
+        "songs": [
+          {
+            "song": "Never Say Die",
+            "chips": []
+          },
+          {
+            "song": "Johnny Blade",
+            "chips": []
+          },
+          {
+            "song": "Junior's Eyes",
+            "chips": []
+          },
+          {
+            "song": "A Hard Road",
+            "chips": []
+          },
+          {
+            "song": "Shock Wave",
+            "chips": []
+          },
+          {
+            "song": "Air Dance",
+            "chips": []
+          },
+          {
+            "song": "Over to You",
+            "chips": []
+          },
+          {
+            "song": "Breakout",
+            "chips": []
+          },
+          {
+            "song": "Swinging the Chain",
+            "chips": []
           }
         ]
       }
