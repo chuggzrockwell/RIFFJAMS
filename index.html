@@ -8350,6 +8350,8 @@ function handleSectionRulersShortcut(e) {
   if (!document.body.classList.contains("sections-mode")) return false;
   if (!sectionRulersShortcutTargetOk(e.target)) return false;
   if (!isSectionRulersNumpad7(e)) return false;
+  /* / armed: Numpad / then 7 = album filter (bound after this one). */
+  if (typeof songAlbumSlashArmed !== "undefined" && songAlbumSlashArmed) return false;
   e.preventDefault();
   try { e.stopImmediatePropagation(); } catch (errStop) { try { e.stopPropagation(); } catch (err2) {} }
   /* Same path as Tools → Rulers. Single window-capture listener only (no doc duplicate). */
@@ -8477,6 +8479,8 @@ function handleSongMetaColsShortcut(e) {
   if (e.metaKey || e.ctrlKey || e.altKey) return false;
   if (!document.body.classList.contains("sections-mode")) return false;
   if (!songMetaColsShortcutTargetOk(e.target)) return false;
+  /* / armed: Numpad / then 8 = album filter (bound after this one). */
+  if (typeof songAlbumSlashArmed !== "undefined" && songAlbumSlashArmed && !isNumpadStar(e)) return false;
   /* * arms next key: *8 = aRSI, *6 = Saturation. Follow-up key fires instantly. */
   if (isNumpadStar(e)) {
     songMetaStarArmed = true;
@@ -10576,6 +10580,12 @@ function applySecFilters() {
         return;
       }
       var rowHasVisible = false;
+      /* Songs with no chips yet (new albums) stay visible when only the album filter is on. */
+      var chipFilterOn = Object.keys(secTypeFilter).some(function(k){ return secTypeFilter[k]; })
+        || Object.keys(secTierFilter).some(function(k){ return secTierFilter[k]; })
+        || Object.keys(secPosFilter).some(function(k){ return secPosFilter[k]; })
+        || secPosOFilter || secPosPFilter || secPosDFilter || secPosSFilter;
+      var keepNoChipRow = active && !chipFilterOn && !row.querySelector(".sec-chip:not(.empty)");
       row.querySelectorAll(".sec-chip").forEach(function(chip){
         if (chip.classList.contains("empty")) {
           chip.classList.remove("filtered-out");
@@ -10590,8 +10600,8 @@ function applySecFilters() {
         }
       });
       // Song Map: hide entire row when filters leave no applicable chips
-      row.classList.toggle("filtered-out", active && !rowHasVisible);
-      if (!active || rowHasVisible) anySongVisible = true;
+      row.classList.toggle("filtered-out", active && !rowHasVisible && !keepNoChipRow);
+      if (!active || rowHasVisible || keepNoChipRow) anySongVisible = true;
     });
     // Hide album block if every song row was filtered out
     if (active && !anySongVisible) block.classList.add("filtered-out");
