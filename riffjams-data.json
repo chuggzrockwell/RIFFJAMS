@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-10T20:29:35.567Z",
+  "updatedAt": "2026-10-11T21:00:00.000Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -11550,5 +11550,11 @@
       ]
     }
   ],
-  "minClientVersion": 2
+  "minClientVersion": 2,
+  "resetSongs": {
+    "token": "ww-rebuild-2026-10-11",
+    "keys": [
+      "Black Sabbath|Wicked World"
+    ]
+  }
 }
