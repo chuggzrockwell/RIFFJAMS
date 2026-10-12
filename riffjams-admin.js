@@ -338,6 +338,17 @@
       else localStorage.setItem(PENDING_KEY, JSON.stringify(p));
     } catch (e) {}
   }
+  /** Compare songs ignoring slot padding (trailing empty chip slots), which the app adds on its own. */
+  function normSongStr(str) {
+    if (typeof str !== "string") return String(str);
+    try {
+      var o = JSON.parse(str);
+      Object.keys(CHIP_FIELDS).forEach(function (f) {
+        if (Array.isArray(o[f])) { while (o[f].length && o[f][o[f].length - 1] == null) o[f].pop(); }
+      });
+      return JSON.stringify(o);
+    } catch (e) { return str; }
+  }
   /** Songs this tab changed since tabBase (any edit path: editor, drag, undo, rulers, times, links). */
   function changedSongs() {
     var out = { albums: {}, solo: {}, arr: {} };
@@ -346,7 +357,7 @@
     ["albums", "solo", "arr"].forEach(function (k) {
       mapSongs(m[k], function (a, s) {
         var key = songKeyOf(a, s);
-        if (tabBase[k][key] !== JSON.stringify(s)) out[k][key] = true;
+        if (normSongStr(tabBase[k][key]) !== normSongStr(JSON.stringify(s))) out[k][key] = true;
       });
     });
     return out;
@@ -390,7 +401,8 @@
    *  started from (per chip slot for chip lists, per field otherwise); keep the repo elsewhere. */
   function mergeSong(baseSong, localSong, repoSong) {
     if (!repoSong) return clone(localSong);
-    if (!baseSong) return clone(localSong);
+    /* No recorded base means we cannot tell what was edited: the repo wins, never a stale local copy. */
+    if (!baseSong) return clone(repoSong);
     var out = clone(repoSong);
     var keys = {};
     [baseSong, localSong, repoSong].forEach(function (o) { Object.keys(o || {}).forEach(function (k) { keys[k] = 1; }); });
@@ -776,6 +788,18 @@
           }
         }
       } catch (eReset) {}
+      /* Drop pending entries that are not real edits (local equals its recorded base, or no base). */
+      try {
+        var cm = currentMaps();
+        [["albums", cm.albums], ["solo", cm.solo], ["arr", cm.arr]].forEach(function (pair) {
+          Object.keys(pend[pair[0]]).forEach(function (key) {
+            var baseRaw = pend[pair[0]][key];
+            var local = findSong(pair[1], key);
+            if (!local || typeof baseRaw !== "string" || baseRaw === "__pending__" || normSongStr(baseRaw) === normSongStr(JSON.stringify(local))) delete pend[pair[0]][key];
+          });
+        });
+        writePending(pend);
+      } catch (ePrune) {}
       sharedData = data;
       window.RIFFJAMS_ASSETS = Object.assign({}, data.assets || {});
       var fresh = buildFreshMaps(data);
