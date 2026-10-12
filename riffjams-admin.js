@@ -764,6 +764,18 @@
       if (!response.ok) return;
       var data = await response.json();
       if (!data || data.version !== 1) return;
+      /* One-time per token: drop this browser's unsynced copy of the listed songs so the repo version wins. */
+      try {
+        var rs = data.resetSongs;
+        if (rs && rs.token && Array.isArray(rs.keys)) {
+          var seenRaw = localStorage.getItem("riffjams-reset-tokens-v1") || "";
+          if (seenRaw.split(",").indexOf(rs.token) < 0) {
+            ["albums", "solo", "arr"].forEach(function (k) { rs.keys.forEach(function (key) { delete pend[k][key]; }); });
+            writePending(pend);
+            localStorage.setItem("riffjams-reset-tokens-v1", seenRaw ? seenRaw + "," + rs.token : rs.token);
+          }
+        }
+      } catch (eReset) {}
       sharedData = data;
       window.RIFFJAMS_ASSETS = Object.assign({}, data.assets || {});
       var fresh = buildFreshMaps(data);
