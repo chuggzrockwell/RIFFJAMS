@@ -13355,7 +13355,7 @@ function showHighlightTip(chip) {
 }
 /* Wasp/Behind the Wall of Sleep's Peek tab crop displays at half size (requested Oct 2026). */
 function isHalfSizePeekCrop(lick) {
-  return typeof lick === "string" && (lick.indexOf("BWS-") === 0 || lick.indexOf("WW-") === 0);
+  return typeof lick === "string" && (lick.indexOf("BWS-") === 0 || lick.indexOf("WW-") === 0 || lick === "EW-S1");
 }
 function lickSrc(id) {
   if (!id) return "";
@@ -17614,6 +17614,6 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=439"></script>
+<script src="riffjams-admin.js?v=440"></script>
 </body>
 </html>
