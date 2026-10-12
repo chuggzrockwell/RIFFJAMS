@@ -239,39 +239,33 @@
               ]
             ],
             [
-              "B1",
+              "I3",
               3,
-              "WW-B1",
+              "WW-I3",
               [
                 3,
+                5,
                 1
               ]
+            ],
+            [
+              "I4",
+              3,
+              "WW-I4",
+              "3O"
             ],
             [
               "V1",
               3,
               "WW-V1",
-              "3O"
-            ],
-            [
-              "L1",
-              2,
-              "WW-L1",
               [
-                2,
                 3
               ]
             ],
             [
-              "B2",
+              "PC1",
               2,
-              "WW-B2",
-              "1O"
-            ],
-            [
-              "S1",
-              1,
-              "WW-S1",
+              "WW-PC1",
               [
                 1
               ]
@@ -283,12 +277,63 @@
               "3O"
             ],
             [
-              "I3",
+              "PC2",
               2,
-              "WW-I3",
+              "WW-PC2",
               [
-                5,
-                1
+                2,
+                3
+              ]
+            ],
+            [
+              "B1",
+              3,
+              "WW-B1",
+              "O"
+            ],
+            [
+              "B2",
+              2,
+              "WW-B2",
+              "2O"
+            ],
+            [
+              "B3",
+              2,
+              "WW-B3",
+              "2O"
+            ],
+            [
+              "B4",
+              2,
+              "WW-B4",
+              "1O"
+            ],
+            [
+              "S1",
+              1,
+              "WW-S1",
+              [
+                1,
+                2
+              ]
+            ],
+            [
+              "S2",
+              1,
+              "WW-S2",
+              [
+                1,
+                2
+              ]
+            ],
+            [
+              "S3",
+              1,
+              "WW-S3",
+              [
+                1,
+                2
               ]
             ],
             [
@@ -296,17 +341,18 @@
               2,
               "WW-O1",
               [
-                3,
-                4
+                5,
+                1
               ]
             ],
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
+            [
+              "O2",
+              3,
+              "WW-O2",
+              [
+                5
+              ]
+            ]
           ]
         },
         {
@@ -4145,7 +4191,7 @@
                   5,
                   1
                 ],
-                0.0
+                4.0
               ],
               [
                 "I2",
@@ -4158,26 +4204,52 @@
                 20.0
               ],
               [
-                "B1",
+                "I3",
                 3,
-                "WW-B1",
+                "WW-I3",
                 [
                   3,
+                  5,
                   1
                 ],
-                53.9
+                28.0
+              ],
+              [
+                "I4",
+                3,
+                "WW-I4",
+                "3O",
+                38.0
               ],
               [
                 "V1",
                 3,
                 "WW-V1",
+                [
+                  3
+                ],
+                52.5
+              ],
+              [
+                "PC1",
+                2,
+                "WW-PC1",
+                [
+                  1
+                ],
+                59.8
+              ],
+              [
+                "V2",
+                3,
+                "WW-V2",
                 "3O",
                 65.7
               ],
               [
-                "L1",
+                "PC2",
                 2,
-                "WW-L1",
+                "WW-PC2",
                 [
                   2,
                   3
@@ -4188,136 +4260,227 @@
                 "V1",
                 3,
                 "WW-V1",
-                "3O",
-                99.7
+                [
+                  3
+                ],
+                93.8
               ],
               [
-                "B2",
+                "PC1",
                 2,
-                "WW-B2",
-                "1O",
-                123.3
-              ],
-              [
-                "S1",
-                1,
-                "WW-S1",
+                "WW-PC1",
                 [
                   1
                 ],
-                181.0
-              ],
-              [
-                "B1",
-                3,
-                "WW-B1",
-                [
-                  3,
-                  1
-                ],
-                202.4
+                96.8
               ],
               [
                 "V2",
                 3,
                 "WW-V2",
                 "3O",
-                214.0
+                99.7
               ],
               [
-                "I3",
+                "PC2",
                 2,
-                "WW-I3",
+                "WW-PC2",
                 [
-                  5,
+                  2,
+                  3
+                ],
+                123.3
+              ],
+              [
+                "B1",
+                3,
+                "WW-B1",
+                "O",
+                127.8
+              ],
+              [
+                "B2",
+                2,
+                "WW-B2",
+                "2O",
+                137.0
+              ],
+              [
+                "B2",
+                2,
+                "WW-B2",
+                "2O",
+                148.4
+              ],
+              [
+                "B3",
+                2,
+                "WW-B3",
+                "2O",
+                157.5
+              ],
+              [
+                "B2",
+                2,
+                "WW-B2",
+                "2O",
+                162.4
+              ],
+              [
+                "B4",
+                2,
+                "WW-B4",
+                "1O",
+                171.5
+              ],
+              [
+                "S1",
+                1,
+                "WW-S1",
+                [
+                  1,
+                  2
+                ],
+                180.7
+              ],
+              [
+                "S2",
+                1,
+                "WW-S2",
+                [
+                  1,
+                  2
+                ],
+                185.7
+              ],
+              [
+                "S3",
+                1,
+                "WW-S3",
+                [
+                  1,
+                  2
+                ],
+                191.0
+              ],
+              [
+                "V1",
+                3,
+                "WW-V1",
+                [
+                  3,
                   1
                 ],
-                241.9
+                200.1
+              ],
+              [
+                "PC1",
+                2,
+                "WW-PC1",
+                [
+                  1
+                ],
+                207.3
+              ],
+              [
+                "V2",
+                3,
+                "WW-V2",
+                "3O",
+                213.1
+              ],
+              [
+                "PC2",
+                2,
+                "WW-PC2",
+                [
+                  2,
+                  3
+                ],
+                236.4
               ],
               [
                 "O1",
                 2,
                 "WW-O1",
                 [
+                  5,
+                  1
+                ],
+                241.0
+              ],
+              [
+                "I2",
+                2,
+                "WW-I2",
+                [
                   3,
                   4
                 ],
-                257.9,
-                278.6
+                257.0
               ],
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
+              [
+                "I3",
+                3,
+                "WW-I3",
+                [
+                  3,
+                  5,
+                  1
+                ],
+                265.0
+              ],
+              [
+                "O2",
+                3,
+                "WW-O2",
+                [
+                  5
+                ],
+                270.9,
+                277.7
+              ]
             ],
             "sectionRulers": [
               {
                 "name": "Intro",
                 "start": 0,
-                "end": 1
-              },
-              {
-                "name": "Main Riff",
-                "start": 2,
-                "end": 2
-              },
-              {
-                "name": "Verse 1",
-                "start": 3,
                 "end": 3
               },
               {
-                "name": "Interlude",
+                "name": "Verse 1",
                 "start": 4,
-                "end": 4
-              },
-              {
-                "name": "Verse 2",
-                "start": 5,
-                "end": 5
-              },
-              {
-                "name": "Bridge",
-                "start": 6,
-                "end": 6
-              },
-              {
-                "name": "Solo",
-                "start": 7,
                 "end": 7
               },
               {
-                "name": "Main Riff",
+                "name": "Verse 2",
                 "start": 8,
-                "end": 8
+                "end": 11
+              },
+              {
+                "name": "Break",
+                "start": 12,
+                "end": 12
+              },
+              {
+                "name": "Interlude",
+                "start": 13,
+                "end": 17
+              },
+              {
+                "name": "Solo",
+                "start": 18,
+                "end": 20
               },
               {
                 "name": "Verse 3",
-                "start": 9,
-                "end": 9
-              },
-              {
-                "name": "Intro Reprise",
-                "start": 10,
-                "end": 10
+                "start": 21,
+                "end": 24
               },
               {
                 "name": "Outro",
-                "start": 11,
-                "end": 11
+                "start": 25,
+                "end": 28
               }
             ]
           },
@@ -8549,105 +8712,241 @@
     {
       "album": "Black Sabbath",
       "song": "Wicked World",
-      "endSec": 278.6,
+      "endSec": 277.7,
       "complete": true,
-      "riffSaturationIndex": 1.724,
+      "riffSaturationIndex": 1.58,
       "chips": [
         {
           "code": "I1",
           "tier": 2,
-          "start": 0,
-          "stop": 20,
-          "duration": 20,
+          "start": 4.0,
+          "stop": 20.0,
+          "duration": 16.0,
           "lick": "WW-I1"
         },
         {
           "code": "I2",
           "tier": 2,
-          "start": 20,
-          "stop": 53.9,
-          "duration": 33.9,
+          "start": 20.0,
+          "stop": 28.0,
+          "duration": 8.0,
           "lick": "WW-I2"
         },
         {
-          "code": "B1",
+          "code": "I3",
           "tier": 3,
-          "start": 53.9,
+          "start": 28.0,
+          "stop": 38.0,
+          "duration": 10.0,
+          "lick": "WW-I3"
+        },
+        {
+          "code": "I4",
+          "tier": 3,
+          "start": 38.0,
+          "stop": 52.5,
+          "duration": 14.5,
+          "lick": "WW-I4"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 52.5,
+          "stop": 59.8,
+          "duration": 7.3,
+          "lick": "WW-V1"
+        },
+        {
+          "code": "PC1",
+          "tier": 2,
+          "start": 59.8,
           "stop": 65.7,
-          "duration": 11.8,
-          "lick": "WW-B1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 65.7,
-          "stop": 89.2,
-          "duration": 23.5,
-          "lick": "WW-V1"
-        },
-        {
-          "code": "L1",
-          "tier": 2,
-          "start": 89.2,
-          "stop": 99.7,
-          "duration": 10.5,
-          "lick": "WW-L1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 99.7,
-          "stop": 123.3,
-          "duration": 23.6,
-          "lick": "WW-V1"
-        },
-        {
-          "code": "B2",
-          "tier": 2,
-          "start": 123.3,
-          "stop": 181,
-          "duration": 57.7,
-          "lick": "WW-B2"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 181,
-          "stop": 202.4,
-          "duration": 21.4,
-          "lick": "WW-S1"
-        },
-        {
-          "code": "B1",
-          "tier": 3,
-          "start": 202.4,
-          "stop": 214,
-          "duration": 11.6,
-          "lick": "WW-B1"
+          "duration": 5.9,
+          "lick": "WW-PC1"
         },
         {
           "code": "V2",
           "tier": 3,
-          "start": 214,
-          "stop": 241.9,
-          "duration": 27.9,
+          "start": 65.7,
+          "stop": 89.2,
+          "duration": 23.5,
           "lick": "WW-V2"
         },
         {
-          "code": "I3",
+          "code": "PC2",
           "tier": 2,
-          "start": 241.9,
-          "stop": 257.9,
-          "duration": 16,
-          "lick": "WW-I3"
+          "start": 89.2,
+          "stop": 93.8,
+          "duration": 4.6,
+          "lick": "WW-PC2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 93.8,
+          "stop": 96.8,
+          "duration": 3.0,
+          "lick": "WW-V1"
+        },
+        {
+          "code": "PC1",
+          "tier": 2,
+          "start": 96.8,
+          "stop": 99.7,
+          "duration": 2.9,
+          "lick": "WW-PC1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 99.7,
+          "stop": 123.3,
+          "duration": 23.6,
+          "lick": "WW-V2"
+        },
+        {
+          "code": "PC2",
+          "tier": 2,
+          "start": 123.3,
+          "stop": 127.8,
+          "duration": 4.5,
+          "lick": "WW-PC2"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 127.8,
+          "stop": 137.0,
+          "duration": 9.2,
+          "lick": "WW-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 137.0,
+          "stop": 148.4,
+          "duration": 11.4,
+          "lick": "WW-B2"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 148.4,
+          "stop": 157.5,
+          "duration": 9.1,
+          "lick": "WW-B2"
+        },
+        {
+          "code": "B3",
+          "tier": 2,
+          "start": 157.5,
+          "stop": 162.4,
+          "duration": 4.9,
+          "lick": "WW-B3"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 162.4,
+          "stop": 171.5,
+          "duration": 9.1,
+          "lick": "WW-B2"
+        },
+        {
+          "code": "B4",
+          "tier": 2,
+          "start": 171.5,
+          "stop": 180.7,
+          "duration": 9.2,
+          "lick": "WW-B4"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 180.7,
+          "stop": 185.7,
+          "duration": 5.0,
+          "lick": "WW-S1"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 185.7,
+          "stop": 191.0,
+          "duration": 5.3,
+          "lick": "WW-S2"
+        },
+        {
+          "code": "S3",
+          "tier": 1,
+          "start": 191.0,
+          "stop": 200.1,
+          "duration": 9.1,
+          "lick": "WW-S3"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 200.1,
+          "stop": 207.3,
+          "duration": 7.2,
+          "lick": "WW-V1"
+        },
+        {
+          "code": "PC1",
+          "tier": 2,
+          "start": 207.3,
+          "stop": 213.1,
+          "duration": 5.8,
+          "lick": "WW-PC1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 213.1,
+          "stop": 236.4,
+          "duration": 23.3,
+          "lick": "WW-V2"
+        },
+        {
+          "code": "PC2",
+          "tier": 2,
+          "start": 236.4,
+          "stop": 241.0,
+          "duration": 4.6,
+          "lick": "WW-PC2"
         },
         {
           "code": "O1",
           "tier": 2,
-          "start": 257.9,
-          "stop": 278.6,
-          "duration": 20.7,
+          "start": 241.0,
+          "stop": 257.0,
+          "duration": 16.0,
           "lick": "WW-O1"
+        },
+        {
+          "code": "I2",
+          "tier": 2,
+          "start": 257.0,
+          "stop": 265.0,
+          "duration": 8.0,
+          "lick": "WW-I2"
+        },
+        {
+          "code": "I3",
+          "tier": 3,
+          "start": 265.0,
+          "stop": 270.9,
+          "duration": 5.9,
+          "lick": "WW-I3"
+        },
+        {
+          "code": "O2",
+          "tier": 3,
+          "start": 270.9,
+          "stop": 277.7,
+          "duration": 6.8,
+          "lick": "WW-O2"
         }
       ]
     },
