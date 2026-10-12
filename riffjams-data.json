@@ -220,16 +220,86 @@
         {
           "song": "Wicked World",
           "sections": [
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
+            [
+              "I1",
+              2,
+              "WW-I1",
+              [
+                5,
+                1
+              ]
+            ],
+            [
+              "I2",
+              2,
+              "WW-I2",
+              [
+                3,
+                4
+              ]
+            ],
+            [
+              "B1",
+              3,
+              "WW-B1",
+              [
+                3,
+                1
+              ]
+            ],
+            [
+              "V1",
+              3,
+              "WW-V1",
+              "3O"
+            ],
+            [
+              "L1",
+              2,
+              "WW-L1",
+              [
+                2,
+                3
+              ]
+            ],
+            [
+              "B2",
+              2,
+              "WW-B2",
+              "1O"
+            ],
+            [
+              "S1",
+              1,
+              "WW-S1",
+              [
+                1
+              ]
+            ],
+            [
+              "V2",
+              3,
+              "WW-V2",
+              "3O"
+            ],
+            [
+              "I3",
+              2,
+              "WW-I3",
+              [
+                5,
+                1
+              ]
+            ],
+            [
+              "O1",
+              2,
+              "WW-O1",
+              [
+                3,
+                4
+              ]
+            ],
             null,
             null,
             null,
@@ -4067,18 +4137,114 @@
           {
             "song": "Wicked World",
             "chips": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              [
+                "I1",
+                2,
+                "WW-I1",
+                [
+                  5,
+                  1
+                ],
+                0.0
+              ],
+              [
+                "I2",
+                2,
+                "WW-I2",
+                [
+                  3,
+                  4
+                ],
+                20.0
+              ],
+              [
+                "B1",
+                3,
+                "WW-B1",
+                [
+                  3,
+                  1
+                ],
+                53.9
+              ],
+              [
+                "V1",
+                3,
+                "WW-V1",
+                "3O",
+                65.7
+              ],
+              [
+                "L1",
+                2,
+                "WW-L1",
+                [
+                  2,
+                  3
+                ],
+                89.2
+              ],
+              [
+                "V1",
+                3,
+                "WW-V1",
+                "3O",
+                99.7
+              ],
+              [
+                "B2",
+                2,
+                "WW-B2",
+                "1O",
+                123.3
+              ],
+              [
+                "S1",
+                1,
+                "WW-S1",
+                [
+                  1
+                ],
+                181.0
+              ],
+              [
+                "B1",
+                3,
+                "WW-B1",
+                [
+                  3,
+                  1
+                ],
+                202.4
+              ],
+              [
+                "V2",
+                3,
+                "WW-V2",
+                "3O",
+                214.0
+              ],
+              [
+                "I3",
+                2,
+                "WW-I3",
+                [
+                  5,
+                  1
+                ],
+                241.9
+              ],
+              [
+                "O1",
+                2,
+                "WW-O1",
+                [
+                  3,
+                  4
+                ],
+                257.9,
+                278.6
+              ],
               null,
               null,
               null,
@@ -4096,6 +4262,63 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "Intro",
+                "start": 0,
+                "end": 1
+              },
+              {
+                "name": "Main Riff",
+                "start": 2,
+                "end": 2
+              },
+              {
+                "name": "Verse 1",
+                "start": 3,
+                "end": 3
+              },
+              {
+                "name": "Interlude",
+                "start": 4,
+                "end": 4
+              },
+              {
+                "name": "Verse 2",
+                "start": 5,
+                "end": 5
+              },
+              {
+                "name": "Bridge",
+                "start": 6,
+                "end": 6
+              },
+              {
+                "name": "Solo",
+                "start": 7,
+                "end": 7
+              },
+              {
+                "name": "Main Riff",
+                "start": 8,
+                "end": 8
+              },
+              {
+                "name": "Verse 3",
+                "start": 9,
+                "end": 9
+              },
+              {
+                "name": "Intro Reprise",
+                "start": 10,
+                "end": 10
+              },
+              {
+                "name": "Outro",
+                "start": 11,
+                "end": 11
+              }
             ]
           },
           {
@@ -8320,6 +8543,111 @@
           "stop": 360.3,
           "duration": 49.6,
           "lick": "NIB-S2"
+        }
+      ]
+    },
+    {
+      "album": "Black Sabbath",
+      "song": "Wicked World",
+      "endSec": 278.6,
+      "complete": true,
+      "riffSaturationIndex": 1.724,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": 20,
+          "duration": 20,
+          "lick": "WW-I1"
+        },
+        {
+          "code": "I2",
+          "tier": 2,
+          "start": 20,
+          "stop": 53.9,
+          "duration": 33.9,
+          "lick": "WW-I2"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 53.9,
+          "stop": 65.7,
+          "duration": 11.8,
+          "lick": "WW-B1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 65.7,
+          "stop": 89.2,
+          "duration": 23.5,
+          "lick": "WW-V1"
+        },
+        {
+          "code": "L1",
+          "tier": 2,
+          "start": 89.2,
+          "stop": 99.7,
+          "duration": 10.5,
+          "lick": "WW-L1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 99.7,
+          "stop": 123.3,
+          "duration": 23.6,
+          "lick": "WW-V1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 123.3,
+          "stop": 181,
+          "duration": 57.7,
+          "lick": "WW-B2"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 181,
+          "stop": 202.4,
+          "duration": 21.4,
+          "lick": "WW-S1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 202.4,
+          "stop": 214,
+          "duration": 11.6,
+          "lick": "WW-B1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 214,
+          "stop": 241.9,
+          "duration": 27.9,
+          "lick": "WW-V2"
+        },
+        {
+          "code": "I3",
+          "tier": 2,
+          "start": 241.9,
+          "stop": 257.9,
+          "duration": 16,
+          "lick": "WW-I3"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 257.9,
+          "stop": 278.6,
+          "duration": 20.7,
+          "lick": "WW-O1"
         }
       ]
     },
