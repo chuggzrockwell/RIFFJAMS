@@ -297,59 +297,141 @@
   }
 
 
-  /** Batch upload: every file is named after its tab (WW-V2.png -> lick WW-V2). One commit for all of them. */
-  async function batchUpload(files) {
-    var button = qs("chipBatchChoose");
+  /* ---------- Staged crops + batch upload ----------
+     Paste a crop into a chip and press Save: the chip is saved locally and the crop is staged here
+     (kept in memory and IndexedDB, shown immediately in the app). "Batch upload" then pushes every
+     staged crop together with the pending chip edits in ONE commit. */
+  var STAGE_DB = "riffjams-staged-crops";
+  var staged = {};   /* lick -> { blob, url } */
+
+  function idb() {
+    return new Promise(function (resolve) {
+      try {
+        var req = indexedDB.open(STAGE_DB, 1);
+        req.onupgradeneeded = function () { req.result.createObjectStore("crops"); };
+        req.onsuccess = function () { resolve(req.result); };
+        req.onerror = function () { resolve(null); };
+      } catch (e) { resolve(null); }
+    });
+  }
+  async function idbRun(mode, fn) {
+    var db = await idb();
+    if (!db) return null;
+    return await new Promise(function (resolve) {
+      try {
+        var tx = db.transaction("crops", mode);
+        var out = fn(tx.objectStore("crops"));
+        tx.oncomplete = function () { resolve(out && out.result !== undefined ? out.result : true); };
+        tx.onerror = tx.onabort = function () { resolve(null); };
+      } catch (e) { resolve(null); }
+    });
+  }
+  function stagedCount() { return Object.keys(staged).length; }
+
+  function updateBatchButton() {
+    var btn = qs("rjBatchUpload");
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.id = "rjBatchUpload";
+      btn.style.cssText = "position:fixed;right:16px;bottom:16px;z-index:100000;padding:12px 18px;border:0;border-radius:10px;" +
+        "background:#6b2fa0;color:#fff;font:inherit;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.4);cursor:pointer;";
+      btn.onclick = batchUploadStaged;
+      document.body.appendChild(btn);
+    }
+    var n = stagedCount();
+    btn.hidden = n === 0;
+    btn.textContent = "Batch upload (" + n + " crop" + (n === 1 ? "" : "s") + ")";
+  }
+
+  /** Called when a chip is saved while a pasted crop is waiting: keep the crop for the batch push. */
+  async function stagePendingImage() {
+    if (!pendingImage) return;
+    var draft = readDraft();                 /* also writes the cleaned tab name back into the field */
+    var blob = pendingImage;
+    var old = staged[draft.lick];
+    if (old && old.url) URL.revokeObjectURL(old.url);
+    var url = URL.createObjectURL(blob);
+    staged[draft.lick] = { blob: blob, url: url };
+    window.RIFFJAMS_ASSETS = window.RIFFJAMS_ASSETS || {};
+    window.RIFFJAMS_ASSETS[draft.lick] = url;   /* shows in Peek/Library right away */
+    clearPendingImage();
+    setMessage("");
+    await idbRun("readwrite", function (store) { return store.put(blob, draft.lick); });
+    updateBatchButton();
+  }
+
+  async function restoreStaged() {
+    var db = await idb();
+    if (!db) return;
+    await new Promise(function (resolve) {
+      try {
+        var tx = db.transaction("crops", "readonly");
+        var store = tx.objectStore("crops");
+        var keysReq = store.getAllKeys();
+        var valsReq = store.getAll();
+        tx.oncomplete = function () {
+          (keysReq.result || []).forEach(function (key, i) {
+            if (staged[key]) return;
+            var blob = valsReq.result[i];
+            var url = URL.createObjectURL(blob);
+            staged[key] = { blob: blob, url: url };
+            window.RIFFJAMS_ASSETS = window.RIFFJAMS_ASSETS || {};
+            window.RIFFJAMS_ASSETS[key] = url;
+          });
+          resolve();
+        };
+        tx.onerror = tx.onabort = function () { resolve(); };
+      } catch (e) { resolve(); }
+    });
+    updateBatchButton();
+  }
+
+  var restoreP = null;
+  function ensureRestored() { return restoreP || (restoreP = restoreStaged()); }
+
+  async function batchUploadStaged() {
+    var btn = qs("rjBatchUpload");
+    var licks = Object.keys(staged);
+    if (!licks.length) return;
     try {
-      files = Array.prototype.slice.call(files || []);
-      if (!files.length) return;
-      if (!TOKEN) throw new Error("Connect GitHub first.");
-      if (button) button.disabled = true;
+      if (!TOKEN) throw new Error("Connect GitHub first (open any chip, then Connect).");
+      if (btn) { btn.disabled = true; btn.textContent = "Uploading " + licks.length + "…"; }
       var images = [];
       var addAssets = {};
-      var seen = {};
-      var skipped = [];
-      var unlinked = [];
-      var maps = currentMaps();
-      var soloMapLike = { albums: maps.solo };
-      for (var i = 0; i < files.length; i++) {
-        var lick = safeId(String(files[i].name || "").replace(/\.[^.]+$/, ""));
-        if (!lick || seen[lick]) { skipped.push(files[i].name + (lick ? " (duplicate name)" : " (no usable name)")); continue; }
-        setMessage("Preparing " + (i + 1) + " of " + files.length + "…");
-        var png;
-        try { png = await normalizeToPng(files[i]); }
-        catch (e) { skipped.push(files[i].name + " (" + (e.message || "not an image") + ")"); continue; }
-        seen[lick] = true;
+      for (var i = 0; i < licks.length; i++) {
+        var lick = licks[i];
         var path = IMAGE_DIR + "/" + lick + ".png";
-        var existing = (sharedData.assets || {})[lick] || (window.RIFFJAMS_ASSETS || {})[lick] || "";
+        var existing = (sharedData.assets || {})[lick] || "";
         var vMatch = /[?&]v=(\d+)/.exec(existing);
         /* Replacing an existing tab: bump ?v= so browsers do not keep showing the old image. */
-        addAssets[lick] = existing ? path + "?v=" + ((vMatch ? parseInt(vMatch[1], 10) : 0) + 1) : path;
-        images.push({ path: path, base64: arrayBufferToBase64(await png.arrayBuffer()) });
-        if (!tabIsStillLinked(maps.albums, soloMapLike, lick)) unlinked.push(lick);
+        addAssets[lick] = (existing && existing.indexOf("blob:") !== 0) ? path + "?v=" + ((vMatch ? parseInt(vMatch[1], 10) : 0) + 1) : path;
+        images.push({ path: path, base64: arrayBufferToBase64(await staged[lick].blob.arrayBuffer()) });
       }
-      if (!images.length) throw new Error("Nothing to upload. " + skipped.join("; "));
-      setMessage("Saving " + images.length + " tab" + (images.length === 1 ? "" : "s") + " to GitHub in one commit…");
       var result = await commitWithRebase({
-        message: "Attach " + images.length + " tab" + (images.length === 1 ? "" : "s") + ": " + Object.keys(addAssets).join(", "),
+        message: "Attach " + licks.length + " tab" + (licks.length === 1 ? "" : "s") + ": " + licks.join(", "),
         images: images,
         addAssets: addAssets,
         force: true
       });
+      /* Uploaded: use the committed manifest, but keep showing the local copy until the site
+         finishes republishing so the new crops never flash broken. */
       window.RIFFJAMS_ASSETS = Object.assign({}, result.manifest.assets || {});
-      var note = "Uploaded " + images.length + ": " + Object.keys(addAssets).join(", ") + ".";
-      if (unlinked.length) note += " Not linked to any chip yet: " + unlinked.join(", ") + ".";
-      if (skipped.length) note += " Skipped: " + skipped.join("; ") + ".";
-      setMessage(note, skipped.length ? "error" : "success");
-      window.setSaveStatus("Uploaded. Publishing…");
+      licks.forEach(function (lick) { window.RIFFJAMS_ASSETS[lick] = staged[lick].url; });
+      staged = {};
+      await idbRun("readwrite", function (store) { return store.clear(); });
+      window.setSaveStatus("Uploaded " + licks.length + ". Publishing…");
       if (document.body.classList.contains("sections-mode")) window.showSections(true);
     } catch (error) {
       if (/expired|Connect GitHub|Bad credentials/i.test(error.message || "")) rememberToken("");
-      setMessage(error.message || "Batch upload failed.", "error");
+      window.setSaveStatus(error.message || "Batch upload failed.");
+      alert(error.message || "Batch upload failed.");
     } finally {
-      if (button) button.disabled = false;
+      if (btn) btn.disabled = false;
+      updateBatchButton();
     }
   }
+
 
   /* ---------- Rebase-safe sync ----------
      Each tab remembers (tabBase) exactly what it loaded from the repo or last committed, per song.
@@ -688,6 +770,13 @@
       }
       return { ok: false, reason: "no-token" };
     }
+    /* Crops are staged for a batch push: hold every auto-sync so chips are never pushed ahead of their
+       images; the Batch upload button commits chips and crops together. */
+    await ensureRestored();
+    if (stagedCount() > 0) {
+      if (typeof window.setSaveStatus === "function") window.setSaveStatus("Saved locally — press Batch upload to push " + stagedCount() + " crop(s) and chips together");
+      return { ok: false, reason: "staged" };
+    }
     if (arrangementSyncInFlight) {
       arrangementSyncQueued = opts;
       return { ok: false, reason: "busy" };
@@ -773,10 +862,7 @@
         '<button type="button" id="chipImageClear" class="chip-image-clear" aria-label="Remove screenshot" hidden>×</button>' +
       '</div>' +
       '<input id="chipImageFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>' +
-      '<div class="chip-paste-actions">' +
-        '<button type="button" class="chip-file-pick" id="chipBatchChoose" title="Pick many files named after their tab, e.g. WW-V2.png. Saved in one commit.">Batch upload (name = tab)</button>' +
-      '</div>' +
-      '<input id="chipBatchFile" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>' +
+      '<small>Paste a crop, then press <b>Save</b> to stage it. Use the <b>Batch upload</b> button to push all staged crops at once.</small>' +
       '<div class="chip-github-connect" id="chipGithubConnect">' +
         '<span id="chipGithubStatus">GitHub connection required</span>' +
         '<button type="button" id="chipGithubOpen">Connect</button>' +
@@ -796,8 +882,24 @@
     qs("chipImageChoose").onclick = function () { qs("chipImageFile").click(); };
     qs("chipImageClear").onclick = function (event) { event.stopPropagation(); clearPendingImage(); setMessage(""); };
     qs("chipAttachSave").onclick = attachAndSave;
-    qs("chipBatchChoose").onclick = function () { qs("chipBatchFile").click(); };
-    qs("chipBatchFile").onchange = function () { var picked = Array.prototype.slice.call(this.files); this.value = ""; batchUpload(picked); };
+    /* Chip Save: if a crop was pasted, stage it for the batch push, then run the normal save. */
+    var saveBtn = qs("chipEditSave");
+    var origSave = saveBtn && saveBtn.onclick;
+    if (saveBtn && origSave) {
+      saveBtn.onclick = async function () {
+        var self = this, args = arguments;
+        if (pendingImage) {
+          try { await stagePendingImage(); }
+          catch (error) { setMessage(error.message || "Could not stage the crop.", "error"); return; }
+        }
+        origSave.apply(self, args);
+      };
+    }
+    /* A crop pasted into a chip that was then cancelled must not leak into the next chip. */
+    if (typeof window.openChipEditor === "function") {
+      var origOpen = window.openChipEditor;
+      window.openChipEditor = function () { clearPendingImage(); setMessage(""); return origOpen.apply(this, arguments); };
+    }
     qs("chipGithubOpen").onclick = function () { qs("chipTokenPanel").hidden = !qs("chipTokenPanel").hidden; qs("chipGithubToken").focus(); };
     qs("chipGithubDisconnect").onclick = function () { rememberToken(""); setMessage("GitHub disconnected."); };
     qs("chipTokenSave").onclick = async function () {
@@ -941,7 +1043,7 @@
 
   injectEditor();
   loadStoredToken();
-  loadSharedData();
+  loadSharedData().then(ensureRestored, ensureRestored);
 
   var originalOpen = window.openChipEditor;
   window.openChipEditor = function (anchor, state) {
