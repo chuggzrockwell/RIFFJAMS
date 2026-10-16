@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-11T21:00:00.000Z",
+  "updatedAt": "2026-10-16T21:45:51.527Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
     "PC2": "user-tabs/PC2.png",
-    "B1": "user-tabs/B1.png",
+    "B1": "user-tabs/B1.png?v=1",
     "B2": "user-tabs/B2.png",
     "B3": "user-tabs/B3.png",
     "B4": "user-tabs/B4.png",
@@ -25,12 +25,14 @@
     "WW-I3": "user-tabs/WW-I3.png?v=2",
     "WW-I4": "user-tabs/WW-I4.png?v=2",
     "WW-I5": "user-tabs/WW-I5.png?v=2",
-    "WW-V1": "user-tabs/WW-V1.png?v=3",
-    "WW-V2": "user-tabs/WW-V2.png?v=3",
-    "WW-V3": "user-tabs/WW-V3.png?v=2",
-    "WW-B1": "user-tabs/WW-B1.png?v=2",
-    "WW-S1": "user-tabs/WW-S1.png?v=2",
-    "WW-O1": "user-tabs/WW-O1.png?v=2"
+    "WW-V1": "user-tabs/WW-V1.png?v=4",
+    "WW-V2": "user-tabs/WW-V2.png?v=4",
+    "WW-V3": "user-tabs/WW-V3.png?v=3",
+    "WW-B1": "user-tabs/WW-B1.png?v=3",
+    "WW-S1": "user-tabs/WW-S1.png?v=3",
+    "WW-O1": "user-tabs/WW-O1.png?v=2",
+    "ww-v1": "user-tabs/ww-v1.png",
+    "V3": "user-tabs/V3.png"
   },
   "albums": [
     {
@@ -157,7 +159,12 @@
               "BWS-O1",
               []
             ],
-            null,
+            [
+              "I3",
+              3,
+              "BWS-I3",
+              []
+            ],
             null,
             null,
             null,
@@ -236,8 +243,8 @@
               2,
               "WW-I1",
               [
-                5,
-                1
+                1,
+                5
               ]
             ],
             [
@@ -254,9 +261,9 @@
               3,
               "WW-I3",
               [
+                1,
                 3,
-                5,
-                1
+                5
               ]
             ],
             [
@@ -266,23 +273,17 @@
               "3O"
             ],
             [
-              "I5",
-              3,
-              "WW-I5",
-              [
-                3,
-                1
-              ]
-            ],
-            [
               "V1",
               3,
               "WW-V1",
-              "3O"
+              [
+                1,
+                3
+              ]
             ],
             [
               "V2",
-              2,
+              3,
               "WW-V2",
               [
                 2,
@@ -292,14 +293,12 @@
             [
               "V3",
               3,
-              "WW-V3",
-              "O"
+              "V3"
             ],
             [
               "B1",
-              2,
-              "WW-B1",
-              "2O"
+              3,
+              "B1"
             ],
             [
               "S1",
@@ -314,11 +313,15 @@
               "O1",
               3,
               "WW-O1",
-              [
-                5
-              ]
+              5
             ],
             null,
+            [
+              "B2",
+              3,
+              "WW-B1",
+              "2O"
+            ],
             null,
             null,
             null,
@@ -332,32 +335,38 @@
             [
               "I1",
               2,
-              "EW-I1"
+              "EW-I1",
+              []
             ],
             [
               "V1",
               3,
-              "EW-V1"
+              "EW-V1",
+              []
             ],
             [
               "V2",
               3,
-              "EW-V2"
+              "EW-V2",
+              []
             ],
             [
               "C1",
               3,
-              "EW-C1"
+              "EW-C1",
+              []
             ],
             [
               "S1",
               3,
-              "EW-S1"
+              "EW-S1",
+              []
             ],
             [
               "C2",
               3,
-              "EW-C2"
+              "EW-C2",
+              []
             ],
             null,
             null,
@@ -618,7 +627,12 @@
                 3
               ]
             ],
-            null,
+            [
+              "B1",
+              2,
+              "IM-V4",
+              3
+            ],
             null,
             null,
             null,
@@ -782,7 +796,7 @@
           "sections": [
             [
               "I1",
-              3,
+              2,
               "FOB-I1"
             ],
             [
@@ -798,7 +812,7 @@
             ],
             [
               "I4",
-              3,
+              2,
               "FOB-I4"
             ],
             [
@@ -824,7 +838,7 @@
             [
               "B1",
               3,
-              "FOB-L1"
+              "FOB-B1"
             ],
             [
               "V1",
@@ -2540,7 +2554,27 @@
           },
           {
             "song": "Wicked World",
-            "licks": []
+            "licks": [
+              [
+                "v1",
+                3,
+                "ww-v1"
+              ],
+              [
+                "V2",
+                3,
+                "WW-V2",
+                [
+                  2,
+                  3
+                ]
+              ],
+              [
+                "V1",
+                3,
+                "ww-v1"
+              ]
+            ]
           },
           {
             "song": "Evil Woman",
@@ -3933,9 +3967,16 @@
                 "BWS-O1",
                 [],
                 188.2,
+                null
+              ],
+              [
+                "I3",
+                3,
+                "BWS-I3",
+                [],
+                null,
                 194.7
               ],
-              null,
               null,
               null,
               null,
@@ -4159,10 +4200,10 @@
                 2,
                 "WW-I1",
                 [
-                  5,
-                  1
+                  1,
+                  5
                 ],
-                4.0
+                4
               ],
               [
                 "I2",
@@ -4172,7 +4213,7 @@
                   3,
                   4
                 ],
-                20.0
+                20
               ],
               [
                 "I3",
@@ -4183,82 +4224,79 @@
                   5,
                   1
                 ],
-                28.0
+                28
               ],
               [
                 "I4",
                 3,
                 "WW-I4",
                 "3O",
-                38.0
-              ],
-              [
-                "I5",
-                3,
-                "WW-I5",
-                [
-                  3,
-                  1
-                ],
-                53.9
+                38
               ],
               [
                 "V1",
                 3,
-                "WW-V1",
-                "3O",
-                65.7
+                "ww-v1",
+                1,
+                53.3
               ],
               [
                 "V2",
-                2,
+                3,
                 "WW-V2",
                 [
-                  2,
+                  1,
                   3
                 ],
-                89.2
-              ],
-              [
-                "I5",
-                3,
-                "WW-I5",
-                [
-                  3,
-                  1
-                ],
-                93.8
-              ],
-              [
-                "V1",
-                3,
-                "WW-V1",
-                "3O",
-                99.7
-              ],
-              [
-                "V2",
-                2,
-                "WW-V2",
-                [
-                  2,
-                  3
-                ],
-                123.3
+                64.7
               ],
               [
                 "V3",
                 3,
                 "WW-V3",
-                "O",
-                127.8
+                "3O",
+                87.5
+              ],
+              [
+                "V1",
+                3,
+                "WW-V1",
+                [
+                  1,
+                  3
+                ],
+                92.3
+              ],
+              [
+                "V2",
+                3,
+                "WW-V2",
+                [
+                  2,
+                  3
+                ],
+                98.1
+              ],
+              [
+                "V3",
+                3,
+                "V3",
+                1,
+                121.2
               ],
               [
                 "B1",
-                2,
+                3,
+                "B1",
+                1,
+                125.8
+              ],
+              [
+                "B2",
+                3,
                 "WW-B1",
                 "2O",
-                137.0
+                134.9
               ],
               [
                 "S1",
@@ -4268,44 +4306,47 @@
                   1,
                   2
                 ],
-                180.7
-              ],
-              [
-                "I5",
-                3,
-                "WW-I5",
-                [
-                  3,
-                  1
-                ],
-                201.5
+                175.1
               ],
               [
                 "V1",
                 3,
                 "WW-V1",
-                "3O",
-                213.1
+                [
+                  1,
+                  3
+                ],
+                196.4
               ],
               [
                 "V2",
-                2,
+                3,
                 "WW-V2",
                 [
                   2,
                   3
                 ],
-                236.4
+                207.6
+              ],
+              [
+                "V3",
+                3,
+                "V3",
+                [
+                  2,
+                  3
+                ],
+                230.5
               ],
               [
                 "I1",
                 2,
                 "WW-I1",
                 [
-                  5,
-                  1
+                  1,
+                  5
                 ],
-                241.0
+                235
               ],
               [
                 "I2",
@@ -4315,28 +4356,26 @@
                   3,
                   4
                 ],
-                257.0
+                251.3
               ],
               [
                 "I3",
                 3,
                 "WW-I3",
                 [
+                  1,
                   3,
-                  5,
-                  1
+                  5
                 ],
-                265.0
+                259.4
               ],
               [
                 "O1",
                 3,
                 "WW-O1",
-                [
-                  5
-                ],
-                270.9,
-                277.7
+                5,
+                264.5,
+                null
               ],
               null,
               null,
@@ -4352,11 +4391,11 @@
               {
                 "name": "Intro",
                 "start": 0,
-                "end": 4
+                "end": 3
               },
               {
                 "name": "Verse 1",
-                "start": 5,
+                "start": 4,
                 "end": 6
               },
               {
@@ -4365,22 +4404,12 @@
                 "end": 9
               },
               {
-                "name": "Break",
+                "name": "bridge",
                 "start": 10,
-                "end": 10
-              },
-              {
-                "name": "Interlude",
-                "start": 11,
-                "end": 11
-              },
-              {
-                "name": "Solo",
-                "start": 12,
                 "end": 12
               },
               {
-                "name": "Verse 3",
+                "name": "verse 3",
                 "start": 13,
                 "end": 15
               },
@@ -4743,6 +4772,43 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "intro",
+                "start": 0,
+                "end": 0
+              },
+              {
+                "name": "VERSE 1",
+                "start": 1,
+                "end": 2
+              },
+              {
+                "name": "VERSE 2",
+                "start": 3,
+                "end": 5
+              },
+              {
+                "name": "VERSE 3",
+                "start": 6,
+                "end": 7
+              },
+              {
+                "name": "S1",
+                "start": 8,
+                "end": 8
+              },
+              {
+                "name": "VERSE 4",
+                "start": 9,
+                "end": 10
+              },
+              {
+                "name": "OUTRO",
+                "start": 11,
+                "end": 15
+              }
             ]
           },
           {
@@ -4850,6 +4916,43 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "INTRO",
+                "start": 0,
+                "end": 0
+              },
+              {
+                "name": "VERSE 1",
+                "start": 1,
+                "end": 2
+              },
+              {
+                "name": "VERSE 2",
+                "start": 3,
+                "end": 4
+              },
+              {
+                "name": "VERSE 3",
+                "start": 5,
+                "end": 6
+              },
+              {
+                "name": "SOLO",
+                "start": 7,
+                "end": 7
+              },
+              {
+                "name": "VERSE 4",
+                "start": 8,
+                "end": 10
+              },
+              {
+                "name": "V5",
+                "start": 11,
+                "end": 11
+              }
             ]
           },
           {
@@ -4950,7 +5053,7 @@
                 166.1
               ],
               [
-                "V4",
+                "B1",
                 2,
                 "IM-V4",
                 3,
@@ -4999,7 +5102,7 @@
                   1,
                   3
                 ],
-                281.6
+                289.2
               ],
               [
                 "O2",
@@ -5041,6 +5144,43 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "INTRO",
+                "start": 0,
+                "end": 0
+              },
+              {
+                "name": "VERSE 1",
+                "start": 1,
+                "end": 2
+              },
+              {
+                "name": "VERSE 2",
+                "start": 3,
+                "end": 4
+              },
+              {
+                "name": "VERSE 3",
+                "start": 5,
+                "end": 6
+              },
+              {
+                "name": "SOLO",
+                "start": 7,
+                "end": 10
+              },
+              {
+                "name": "VERSE 4",
+                "start": 11,
+                "end": 12
+              },
+              {
+                "name": "OUTRO",
+                "start": 13,
+                "end": 16
+              }
             ]
           },
           {
@@ -5086,14 +5226,14 @@
                 3,
                 "EF-B1",
                 1,
-                108.9
+                116.1
               ],
               [
                 "B2",
                 3,
                 "EF-B2",
                 1,
-                136.3
+                136.6
               ],
               [
                 "B3",
@@ -5166,6 +5306,33 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "VERSE 1",
+                "start": 0,
+                "end": 1
+              },
+              {
+                "name": "VERSE 2",
+                "start": 2,
+                "end": 4
+              },
+              {
+                "name": "BRIDGE",
+                "start": 5,
+                "end": 10
+              },
+              {
+                "name": "VERSE 3",
+                "start": 11,
+                "end": 12
+              },
+              {
+                "name": "OUTRO",
+                "start": 13,
+                "end": 14
+              }
             ]
           },
           {
@@ -5183,14 +5350,14 @@
                 3,
                 "V2",
                 1,
-                86.7
+                42.6
               ],
               [
                 "V1",
                 3,
                 "HOD-V1",
                 1,
-                107.8
+                86.7
               ],
               [
                 "B1",
@@ -5303,6 +5470,43 @@
               null,
               null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "verse 1",
+                "start": 0,
+                "end": 1
+              },
+              {
+                "name": "v2",
+                "start": 2,
+                "end": 2
+              },
+              {
+                "name": "bridge 1",
+                "start": 3,
+                "end": 6
+              },
+              {
+                "name": "bridge 2",
+                "start": 7,
+                "end": 11
+              },
+              {
+                "name": "verse 3",
+                "start": 12,
+                "end": 13
+              },
+              {
+                "name": "verse 4",
+                "start": 14,
+                "end": 15
+              },
+              {
+                "name": "outro",
+                "start": 16,
+                "end": 16
+              }
             ]
           },
           {
@@ -8432,87 +8636,6 @@
     },
     {
       "album": "Black Sabbath",
-      "song": "Wasp/Behind the Wall of Sleep",
-      "endSec": 194.7,
-      "complete": true,
-      "riffSaturationIndex": 1.399,
-      "chips": [
-        {
-          "code": "I1",
-          "tier": 3,
-          "start": 0,
-          "stop": 11.1,
-          "duration": 11.1,
-          "lick": "BWS-I1"
-        },
-        {
-          "code": "I2",
-          "tier": 2,
-          "start": 11.1,
-          "stop": 21.4,
-          "duration": 10.3,
-          "lick": "BWS-I2"
-        },
-        {
-          "code": "I1",
-          "tier": 3,
-          "start": 21.4,
-          "stop": 37.4,
-          "duration": 16,
-          "lick": "BWS-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 37.4,
-          "stop": 89.6,
-          "duration": 52.2,
-          "lick": "BWS-V1"
-        },
-        {
-          "code": "B1",
-          "tier": 3,
-          "start": 89.6,
-          "stop": 120.1,
-          "duration": 30.5,
-          "lick": "BWS-B1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 120.1,
-          "stop": 150.5,
-          "duration": 30.4,
-          "lick": "BWS-S1"
-        },
-        {
-          "code": "I1",
-          "tier": 3,
-          "start": 150.5,
-          "stop": 166.9,
-          "duration": 16.4,
-          "lick": "BWS-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 166.9,
-          "stop": 188.2,
-          "duration": 21.3,
-          "lick": "BWS-V1"
-        },
-        {
-          "code": "O1",
-          "tier": 2,
-          "start": 188.2,
-          "stop": 194.7,
-          "duration": 6.5,
-          "lick": "BWS-O1"
-        }
-      ]
-    },
-    {
-      "album": "Black Sabbath",
       "song": "N.I.B.",
       "endSec": 360.3,
       "complete": true,
@@ -8617,417 +8740,6 @@
       ]
     },
     {
-      "album": "Black Sabbath",
-      "song": "Wicked World",
-      "endSec": 277.7,
-      "complete": true,
-      "riffSaturationIndex": 1.537,
-      "chips": [
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 4.0,
-          "stop": 20.0,
-          "duration": 16.0,
-          "lick": "WW-I1"
-        },
-        {
-          "code": "I2",
-          "tier": 2,
-          "start": 20.0,
-          "stop": 28.0,
-          "duration": 8.0,
-          "lick": "WW-I2"
-        },
-        {
-          "code": "I3",
-          "tier": 3,
-          "start": 28.0,
-          "stop": 38.0,
-          "duration": 10.0,
-          "lick": "WW-I3"
-        },
-        {
-          "code": "I4",
-          "tier": 3,
-          "start": 38.0,
-          "stop": 53.9,
-          "duration": 15.9,
-          "lick": "WW-I4"
-        },
-        {
-          "code": "I5",
-          "tier": 3,
-          "start": 53.9,
-          "stop": 65.7,
-          "duration": 11.8,
-          "lick": "WW-I5"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 65.7,
-          "stop": 89.2,
-          "duration": 23.5,
-          "lick": "WW-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 89.2,
-          "stop": 93.8,
-          "duration": 4.6,
-          "lick": "WW-V2"
-        },
-        {
-          "code": "I5",
-          "tier": 3,
-          "start": 93.8,
-          "stop": 99.7,
-          "duration": 5.9,
-          "lick": "WW-I5"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 99.7,
-          "stop": 123.3,
-          "duration": 23.6,
-          "lick": "WW-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 123.3,
-          "stop": 127.8,
-          "duration": 4.5,
-          "lick": "WW-V2"
-        },
-        {
-          "code": "V3",
-          "tier": 3,
-          "start": 127.8,
-          "stop": 137.0,
-          "duration": 9.2,
-          "lick": "WW-V3"
-        },
-        {
-          "code": "B1",
-          "tier": 2,
-          "start": 137.0,
-          "stop": 180.7,
-          "duration": 43.7,
-          "lick": "WW-B1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 180.7,
-          "stop": 201.5,
-          "duration": 20.8,
-          "lick": "WW-S1"
-        },
-        {
-          "code": "I5",
-          "tier": 3,
-          "start": 201.5,
-          "stop": 213.1,
-          "duration": 11.6,
-          "lick": "WW-I5"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 213.1,
-          "stop": 236.4,
-          "duration": 23.3,
-          "lick": "WW-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 236.4,
-          "stop": 241.0,
-          "duration": 4.6,
-          "lick": "WW-V2"
-        },
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 241.0,
-          "stop": 257.0,
-          "duration": 16.0,
-          "lick": "WW-I1"
-        },
-        {
-          "code": "I2",
-          "tier": 2,
-          "start": 257.0,
-          "stop": 265.0,
-          "duration": 8.0,
-          "lick": "WW-I2"
-        },
-        {
-          "code": "I3",
-          "tier": 3,
-          "start": 265.0,
-          "stop": 270.9,
-          "duration": 5.9,
-          "lick": "WW-I3"
-        },
-        {
-          "code": "O1",
-          "tier": 3,
-          "start": 270.9,
-          "stop": 277.7,
-          "duration": 6.8,
-          "lick": "WW-O1"
-        }
-      ]
-    },
-    {
-      "album": "Paranoid",
-      "song": "War Pigs",
-      "endSec": 467.1,
-      "complete": true,
-      "riffSaturationIndex": 2.123,
-      "chips": [
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 0,
-          "stop": 51.9,
-          "duration": 51.9,
-          "lick": "WP-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 51.9,
-          "stop": 105.9,
-          "duration": 54,
-          "lick": "WP-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 105.9,
-          "stop": 126.9,
-          "duration": 21,
-          "lick": "WP-V2"
-        },
-        {
-          "code": "V3",
-          "tier": 2,
-          "start": 126.9,
-          "stop": 137.5,
-          "duration": 10.6,
-          "lick": "WP-V3"
-        },
-        {
-          "code": "V4",
-          "tier": 1,
-          "start": 137.5,
-          "stop": 158.2,
-          "duration": 20.7,
-          "lick": "WP-V4"
-        },
-        {
-          "code": "V3",
-          "tier": 2,
-          "start": 158.2,
-          "stop": 168.6,
-          "duration": 10.4,
-          "lick": "WP-V3"
-        },
-        {
-          "code": "V4",
-          "tier": 1,
-          "start": 168.6,
-          "stop": 189.5,
-          "duration": 20.9,
-          "lick": "WP-V4"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 189.5,
-          "stop": 210.4,
-          "duration": 20.9,
-          "lick": "WP-V2"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 210.4,
-          "stop": 269.2,
-          "duration": 58.8,
-          "lick": "WP-S1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 269.2,
-          "stop": 322.6,
-          "duration": 53.4,
-          "lick": "WP-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 322.6,
-          "stop": 343.3,
-          "duration": 20.7,
-          "lick": "WP-V2"
-        },
-        {
-          "code": "O1",
-          "tier": 2,
-          "start": 343.3,
-          "stop": 394.4,
-          "duration": 51.1,
-          "lick": "WP-O1"
-        },
-        {
-          "code": "O2",
-          "tier": 1,
-          "start": 394.4,
-          "stop": 416.1,
-          "duration": 21.7,
-          "lick": "WP-O2"
-        },
-        {
-          "code": "S2",
-          "tier": 1,
-          "start": 416.1,
-          "stop": 437.2,
-          "duration": 21.1,
-          "lick": "WP-S2"
-        },
-        {
-          "code": "O2",
-          "tier": 1,
-          "start": 437.2,
-          "stop": 458.7,
-          "duration": 21.5,
-          "lick": "WP-O2"
-        },
-        {
-          "code": "O1",
-          "tier": 2,
-          "start": 458.7,
-          "stop": 467.1,
-          "duration": 8.4,
-          "lick": "WP-O1"
-        }
-      ]
-    },
-    {
-      "album": "Paranoid",
-      "song": "Paranoid",
-      "endSec": 164.2,
-      "complete": true,
-      "riffSaturationIndex": 1.502,
-      "chips": [
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 0,
-          "stop": 12.2,
-          "duration": 12.2,
-          "lick": "P-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 12.2,
-          "stop": 23.9,
-          "duration": 11.7,
-          "lick": "P-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 3,
-          "start": 23.9,
-          "stop": 35.7,
-          "duration": 11.8,
-          "lick": "P-V2"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 35.7,
-          "stop": 47.4,
-          "duration": 11.7,
-          "lick": "P-V1"
-        },
-        {
-          "code": "V3",
-          "tier": 3,
-          "start": 47.4,
-          "stop": 59.2,
-          "duration": 11.8,
-          "lick": "P-V3"
-        },
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 59.2,
-          "stop": 70.9,
-          "duration": 11.7,
-          "lick": "P-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 70.9,
-          "stop": 82.7,
-          "duration": 11.8,
-          "lick": "P-V1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 82.7,
-          "stop": 106.1,
-          "duration": 23.4,
-          "lick": "P-S1"
-        },
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 106.1,
-          "stop": 117.8,
-          "duration": 11.7,
-          "lick": "P-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 117.8,
-          "stop": 129.6,
-          "duration": 11.8,
-          "lick": "P-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 3,
-          "start": 129.6,
-          "stop": 141.3,
-          "duration": 11.7,
-          "lick": "P-V2"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 141.3,
-          "stop": 164.2,
-          "duration": 22.9,
-          "lick": "P-V1"
-        }
-      ]
-    },
-    {
       "album": "Paranoid",
       "song": "Planet Caravan",
       "endSec": 269,
@@ -9049,417 +8761,6 @@
           "stop": 269,
           "duration": 120,
           "lick": "PC-S1"
-        }
-      ]
-    },
-    {
-      "album": "Paranoid",
-      "song": "Iron Man",
-      "endSec": 351,
-      "complete": true,
-      "riffSaturationIndex": 2.654,
-      "chips": [
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 28,
-          "stop": 73.1,
-          "duration": 45.1,
-          "lick": "IM-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 73.1,
-          "stop": 92.7,
-          "duration": 19.6,
-          "lick": "IM-V2"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 92.7,
-          "stop": 117.7,
-          "duration": 25,
-          "lick": "IM-V1"
-        },
-        {
-          "code": "V3",
-          "tier": 2,
-          "start": 117.7,
-          "stop": 141.1,
-          "duration": 23.4,
-          "lick": "IM-V3"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 141.1,
-          "stop": 166.1,
-          "duration": 25,
-          "lick": "IM-V1"
-        },
-        {
-          "code": "V3",
-          "tier": 2,
-          "start": 166.1,
-          "stop": 191.4,
-          "duration": 25.3,
-          "lick": "IM-V3"
-        },
-        {
-          "code": "V4",
-          "tier": 2,
-          "start": 191.4,
-          "stop": 197.1,
-          "duration": 5.7,
-          "lick": "IM-V4"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 197.1,
-          "stop": 219.1,
-          "duration": 22,
-          "lick": "IM-S1"
-        },
-        {
-          "code": "V4",
-          "tier": 2,
-          "start": 219.1,
-          "stop": 225.5,
-          "duration": 6.4,
-          "lick": "IM-V4"
-        },
-        {
-          "code": "V4",
-          "tier": 2,
-          "start": 225.5,
-          "stop": 237.4,
-          "duration": 11.9,
-          "lick": "IM-V4"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 237.4,
-          "stop": 262.2,
-          "duration": 24.8,
-          "lick": "IM-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 262.2,
-          "stop": 281.6,
-          "duration": 19.4,
-          "lick": "IM-V2"
-        },
-        {
-          "code": "O1",
-          "tier": 1,
-          "start": 281.6,
-          "stop": 301.5,
-          "duration": 19.9,
-          "lick": "IM-O1"
-        },
-        {
-          "code": "O2",
-          "tier": 1,
-          "start": 301.5,
-          "stop": 313.7,
-          "duration": 12.2,
-          "lick": "IM-O1"
-        },
-        {
-          "code": "S2",
-          "tier": 1,
-          "start": 313.7,
-          "stop": 331.8,
-          "duration": 18.1,
-          "lick": "IM-S2"
-        },
-        {
-          "code": "O2",
-          "tier": 1,
-          "start": 331.8,
-          "stop": 351,
-          "duration": 19.2,
-          "lick": "IM-O1"
-        }
-      ]
-    },
-    {
-      "album": "Paranoid",
-      "song": "Electric Funeral",
-      "endSec": 279,
-      "complete": true,
-      "riffSaturationIndex": 1,
-      "chips": [
-        {
-          "code": "I1",
-          "tier": 3,
-          "start": 0,
-          "stop": 15.8,
-          "duration": 15.8,
-          "lick": "EF-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 15.8,
-          "stop": 46.9,
-          "duration": 31.1,
-          "lick": "EF-V1"
-        },
-        {
-          "code": "I1",
-          "tier": 3,
-          "start": 46.9,
-          "stop": 62.4,
-          "duration": 15.5,
-          "lick": "EF-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 62.4,
-          "stop": 93.5,
-          "duration": 31.1,
-          "lick": "EF-V1"
-        },
-        {
-          "code": "I1",
-          "tier": 3,
-          "start": 93.5,
-          "stop": 108.9,
-          "duration": 15.4,
-          "lick": "EF-I1"
-        },
-        {
-          "code": "B1",
-          "tier": 3,
-          "start": 108.9,
-          "stop": 136.3,
-          "duration": 27.4,
-          "lick": "EF-B1"
-        },
-        {
-          "code": "B2",
-          "tier": 3,
-          "start": 136.3,
-          "stop": 145.1,
-          "duration": 8.8,
-          "lick": "EF-B2"
-        },
-        {
-          "code": "B3",
-          "tier": 3,
-          "start": 145.1,
-          "stop": 153.3,
-          "duration": 8.2,
-          "lick": "EF-B3"
-        },
-        {
-          "code": "B2",
-          "tier": 3,
-          "start": 153.3,
-          "stop": 161.5,
-          "duration": 8.2,
-          "lick": "EF-B2"
-        },
-        {
-          "code": "B3",
-          "tier": 3,
-          "start": 161.5,
-          "stop": 169.8,
-          "duration": 8.3,
-          "lick": "EF-B3"
-        },
-        {
-          "code": "B4",
-          "tier": 3,
-          "start": 169.8,
-          "stop": 188.1,
-          "duration": 18.3,
-          "lick": "EF-B4"
-        },
-        {
-          "code": "I1",
-          "tier": 3,
-          "start": 188.1,
-          "stop": 203.3,
-          "duration": 15.2,
-          "lick": "EF-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 203.3,
-          "stop": 233.4,
-          "duration": 30.1,
-          "lick": "EF-V1"
-        },
-        {
-          "code": "I1",
-          "tier": 3,
-          "start": 233.4,
-          "stop": 248.7,
-          "duration": 15.3,
-          "lick": "EF-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 248.7,
-          "stop": 279,
-          "duration": 30.3,
-          "lick": "EF-V1"
-        }
-      ]
-    },
-    {
-      "album": "Paranoid",
-      "song": "Hand of Doom",
-      "endSec": 428,
-      "complete": true,
-      "riffSaturationIndex": 1.478,
-      "chips": [
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 0,
-          "stop": 86.7,
-          "duration": 86.7,
-          "lick": "HOD-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 3,
-          "start": 86.7,
-          "stop": 107.8,
-          "duration": 21.1,
-          "lick": "V2"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 107.8,
-          "stop": 125,
-          "duration": 17.2,
-          "lick": "HOD-V1"
-        },
-        {
-          "code": "B1",
-          "tier": 2,
-          "start": 125,
-          "stop": 138.8,
-          "duration": 13.8,
-          "lick": "HOD-B1"
-        },
-        {
-          "code": "B2",
-          "tier": 1,
-          "start": 138.8,
-          "stop": 166.2,
-          "duration": 27.4,
-          "lick": "HOD-B2"
-        },
-        {
-          "code": "B1",
-          "tier": 2,
-          "start": 166.2,
-          "stop": 179.9,
-          "duration": 13.7,
-          "lick": "HOD-B1"
-        },
-        {
-          "code": "B2",
-          "tier": 1,
-          "start": 179.9,
-          "stop": 207.2,
-          "duration": 27.3,
-          "lick": "HOD-B2"
-        },
-        {
-          "code": "B3",
-          "tier": 3,
-          "start": 207.2,
-          "stop": 217.1,
-          "duration": 9.9,
-          "lick": "HOD-B3"
-        },
-        {
-          "code": "B4",
-          "tier": 3,
-          "start": 217.1,
-          "stop": 250.8,
-          "duration": 33.7,
-          "lick": "HOD-B4"
-        },
-        {
-          "code": "B1",
-          "tier": 2,
-          "start": 250.8,
-          "stop": 264.6,
-          "duration": 13.8,
-          "lick": "HOD-B1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 264.6,
-          "stop": 291.5,
-          "duration": 26.9,
-          "lick": "HOD-S1"
-        },
-        {
-          "code": "B5",
-          "tier": 3,
-          "start": 291.5,
-          "stop": 297,
-          "duration": 5.5,
-          "lick": "B5"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 297,
-          "stop": 340.6,
-          "duration": 43.6,
-          "lick": "HOD-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 3,
-          "start": 340.6,
-          "stop": 361.9,
-          "duration": 21.3,
-          "lick": "V2"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 361.9,
-          "stop": 384.2,
-          "duration": 22.3,
-          "lick": "HOD-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 3,
-          "start": 384.2,
-          "stop": 405.4,
-          "duration": 21.2,
-          "lick": "V2"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 405.4,
-          "stop": 428,
-          "duration": 22.6,
-          "lick": "HOD-V1"
         }
       ]
     },
@@ -11557,6 +10858,909 @@
           "stop": 198,
           "duration": 28.7,
           "lick": "EW-C1"
+        }
+      ]
+    },
+    {
+      "album": "Black Sabbath",
+      "song": "Wasp/Behind the Wall of Sleep",
+      "endSec": 194.7,
+      "complete": true,
+      "riffSaturationIndex": 1.399,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 0,
+          "stop": 11.1,
+          "duration": 11.1,
+          "lick": "BWS-I1"
+        },
+        {
+          "code": "I2",
+          "tier": 2,
+          "start": 11.1,
+          "stop": 21.4,
+          "duration": 10.3,
+          "lick": "BWS-I2"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 21.4,
+          "stop": 37.4,
+          "duration": 16,
+          "lick": "BWS-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 37.4,
+          "stop": 89.6,
+          "duration": 52.2,
+          "lick": "BWS-V1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 89.6,
+          "stop": 120.1,
+          "duration": 30.5,
+          "lick": "BWS-B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 120.1,
+          "stop": 150.5,
+          "duration": 30.4,
+          "lick": "BWS-S1"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 150.5,
+          "stop": 166.9,
+          "duration": 16.4,
+          "lick": "BWS-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 166.9,
+          "stop": 188.2,
+          "duration": 21.3,
+          "lick": "BWS-V1"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 188.2,
+          "stop": 194.7,
+          "duration": 6.5,
+          "lick": "BWS-O1"
+        }
+      ]
+    },
+    {
+      "album": "Black Sabbath",
+      "song": "Wicked World",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1.349,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 4,
+          "stop": 20,
+          "duration": 16,
+          "lick": "WW-I1"
+        },
+        {
+          "code": "I2",
+          "tier": 2,
+          "start": 20,
+          "stop": 28,
+          "duration": 8,
+          "lick": "WW-I2"
+        },
+        {
+          "code": "I3",
+          "tier": 3,
+          "start": 28,
+          "stop": 38,
+          "duration": 10,
+          "lick": "WW-I3"
+        },
+        {
+          "code": "I4",
+          "tier": 3,
+          "start": 38,
+          "stop": 53.3,
+          "duration": 15.3,
+          "lick": "WW-I4"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 53.3,
+          "stop": 64.7,
+          "duration": 11.4,
+          "lick": "ww-v1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 64.7,
+          "stop": 87.5,
+          "duration": 22.8,
+          "lick": "WW-V2"
+        },
+        {
+          "code": "V3",
+          "tier": 3,
+          "start": 87.5,
+          "stop": 92.3,
+          "duration": 4.8,
+          "lick": "WW-V3"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 92.3,
+          "stop": 98.1,
+          "duration": 5.8,
+          "lick": "WW-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 98.1,
+          "stop": 121.2,
+          "duration": 23.1,
+          "lick": "WW-V2"
+        },
+        {
+          "code": "V3",
+          "tier": 3,
+          "start": 121.2,
+          "stop": 125.8,
+          "duration": 4.6,
+          "lick": "V3"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 125.8,
+          "stop": 134.9,
+          "duration": 9.1,
+          "lick": "B1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 134.9,
+          "stop": 175.1,
+          "duration": 40.2,
+          "lick": "WW-B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 175.1,
+          "stop": 196.4,
+          "duration": 21.3,
+          "lick": "WW-S1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 196.4,
+          "stop": 207.6,
+          "duration": 11.2,
+          "lick": "WW-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 207.6,
+          "stop": 230.5,
+          "duration": 22.9,
+          "lick": "WW-V2"
+        },
+        {
+          "code": "V3",
+          "tier": 3,
+          "start": 230.5,
+          "stop": 235,
+          "duration": 4.5,
+          "lick": "V3"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 235,
+          "stop": 251.3,
+          "duration": 16.3,
+          "lick": "WW-I1"
+        },
+        {
+          "code": "I2",
+          "tier": 2,
+          "start": 251.3,
+          "stop": 259.4,
+          "duration": 8.1,
+          "lick": "WW-I2"
+        },
+        {
+          "code": "I3",
+          "tier": 3,
+          "start": 259.4,
+          "stop": 264.5,
+          "duration": 5.1,
+          "lick": "WW-I3"
+        },
+        {
+          "code": "O1",
+          "tier": 3,
+          "start": 264.5,
+          "stop": null,
+          "duration": null,
+          "lick": "WW-O1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "War Pigs",
+      "endSec": 467.1,
+      "complete": true,
+      "riffSaturationIndex": 2.123,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": 51.9,
+          "duration": 51.9,
+          "lick": "WP-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 51.9,
+          "stop": 105.9,
+          "duration": 54,
+          "lick": "WP-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 105.9,
+          "stop": 126.9,
+          "duration": 21,
+          "lick": "WP-V2"
+        },
+        {
+          "code": "V3",
+          "tier": 2,
+          "start": 126.9,
+          "stop": 137.5,
+          "duration": 10.6,
+          "lick": "WP-V3"
+        },
+        {
+          "code": "V4",
+          "tier": 1,
+          "start": 137.5,
+          "stop": 158.2,
+          "duration": 20.7,
+          "lick": "WP-V4"
+        },
+        {
+          "code": "V3",
+          "tier": 2,
+          "start": 158.2,
+          "stop": 168.6,
+          "duration": 10.4,
+          "lick": "WP-V3"
+        },
+        {
+          "code": "V4",
+          "tier": 1,
+          "start": 168.6,
+          "stop": 189.5,
+          "duration": 20.9,
+          "lick": "WP-V4"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 189.5,
+          "stop": 210.4,
+          "duration": 20.9,
+          "lick": "WP-V2"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 210.4,
+          "stop": 269.2,
+          "duration": 58.8,
+          "lick": "WP-S1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 269.2,
+          "stop": 322.6,
+          "duration": 53.4,
+          "lick": "WP-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 322.6,
+          "stop": 343.3,
+          "duration": 20.7,
+          "lick": "WP-V2"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 343.3,
+          "stop": 394.4,
+          "duration": 51.1,
+          "lick": "WP-O1"
+        },
+        {
+          "code": "O2",
+          "tier": 1,
+          "start": 394.4,
+          "stop": 416.1,
+          "duration": 21.7,
+          "lick": "WP-O2"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 416.1,
+          "stop": 437.2,
+          "duration": 21.1,
+          "lick": "WP-S2"
+        },
+        {
+          "code": "O2",
+          "tier": 1,
+          "start": 437.2,
+          "stop": 458.7,
+          "duration": 21.5,
+          "lick": "WP-O2"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 458.7,
+          "stop": 467.1,
+          "duration": 8.4,
+          "lick": "WP-O1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "Paranoid",
+      "endSec": 164.2,
+      "complete": true,
+      "riffSaturationIndex": 1.502,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": 12.2,
+          "duration": 12.2,
+          "lick": "P-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 12.2,
+          "stop": 23.9,
+          "duration": 11.7,
+          "lick": "P-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 23.9,
+          "stop": 35.7,
+          "duration": 11.8,
+          "lick": "P-V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 35.7,
+          "stop": 47.4,
+          "duration": 11.7,
+          "lick": "P-V1"
+        },
+        {
+          "code": "V3",
+          "tier": 3,
+          "start": 47.4,
+          "stop": 59.2,
+          "duration": 11.8,
+          "lick": "P-V3"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 59.2,
+          "stop": 70.9,
+          "duration": 11.7,
+          "lick": "P-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 70.9,
+          "stop": 82.7,
+          "duration": 11.8,
+          "lick": "P-V1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 82.7,
+          "stop": 106.1,
+          "duration": 23.4,
+          "lick": "P-S1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 106.1,
+          "stop": 117.8,
+          "duration": 11.7,
+          "lick": "P-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 117.8,
+          "stop": 129.6,
+          "duration": 11.8,
+          "lick": "P-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 129.6,
+          "stop": 141.3,
+          "duration": 11.7,
+          "lick": "P-V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 141.3,
+          "stop": 164.2,
+          "duration": 22.9,
+          "lick": "P-V1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "Iron Man",
+      "endSec": 351,
+      "complete": true,
+      "riffSaturationIndex": 2.631,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 28,
+          "stop": 73.1,
+          "duration": 45.1,
+          "lick": "IM-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 73.1,
+          "stop": 92.7,
+          "duration": 19.6,
+          "lick": "IM-V2"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 92.7,
+          "stop": 117.7,
+          "duration": 25,
+          "lick": "IM-V1"
+        },
+        {
+          "code": "V3",
+          "tier": 2,
+          "start": 117.7,
+          "stop": 141.1,
+          "duration": 23.4,
+          "lick": "IM-V3"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 141.1,
+          "stop": 166.1,
+          "duration": 25,
+          "lick": "IM-V1"
+        },
+        {
+          "code": "V3",
+          "tier": 2,
+          "start": 166.1,
+          "stop": 191.4,
+          "duration": 25.3,
+          "lick": "IM-V3"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 191.4,
+          "stop": 197.1,
+          "duration": 5.7,
+          "lick": "IM-V4"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 197.1,
+          "stop": 219.1,
+          "duration": 22,
+          "lick": "IM-S1"
+        },
+        {
+          "code": "V4",
+          "tier": 2,
+          "start": 219.1,
+          "stop": 225.5,
+          "duration": 6.4,
+          "lick": "IM-V4"
+        },
+        {
+          "code": "V4",
+          "tier": 2,
+          "start": 225.5,
+          "stop": 237.4,
+          "duration": 11.9,
+          "lick": "IM-V4"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 237.4,
+          "stop": 262.2,
+          "duration": 24.8,
+          "lick": "IM-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 262.2,
+          "stop": 289.2,
+          "duration": 27,
+          "lick": "IM-V2"
+        },
+        {
+          "code": "O1",
+          "tier": 1,
+          "start": 289.2,
+          "stop": 301.5,
+          "duration": 12.3,
+          "lick": "IM-O1"
+        },
+        {
+          "code": "O2",
+          "tier": 1,
+          "start": 301.5,
+          "stop": 313.7,
+          "duration": 12.2,
+          "lick": "IM-O1"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 313.7,
+          "stop": 331.8,
+          "duration": 18.1,
+          "lick": "IM-S2"
+        },
+        {
+          "code": "O2",
+          "tier": 1,
+          "start": 331.8,
+          "stop": 351,
+          "duration": 19.2,
+          "lick": "IM-O1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "Electric Funeral",
+      "endSec": 279,
+      "complete": true,
+      "riffSaturationIndex": 1,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 0,
+          "stop": 15.8,
+          "duration": 15.8,
+          "lick": "EF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 15.8,
+          "stop": 46.9,
+          "duration": 31.1,
+          "lick": "EF-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 46.9,
+          "stop": 62.4,
+          "duration": 15.5,
+          "lick": "EF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 62.4,
+          "stop": 93.5,
+          "duration": 31.1,
+          "lick": "EF-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 93.5,
+          "stop": 116.1,
+          "duration": 22.6,
+          "lick": "EF-I1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 116.1,
+          "stop": 136.6,
+          "duration": 20.5,
+          "lick": "EF-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 136.6,
+          "stop": 145.1,
+          "duration": 8.5,
+          "lick": "EF-B2"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 145.1,
+          "stop": 153.3,
+          "duration": 8.2,
+          "lick": "EF-B3"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 153.3,
+          "stop": 161.5,
+          "duration": 8.2,
+          "lick": "EF-B2"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 161.5,
+          "stop": 169.8,
+          "duration": 8.3,
+          "lick": "EF-B3"
+        },
+        {
+          "code": "B4",
+          "tier": 3,
+          "start": 169.8,
+          "stop": 188.1,
+          "duration": 18.3,
+          "lick": "EF-B4"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 188.1,
+          "stop": 203.3,
+          "duration": 15.2,
+          "lick": "EF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 203.3,
+          "stop": 233.4,
+          "duration": 30.1,
+          "lick": "EF-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 233.4,
+          "stop": 248.7,
+          "duration": 15.3,
+          "lick": "EF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 248.7,
+          "stop": 279,
+          "duration": 30.3,
+          "lick": "EF-V1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "Hand of Doom",
+      "endSec": 428,
+      "complete": true,
+      "riffSaturationIndex": 1.478,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 0,
+          "stop": 42.6,
+          "duration": 42.6,
+          "lick": "HOD-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 42.6,
+          "stop": 86.7,
+          "duration": 44.1,
+          "lick": "V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 86.7,
+          "stop": 125,
+          "duration": 38.3,
+          "lick": "HOD-V1"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 125,
+          "stop": 138.8,
+          "duration": 13.8,
+          "lick": "HOD-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 1,
+          "start": 138.8,
+          "stop": 166.2,
+          "duration": 27.4,
+          "lick": "HOD-B2"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 166.2,
+          "stop": 179.9,
+          "duration": 13.7,
+          "lick": "HOD-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 1,
+          "start": 179.9,
+          "stop": 207.2,
+          "duration": 27.3,
+          "lick": "HOD-B2"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 207.2,
+          "stop": 217.1,
+          "duration": 9.9,
+          "lick": "HOD-B3"
+        },
+        {
+          "code": "B4",
+          "tier": 3,
+          "start": 217.1,
+          "stop": 250.8,
+          "duration": 33.7,
+          "lick": "HOD-B4"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 250.8,
+          "stop": 264.6,
+          "duration": 13.8,
+          "lick": "HOD-B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 264.6,
+          "stop": 291.5,
+          "duration": 26.9,
+          "lick": "HOD-S1"
+        },
+        {
+          "code": "B5",
+          "tier": 3,
+          "start": 291.5,
+          "stop": 297,
+          "duration": 5.5,
+          "lick": "B5"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 297,
+          "stop": 340.6,
+          "duration": 43.6,
+          "lick": "HOD-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 340.6,
+          "stop": 361.9,
+          "duration": 21.3,
+          "lick": "V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 361.9,
+          "stop": 384.2,
+          "duration": 22.3,
+          "lick": "HOD-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 384.2,
+          "stop": 405.4,
+          "duration": 21.2,
+          "lick": "V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 405.4,
+          "stop": 428,
+          "duration": 22.6,
+          "lick": "HOD-V1"
         }
       ]
     }
