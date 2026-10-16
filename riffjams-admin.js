@@ -297,6 +297,60 @@
   }
 
 
+  /** Batch upload: every file is named after its tab (WW-V2.png -> lick WW-V2). One commit for all of them. */
+  async function batchUpload(files) {
+    var button = qs("chipBatchChoose");
+    try {
+      files = Array.prototype.slice.call(files || []);
+      if (!files.length) return;
+      if (!TOKEN) throw new Error("Connect GitHub first.");
+      if (button) button.disabled = true;
+      var images = [];
+      var addAssets = {};
+      var seen = {};
+      var skipped = [];
+      var unlinked = [];
+      var maps = currentMaps();
+      var soloMapLike = { albums: maps.solo };
+      for (var i = 0; i < files.length; i++) {
+        var lick = safeId(String(files[i].name || "").replace(/\.[^.]+$/, ""));
+        if (!lick || seen[lick]) { skipped.push(files[i].name + (lick ? " (duplicate name)" : " (no usable name)")); continue; }
+        setMessage("Preparing " + (i + 1) + " of " + files.length + "…");
+        var png;
+        try { png = await normalizeToPng(files[i]); }
+        catch (e) { skipped.push(files[i].name + " (" + (e.message || "not an image") + ")"); continue; }
+        seen[lick] = true;
+        var path = IMAGE_DIR + "/" + lick + ".png";
+        var existing = (sharedData.assets || {})[lick] || (window.RIFFJAMS_ASSETS || {})[lick] || "";
+        var vMatch = /[?&]v=(\d+)/.exec(existing);
+        /* Replacing an existing tab: bump ?v= so browsers do not keep showing the old image. */
+        addAssets[lick] = existing ? path + "?v=" + ((vMatch ? parseInt(vMatch[1], 10) : 0) + 1) : path;
+        images.push({ path: path, base64: arrayBufferToBase64(await png.arrayBuffer()) });
+        if (!tabIsStillLinked(maps.albums, soloMapLike, lick)) unlinked.push(lick);
+      }
+      if (!images.length) throw new Error("Nothing to upload. " + skipped.join("; "));
+      setMessage("Saving " + images.length + " tab" + (images.length === 1 ? "" : "s") + " to GitHub in one commit…");
+      var result = await commitWithRebase({
+        message: "Attach " + images.length + " tab" + (images.length === 1 ? "" : "s") + ": " + Object.keys(addAssets).join(", "),
+        images: images,
+        addAssets: addAssets,
+        force: true
+      });
+      window.RIFFJAMS_ASSETS = Object.assign({}, result.manifest.assets || {});
+      var note = "Uploaded " + images.length + ": " + Object.keys(addAssets).join(", ") + ".";
+      if (unlinked.length) note += " Not linked to any chip yet: " + unlinked.join(", ") + ".";
+      if (skipped.length) note += " Skipped: " + skipped.join("; ") + ".";
+      setMessage(note, skipped.length ? "error" : "success");
+      window.setSaveStatus("Uploaded. Publishing…");
+      if (document.body.classList.contains("sections-mode")) window.showSections(true);
+    } catch (error) {
+      if (/expired|Connect GitHub|Bad credentials/i.test(error.message || "")) rememberToken("");
+      setMessage(error.message || "Batch upload failed.", "error");
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
+
   /* ---------- Rebase-safe sync ----------
      Each tab remembers (tabBase) exactly what it loaded from the repo or last committed, per song.
      A commit re-reads riffjams-data.json from the branch head and replaces ONLY the songs this tab
@@ -511,12 +565,14 @@
       };
       try {
         var treeEntries = [];
-        if (opts.imagePath && opts.imageBase64) {
+        var imageList = (opts.images || []).slice();
+        if (opts.imagePath && opts.imageBase64) imageList.push({ path: opts.imagePath, base64: opts.imageBase64 });
+        for (var ii = 0; ii < imageList.length; ii++) {
           var imageGitBlob = await github(prefix + "/git/blobs", {
             method: "POST",
-            body: JSON.stringify({ content: opts.imageBase64, encoding: "base64" })
+            body: JSON.stringify({ content: imageList[ii].base64, encoding: "base64" })
           });
-          treeEntries.push({ path: opts.imagePath, mode: "100644", type: "blob", sha: imageGitBlob.sha });
+          treeEntries.push({ path: imageList[ii].path, mode: "100644", type: "blob", sha: imageGitBlob.sha });
         }
         var dataGitBlob = await github(prefix + "/git/blobs", {
           method: "POST",
@@ -717,6 +773,10 @@
         '<button type="button" id="chipImageClear" class="chip-image-clear" aria-label="Remove screenshot" hidden>×</button>' +
       '</div>' +
       '<input id="chipImageFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>' +
+      '<div class="chip-paste-actions">' +
+        '<button type="button" class="chip-file-pick" id="chipBatchChoose" title="Pick many files named after their tab, e.g. WW-V2.png. Saved in one commit.">Batch upload (name = tab)</button>' +
+      '</div>' +
+      '<input id="chipBatchFile" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>' +
       '<div class="chip-github-connect" id="chipGithubConnect">' +
         '<span id="chipGithubStatus">GitHub connection required</span>' +
         '<button type="button" id="chipGithubOpen">Connect</button>' +
@@ -736,6 +796,8 @@
     qs("chipImageChoose").onclick = function () { qs("chipImageFile").click(); };
     qs("chipImageClear").onclick = function (event) { event.stopPropagation(); clearPendingImage(); setMessage(""); };
     qs("chipAttachSave").onclick = attachAndSave;
+    qs("chipBatchChoose").onclick = function () { qs("chipBatchFile").click(); };
+    qs("chipBatchFile").onchange = function () { var picked = Array.prototype.slice.call(this.files); this.value = ""; batchUpload(picked); };
     qs("chipGithubOpen").onclick = function () { qs("chipTokenPanel").hidden = !qs("chipTokenPanel").hidden; qs("chipGithubToken").focus(); };
     qs("chipGithubDisconnect").onclick = function () { rememberToken(""); setMessage("GitHub disconnected."); };
     qs("chipTokenSave").onclick = async function () {
