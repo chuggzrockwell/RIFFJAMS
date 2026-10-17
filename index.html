@@ -9844,6 +9844,10 @@ function showSections(keepScroll) {
       : (soloMode ? (n + " licks") : (n + " sections")));
   buildSecFilters();
   applySecFilters();
+  fitSongNames(wrapEl);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function(){ fitSongNames(document.querySelector("#sectionsSheet .sections-wrap")); });
+  }
   updateSoloUi();
   syncArrangementButtons();
   if (sectionsMode === "play") {
@@ -9862,6 +9866,30 @@ function showSections(keepScroll) {
     window.scrollTo(0, 0);
   }
   updateEditSaveUi();
+}
+
+/* Widen the song-name column just enough that the longest title is never cut off with an ellipsis. */
+function fitSongNames(wrapEl) {
+  if (!wrapEl || singleSongMode) return;
+  wrapEl.style.removeProperty("--name-w");
+  wrapEl.style.removeProperty("width");
+  var names = wrapEl.querySelectorAll(".song-name");
+  var base = parseFloat(getComputedStyle(wrapEl).getPropertyValue("--name-w")) || 236;
+  var range = document.createRange();
+  var pillMax = 0;
+  for (var i = 0; i < names.length; i++) {
+    if (!names[i].parentElement || !names[i].parentElement.clientWidth) continue; /* hidden by a filter */
+    range.selectNodeContents(names[i]);
+    pillMax = Math.max(pillMax, range.getBoundingClientRect().width + 16);
+  }
+  /* The dark name pill can be at most (--name-w - 2 icons - gaps) wide; make that fit the longest title. */
+  var iconsAndGaps = 2 * (parseFloat(getComputedStyle(wrapEl).getPropertyValue("--chip-h")) - 4) + 18;
+  var needed = Math.ceil(pillMax + iconsAndGaps);
+  if (needed > base) {
+    wrapEl.style.setProperty("--name-w", Math.min(needed, 640) + "px");
+    /* Let the grid grow past the page width instead of squeezing the name pill. */
+    wrapEl.style.width = "max-content";
+  }
 }
 
 var secTypeFilter = {};
