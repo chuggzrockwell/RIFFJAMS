@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-16T21:45:51.527Z",
+  "updatedAt": "2026-10-18T17:47:46.834Z",
   "assets": {
     "V1": "user-tabs/V1.png",
     "PC1": "user-tabs/PC1.png",
@@ -10,7 +10,7 @@
     "B3": "user-tabs/B3.png",
     "B4": "user-tabs/B4.png",
     "S1": "user-tabs/S1.png",
-    "I1": "user-tabs/I1.png",
+    "I1": "user-tabs/I1.png?v=1",
     "B5": "user-tabs/B5.png",
     "B6": "user-tabs/B6.png",
     "B7": "user-tabs/B7.png",
@@ -32,7 +32,10 @@
     "WW-S1": "user-tabs/WW-S1.png?v=3",
     "WW-O1": "user-tabs/WW-O1.png?v=2",
     "ww-v1": "user-tabs/ww-v1.png",
-    "V3": "user-tabs/V3.png"
+    "V3": "user-tabs/V3.png",
+    "I2": "user-tabs/I2.png",
+    "I3": "user-tabs/I3.png",
+    "I4": "user-tabs/I4.png"
   },
   "albums": [
     {
@@ -384,11 +387,36 @@
         {
           "song": "Sleeping Village/ Bit of Finger",
           "sections": [
-            null,
-            null,
-            null,
-            null,
-            null,
+            [
+              "I1",
+              3,
+              "I1",
+              "1O"
+            ],
+            [
+              "I2",
+              2,
+              "I2",
+              3
+            ],
+            [
+              "I3",
+              2,
+              "I3",
+              3
+            ],
+            [
+              "I4",
+              3,
+              "I4",
+              []
+            ],
+            [
+              "S1",
+              1,
+              "",
+              []
+            ],
             null,
             null,
             null,
@@ -4571,11 +4599,35 @@
           {
             "song": "Sleeping Village/ Bit of Finger",
             "chips": [
-              null,
-              null,
-              null,
-              null,
-              null,
+              [
+                "I1",
+                3,
+                "I1",
+                "1O",
+                0
+              ],
+              [
+                "I2",
+                2,
+                "I2",
+                3
+              ],
+              [
+                "I3",
+                2,
+                "I3",
+                3
+              ],
+              [
+                "I4",
+                3,
+                "I4"
+              ],
+              [
+                "S1",
+                1,
+                "SV-S1"
+              ],
               null,
               null,
               null,
@@ -11761,6 +11813,23 @@
           "stop": 428,
           "duration": 22.6,
           "lick": "HOD-V1"
+        }
+      ]
+    },
+    {
+      "album": "Black Sabbath",
+      "song": "Sleeping Village/ Bit of Finger",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "I1"
         }
       ]
     }
