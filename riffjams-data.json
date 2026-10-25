@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-25T17:00:40.076Z",
+  "updatedAt": "2026-10-25T17:02:58.817Z",
   "assets": {
     "V1": "user-tabs/V1.png?v=1",
     "PC1": "user-tabs/PC1.png?v=1",
     "PC2": "user-tabs/PC2.png?v=1",
     "B1": "user-tabs/B1.png?v=2",
-    "B2": "user-tabs/B2.png?v=1",
-    "B3": "user-tabs/B3.png",
+    "B2": "user-tabs/B2.png?v=2",
+    "B3": "user-tabs/B3.png?v=1",
     "B4": "user-tabs/B4.png",
     "S1": "user-tabs/S1.png?v=1",
     "I1": "user-tabs/I1.png?v=1",
@@ -2359,25 +2359,32 @@
               "B2",
               3,
               "B2",
-              []
+              "1O"
             ],
             [
               "C1",
               1,
-              "C1",
-              []
+              "C1"
             ],
             [
               "S2",
               1,
-              "",
-              []
+              "S2"
             ],
             [
               "B2",
               2,
               "B2",
               "1O"
+            ],
+            [
+              "B3",
+              3,
+              "B3",
+              [
+                1,
+                2
+              ]
             ]
           ]
         }
@@ -8639,23 +8646,39 @@
                 "B1",
                 2,
                 "B1",
-                4
+                4,
+                173.3
               ],
               [
                 "B2",
-                2,
+                3,
                 "B2",
-                "1O"
+                "1O",
+                188.2
               ],
               [
                 "C1",
                 1,
-                "C1"
+                "C1",
+                1,
+                196
+              ],
+              [
+                "B3",
+                3,
+                "B3",
+                [
+                  1,
+                  2
+                ],
+                235
               ],
               [
                 "S2",
                 1,
-                "S2"
+                "S2",
+                1,
+                274.6
               ]
             ]
           }
@@ -11972,7 +11995,7 @@
       "song": "Dirty Women",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.218,
+      "riffSaturationIndex": 2.085,
       "chips": [
         {
           "code": "V1",
@@ -12034,9 +12057,49 @@
           "code": "PC2",
           "tier": 2,
           "start": 145.4,
+          "stop": 173.3,
+          "duration": 27.9,
+          "lick": "PC2"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 173.3,
+          "stop": 188.2,
+          "duration": 14.9,
+          "lick": "B1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 188.2,
+          "stop": 196,
+          "duration": 7.8,
+          "lick": "B2"
+        },
+        {
+          "code": "C1",
+          "tier": 1,
+          "start": 196,
+          "stop": 235,
+          "duration": 39,
+          "lick": "C1"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 235,
+          "stop": 274.6,
+          "duration": 39.6,
+          "lick": "B3"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 274.6,
           "stop": null,
           "duration": null,
-          "lick": "PC2"
+          "lick": "S2"
         }
       ]
     }
