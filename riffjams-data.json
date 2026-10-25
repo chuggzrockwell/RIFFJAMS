@@ -1,15 +1,15 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-18T17:47:46.834Z",
+  "updatedAt": "2026-10-25T16:55:37.620Z",
   "assets": {
-    "V1": "user-tabs/V1.png",
-    "PC1": "user-tabs/PC1.png",
-    "PC2": "user-tabs/PC2.png",
-    "B1": "user-tabs/B1.png?v=1",
-    "B2": "user-tabs/B2.png",
+    "V1": "user-tabs/V1.png?v=1",
+    "PC1": "user-tabs/PC1.png?v=1",
+    "PC2": "user-tabs/PC2.png?v=1",
+    "B1": "user-tabs/B1.png?v=2",
+    "B2": "user-tabs/B2.png?v=1",
     "B3": "user-tabs/B3.png",
     "B4": "user-tabs/B4.png",
-    "S1": "user-tabs/S1.png",
+    "S1": "user-tabs/S1.png?v=1",
     "I1": "user-tabs/I1.png?v=1",
     "B5": "user-tabs/B5.png",
     "B6": "user-tabs/B6.png",
@@ -35,7 +35,8 @@
     "V3": "user-tabs/V3.png",
     "I2": "user-tabs/I2.png",
     "I3": "user-tabs/I3.png",
-    "I4": "user-tabs/I4.png"
+    "I4": "user-tabs/I4.png",
+    "C1": "user-tabs/C1.png"
   },
   "albums": [
     {
@@ -2324,7 +2325,62 @@
         },
         {
           "song": "Dirty Women",
-          "sections": []
+          "sections": [
+            [
+              "V1",
+              2,
+              "V1",
+              "1O"
+            ],
+            [
+              "PC1",
+              2,
+              "PC1",
+              "4S"
+            ],
+            [
+              "PC2",
+              2,
+              "PC2",
+              4
+            ],
+            [
+              "S1",
+              1,
+              "S1",
+              []
+            ],
+            [
+              "PC2",
+              2,
+              "PC2",
+              4
+            ],
+            [
+              "B1",
+              3,
+              "B1",
+              4
+            ],
+            [
+              "B2",
+              3,
+              "B2",
+              []
+            ],
+            [
+              "C1",
+              1,
+              "C1",
+              []
+            ],
+            [
+              "B2",
+              2,
+              "B2",
+              "1O"
+            ]
+          ]
         }
       ]
     },
@@ -8523,7 +8579,48 @@
           },
           {
             "song": "Dirty Women",
-            "chips": []
+            "chips": [
+              [
+                "V1",
+                2,
+                "V1",
+                "1O"
+              ],
+              [
+                "PC1",
+                2,
+                "PC1",
+                "4S"
+              ],
+              [
+                "PC2",
+                2,
+                "PC2",
+                4
+              ],
+              [
+                "S1",
+                1,
+                "S1"
+              ],
+              [
+                "B1",
+                3,
+                "B1",
+                4
+              ],
+              [
+                "B2",
+                2,
+                "B2",
+                "1O"
+              ],
+              [
+                "C1",
+                1,
+                "C1"
+              ]
+            ]
           }
         ]
       },
