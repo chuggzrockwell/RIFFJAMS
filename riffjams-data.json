@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-25T16:59:38.465Z",
+  "updatedAt": "2026-10-25T17:00:40.076Z",
   "assets": {
     "V1": "user-tabs/V1.png?v=1",
     "PC1": "user-tabs/PC1.png?v=1",
@@ -2347,8 +2347,7 @@
             [
               "S1",
               1,
-              "S1",
-              []
+              "S1"
             ],
             [
               "B1",
@@ -8609,15 +8608,32 @@
                 64.1
               ],
               [
+                "V1",
+                2,
+                "V1",
+                "1O",
+                76.3
+              ],
+              [
                 "PC2",
                 2,
                 "PC2",
-                4
+                4,
+                84.8
               ],
               [
                 "S1",
                 1,
-                "S1"
+                "S1",
+                1,
+                113.7
+              ],
+              [
+                "PC2",
+                2,
+                "PC2",
+                4,
+                145.4
               ],
               [
                 "B1",
@@ -11956,7 +11972,7 @@
       "song": "Dirty Women",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2,
+      "riffSaturationIndex": 2.218,
       "chips": [
         {
           "code": "V1",
@@ -11986,9 +12002,41 @@
           "code": "PC1",
           "tier": 2,
           "start": 64.1,
+          "stop": 76.3,
+          "duration": 12.2,
+          "lick": "PC1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 76.3,
+          "stop": 84.8,
+          "duration": 8.5,
+          "lick": "V1"
+        },
+        {
+          "code": "PC2",
+          "tier": 2,
+          "start": 84.8,
+          "stop": 113.7,
+          "duration": 28.9,
+          "lick": "PC2"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 113.7,
+          "stop": 145.4,
+          "duration": 31.7,
+          "lick": "S1"
+        },
+        {
+          "code": "PC2",
+          "tier": 2,
+          "start": 145.4,
           "stop": null,
           "duration": null,
-          "lick": "PC1"
+          "lick": "PC2"
         }
       ]
     }
