@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-25T16:58:36.175Z",
+  "updatedAt": "2026-10-25T16:59:38.465Z",
   "assets": {
     "V1": "user-tabs/V1.png?v=1",
     "PC1": "user-tabs/PC1.png?v=1",
@@ -8584,13 +8584,29 @@
                 "V1",
                 2,
                 "V1",
-                "1O"
+                "1O",
+                0
               ],
               [
                 "PC1",
                 2,
                 "PC1",
-                "4S"
+                "4S",
+                26.4
+              ],
+              [
+                "V1",
+                2,
+                "V1",
+                "1O",
+                38.6
+              ],
+              [
+                "PC1",
+                2,
+                "PC1",
+                "4S",
+                64.1
               ],
               [
                 "PC2",
@@ -11932,6 +11948,47 @@
           "stop": null,
           "duration": null,
           "lick": "I1"
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "Dirty Women",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 2,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 0,
+          "stop": 26.4,
+          "duration": 26.4,
+          "lick": "V1"
+        },
+        {
+          "code": "PC1",
+          "tier": 2,
+          "start": 26.4,
+          "stop": 38.6,
+          "duration": 12.2,
+          "lick": "PC1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 38.6,
+          "stop": 64.1,
+          "duration": 25.5,
+          "lick": "V1"
+        },
+        {
+          "code": "PC1",
+          "tier": 2,
+          "start": 64.1,
+          "stop": null,
+          "duration": null,
+          "lick": "PC1"
         }
       ]
     }
