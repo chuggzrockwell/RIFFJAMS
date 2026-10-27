@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-27T01:24:11.101Z",
+  "updatedAt": "2026-10-27T01:25:28.042Z",
   "assets": {
     "V1": "user-tabs/V1.png?v=1",
     "PC1": "user-tabs/PC1.png?v=1",
@@ -8744,14 +8744,35 @@
                 3,
                 "PC1",
                 [],
-                null
+                41
               ],
               [
                 "C1",
                 3,
                 "C1",
                 [],
-                null
+                55.8
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                [],
+                65.4
+              ],
+              [
+                "PC1",
+                3,
+                "PC1",
+                [],
+                41
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                [],
+                55.8
               ],
               [
                 "B1",
@@ -12183,6 +12204,55 @@
           "stop": 422.4,
           "duration": 147.8,
           "lick": "S2"
+        }
+      ]
+    },
+    {
+      "album": "Never Say Die!",
+      "song": "Never Say Die",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1,
+      "chips": [
+        {
+          "code": "PC1",
+          "tier": 3,
+          "start": 41,
+          "stop": 41,
+          "duration": null,
+          "lick": "PC1"
+        },
+        {
+          "code": "PC1",
+          "tier": 3,
+          "start": 41,
+          "stop": 55.8,
+          "duration": 14.8,
+          "lick": "PC1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 55.8,
+          "stop": 55.8,
+          "duration": null,
+          "lick": "C1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 55.8,
+          "stop": 65.4,
+          "duration": 9.6,
+          "lick": "C1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 65.4,
+          "stop": null,
+          "duration": null,
+          "lick": "V1"
         }
       ]
     }
