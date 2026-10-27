@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-27T01:27:31.273Z",
+  "updatedAt": "2026-10-27T01:28:31.414Z",
   "assets": {
     "V1": "user-tabs/V1.png?v=1",
     "PC1": "user-tabs/PC1.png?v=1",
@@ -8796,6 +8796,20 @@
                 151.5
               ],
               [
+                "PC1",
+                3,
+                "PC1",
+                [],
+                170.9
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                [],
+                185.6
+              ],
+              [
                 "S1",
                 1,
                 "S1",
@@ -8815,9 +8829,14 @@
                 "end": 6
               },
               {
-                "name": "Section",
+                "name": "B",
                 "start": 7,
                 "end": 7
+              },
+              {
+                "name": "VERSE 3",
+                "start": 8,
+                "end": 10
               }
             ]
           },
@@ -12236,7 +12255,7 @@
       "song": "Never Say Die",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1,
+      "riffSaturationIndex": 1.134,
       "chips": [
         {
           "code": "PC1",
@@ -12298,9 +12317,25 @@
           "code": "V2",
           "tier": 2,
           "start": 151.5,
+          "stop": 170.9,
+          "duration": 19.4,
+          "lick": "V2"
+        },
+        {
+          "code": "PC1",
+          "tier": 3,
+          "start": 170.9,
+          "stop": 185.6,
+          "duration": 14.7,
+          "lick": "PC1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 185.6,
           "stop": null,
           "duration": null,
-          "lick": "V2"
+          "lick": "C1"
         }
       ]
     }
