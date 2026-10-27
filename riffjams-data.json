@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-27T01:25:28.042Z",
+  "updatedAt": "2026-10-27T01:26:29.724Z",
   "assets": {
     "V1": "user-tabs/V1.png?v=1",
     "PC1": "user-tabs/PC1.png?v=1",
@@ -8765,21 +8765,28 @@
                 3,
                 "PC1",
                 [],
-                41
+                95.4
               ],
               [
                 "C1",
                 3,
                 "C1",
                 [],
-                55.8
+                110.2
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                [],
+                119.9
               ],
               [
                 "B1",
                 3,
                 "B1",
                 [],
-                null
+                129.8
               ],
               [
                 "V2",
@@ -8795,6 +8802,18 @@
                 [],
                 null
               ]
+            ],
+            "sectionRulers": [
+              {
+                "name": "VERSE 1",
+                "start": 0,
+                "end": 2
+              },
+              {
+                "name": "VERSE 2",
+                "start": 3,
+                "end": 6
+              }
             ]
           },
           {
@@ -12218,25 +12237,9 @@
           "code": "PC1",
           "tier": 3,
           "start": 41,
-          "stop": 41,
-          "duration": null,
-          "lick": "PC1"
-        },
-        {
-          "code": "PC1",
-          "tier": 3,
-          "start": 41,
           "stop": 55.8,
           "duration": 14.8,
           "lick": "PC1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 55.8,
-          "stop": 55.8,
-          "duration": null,
-          "lick": "C1"
         },
         {
           "code": "C1",
@@ -12250,9 +12253,41 @@
           "code": "V1",
           "tier": 3,
           "start": 65.4,
+          "stop": 95.4,
+          "duration": 30,
+          "lick": "V1"
+        },
+        {
+          "code": "PC1",
+          "tier": 3,
+          "start": 95.4,
+          "stop": 110.2,
+          "duration": 14.8,
+          "lick": "PC1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 110.2,
+          "stop": 119.9,
+          "duration": 9.7,
+          "lick": "C1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 119.9,
+          "stop": 129.8,
+          "duration": 9.9,
+          "lick": "V1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 129.8,
           "stop": null,
           "duration": null,
-          "lick": "V1"
+          "lick": "B1"
         }
       ]
     }
