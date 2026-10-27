@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-27T01:26:29.724Z",
+  "updatedAt": "2026-10-27T01:27:31.273Z",
   "assets": {
     "V1": "user-tabs/V1.png?v=1",
     "PC1": "user-tabs/PC1.png?v=1",
@@ -8786,14 +8786,14 @@
                 3,
                 "B1",
                 [],
-                129.8
+                129.9
               ],
               [
                 "V2",
                 2,
                 "V2",
                 [],
-                null
+                151.5
               ],
               [
                 "S1",
@@ -8813,6 +8813,11 @@
                 "name": "VERSE 2",
                 "start": 3,
                 "end": 6
+              },
+              {
+                "name": "Section",
+                "start": 7,
+                "end": 7
               }
             ]
           },
@@ -12277,17 +12282,25 @@
           "code": "V1",
           "tier": 3,
           "start": 119.9,
-          "stop": 129.8,
-          "duration": 9.9,
+          "stop": 129.9,
+          "duration": 10,
           "lick": "V1"
         },
         {
           "code": "B1",
           "tier": 3,
-          "start": 129.8,
+          "start": 129.9,
+          "stop": 151.5,
+          "duration": 21.6,
+          "lick": "B1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 151.5,
           "stop": null,
           "duration": null,
-          "lick": "B1"
+          "lick": "V2"
         }
       ]
     }
