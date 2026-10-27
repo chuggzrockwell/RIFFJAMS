@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-27T01:29:31.768Z",
+  "updatedAt": "2026-10-27T01:30:32.000Z",
   "assets": {
     "V1": "user-tabs/V1.png?v=1",
     "PC1": "user-tabs/PC1.png?v=1",
@@ -8726,6 +8726,31 @@
                 "name": "VERSE 1",
                 "start": 0,
                 "end": 1
+              },
+              {
+                "name": "VERSE 2",
+                "start": 2,
+                "end": 3
+              },
+              {
+                "name": "VERSE 3",
+                "start": 4,
+                "end": 5
+              },
+              {
+                "name": "SOLO 1",
+                "start": 6,
+                "end": 7
+              },
+              {
+                "name": "BRIDGE",
+                "start": 8,
+                "end": 9
+              },
+              {
+                "name": "c",
+                "start": 10,
+                "end": 10
               }
             ]
           }
@@ -12151,6 +12176,103 @@
       ]
     },
     {
+      "album": "Never Say Die!",
+      "song": "Never Say Die",
+      "endSec": 224,
+      "complete": true,
+      "riffSaturationIndex": 1.422,
+      "chips": [
+        {
+          "code": "PC1",
+          "tier": 3,
+          "start": 41,
+          "stop": 55.8,
+          "duration": 14.8,
+          "lick": "PC1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 55.8,
+          "stop": 65.4,
+          "duration": 9.6,
+          "lick": "C1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 65.4,
+          "stop": 95.4,
+          "duration": 30,
+          "lick": "V1"
+        },
+        {
+          "code": "PC1",
+          "tier": 3,
+          "start": 95.4,
+          "stop": 110.2,
+          "duration": 14.8,
+          "lick": "PC1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 110.2,
+          "stop": 119.9,
+          "duration": 9.7,
+          "lick": "C1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 119.9,
+          "stop": 129.9,
+          "duration": 10,
+          "lick": "V1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 129.9,
+          "stop": 151.5,
+          "duration": 21.6,
+          "lick": "B1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 151.5,
+          "stop": 170.9,
+          "duration": 19.4,
+          "lick": "V2"
+        },
+        {
+          "code": "PC1",
+          "tier": 3,
+          "start": 170.9,
+          "stop": 185.6,
+          "duration": 14.7,
+          "lick": "PC1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 185.6,
+          "stop": 195.1,
+          "duration": 9.5,
+          "lick": "C1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 195.1,
+          "stop": 224,
+          "duration": 28.9,
+          "lick": "S1"
+        }
+      ]
+    },
+    {
       "album": "Technical Ecstasy",
       "song": "Dirty Women",
       "endSec": 422.4,
@@ -12260,103 +12382,6 @@
           "stop": 422.4,
           "duration": 147.8,
           "lick": "S2"
-        }
-      ]
-    },
-    {
-      "album": "Never Say Die!",
-      "song": "Never Say Die",
-      "endSec": 224,
-      "complete": true,
-      "riffSaturationIndex": 1.422,
-      "chips": [
-        {
-          "code": "PC1",
-          "tier": 3,
-          "start": 41,
-          "stop": 55.8,
-          "duration": 14.8,
-          "lick": "PC1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 55.8,
-          "stop": 65.4,
-          "duration": 9.6,
-          "lick": "C1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 65.4,
-          "stop": 95.4,
-          "duration": 30,
-          "lick": "V1"
-        },
-        {
-          "code": "PC1",
-          "tier": 3,
-          "start": 95.4,
-          "stop": 110.2,
-          "duration": 14.8,
-          "lick": "PC1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 110.2,
-          "stop": 119.9,
-          "duration": 9.7,
-          "lick": "C1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 119.9,
-          "stop": 129.9,
-          "duration": 10,
-          "lick": "V1"
-        },
-        {
-          "code": "B1",
-          "tier": 3,
-          "start": 129.9,
-          "stop": 151.5,
-          "duration": 21.6,
-          "lick": "B1"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 151.5,
-          "stop": 170.9,
-          "duration": 19.4,
-          "lick": "V2"
-        },
-        {
-          "code": "PC1",
-          "tier": 3,
-          "start": 170.9,
-          "stop": 185.6,
-          "duration": 14.7,
-          "lick": "PC1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 185.6,
-          "stop": 195.1,
-          "duration": 9.5,
-          "lick": "C1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 195.1,
-          "stop": 224,
-          "duration": 28.9,
-          "lick": "S1"
         }
       ]
     }
