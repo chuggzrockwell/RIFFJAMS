@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-27T01:28:31.414Z",
+  "updatedAt": "2026-10-27T01:29:31.768Z",
   "assets": {
     "V1": "user-tabs/V1.png?v=1",
     "PC1": "user-tabs/PC1.png?v=1",
@@ -8720,6 +8720,13 @@
                 274.6,
                 422.4
               ]
+            ],
+            "sectionRulers": [
+              {
+                "name": "VERSE 1",
+                "start": 0,
+                "end": 1
+              }
             ]
           }
         ]
@@ -8814,7 +8821,8 @@
                 1,
                 "S1",
                 [],
-                null
+                195.1,
+                224
               ]
             ],
             "sectionRulers": [
@@ -8837,6 +8845,11 @@
                 "name": "VERSE 3",
                 "start": 8,
                 "end": 10
+              },
+              {
+                "name": "SOLO",
+                "start": 11,
+                "end": 11
               }
             ]
           },
@@ -12253,9 +12266,9 @@
     {
       "album": "Never Say Die!",
       "song": "Never Say Die",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.134,
+      "endSec": 224,
+      "complete": true,
+      "riffSaturationIndex": 1.422,
       "chips": [
         {
           "code": "PC1",
@@ -12333,9 +12346,17 @@
           "code": "C1",
           "tier": 3,
           "start": 185.6,
-          "stop": null,
-          "duration": null,
+          "stop": 195.1,
+          "duration": 9.5,
           "lick": "C1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 195.1,
+          "stop": 224,
+          "duration": 28.9,
+          "lick": "S1"
         }
       ]
     }
