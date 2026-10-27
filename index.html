@@ -2124,6 +2124,16 @@
   body.song-meta-two.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta {
     --song-meta-w: 184px;
   }
+  /* Tuning · key · BPM plates: 3 + RSI/aRSI. Sized so each plate stays readable. */
+  body.song-meta-fields.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta {
+    --song-meta-w: 232px;
+  }
+  body.song-meta-fields.song-meta-two.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta {
+    --song-meta-w: 280px;
+  }
+  body.song-meta-fields.song-meta-only-fields.sections-mode:not(.sections-edit):not(.sections-play) .sections-wrap.has-song-meta {
+    --song-meta-w: 180px;
+  }
   /* RSI off: collapse the column so chips hug the nameplate (no gap). */
   body.song-meta-cols-off .sections-wrap {
     --song-meta-w: 0px !important;
@@ -3151,16 +3161,13 @@
     min-width: 0;
     align-self: flex-end;
   }
-  .song-sec-lane,
-  .song-meta-lane {
+  .song-sec-lane {
     position: relative;
     height: 16px;
     margin: 0 0 2px;
     user-select: none;
     border-radius: 2px;
   }
-  /* Rulers → Meta: same bar as a section ruler, but read-only (not a .song-sec-lane, so no drag-to-add). */
-  .song-meta-ruler { background: #1b1e26; color: #e8e6e1; border-color: #2c3040; }
   body.sections-edit .song-sec-lane {
     cursor: crosshair;
     background: rgba(255,255,255,.05);
@@ -4747,7 +4754,7 @@
         <div class="map-tools-menu" id="mapToolsMenu" role="menu">
           <button type="button" class="map-tools-item" id="secPeekBtn" role="menuitemcheckbox" aria-checked="false" title="Hover chips to peek tabs">Peek</button>
           <button type="button" class="map-tools-item" id="secRulersBtn" role="menuitemcheckbox" aria-checked="false" title="Show section rulers">Rulers</button>
-          <button type="button" class="map-tools-item" id="secMetaBtn" role="menuitemcheckbox" aria-checked="false" title="Rulers show each song's tuning, key and BPM instead of sections">Meta</button>
+          <button type="button" class="map-tools-item" id="secMetaBtn" role="menuitemcheckbox" aria-checked="false" title="Show each song's tuning, key and BPM beside RSI">Meta</button>
           <button type="button" class="map-tools-item" id="secMetaColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show RSI column">RSI</button>
           <button type="button" class="map-tools-item" id="secARsiColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show aRSI (adjusted RSI) column — Numpad * then 8">aRSI</button>
           <button type="button" class="map-tools-item" id="secSaturationBtn" role="menuitemcheckbox" aria-checked="false" title="Toggle Arrangement riff-tier purples (any Song Map view) — Numpad * then 6">Saturation</button>
@@ -8284,35 +8291,6 @@ try {
   var _sru = localStorage.getItem(SECTION_RULERS_KEY);
   if (_sru === "0") sectionRulersOn = false;
 } catch (eSr) {}
-/* Song Map Tools → Meta: rulers lane shows tuning · key · BPM per song instead of sections. Default off. */
-var SECTION_RULER_MODE_KEY = "riffjams-section-ruler-mode";
-var sectionRulerMode = "sections";
-try {
-  if (localStorage.getItem(SECTION_RULER_MODE_KEY) === "meta") sectionRulerMode = "meta";
-} catch (eSrm) {}
-function syncSectionRulerModeUi() {
-  var btn = document.getElementById("secMetaBtn");
-  if (!btn) return;
-  var on = sectionRulerMode === "meta";
-  btn.classList.toggle("on", on);
-  btn.setAttribute("aria-checked", on ? "true" : "false");
-}
-function toggleSectionRulerModeUi() {
-  setSectionRulerMode(sectionRulerMode === "meta" ? "sections" : "meta");
-}
-function setSectionRulerMode(mode) {
-  var next = mode === "meta" ? "meta" : "sections";
-  sectionRulerMode = next;
-  try { localStorage.setItem(SECTION_RULER_MODE_KEY, next); } catch (eSrmSet) {}
-  syncSectionRulerModeUi();
-  /* Meta is drawn in the rulers lane, so picking it turns Rulers on. setSectionRulers rebuilds the map. */
-  if (next === "meta" && !sectionRulersOn) {
-    setSectionRulers(true);
-    return;
-  }
-  var sec = document.getElementById("sections");
-  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") showSections(true);
-}
 function syncSectionRulersUi() {
   document.body.classList.toggle("section-rulers-off", !sectionRulersOn);
   var btn = document.getElementById("secRulersBtn");
@@ -8402,10 +8380,28 @@ try {
 var ARSI_COL_KEY = "riffjams-arsi-col";
 var aRsiColOn = false;
 try { if (localStorage.getItem(ARSI_COL_KEY) === "1") aRsiColOn = true; } catch (eArsi) {}
-function songMetaAnyColOn() { return songMetaColsOn || aRsiColOn; }
+/* Song Map Tools → Meta: tuning, key and BPM plates in the RSI strip. Default off. */
+var SONG_META_FIELDS_KEY = "riffjams-song-meta-fields";
+var songMetaFieldsOn = false;
+try { if (localStorage.getItem(SONG_META_FIELDS_KEY) === "1") songMetaFieldsOn = true; } catch (eSmf) {}
+function songMetaAnyColOn() { return songMetaColsOn || aRsiColOn || songMetaFieldsOn; }
+function toggleSongMetaFieldsUi() {
+  songMetaFieldsOn = !songMetaFieldsOn;
+  try { localStorage.setItem(SONG_META_FIELDS_KEY, songMetaFieldsOn ? "1" : "0"); } catch (eSmfSet) {}
+  syncSongMetaColsUi();
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") showSections(true);
+}
 function syncSongMetaColsUi() {
   document.body.classList.toggle("song-meta-cols-off", !songMetaAnyColOn());
   document.body.classList.toggle("song-meta-two", songMetaColsOn && aRsiColOn);
+  document.body.classList.toggle("song-meta-fields", songMetaFieldsOn);
+  document.body.classList.toggle("song-meta-only-fields", songMetaFieldsOn && !songMetaColsOn && !aRsiColOn);
+  var mBtn = document.getElementById("secMetaBtn");
+  if (mBtn) {
+    mBtn.classList.toggle("on", songMetaFieldsOn);
+    mBtn.setAttribute("aria-checked", songMetaFieldsOn ? "true" : "false");
+  }
   var aBtn = document.getElementById("secARsiColsBtn");
   if (aBtn) {
     aBtn.classList.toggle("on", aRsiColOn);
@@ -8713,7 +8709,6 @@ function mapToolsIsOpen() {
   return !!(dd && dd.classList.contains("open"));
 }
 syncSectionRulersUi();
-syncSectionRulerModeUi();
 syncSongMetaColsUi();
 syncArrSaturationUi();
 /* Song-section rulers: inclusive chip columns on the song of the map on screen.
@@ -9269,22 +9264,8 @@ function sectionRulerDrawRange(start, end) {
   if (e < s) return null;
   return { start: s, end: e };
 }
-/* Rulers → Meta: read-only bar per song showing tuning · keys · BPM from the song meta editor. */
-function songMetaLaneHtml(song, maxCols) {
-  var meta = readCanonicalSongMeta(song.song);
-  var bits = [];
-  if (meta.tuning) bits.push(meta.tuning);
-  if (meta.keys.length) bits.push(meta.keys.join(" / "));
-  if (meta.bpms.length) bits.push(meta.bpms.join(" / ") + " BPM");
-  var text = bits.length ? bits.join(" · ") : "—";
-  var esc = songMetaEscapeAttr(text);
-  return '<div class="song-meta-lane" data-cols="'+maxCols+'" title="'+esc+'">'
-    + '<div class="song-sec-ruler song-meta-ruler" style="--sr-i:0;--sr-n:'+Math.max(maxCols, 1)+';"><span class="song-sec-name">'+esc+'</span></div>'
-    + '</div>';
-}
 function sectionRulerLaneHtml(song, maxCols, repInfo) {
   if (!sectionRulersOn) return "";
-  if (sectionRulerMode === "meta") return songMetaLaneHtml(song, maxCols);
   var rulers = readSectionRulers(song);
   var hasRep = !!(repInfo && repInfo.blocks && repInfo.blocks.length);
   /* Rows with repeat blocks show rulers folded to the display columns; editing them is locked there. */
@@ -9678,6 +9659,8 @@ function showSections(keepScroll) {
     + (!sectionRulersOn ? " section-rulers-off" : "")
     + (!songMetaAnyColOn() ? " song-meta-cols-off" : "")
     + (songMetaColsOn && aRsiColOn ? " song-meta-two" : "")
+    + (songMetaFieldsOn ? " song-meta-fields" : "")
+    + (songMetaFieldsOn && !songMetaColsOn && !aRsiColOn ? " song-meta-only-fields" : "")
     + (highlightMode ? " sec-peek-on" : "")
     + (typeof arrSaturationOn !== "undefined" && arrSaturationOn ? " arr-saturation" : "");
   document.getElementById("home").className = "hidden";
@@ -9732,7 +9715,7 @@ function showSections(keepScroll) {
   var showMetaCols = songMetaAnyColOn() && (anySongMeta || anySongRsi);
   var metaHeads = showMetaCols
     ? '<span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-gap" aria-hidden="true"></span><span class="song-meta-head-name" aria-hidden="true"></span><div class="song-meta-heads">'
-      + (songMetaColsOn ? '<span>RSI</span>' : '') + (aRsiColOn ? '<span>aRSI</span>' : '') + '</div>'
+      + (songMetaFieldsOn ? '<span>Tuning</span><span>Key</span><span>BPM</span>' : '') + (songMetaColsOn ? '<span>RSI</span>' : '') + (aRsiColOn ? '<span>aRSI</span>' : '') + '</div>'
     : "";
   var ruler = '<div class="sec-ruler"><div class="row-num"></div>'+(metaHeads || '<div class="song-name-spacer" aria-hidden="true"></div>')+'<div class="song-secs">'+colNums+'</div></div>';
   var singleFocus = singleSongMode ? resolveSingleSongName(singleSongPickerAlbums()) : "";
@@ -14156,9 +14139,16 @@ function songMetaStripHtml(songName) {
   }
   var aRsiText = songARsiLabelByName[songName] || "—";
   var tip = [];
+  var fields = [];
+  if (songMetaFieldsOn) {
+    var meta = readCanonicalSongMeta(songName);
+    fields = [meta.tuning || "—", meta.keys.join(" / ") || "—", meta.bpms.join(" / ") || "—"];
+    tip.push("Tuning · " + fields[0], "Key · " + fields[1], "BPM · " + fields[2]);
+  }
   if (songMetaColsOn) tip.push("RSI · " + rsiText);
   if (aRsiColOn) tip.push("aRSI · " + aRsiText);
   return '<div class="song-meta-strip" title="'+songMetaEscapeAttr(tip.join("  "))+'">'
+    + fields.map(bit).join("")
     + (songMetaColsOn ? bit(rsiText) : "")
     + (aRsiColOn ? bit(aRsiText) : "")
     + '</div>';
@@ -16297,7 +16287,7 @@ document.getElementById("secModes").onclick = function(e){
     return;
   }
   if (e.target.closest("#secMetaBtn")) {
-    toggleSectionRulerModeUi();
+    toggleSongMetaFieldsUi();
     setMapToolsOpen(false);
     return;
   }
