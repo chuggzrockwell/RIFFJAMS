@@ -4742,17 +4742,12 @@
           <option value="single">Single Song</option>
         </select>
       </label>
-      <label class="map-mode-dd" title="Rulers">
-        <select id="secRulerModeSelect" aria-label="Rulers">
-          <option value="sections" selected>Sections</option>
-          <option value="meta">Meta</option>
-        </select>
-      </label>
       <div class="map-mode-dd map-tools-dd" id="mapToolsDd">
         <button type="button" class="map-tools-btn" id="mapToolsBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="mapToolsMenu" title="Tools">Tools</button>
         <div class="map-tools-menu" id="mapToolsMenu" role="menu">
           <button type="button" class="map-tools-item" id="secPeekBtn" role="menuitemcheckbox" aria-checked="false" title="Hover chips to peek tabs">Peek</button>
           <button type="button" class="map-tools-item" id="secRulersBtn" role="menuitemcheckbox" aria-checked="false" title="Show section rulers">Rulers</button>
+          <button type="button" class="map-tools-item" id="secMetaBtn" role="menuitemcheckbox" aria-checked="false" title="Rulers show each song's tuning, key and BPM instead of sections">Meta</button>
           <button type="button" class="map-tools-item" id="secMetaColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show RSI column">RSI</button>
           <button type="button" class="map-tools-item" id="secARsiColsBtn" role="menuitemcheckbox" aria-checked="false" title="Show aRSI (adjusted RSI) column — Numpad * then 8">aRSI</button>
           <button type="button" class="map-tools-item" id="secSaturationBtn" role="menuitemcheckbox" aria-checked="false" title="Toggle Arrangement riff-tier purples (any Song Map view) — Numpad * then 6">Saturation</button>
@@ -8289,15 +8284,21 @@ try {
   var _sru = localStorage.getItem(SECTION_RULERS_KEY);
   if (_sru === "0") sectionRulersOn = false;
 } catch (eSr) {}
-/* Rulers dropdown beside View: Sections (chip rulers) or Meta (tuning · key · BPM per song). Default Sections. */
+/* Song Map Tools → Meta: rulers lane shows tuning · key · BPM per song instead of sections. Default off. */
 var SECTION_RULER_MODE_KEY = "riffjams-section-ruler-mode";
 var sectionRulerMode = "sections";
 try {
   if (localStorage.getItem(SECTION_RULER_MODE_KEY) === "meta") sectionRulerMode = "meta";
 } catch (eSrm) {}
 function syncSectionRulerModeUi() {
-  var sel = document.getElementById("secRulerModeSelect");
-  if (sel) sel.value = sectionRulerMode;
+  var btn = document.getElementById("secMetaBtn");
+  if (!btn) return;
+  var on = sectionRulerMode === "meta";
+  btn.classList.toggle("on", on);
+  btn.setAttribute("aria-checked", on ? "true" : "false");
+}
+function toggleSectionRulerModeUi() {
+  setSectionRulerMode(sectionRulerMode === "meta" ? "sections" : "meta");
 }
 function setSectionRulerMode(mode) {
   var next = mode === "meta" ? "meta" : "sections";
@@ -8713,9 +8714,6 @@ function mapToolsIsOpen() {
 }
 syncSectionRulersUi();
 syncSectionRulerModeUi();
-document.getElementById("secRulerModeSelect").addEventListener("change", function(e){
-  setSectionRulerMode(e.target.value);
-});
 syncSongMetaColsUi();
 syncArrSaturationUi();
 /* Song-section rulers: inclusive chip columns on the song of the map on screen.
@@ -16295,6 +16293,11 @@ document.getElementById("secModes").onclick = function(e){
   }
   if (e.target.closest("#secRulersBtn")) {
     toggleSectionRulersUi();
+    setMapToolsOpen(false);
+    return;
+  }
+  if (e.target.closest("#secMetaBtn")) {
+    toggleSectionRulerModeUi();
     setMapToolsOpen(false);
     return;
   }
