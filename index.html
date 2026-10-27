@@ -3151,13 +3151,16 @@
     min-width: 0;
     align-self: flex-end;
   }
-  .song-sec-lane {
+  .song-sec-lane,
+  .song-meta-lane {
     position: relative;
     height: 16px;
     margin: 0 0 2px;
     user-select: none;
     border-radius: 2px;
   }
+  /* Rulers → Meta: same bar as a section ruler, but read-only (not a .song-sec-lane, so no drag-to-add). */
+  .song-meta-ruler { background: #1b1e26; color: #e8e6e1; border-color: #2c3040; }
   body.sections-edit .song-sec-lane {
     cursor: crosshair;
     background: rgba(255,255,255,.05);
@@ -4737,6 +4740,12 @@
           <option value="solo">Solo</option>
           <option value="riff" selected>Riff</option>
           <option value="single">Single Song</option>
+        </select>
+      </label>
+      <label class="map-mode-dd" title="Rulers">
+        <select id="secRulerModeSelect" aria-label="Rulers">
+          <option value="sections" selected>Sections</option>
+          <option value="meta">Meta</option>
         </select>
       </label>
       <div class="map-mode-dd map-tools-dd" id="mapToolsDd">
@@ -8280,6 +8289,29 @@ try {
   var _sru = localStorage.getItem(SECTION_RULERS_KEY);
   if (_sru === "0") sectionRulersOn = false;
 } catch (eSr) {}
+/* Rulers dropdown beside View: Sections (chip rulers) or Meta (tuning · key · BPM per song). Default Sections. */
+var SECTION_RULER_MODE_KEY = "riffjams-section-ruler-mode";
+var sectionRulerMode = "sections";
+try {
+  if (localStorage.getItem(SECTION_RULER_MODE_KEY) === "meta") sectionRulerMode = "meta";
+} catch (eSrm) {}
+function syncSectionRulerModeUi() {
+  var sel = document.getElementById("secRulerModeSelect");
+  if (sel) sel.value = sectionRulerMode;
+}
+function setSectionRulerMode(mode) {
+  var next = mode === "meta" ? "meta" : "sections";
+  sectionRulerMode = next;
+  try { localStorage.setItem(SECTION_RULER_MODE_KEY, next); } catch (eSrmSet) {}
+  syncSectionRulerModeUi();
+  /* Meta is drawn in the rulers lane, so picking it turns Rulers on. setSectionRulers rebuilds the map. */
+  if (next === "meta" && !sectionRulersOn) {
+    setSectionRulers(true);
+    return;
+  }
+  var sec = document.getElementById("sections");
+  if (sec && !sec.classList.contains("hidden") && typeof showSections === "function") showSections(true);
+}
 function syncSectionRulersUi() {
   document.body.classList.toggle("section-rulers-off", !sectionRulersOn);
   var btn = document.getElementById("secRulersBtn");
@@ -8680,6 +8712,10 @@ function mapToolsIsOpen() {
   return !!(dd && dd.classList.contains("open"));
 }
 syncSectionRulersUi();
+syncSectionRulerModeUi();
+document.getElementById("secRulerModeSelect").addEventListener("change", function(e){
+  setSectionRulerMode(e.target.value);
+});
 syncSongMetaColsUi();
 syncArrSaturationUi();
 /* Song-section rulers: inclusive chip columns on the song of the map on screen.
@@ -9235,8 +9271,22 @@ function sectionRulerDrawRange(start, end) {
   if (e < s) return null;
   return { start: s, end: e };
 }
+/* Rulers → Meta: read-only bar per song showing tuning · keys · BPM from the song meta editor. */
+function songMetaLaneHtml(song, maxCols) {
+  var meta = readCanonicalSongMeta(song.song);
+  var bits = [];
+  if (meta.tuning) bits.push(meta.tuning);
+  if (meta.keys.length) bits.push(meta.keys.join(" / "));
+  if (meta.bpms.length) bits.push(meta.bpms.join(" / ") + " BPM");
+  var text = bits.length ? bits.join(" · ") : "—";
+  var esc = songMetaEscapeAttr(text);
+  return '<div class="song-meta-lane" data-cols="'+maxCols+'" title="'+esc+'">'
+    + '<div class="song-sec-ruler song-meta-ruler" style="--sr-i:0;--sr-n:'+Math.max(maxCols, 1)+';"><span class="song-sec-name">'+esc+'</span></div>'
+    + '</div>';
+}
 function sectionRulerLaneHtml(song, maxCols, repInfo) {
   if (!sectionRulersOn) return "";
+  if (sectionRulerMode === "meta") return songMetaLaneHtml(song, maxCols);
   var rulers = readSectionRulers(song);
   var hasRep = !!(repInfo && repInfo.blocks && repInfo.blocks.length);
   /* Rows with repeat blocks show rulers folded to the display columns; editing them is locked there. */
