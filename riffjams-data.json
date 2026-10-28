@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-28T23:20:29.815Z",
+  "updatedAt": "2026-10-28T23:33:01.997Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=3",
@@ -10,7 +10,7 @@
     "B2": "user-tabs/B2.png?v=3",
     "B3": "user-tabs/B3.png?v=2",
     "B4": "user-tabs/B4.png",
-    "S1": "user-tabs/S1.png?v=3",
+    "S1": "user-tabs/S1.png?v=4",
     "I1": "user-tabs/I1.png?v=2",
     "B5": "user-tabs/B5.png",
     "B6": "user-tabs/B6.png",
@@ -2501,7 +2501,7 @@
             [
               "S1",
               1,
-              "",
+              "S1",
               []
             ]
           ]
@@ -9079,8 +9079,7 @@
                 1,
                 "S1",
                 1,
-                297.2,
-                386.3
+                297.2
               ]
             ],
             "sectionRulers": [
@@ -12710,10 +12709,99 @@
     },
     {
       "album": "Never Say Die!",
-      "song": "Johnny Blade",
-      "endSec": 386.3,
+      "song": "Junior's Eyes",
+      "endSec": 398,
       "complete": true,
-      "riffSaturationIndex": 1.982,
+      "riffSaturationIndex": 1.251,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 31.2,
+          "stop": 78.8,
+          "duration": 47.6,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 78.8,
+          "stop": 109.2,
+          "duration": 30.4,
+          "lick": "C1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 109.2,
+          "stop": 156.9,
+          "duration": 47.7,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 156.9,
+          "stop": 187.5,
+          "duration": 30.6,
+          "lick": "C1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 187.5,
+          "stop": 202.9,
+          "duration": 15.4,
+          "lick": "B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 202.9,
+          "stop": 249,
+          "duration": 46.1,
+          "lick": "S1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 249,
+          "stop": 312,
+          "duration": 63,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 312,
+          "stop": 342.4,
+          "duration": 30.4,
+          "lick": "C1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 342.4,
+          "stop": 373.4,
+          "duration": 31,
+          "lick": "B1"
+        },
+        {
+          "code": "O1",
+          "tier": 3,
+          "start": 373.4,
+          "stop": 398,
+          "duration": 24.6,
+          "lick": "O1"
+        }
+      ]
+    },
+    {
+      "album": "Never Say Die!",
+      "song": "Johnny Blade",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1.636,
       "chips": [
         {
           "code": "I1",
@@ -12823,98 +12911,9 @@
           "code": "S1",
           "tier": 1,
           "start": 297.2,
-          "stop": 386.3,
-          "duration": 89.1,
+          "stop": null,
+          "duration": null,
           "lick": "S1"
-        }
-      ]
-    },
-    {
-      "album": "Never Say Die!",
-      "song": "Junior's Eyes",
-      "endSec": 398,
-      "complete": true,
-      "riffSaturationIndex": 1.251,
-      "chips": [
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 31.2,
-          "stop": 78.8,
-          "duration": 47.6,
-          "lick": "V1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 78.8,
-          "stop": 109.2,
-          "duration": 30.4,
-          "lick": "C1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 109.2,
-          "stop": 156.9,
-          "duration": 47.7,
-          "lick": "V1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 156.9,
-          "stop": 187.5,
-          "duration": 30.6,
-          "lick": "C1"
-        },
-        {
-          "code": "B1",
-          "tier": 3,
-          "start": 187.5,
-          "stop": 202.9,
-          "duration": 15.4,
-          "lick": "B1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 202.9,
-          "stop": 249,
-          "duration": 46.1,
-          "lick": "S1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 249,
-          "stop": 312,
-          "duration": 63,
-          "lick": "V1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 312,
-          "stop": 342.4,
-          "duration": 30.4,
-          "lick": "C1"
-        },
-        {
-          "code": "B1",
-          "tier": 3,
-          "start": 342.4,
-          "stop": 373.4,
-          "duration": 31,
-          "lick": "B1"
-        },
-        {
-          "code": "O1",
-          "tier": 3,
-          "start": 373.4,
-          "stop": 398,
-          "duration": 24.6,
-          "lick": "O1"
         }
       ]
     }
