@@ -1,12 +1,12 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-28T01:06:53.096Z",
+  "updatedAt": "2026-10-28T18:31:28.812Z",
   "assets": {
     "12": "user-tabs/12.png",
-    "V1": "user-tabs/V1.png?v=2",
+    "V1": "user-tabs/V1.png?v=3",
     "PC1": "user-tabs/PC1.png?v=3",
     "PC2": "user-tabs/PC2.png?v=2",
-    "B1": "user-tabs/B1.png?v=3",
+    "B1": "user-tabs/B1.png?v=4",
     "B2": "user-tabs/B2.png?v=3",
     "B3": "user-tabs/B3.png?v=2",
     "B4": "user-tabs/B4.png",
@@ -37,7 +37,7 @@
     "I2": "user-tabs/I2.png",
     "I3": "user-tabs/I3.png",
     "I4": "user-tabs/I4.png",
-    "C1": "user-tabs/C1.png?v=1",
+    "C1": "user-tabs/C1.png?v=2",
     "V2": "user-tabs/V2.png?v=1",
     "C2": "user-tabs/C2.png",
     "C3": "user-tabs/C3.png"
@@ -2507,7 +2507,23 @@
         },
         {
           "song": "Junior's Eyes",
-          "sections": []
+          "sections": [
+            [
+              "V1",
+              3,
+              "V1"
+            ],
+            [
+              "C1",
+              3,
+              "C1"
+            ],
+            [
+              "B1",
+              3,
+              "B1"
+            ]
+          ]
         },
         {
           "song": "A Hard Road",
@@ -9081,7 +9097,55 @@
           },
           {
             "song": "Junior's Eyes",
-            "chips": []
+            "chips": [
+              [
+                "V1",
+                3,
+                "V1",
+                [],
+                31.2
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                [],
+                78.8
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                [],
+                109.2
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                [],
+                156.9
+              ],
+              [
+                "B1",
+                3,
+                "B1",
+                [],
+                187.5
+              ]
+            ],
+            "sectionRulers": [
+              {
+                "name": "VERSE 1",
+                "start": 0,
+                "end": 1
+              },
+              {
+                "name": "VERSE 2",
+                "start": 2,
+                "end": 3
+              }
+            ]
           },
           {
             "song": "A Hard Road",
@@ -12700,6 +12764,55 @@
           "stop": 386.3,
           "duration": 89.1,
           "lick": "S1"
+        }
+      ]
+    },
+    {
+      "album": "Never Say Die!",
+      "song": "Junior's Eyes",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 31.2,
+          "stop": 78.8,
+          "duration": 47.6,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 78.8,
+          "stop": 109.2,
+          "duration": 30.4,
+          "lick": "C1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 109.2,
+          "stop": 156.9,
+          "duration": 47.7,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 156.9,
+          "stop": 187.5,
+          "duration": 30.6,
+          "lick": "C1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 187.5,
+          "stop": null,
+          "duration": null,
+          "lick": "B1"
         }
       ]
     }
