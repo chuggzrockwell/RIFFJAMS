@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-28T18:36:08.129Z",
+  "updatedAt": "2026-10-28T18:40:27.029Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=3",
@@ -10,7 +10,7 @@
     "B2": "user-tabs/B2.png?v=3",
     "B3": "user-tabs/B3.png?v=2",
     "B4": "user-tabs/B4.png",
-    "S1": "user-tabs/S1.png?v=2",
+    "S1": "user-tabs/S1.png?v=3",
     "I1": "user-tabs/I1.png?v=2",
     "B5": "user-tabs/B5.png",
     "B6": "user-tabs/B6.png",
@@ -2522,6 +2522,16 @@
               "B1",
               3,
               "B1"
+            ],
+            [
+              "S1",
+              3,
+              "S1"
+            ],
+            [
+              "O1",
+              3,
+              "O1"
             ]
           ]
         },
@@ -9132,6 +9142,41 @@
                 "B1",
                 [],
                 187.5
+              ],
+              [
+                "S1",
+                3,
+                "S1",
+                [],
+                202.9
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                [],
+                249
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                [],
+                312
+              ],
+              [
+                "B1",
+                3,
+                "B1",
+                [],
+                342.4
+              ],
+              [
+                "O1",
+                3,
+                "O1",
+                [],
+                373.4
               ]
             ],
             "sectionRulers": [
@@ -9146,9 +9191,19 @@
                 "end": 3
               },
               {
-                "name": "Section",
+                "name": "bridge",
                 "start": 4,
-                "end": 6
+                "end": 5
+              },
+              {
+                "name": "VERSE 3",
+                "start": 6,
+                "end": 8
+              },
+              {
+                "name": "O",
+                "start": 9,
+                "end": 9
               }
             ]
           },
@@ -12815,9 +12870,49 @@
           "code": "B1",
           "tier": 3,
           "start": 187.5,
+          "stop": 202.9,
+          "duration": 15.4,
+          "lick": "B1"
+        },
+        {
+          "code": "S1",
+          "tier": 3,
+          "start": 202.9,
+          "stop": 249,
+          "duration": 46.1,
+          "lick": "S1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 249,
+          "stop": 312,
+          "duration": 63,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 312,
+          "stop": 342.4,
+          "duration": 30.4,
+          "lick": "C1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 342.4,
+          "stop": 373.4,
+          "duration": 31,
+          "lick": "B1"
+        },
+        {
+          "code": "O1",
+          "tier": 3,
+          "start": 373.4,
           "stop": null,
           "duration": null,
-          "lick": "B1"
+          "lick": "O1"
         }
       ]
     }
