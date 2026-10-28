@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-28T18:40:27.029Z",
+  "updatedAt": "2026-10-28T18:43:54.820Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=3",
@@ -40,7 +40,8 @@
     "C1": "user-tabs/C1.png?v=2",
     "V2": "user-tabs/V2.png?v=1",
     "C2": "user-tabs/C2.png",
-    "C3": "user-tabs/C3.png"
+    "C3": "user-tabs/C3.png",
+    "O1": "user-tabs/O1.png"
   },
   "albums": [
     {
@@ -2525,7 +2526,7 @@
             ],
             [
               "S1",
-              3,
+              1,
               "S1"
             ],
             [
@@ -9145,7 +9146,7 @@
               ],
               [
                 "S1",
-                3,
+                1,
                 "S1",
                 [],
                 202.9
@@ -9176,7 +9177,8 @@
                 3,
                 "O1",
                 [],
-                373.4
+                373.4,
+                398
               ]
             ],
             "sectionRulers": [
@@ -12830,9 +12832,9 @@
     {
       "album": "Never Say Die!",
       "song": "Junior's Eyes",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1,
+      "endSec": 398,
+      "complete": true,
+      "riffSaturationIndex": 1.251,
       "chips": [
         {
           "code": "V1",
@@ -12876,7 +12878,7 @@
         },
         {
           "code": "S1",
-          "tier": 3,
+          "tier": 1,
           "start": 202.9,
           "stop": 249,
           "duration": 46.1,
@@ -12910,8 +12912,8 @@
           "code": "O1",
           "tier": 3,
           "start": 373.4,
-          "stop": null,
-          "duration": null,
+          "stop": 398,
+          "duration": 24.6,
           "lick": "O1"
         }
       ]
