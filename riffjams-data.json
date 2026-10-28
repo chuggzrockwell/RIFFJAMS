@@ -1,16 +1,17 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-28T00:28:34.723Z",
+  "updatedAt": "2026-10-28T01:06:53.096Z",
   "assets": {
-    "V1": "user-tabs/V1.png?v=1",
-    "PC1": "user-tabs/PC1.png?v=2",
-    "PC2": "user-tabs/PC2.png?v=1",
-    "B1": "user-tabs/B1.png?v=2",
-    "B2": "user-tabs/B2.png?v=2",
-    "B3": "user-tabs/B3.png?v=1",
+    "12": "user-tabs/12.png",
+    "V1": "user-tabs/V1.png?v=2",
+    "PC1": "user-tabs/PC1.png?v=3",
+    "PC2": "user-tabs/PC2.png?v=2",
+    "B1": "user-tabs/B1.png?v=3",
+    "B2": "user-tabs/B2.png?v=3",
+    "B3": "user-tabs/B3.png?v=2",
     "B4": "user-tabs/B4.png",
     "S1": "user-tabs/S1.png?v=2",
-    "I1": "user-tabs/I1.png?v=1",
+    "I1": "user-tabs/I1.png?v=2",
     "B5": "user-tabs/B5.png",
     "B6": "user-tabs/B6.png",
     "B7": "user-tabs/B7.png",
@@ -36,8 +37,10 @@
     "I2": "user-tabs/I2.png",
     "I3": "user-tabs/I3.png",
     "I4": "user-tabs/I4.png",
-    "C1": "user-tabs/C1.png",
-    "V2": "user-tabs/V2.png"
+    "C1": "user-tabs/C1.png?v=1",
+    "V2": "user-tabs/V2.png?v=1",
+    "C2": "user-tabs/C2.png",
+    "C3": "user-tabs/C3.png"
   },
   "albums": [
     {
@@ -2437,12 +2440,66 @@
             [
               "I1",
               3,
-              "",
-              []
+              "I1"
             ],
             [
-              "12",
+              "V1",
               2,
+              "V1"
+            ],
+            [
+              "PC1",
+              2,
+              "PC1"
+            ],
+            [
+              "C1",
+              3,
+              "C1"
+            ],
+            [
+              "S1",
+              1,
+              "S1"
+            ],
+            [
+              "V2",
+              2,
+              "V2"
+            ],
+            [
+              "PC2",
+              2,
+              "PC2"
+            ],
+            [
+              "C2",
+              3,
+              "C2"
+            ],
+            [
+              "B1",
+              3,
+              "B1"
+            ],
+            [
+              "B2",
+              2,
+              "B2"
+            ],
+            [
+              "C3",
+              3,
+              "C3"
+            ],
+            [
+              "B3",
+              3,
+              "B3"
+            ],
+            [
+              "S1",
+              1,
               "",
               []
             ]
@@ -8902,13 +8959,124 @@
               [
                 "I1",
                 3,
-                "I1"
+                "I1",
+                1,
+                35.4
               ],
               [
-                "12",
+                "V1",
                 2,
-                "12"
+                "V1",
+                1,
+                41.2
+              ],
+              [
+                "PC1",
+                2,
+                "PC1",
+                1,
+                79.5
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                1,
+                90.9
+              ],
+              [
+                "V2",
+                2,
+                "V2",
+                1,
+                97.2
+              ],
+              [
+                "PC2",
+                2,
+                "PC2",
+                1,
+                122.9
+              ],
+              [
+                "C2",
+                3,
+                "C2",
+                1,
+                134.3
+              ],
+              [
+                "B1",
+                3,
+                "B1",
+                1,
+                147.8
+              ],
+              [
+                "B2",
+                2,
+                "B2",
+                1,
+                154.3
+              ],
+              [
+                "C3",
+                3,
+                "C3",
+                1,
+                194.3
+              ],
+              [
+                "B2",
+                2,
+                "B2",
+                1,
+                207.3
+              ],
+              [
+                "C3",
+                3,
+                "C3",
+                1,
+                246.9
+              ],
+              [
+                "B3",
+                3,
+                "B3",
+                1,
+                272.7
+              ],
+              [
+                "S1",
+                1,
+                "S1",
+                1,
+                297.2,
+                386.3
               ]
+            ],
+            "sectionRulers": [
+              {
+                "name": "VERSE 1",
+                "start": 0,
+                "end": 3
+              },
+              {
+                "name": "VERSE 2",
+                "start": 4,
+                "end": 6
+              },
+              {
+                "name": "bridge 1",
+                "start": 7,
+                "end": 9
+              },
+              {
+                "name": "bridge 2",
+                "start": 10,
+                "end": 13
+              }
             ]
           },
           {
@@ -12411,6 +12579,127 @@
           "stop": 422.4,
           "duration": 147.8,
           "lick": "S2"
+        }
+      ]
+    },
+    {
+      "album": "Never Say Die!",
+      "song": "Johnny Blade",
+      "endSec": 386.3,
+      "complete": true,
+      "riffSaturationIndex": 1.982,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 35.4,
+          "stop": 41.2,
+          "duration": 5.8,
+          "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 41.2,
+          "stop": 79.5,
+          "duration": 38.3,
+          "lick": "V1"
+        },
+        {
+          "code": "PC1",
+          "tier": 2,
+          "start": 79.5,
+          "stop": 90.9,
+          "duration": 11.4,
+          "lick": "PC1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 90.9,
+          "stop": 97.2,
+          "duration": 6.3,
+          "lick": "C1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 97.2,
+          "stop": 122.9,
+          "duration": 25.7,
+          "lick": "V2"
+        },
+        {
+          "code": "PC2",
+          "tier": 2,
+          "start": 122.9,
+          "stop": 134.3,
+          "duration": 11.4,
+          "lick": "PC2"
+        },
+        {
+          "code": "C2",
+          "tier": 3,
+          "start": 134.3,
+          "stop": 147.8,
+          "duration": 13.5,
+          "lick": "C2"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 147.8,
+          "stop": 154.3,
+          "duration": 6.5,
+          "lick": "B1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 154.3,
+          "stop": 194.3,
+          "duration": 40,
+          "lick": "B2"
+        },
+        {
+          "code": "C3",
+          "tier": 3,
+          "start": 194.3,
+          "stop": 207.3,
+          "duration": 13,
+          "lick": "C3"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 207.3,
+          "stop": 246.9,
+          "duration": 39.6,
+          "lick": "B2"
+        },
+        {
+          "code": "C3",
+          "tier": 3,
+          "start": 246.9,
+          "stop": 272.7,
+          "duration": 25.8,
+          "lick": "C3"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 272.7,
+          "stop": 297.2,
+          "duration": 24.5,
+          "lick": "B3"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 297.2,
+          "stop": 386.3,
+          "duration": 89.1,
+          "lick": "S1"
         }
       ]
     }
