@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-29T00:11:22.468Z",
+  "updatedAt": "2026-10-29T00:37:34.011Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=3",
@@ -9108,7 +9108,8 @@
                 1,
                 "JB-S1",
                 1,
-                297.2
+                297.2,
+                397
               ]
             ],
             "sectionRulers": [
@@ -12828,9 +12829,9 @@
     {
       "album": "Never Say Die!",
       "song": "Johnny Blade",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.636,
+      "endSec": 397,
+      "complete": true,
+      "riffSaturationIndex": 2.012,
       "chips": [
         {
           "code": "I1",
@@ -12838,7 +12839,7 @@
           "start": 35.4,
           "stop": 41.2,
           "duration": 5.8,
-          "lick": "I1"
+          "lick": "JB-I1"
         },
         {
           "code": "V1",
@@ -12846,7 +12847,7 @@
           "start": 41.2,
           "stop": 79.5,
           "duration": 38.3,
-          "lick": "V1"
+          "lick": "JB-V1"
         },
         {
           "code": "PC1",
@@ -12854,7 +12855,7 @@
           "start": 79.5,
           "stop": 90.9,
           "duration": 11.4,
-          "lick": "PC1"
+          "lick": "JB-PC1"
         },
         {
           "code": "C1",
@@ -12862,7 +12863,7 @@
           "start": 90.9,
           "stop": 97.2,
           "duration": 6.3,
-          "lick": "C1"
+          "lick": "JB-C1"
         },
         {
           "code": "V2",
@@ -12870,7 +12871,7 @@
           "start": 97.2,
           "stop": 122.9,
           "duration": 25.7,
-          "lick": "V2"
+          "lick": "JB-V2"
         },
         {
           "code": "PC2",
@@ -12878,7 +12879,7 @@
           "start": 122.9,
           "stop": 134.3,
           "duration": 11.4,
-          "lick": "PC2"
+          "lick": "JB-PC2"
         },
         {
           "code": "C2",
@@ -12886,7 +12887,7 @@
           "start": 134.3,
           "stop": 147.8,
           "duration": 13.5,
-          "lick": "C2"
+          "lick": "JB-C2"
         },
         {
           "code": "B1",
@@ -12894,7 +12895,7 @@
           "start": 147.8,
           "stop": 154.3,
           "duration": 6.5,
-          "lick": "B1"
+          "lick": "JB-B1"
         },
         {
           "code": "B2",
@@ -12902,7 +12903,7 @@
           "start": 154.3,
           "stop": 194.3,
           "duration": 40,
-          "lick": "B2"
+          "lick": "JB-B2"
         },
         {
           "code": "C3",
@@ -12910,7 +12911,7 @@
           "start": 194.3,
           "stop": 207.3,
           "duration": 13,
-          "lick": "C3"
+          "lick": "JB-C3"
         },
         {
           "code": "B2",
@@ -12918,7 +12919,7 @@
           "start": 207.3,
           "stop": 246.9,
           "duration": 39.6,
-          "lick": "B2"
+          "lick": "JB-B2"
         },
         {
           "code": "C3",
@@ -12926,7 +12927,7 @@
           "start": 246.9,
           "stop": 272.7,
           "duration": 25.8,
-          "lick": "C3"
+          "lick": "JB-C3"
         },
         {
           "code": "B3",
@@ -12934,15 +12935,15 @@
           "start": 272.7,
           "stop": 297.2,
           "duration": 24.5,
-          "lick": "B3"
+          "lick": "JB-B3"
         },
         {
           "code": "S1",
           "tier": 1,
           "start": 297.2,
-          "stop": null,
-          "duration": null,
-          "lick": "S1"
+          "stop": 397,
+          "duration": 99.8,
+          "lick": "JB-S1"
         }
       ]
     }
