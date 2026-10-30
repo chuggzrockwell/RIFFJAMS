@@ -4718,12 +4718,12 @@
   #rjTimer { position: fixed; top: 8px; right: 8px; z-index: 99999; display: flex; align-items: center; gap: 6px;
     background: #fff; color: #7030a0; border-radius: 8px; padding: 4px 8px; box-shadow: 0 2px 8px rgba(0,0,0,.45);
     font-family: "Vol4 Title", sans-serif; user-select: none; }
-  #rjTimer .rjt-time { font-size: 22px; line-height: 1; letter-spacing: 1px; min-width: 52px; text-align: center; }
+  #rjTimer .rjt-time { font-size: 22px; line-height: 1; letter-spacing: 1px; min-width: 76px; text-align: center; }
   #rjTimer button { border: 0; background: #7030a0; color: #fff; width: 26px; height: 26px; border-radius: 6px; cursor: pointer;
     font-size: 13px; line-height: 1; padding: 0; display: flex; align-items: center; justify-content: center; }
   #rjTimer button.off { opacity: .35; }
   #rjTimer.running .rjt-time { animation: none; }
-  @media (max-width: 600px) { #rjTimer { top: 4px; right: 4px; padding: 3px 6px; } #rjTimer .rjt-time { font-size: 18px; min-width: 44px; } #rjTimer button { width: 22px; height: 22px; } }
+  @media (max-width: 600px) { #rjTimer { top: 4px; right: 4px; padding: 3px 6px; } #rjTimer .rjt-time { font-size: 18px; min-width: 64px; } #rjTimer button { width: 22px; height: 22px; } }
 </style>
 </head>
 <body class="home-mode">
@@ -17699,7 +17699,7 @@ if (isPlayboardPage()) {
 </script>
 <script src="riffjams-admin.js?v=442"></script>
 <div id="rjTimer" aria-label="Practice timer">
-  <span class="rjt-time" id="rjtTime">0:00</span>
+  <span class="rjt-time" id="rjtTime">0:00:00</span>
   <button type="button" id="rjtPlay" title="Play" aria-label="Play">&#9654;</button>
   <button type="button" id="rjtPause" class="off" title="Pause" aria-label="Pause">&#10074;&#10074;</button>
 </div>
@@ -17711,8 +17711,8 @@ if (isPlayboardPage()) {
   function cur() { return st.ms + (st.since ? Date.now() - st.since : 0); }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
   function draw() {
-    var m = Math.floor(cur() / 60000);
-    t.textContent = Math.floor(m / 60) + ":" + ("0" + (m % 60)).slice(-2);
+    var sec = Math.floor(cur() / 1000), m = Math.floor(sec / 60);
+    t.textContent = Math.floor(m / 60) + ":" + ("0" + (m % 60)).slice(-2) + ":" + ("0" + (sec % 60)).slice(-2);
     pl.classList.toggle("off", !!st.since); pa.classList.toggle("off", !st.since);
   }
   pl.addEventListener("click", function () { if (!st.since) { st.since = Date.now(); save(); draw(); } });
