@@ -4714,6 +4714,16 @@
     }
   }
   /* ==================== END MOBILE-ONLY LAYOUT ==================== */
+  /* ==================== PRACTICE TIMER ==================== */
+  #rjTimer { position: fixed; top: 8px; right: 8px; z-index: 99999; display: flex; align-items: center; gap: 6px;
+    background: #fff; color: #7030a0; border-radius: 8px; padding: 4px 8px; box-shadow: 0 2px 8px rgba(0,0,0,.45);
+    font-family: "Vol4 Title", sans-serif; user-select: none; }
+  #rjTimer .rjt-time { font-size: 22px; line-height: 1; letter-spacing: 1px; min-width: 52px; text-align: center; }
+  #rjTimer button { border: 0; background: #7030a0; color: #fff; width: 26px; height: 26px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; line-height: 1; padding: 0; display: flex; align-items: center; justify-content: center; }
+  #rjTimer button.off { opacity: .35; }
+  #rjTimer.running .rjt-time { animation: none; }
+  @media (max-width: 600px) { #rjTimer { top: 4px; right: 4px; padding: 3px 6px; } #rjTimer .rjt-time { font-size: 18px; min-width: 44px; } #rjTimer button { width: 22px; height: 22px; } }
 </style>
 </head>
 <body class="home-mode">
@@ -17688,5 +17698,28 @@ if (isPlayboardPage()) {
 }
 </script>
 <script src="riffjams-admin.js?v=442"></script>
+<div id="rjTimer" aria-label="Practice timer">
+  <span class="rjt-time" id="rjtTime">0:00</span>
+  <button type="button" id="rjtPlay" title="Play" aria-label="Play">&#9654;</button>
+  <button type="button" id="rjtPause" class="off" title="Pause" aria-label="Pause">&#10074;&#10074;</button>
+</div>
+<script>
+(function () {
+  var KEY = "riffjams_timer_v1", st = { ms: 0, since: null };
+  try { var s = JSON.parse(localStorage.getItem(KEY)); if (s) st = s; } catch (e) {}
+  var t = document.getElementById("rjtTime"), pl = document.getElementById("rjtPlay"), pa = document.getElementById("rjtPause");
+  function cur() { return st.ms + (st.since ? Date.now() - st.since : 0); }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+  function draw() {
+    var m = Math.floor(cur() / 60000);
+    t.textContent = Math.floor(m / 60) + ":" + ("0" + (m % 60)).slice(-2);
+    pl.classList.toggle("off", !!st.since); pa.classList.toggle("off", !st.since);
+  }
+  pl.addEventListener("click", function () { if (!st.since) { st.since = Date.now(); save(); draw(); } });
+  pa.addEventListener("click", function () { if (st.since) { st.ms = cur(); st.since = null; save(); draw(); } });
+  window.addEventListener("storage", function (e) { if (e.key === KEY) { try { st = JSON.parse(e.newValue) || { ms: 0, since: null }; } catch (x) {} draw(); } });
+  setInterval(draw, 1000); draw();
+})();
+</script>
 </body>
 </html>
