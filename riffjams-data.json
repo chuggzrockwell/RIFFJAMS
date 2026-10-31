@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-31T23:06:04.576Z",
+  "updatedAt": "2026-10-31T23:07:17.838Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=4",
@@ -2593,12 +2593,7 @@
               3,
               "S1"
             ],
-            [
-              "O1",
-              3,
-              "O1",
-              []
-            ]
+            null
           ]
         },
         {
@@ -9337,9 +9332,12 @@
                 230.3
               ],
               [
-                "O1",
+                "C1",
                 3,
-                "O1"
+                "C1",
+                1,
+                267.6,
+                351.9
               ]
             ]
           },
@@ -13051,9 +13049,9 @@
     {
       "album": "Never Say Die!",
       "song": "A Hard Road",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.656,
+      "endSec": 351.9,
+      "complete": true,
+      "riffSaturationIndex": 1.535,
       "chips": [
         {
           "code": "I1",
@@ -13123,9 +13121,17 @@
           "code": "V1",
           "tier": 2,
           "start": 230.3,
-          "stop": null,
-          "duration": null,
+          "stop": 267.6,
+          "duration": 37.3,
           "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 267.6,
+          "stop": 351.9,
+          "duration": 84.3,
+          "lick": "C1"
         }
       ]
     }
