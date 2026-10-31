@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-31T23:04:00.302Z",
+  "updatedAt": "2026-10-31T23:05:02.142Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=4",
@@ -2581,14 +2581,12 @@
             [
               "C1",
               3,
-              "C1",
-              []
+              "C1"
             ],
             [
               "B1",
               2,
-              "B1",
-              []
+              "B1"
             ],
             [
               "S1",
@@ -9293,12 +9291,30 @@
               [
                 "C1",
                 3,
-                "C1"
+                "C1",
+                1,
+                50.3
+              ],
+              [
+                "V1",
+                2,
+                "V1",
+                1,
+                65.2
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                1,
+                103.3
               ],
               [
                 "B1",
                 2,
-                "B1"
+                "B1",
+                1,
+                118.3
               ],
               [
                 "S1",
@@ -13022,7 +13038,7 @@
       "song": "A Hard Road",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1,
+      "riffSaturationIndex": 1.709,
       "chips": [
         {
           "code": "I1",
@@ -13036,9 +13052,41 @@
           "code": "V1",
           "tier": 2,
           "start": 4.5,
+          "stop": 50.3,
+          "duration": 45.8,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 50.3,
+          "stop": 65.2,
+          "duration": 14.9,
+          "lick": "C1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 65.2,
+          "stop": 103.3,
+          "duration": 38.1,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 103.3,
+          "stop": 118.3,
+          "duration": 15,
+          "lick": "C1"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 118.3,
           "stop": null,
           "duration": null,
-          "lick": "V1"
+          "lick": "B1"
         }
       ]
     }
