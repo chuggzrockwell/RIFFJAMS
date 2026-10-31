@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-10-31T23:05:02.142Z",
+  "updatedAt": "2026-10-31T23:06:04.576Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=4",
@@ -2591,8 +2591,7 @@
             [
               "S1",
               3,
-              "S1",
-              []
+              "S1"
             ],
             [
               "O1",
@@ -9319,7 +9318,23 @@
               [
                 "S1",
                 3,
-                "S1"
+                "S1",
+                1,
+                152.1
+              ],
+              [
+                "B1",
+                2,
+                "B1",
+                1,
+                196.9
+              ],
+              [
+                "V1",
+                2,
+                "V1",
+                1,
+                230.3
               ],
               [
                 "O1",
@@ -13038,7 +13053,7 @@
       "song": "A Hard Road",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.709,
+      "riffSaturationIndex": 1.656,
       "chips": [
         {
           "code": "I1",
@@ -13084,9 +13099,33 @@
           "code": "B1",
           "tier": 2,
           "start": 118.3,
+          "stop": 152.1,
+          "duration": 33.8,
+          "lick": "B1"
+        },
+        {
+          "code": "S1",
+          "tier": 3,
+          "start": 152.1,
+          "stop": 196.9,
+          "duration": 44.8,
+          "lick": "S1"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 196.9,
+          "stop": 230.3,
+          "duration": 33.4,
+          "lick": "B1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 230.3,
           "stop": null,
           "duration": null,
-          "lick": "B1"
+          "lick": "V1"
         }
       ]
     }
