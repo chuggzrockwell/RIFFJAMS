@@ -5608,6 +5608,13 @@ function countArrangementChips(song) {
   (song.chips || []).forEach(function(pair){ if (isChipPair(pair)) n++; });
   return n;
 }
+function songsWithArrangements(map) {
+  var n = 0;
+  ((map && map.albums) || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){ if (countArrangementChips(s) > 0) n++; });
+  });
+  return n;
+}
 function totalArrangementChips(map) {
   var n = 0;
   ((map && map.albums) || []).forEach(function(a){
@@ -10630,6 +10637,7 @@ function applySecFilters() {
   // Filters apply in View/Edit/Play, same as Arrangement already did.
   var active = secFiltersActive();
   var shown = 0;
+  var shownSongs = 0;
   sheet.querySelectorAll(".album-block").forEach(function(block){
     var albumName = block.getAttribute("data-album") || "";
     // Album filter = include: when any checked, only those albums show
@@ -10671,18 +10679,20 @@ function applySecFilters() {
       });
       // Song Map: hide entire row when filters leave no applicable chips
       row.classList.toggle("filtered-out", active && !rowHasVisible && !keepNoChipRow);
+      if (!row.classList.contains("filtered-out") && row.querySelector(".sec-chip:not(.empty)")) shownSongs++;
       if (!active || rowHasVisible || keepNoChipRow) anySongVisible = true;
     });
     // Hide album block if every song row was filtered out
     if (active && !anySongVisible) block.classList.add("filtered-out");
   });
   var total = 0;
-  if (arrangementMode && ARRANGEMENT_MAP) total = totalArrangementChips(ARRANGEMENT_MAP);
+  if (arrangementMode && ARRANGEMENT_MAP) total = songsWithArrangements(ARRANGEMENT_MAP);
   else if (soloMode && SOLO_MAP) total = totalSoloChips(SOLO_MAP);
   else ALBUMS.forEach(function(a){ a.songs.forEach(function(s){ total += countSongChips(s); }); });
   var el = document.getElementById("sectionsCount");
-  var unit = arrangementMode ? "arrangements" : (soloMode ? "licks" : "sections");
-  if (el) el.textContent = active ? (shown + " / " + total + " " + unit) : (total + " " + unit);
+  var unit = arrangementMode ? "songs" : (soloMode ? "licks" : "sections");
+  var shownCount = arrangementMode ? shownSongs : shown;
+  if (el) el.textContent = active ? (shownCount + " / " + total + " " + unit) : (total + " " + unit);
   sizeAlbumCovers();
   if (typeof playQueue !== "undefined" && playQueue.length) {
     playQueue = playQueue.filter(function(item){
