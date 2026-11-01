@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-01T18:30:03.814Z",
+  "updatedAt": "2026-11-01T19:03:21.334Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=4",
@@ -9370,12 +9370,17 @@
                 230.3
               ],
               [
-                "22",
+                "C1",
                 3,
                 "C1",
                 1,
                 267.6,
                 351.9
+              ],
+              [
+                "22",
+                3,
+                "C1"
               ]
             ]
           },
@@ -13085,11 +13090,44 @@
       ]
     },
     {
+      "album": "Technical Ecstasy",
+      "song": "It's Alright",
+      "endSec": 231.2,
+      "complete": true,
+      "riffSaturationIndex": 1.403,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 0,
+          "stop": 98,
+          "duration": 98,
+          "lick": "V1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 98,
+          "stop": 144.6,
+          "duration": 46.6,
+          "lick": "S1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 144.6,
+          "stop": 231.2,
+          "duration": 86.6,
+          "lick": "V1"
+        }
+      ]
+    },
+    {
       "album": "Never Say Die!",
       "song": "A Hard Road",
-      "endSec": 351.9,
-      "complete": true,
-      "riffSaturationIndex": 1.535,
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1.704,
       "chips": [
         {
           "code": "I1",
@@ -13164,45 +13202,12 @@
           "lick": "V1"
         },
         {
-          "code": "22",
+          "code": "C1",
           "tier": 3,
           "start": 267.6,
-          "stop": 351.9,
-          "duration": 84.3,
+          "stop": null,
+          "duration": null,
           "lick": "C1"
-        }
-      ]
-    },
-    {
-      "album": "Technical Ecstasy",
-      "song": "It's Alright",
-      "endSec": 231.2,
-      "complete": true,
-      "riffSaturationIndex": 1.403,
-      "chips": [
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 0,
-          "stop": 98,
-          "duration": 98,
-          "lick": "V1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 98,
-          "stop": 144.6,
-          "duration": 46.6,
-          "lick": "S1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 144.6,
-          "stop": 231.2,
-          "duration": 86.6,
-          "lick": "V1"
         }
       ]
     }
