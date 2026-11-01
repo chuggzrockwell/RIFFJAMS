@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-01T20:56:57.289Z",
+  "updatedAt": "2026-11-01T21:02:31.814Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=5",
@@ -8775,7 +8775,8 @@
                 "V1",
                 2,
                 "V1",
-                []
+                [],
+                0
               ],
               [
                 "V2",
@@ -13279,6 +13280,23 @@
           "code": "V1",
           "tier": 2,
           "start": 230.3,
+          "stop": null,
+          "duration": null,
+          "lick": "V1"
+        }
+      ]
+    },
+    {
+      "album": "Sabotage",
+      "song": "Symptom of the Universe",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 0,
           "stop": null,
           "duration": null,
           "lick": "V1"
