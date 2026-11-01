@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-01T00:26:47.423Z",
+  "updatedAt": "2026-11-01T16:05:08.997Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=4",
@@ -2339,7 +2339,13 @@
         },
         {
           "song": "It's Alright",
-          "sections": []
+          "sections": [
+            [
+              "V1",
+              3,
+              "V1"
+            ]
+          ]
         },
         {
           "song": "Gypsy",
@@ -8761,7 +8767,15 @@
           },
           {
             "song": "It's Alright",
-            "chips": []
+            "chips": [
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                0
+              ]
+            ]
           },
           {
             "song": "Gypsy",
@@ -13136,6 +13150,23 @@
           "stop": 351.9,
           "duration": 84.3,
           "lick": "C1"
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "It's Alright",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "V1"
         }
       ]
     }
