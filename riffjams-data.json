@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-01T20:28:12.417Z",
+  "updatedAt": "2026-11-01T20:56:57.289Z",
   "assets": {
     "12": "user-tabs/12.png",
-    "V1": "user-tabs/V1.png?v=4",
+    "V1": "user-tabs/V1.png?v=5",
     "PC1": "user-tabs/PC1.png?v=3",
     "PC2": "user-tabs/PC2.png?v=2",
-    "B1": "user-tabs/B1.png?v=6",
-    "B2": "user-tabs/B2.png?v=3",
+    "B1": "user-tabs/B1.png?v=7",
+    "B2": "user-tabs/B2.png?v=4",
     "B3": "user-tabs/B3.png?v=2",
     "B4": "user-tabs/B4.png",
     "S1": "user-tabs/S1.png?v=5",
@@ -38,10 +38,10 @@
     "I3": "user-tabs/I3.png",
     "I4": "user-tabs/I4.png",
     "C1": "user-tabs/C1.png?v=3",
-    "V2": "user-tabs/V2.png?v=1",
+    "V2": "user-tabs/V2.png?v=2",
     "C2": "user-tabs/C2.png",
     "C3": "user-tabs/C3.png",
-    "O1": "user-tabs/O1.png?v=1",
+    "O1": "user-tabs/O1.png?v=2",
     "DW-V1": "user-tabs/DW-V1.png",
     "DW-PC1": "user-tabs/DW-PC1.png",
     "DW-PC2": "user-tabs/DW-PC2.png",
@@ -2304,7 +2304,38 @@
         },
         {
           "song": "Symptom of the Universe",
-          "sections": []
+          "sections": [
+            [
+              "V1",
+              2,
+              "V1"
+            ],
+            [
+              "V2",
+              3,
+              "V2"
+            ],
+            [
+              "B1",
+              2,
+              "B1"
+            ],
+            [
+              "B2",
+              3,
+              "B2"
+            ],
+            [
+              "S1",
+              3,
+              "S1"
+            ],
+            [
+              "O1",
+              3,
+              "O1"
+            ]
+          ]
         },
         {
           "song": "Megalomania",
@@ -8739,7 +8770,49 @@
           },
           {
             "song": "Symptom of the Universe",
-            "chips": []
+            "chips": [
+              [
+                "V1",
+                2,
+                "V1",
+                []
+              ],
+              [
+                "V2",
+                3,
+                "V2",
+                [],
+                null
+              ],
+              [
+                "B1",
+                2,
+                "B1",
+                [],
+                null
+              ],
+              [
+                "B2",
+                3,
+                "B2",
+                [],
+                null
+              ],
+              [
+                "S1",
+                3,
+                "S1",
+                [],
+                null
+              ],
+              [
+                "O1",
+                3,
+                "O1",
+                [],
+                null
+              ]
+            ]
           },
           {
             "song": "Megalomania",
