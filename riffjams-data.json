@@ -1,16 +1,16 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-01T21:05:48.728Z",
+  "updatedAt": "2026-11-01T23:34:01.809Z",
   "assets": {
     "12": "user-tabs/12.png",
-    "V1": "user-tabs/V1.png?v=5",
+    "V1": "user-tabs/V1.png?v=6",
     "PC1": "user-tabs/PC1.png?v=3",
     "PC2": "user-tabs/PC2.png?v=2",
     "B1": "user-tabs/B1.png?v=7",
     "B2": "user-tabs/B2.png?v=4",
     "B3": "user-tabs/B3.png?v=2",
     "B4": "user-tabs/B4.png",
-    "S1": "user-tabs/S1.png?v=5",
+    "S1": "user-tabs/S1.png?v=6",
     "I1": "user-tabs/I1.png?v=3",
     "B5": "user-tabs/B5.png",
     "B6": "user-tabs/B6.png",
@@ -37,8 +37,8 @@
     "I2": "user-tabs/I2.png",
     "I3": "user-tabs/I3.png",
     "I4": "user-tabs/I4.png",
-    "C1": "user-tabs/C1.png?v=3",
-    "V2": "user-tabs/V2.png?v=2",
+    "C1": "user-tabs/C1.png?v=4",
+    "V2": "user-tabs/V2.png?v=3",
     "C2": "user-tabs/C2.png",
     "C3": "user-tabs/C3.png",
     "O1": "user-tabs/O1.png?v=2",
@@ -2296,7 +2296,32 @@
       "songs": [
         {
           "song": "Hole in the Sky",
-          "sections": []
+          "sections": [
+            [
+              "V1",
+              2,
+              "V1",
+              [
+                1,
+                3
+              ]
+            ],
+            [
+              "V2",
+              2,
+              "V2"
+            ],
+            [
+              "C1",
+              2,
+              "C1"
+            ],
+            [
+              "S1",
+              3,
+              "S1"
+            ]
+          ]
         },
         {
           "song": "Don't Start (Too Late)",
@@ -2327,7 +2352,7 @@
             ],
             [
               "S1",
-              3,
+              1,
               "S1"
             ],
             [
@@ -8762,7 +8787,39 @@
         "songs": [
           {
             "song": "Hole in the Sky",
-            "chips": []
+            "chips": [
+              [
+                "V1",
+                2,
+                "V1",
+                [
+                  1,
+                  3
+                ],
+                0
+              ],
+              [
+                "V2",
+                2,
+                "V2",
+                [],
+                null
+              ],
+              [
+                "C1",
+                2,
+                "C1",
+                [],
+                null
+              ],
+              [
+                "S1",
+                3,
+                "S1",
+                [],
+                null
+              ]
+            ]
           },
           {
             "song": "Don't Start (Too Late)",
@@ -8843,9 +8900,9 @@
               ],
               [
                 "S1",
-                3,
+                1,
                 "S1",
-                [],
+                1,
                 229.3
               ],
               [
@@ -8853,7 +8910,8 @@
                 3,
                 "O1",
                 [],
-                263.4
+                263.4,
+                387.1
               ]
             ]
           },
@@ -13330,10 +13388,27 @@
     },
     {
       "album": "Sabotage",
-      "song": "Symptom of the Universe",
+      "song": "Hole in the Sky",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.657,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "V1"
+        }
+      ]
+    },
+    {
+      "album": "Sabotage",
+      "song": "Symptom of the Universe",
+      "endSec": 387.1,
+      "complete": true,
+      "riffSaturationIndex": 1.623,
       "chips": [
         {
           "code": "V1",
@@ -13417,7 +13492,7 @@
         },
         {
           "code": "S1",
-          "tier": 3,
+          "tier": 1,
           "start": 229.3,
           "stop": 263.4,
           "duration": 34.1,
@@ -13427,8 +13502,8 @@
           "code": "O1",
           "tier": 3,
           "start": 263.4,
-          "stop": null,
-          "duration": null,
+          "stop": 387.1,
+          "duration": 123.7,
           "lick": "O1"
         }
       ]
