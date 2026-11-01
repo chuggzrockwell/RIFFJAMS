@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-01T23:34:01.809Z",
+  "updatedAt": "2026-11-01T23:35:02.569Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=6",
@@ -8796,7 +8796,7 @@
                   1,
                   3
                 ],
-                0
+                6.8
               ],
               [
                 "V2",
@@ -13388,23 +13388,6 @@
     },
     {
       "album": "Sabotage",
-      "song": "Hole in the Sky",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": null,
-      "chips": [
-        {
-          "code": "V1",
-          "tier": 2,
-          "start": 0,
-          "stop": null,
-          "duration": null,
-          "lick": "V1"
-        }
-      ]
-    },
-    {
-      "album": "Sabotage",
       "song": "Symptom of the Universe",
       "endSec": 387.1,
       "complete": true,
@@ -13505,6 +13488,23 @@
           "stop": 387.1,
           "duration": 123.7,
           "lick": "O1"
+        }
+      ]
+    },
+    {
+      "album": "Sabotage",
+      "song": "Hole in the Sky",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 6.8,
+          "stop": null,
+          "duration": null,
+          "lick": "V1"
         }
       ]
     }
