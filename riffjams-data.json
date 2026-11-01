@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-01T19:03:21.334Z",
+  "updatedAt": "2026-11-01T20:28:12.417Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=4",
@@ -1511,7 +1511,11 @@
         {
           "song": "FX",
           "sections": [
-            null,
+            [
+              "I1",
+              3,
+              "i1"
+            ],
             null,
             null,
             null,
@@ -2604,11 +2608,7 @@
               3,
               "S1"
             ],
-            [
-              "22",
-              3,
-              "C1"
-            ]
+            null
           ]
         },
         {
@@ -6928,7 +6928,13 @@
           {
             "song": "FX",
             "chips": [
-              null,
+              [
+                "i1",
+                3,
+                "i1",
+                [],
+                null
+              ],
               null,
               null,
               null,
@@ -9374,14 +9380,9 @@
                 3,
                 "C1",
                 1,
-                267.6,
-                351.9
+                50.3
               ],
-              [
-                "22",
-                3,
-                "C1"
-              ]
+              null
             ]
           },
           {
@@ -13127,7 +13128,7 @@
       "song": "A Hard Road",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.704,
+      "riffSaturationIndex": 1.656,
       "chips": [
         {
           "code": "I1",
@@ -13144,6 +13145,14 @@
           "stop": 50.3,
           "duration": 45.8,
           "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 50.3,
+          "stop": 50.3,
+          "duration": null,
+          "lick": "C1"
         },
         {
           "code": "C1",
@@ -13197,17 +13206,9 @@
           "code": "V1",
           "tier": 2,
           "start": 230.3,
-          "stop": 267.6,
-          "duration": 37.3,
-          "lick": "V1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 267.6,
           "stop": null,
           "duration": null,
-          "lick": "C1"
+          "lick": "V1"
         }
       ]
     }
