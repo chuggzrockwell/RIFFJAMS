@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-01T21:03:31.819Z",
+  "updatedAt": "2026-11-01T21:04:33.212Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=5",
@@ -8804,10 +8804,22 @@
                 2,
                 "B1",
                 [],
-                null
+                118.2
               ],
-              null,
-              null,
+              [
+                "V2",
+                3,
+                "V2",
+                [],
+                140
+              ],
+              [
+                "V1",
+                2,
+                "V1",
+                [],
+                150.8
+              ],
               null,
               [
                 "B2",
@@ -13308,7 +13320,7 @@
       "song": "Symptom of the Universe",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.901,
+      "riffSaturationIndex": 1.789,
       "chips": [
         {
           "code": "V1",
@@ -13338,9 +13350,33 @@
           "code": "V2",
           "tier": 3,
           "start": 107.9,
+          "stop": 118.2,
+          "duration": 10.3,
+          "lick": "V2"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 118.2,
+          "stop": 140,
+          "duration": 21.8,
+          "lick": "B1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 140,
+          "stop": 150.8,
+          "duration": 10.8,
+          "lick": "V2"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 150.8,
           "stop": null,
           "duration": null,
-          "lick": "V2"
+          "lick": "V1"
         }
       ]
     }
