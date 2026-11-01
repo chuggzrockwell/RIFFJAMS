@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-01T21:04:33.212Z",
+  "updatedAt": "2026-11-01T21:05:48.728Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=5",
@@ -8820,27 +8820,40 @@
                 [],
                 150.8
               ],
-              null,
+              [
+                "V2",
+                3,
+                "V2",
+                [],
+                182.9
+              ],
+              [
+                "B1",
+                2,
+                "B1",
+                [],
+                193.4
+              ],
               [
                 "B2",
                 3,
                 "B2",
                 [],
-                null
+                215.4
               ],
               [
                 "S1",
                 3,
                 "S1",
                 [],
-                null
+                229.3
               ],
               [
                 "O1",
                 3,
                 "O1",
                 [],
-                null
+                263.4
               ]
             ]
           },
@@ -13320,7 +13333,7 @@
       "song": "Symptom of the Universe",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.789,
+      "riffSaturationIndex": 1.657,
       "chips": [
         {
           "code": "V1",
@@ -13374,9 +13387,49 @@
           "code": "V1",
           "tier": 2,
           "start": 150.8,
+          "stop": 182.9,
+          "duration": 32.1,
+          "lick": "V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 182.9,
+          "stop": 193.4,
+          "duration": 10.5,
+          "lick": "V2"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 193.4,
+          "stop": 215.4,
+          "duration": 22,
+          "lick": "B1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 215.4,
+          "stop": 229.3,
+          "duration": 13.9,
+          "lick": "B2"
+        },
+        {
+          "code": "S1",
+          "tier": 3,
+          "start": 229.3,
+          "stop": 263.4,
+          "duration": 34.1,
+          "lick": "S1"
+        },
+        {
+          "code": "O1",
+          "tier": 3,
+          "start": 263.4,
           "stop": null,
           "duration": null,
-          "lick": "V1"
+          "lick": "O1"
         }
       ]
     }
