@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-01T16:05:08.997Z",
+  "updatedAt": "2026-11-01T16:06:09.938Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=4",
@@ -2344,6 +2344,11 @@
               "V1",
               3,
               "V1"
+            ],
+            [
+              "S1",
+              1,
+              "S1"
             ]
           ]
         },
@@ -8774,6 +8779,20 @@
                 "V1",
                 1,
                 0
+              ],
+              [
+                "S1",
+                1,
+                "S1",
+                1,
+                98
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                0
               ]
             ]
           },
@@ -13158,15 +13177,31 @@
       "song": "It's Alright",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": null,
+      "riffSaturationIndex": 1,
       "chips": [
         {
           "code": "V1",
           "tier": 3,
           "start": 0,
-          "stop": null,
+          "stop": 0,
           "duration": null,
           "lick": "V1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 0,
+          "stop": 98,
+          "duration": 98,
+          "lick": "V1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 98,
+          "stop": null,
+          "duration": null,
+          "lick": "S1"
         }
       ]
     }
