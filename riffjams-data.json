@@ -1,17 +1,17 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-02T23:54:40.120Z",
+  "updatedAt": "2026-11-04T23:13:12.050Z",
   "assets": {
     "12": "user-tabs/12.png",
-    "V1": "user-tabs/V1.png?v=6",
+    "V1": "user-tabs/V1.png?v=7",
     "PC1": "user-tabs/PC1.png?v=3",
     "PC2": "user-tabs/PC2.png?v=2",
-    "B1": "user-tabs/B1.png?v=7",
-    "B2": "user-tabs/B2.png?v=4",
+    "B1": "user-tabs/B1.png?v=8",
+    "B2": "user-tabs/B2.png?v=5",
     "B3": "user-tabs/B3.png?v=2",
     "B4": "user-tabs/B4.png",
     "S1": "user-tabs/S1.png?v=6",
-    "I1": "user-tabs/I1.png?v=3",
+    "I1": "user-tabs/I1.png?v=4",
     "B5": "user-tabs/B5.png",
     "B6": "user-tabs/B6.png",
     "B7": "user-tabs/B7.png",
@@ -37,7 +37,7 @@
     "I2": "user-tabs/I2.png",
     "I3": "user-tabs/I3.png",
     "I4": "user-tabs/I4.png",
-    "C1": "user-tabs/C1.png?v=4",
+    "C1": "user-tabs/C1.png?v=5",
     "V2": "user-tabs/V2.png?v=3",
     "C2": "user-tabs/C2.png",
     "C3": "user-tabs/C3.png",
@@ -2391,7 +2391,44 @@
       "songs": [
         {
           "song": "Back Street Kids",
-          "sections": []
+          "sections": [
+            [
+              "I1",
+              2,
+              "I1",
+              "1i⁵–ii⁵–♭III⁵"
+            ],
+            [
+              "C1",
+              3,
+              "C1",
+              []
+            ],
+            [
+              "V1",
+              1,
+              "V1",
+              4
+            ],
+            [
+              "B1",
+              3,
+              "B1",
+              []
+            ],
+            [
+              "B2",
+              2,
+              "B2",
+              []
+            ],
+            [
+              "S1",
+              1,
+              "",
+              []
+            ]
+          ]
         },
         {
           "song": "You Won't Change Me",
@@ -9016,7 +9053,40 @@
         "songs": [
           {
             "song": "Back Street Kids",
-            "chips": []
+            "chips": [
+              [
+                "I1",
+                2,
+                "I1",
+                "1i⁵–ii⁵–♭III⁵"
+              ],
+              [
+                "C1",
+                3,
+                "C1"
+              ],
+              [
+                "V1",
+                1,
+                "V1",
+                4
+              ],
+              [
+                "B1",
+                3,
+                "B1"
+              ],
+              [
+                "B2",
+                2,
+                "B2"
+              ],
+              [
+                "S1",
+                1,
+                "S1"
+              ]
+            ]
           },
           {
             "song": "You Won't Change Me",
