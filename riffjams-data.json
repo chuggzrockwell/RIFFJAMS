@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:19:35.328Z",
+  "updatedAt": "2026-11-04T23:20:42.122Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -9779,7 +9779,7 @@
                 3,
                 "C1",
                 1,
-                50.3
+                267.6
               ],
               null
             ],
@@ -9793,6 +9793,16 @@
                 "name": "VERSE 2",
                 "start": 3,
                 "end": 4
+              },
+              {
+                "name": "BRIDGE",
+                "start": 5,
+                "end": 7
+              },
+              {
+                "name": "VERSE 4",
+                "start": 8,
+                "end": 9
               }
             ]
           },
@@ -13862,7 +13872,7 @@
       "song": "A Hard Road",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.656,
+      "riffSaturationIndex": 1.704,
       "chips": [
         {
           "code": "I1",
@@ -13879,14 +13889,6 @@
           "stop": 50.3,
           "duration": 45.8,
           "lick": "V1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 50.3,
-          "stop": 50.3,
-          "duration": null,
-          "lick": "C1"
         },
         {
           "code": "C1",
@@ -13940,9 +13942,17 @@
           "code": "V1",
           "tier": 2,
           "start": 230.3,
+          "stop": 267.6,
+          "duration": 37.3,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 267.6,
           "stop": null,
           "duration": null,
-          "lick": "V1"
+          "lick": "C1"
         }
       ]
     }
