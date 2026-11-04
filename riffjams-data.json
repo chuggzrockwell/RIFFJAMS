@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:13:12.050Z",
+  "updatedAt": "2026-11-04T23:14:13.738Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -2401,8 +2401,7 @@
             [
               "C1",
               3,
-              "C1",
-              []
+              "C1"
             ],
             [
               "V1",
@@ -9058,19 +9057,39 @@
                 "I1",
                 2,
                 "I1",
-                "1i⁵–ii⁵–♭III⁵"
+                "1i⁵–ii⁵–♭III⁵",
+                0
               ],
               [
                 "C1",
                 3,
-                "C1"
+                "C1",
+                1,
+                14.3
+              ],
+              [
+                "I1",
+                2,
+                "I1",
+                "1i⁵–ii⁵–♭III⁵",
+                21.3
               ],
               [
                 "V1",
                 1,
                 "V1",
-                4
+                4,
+                28.3
               ],
+              [
+                "C1",
+                3,
+                "C1",
+                1,
+                14.3
+              ],
+              null,
+              null,
               [
                 "B1",
                 3,
@@ -13734,6 +13753,55 @@
           "start": 224.8,
           "stop": 238.9,
           "duration": 14.1,
+          "lick": "V1"
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "Back Street Kids",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1.753,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": 14.3,
+          "duration": 14.3,
+          "lick": "I1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 14.3,
+          "stop": 14.3,
+          "duration": null,
+          "lick": "C1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 14.3,
+          "stop": 21.3,
+          "duration": 7,
+          "lick": "C1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 21.3,
+          "stop": 28.3,
+          "duration": 7,
+          "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 28.3,
+          "stop": null,
+          "duration": null,
           "lick": "V1"
         }
       ]
