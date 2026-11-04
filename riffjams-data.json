@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:26:33.520Z",
+  "updatedAt": "2026-11-04T23:27:38.687Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -6370,6 +6370,27 @@
                 3,
                 46.1
               ],
+              [
+                "V1",
+                1,
+                "COTG-V1",
+                3,
+                52.6
+              ],
+              [
+                "I2",
+                3,
+                "COTG-I2",
+                [],
+                78
+              ],
+              [
+                "I1",
+                1,
+                "COTG-I1",
+                3,
+                87.5
+              ],
               null,
               [
                 "B1",
@@ -6421,10 +6442,14 @@
               null,
               null,
               null,
-              null,
-              null,
-              null,
               null
+            ],
+            "sectionRulers": [
+              {
+                "name": "INTRO",
+                "start": 0,
+                "end": 4
+              }
             ]
           },
           {
@@ -14009,7 +14034,7 @@
       "song": "Children of the Grave",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.802,
+      "riffSaturationIndex": 2.217,
       "chips": [
         {
           "code": "I1",
@@ -14047,6 +14072,30 @@
           "code": "I1",
           "tier": 1,
           "start": 46.1,
+          "stop": 52.6,
+          "duration": 6.5,
+          "lick": "COTG-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 52.6,
+          "stop": 78,
+          "duration": 25.4,
+          "lick": "COTG-V1"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 78,
+          "stop": 87.5,
+          "duration": 9.5,
+          "lick": "COTG-I2"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 87.5,
           "stop": null,
           "duration": null,
           "lick": "COTG-I1"
