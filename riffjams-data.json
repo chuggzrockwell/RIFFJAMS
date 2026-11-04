@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:31:19.283Z",
+  "updatedAt": "2026-11-04T23:32:26.685Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -6419,12 +6419,20 @@
                 172.1
               ],
               [
+                "I1",
+                1,
+                "COTG-I1",
+                3,
+                181.8
+              ],
+              [
                 "V1",
                 1,
                 "COTG-V1",
                 3,
-                52.6
+                188.3
               ],
+              null,
               [
                 "B2",
                 3,
@@ -6456,8 +6464,6 @@
                 [],
                 null
               ],
-              null,
-              null,
               null,
               null,
               null,
@@ -14073,7 +14079,7 @@
       "song": "Children of the Grave",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.477,
+      "riffSaturationIndex": 2.415,
       "chips": [
         {
           "code": "I1",
@@ -14114,14 +14120,6 @@
           "stop": 52.6,
           "duration": 6.5,
           "lick": "COTG-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 52.6,
-          "stop": 52.6,
-          "duration": null,
-          "lick": "COTG-V1"
         },
         {
           "code": "V1",
@@ -14175,9 +14173,25 @@
           "code": "I2",
           "tier": 3,
           "start": 172.1,
+          "stop": 181.8,
+          "duration": 9.7,
+          "lick": "COTG-I2"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 181.8,
+          "stop": 188.3,
+          "duration": 6.5,
+          "lick": "COTG-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 188.3,
           "stop": null,
           "duration": null,
-          "lick": "COTG-I2"
+          "lick": "COTG-V1"
         }
       ]
     }
