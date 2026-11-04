@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:44:41.177Z",
+  "updatedAt": "2026-11-04T23:45:43.765Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -6264,20 +6264,32 @@
                 135.4
               ],
               [
+                "I1",
+                1,
+                "AF-I1",
+                [],
+                156
+              ],
+              [
+                "V1",
+                1,
+                "AF-V1",
+                "4S",
+                175.7
+              ],
+              null,
+              null,
+              [
                 "S1",
                 1,
                 "AF-S1",
                 []
               ],
-              null,
               [
                 "B3",
                 2,
                 "AF-B3"
               ],
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -6310,7 +6322,12 @@
               {
                 "name": "BRIDGE",
                 "start": 4,
-                "end": 4
+                "end": 5
+              },
+              {
+                "name": "VERSE 3",
+                "start": 6,
+                "end": 7
               }
             ]
           },
@@ -14265,7 +14282,7 @@
       "song": "After Forever",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.846,
+      "riffSaturationIndex": 2.764,
       "chips": [
         {
           "code": "I1",
@@ -14311,9 +14328,25 @@
           "code": "B2",
           "tier": 2,
           "start": 135.4,
+          "stop": 156,
+          "duration": 20.6,
+          "lick": "AF-B2"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 156,
+          "stop": 175.7,
+          "duration": 19.7,
+          "lick": "AF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 175.7,
           "stop": null,
           "duration": null,
-          "lick": "AF-B2"
+          "lick": "AF-V1"
         }
       ]
     }
