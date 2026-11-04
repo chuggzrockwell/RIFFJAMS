@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:15:15.526Z",
+  "updatedAt": "2026-11-04T23:16:16.344Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -2417,14 +2417,12 @@
             [
               "B2",
               2,
-              "B2",
-              []
+              "B2"
             ],
             [
               "S1",
               1,
-              "",
-              []
+              "S1"
             ]
           ]
         },
@@ -9111,12 +9109,23 @@
               [
                 "B2",
                 2,
-                "B2"
+                "B2",
+                1,
+                120.1
+              ],
+              [
+                "B1",
+                3,
+                "B1",
+                1,
+                148.6
               ],
               [
                 "S1",
                 1,
-                "S1"
+                "S1",
+                1,
+                163
               ]
             ],
             "sectionRulers": [
@@ -9136,9 +9145,9 @@
                 "end": 6
               },
               {
-                "name": "Section",
+                "name": "BRIDGE",
                 "start": 7,
-                "end": 8
+                "end": 10
               }
             ]
           },
@@ -13797,7 +13806,7 @@
       "song": "Back Street Kids",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.065,
+      "riffSaturationIndex": 1.867,
       "chips": [
         {
           "code": "I1",
@@ -13859,9 +13868,33 @@
           "code": "B1",
           "tier": 3,
           "start": 105.9,
+          "stop": 120.1,
+          "duration": 14.2,
+          "lick": "B1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 120.1,
+          "stop": 148.6,
+          "duration": 28.5,
+          "lick": "B2"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 148.6,
+          "stop": 163,
+          "duration": 14.4,
+          "lick": "B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 163,
           "stop": null,
           "duration": null,
-          "lick": "B1"
+          "lick": "S1"
         }
       ]
     }
