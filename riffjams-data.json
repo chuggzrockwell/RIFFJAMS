@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:17:24.805Z",
+  "updatedAt": "2026-11-04T23:18:32.571Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -2407,7 +2407,7 @@
               "V1",
               2,
               "V1",
-              "1i⁵–ii⁵–♭III⁵"
+              4
             ],
             [
               "B1",
@@ -9097,7 +9097,7 @@
                 3,
                 "C1",
                 1,
-                98.7
+                98.8
               ],
               [
                 "B1",
@@ -9121,11 +9121,18 @@
                 148.6
               ],
               [
-                "V1",
+                "S1",
                 1,
+                "S1",
+                1,
+                163
+              ],
+              [
+                "V1",
+                2,
                 "V1",
                 4,
-                28.3
+                184.6
               ],
               [
                 "C1",
@@ -9159,7 +9166,7 @@
               {
                 "name": "VERSE 3",
                 "start": 10,
-                "end": 11
+                "end": 13
               }
             ]
           },
@@ -13818,7 +13825,7 @@
       "song": "Back Street Kids",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.951,
+      "riffSaturationIndex": 1.999,
       "chips": [
         {
           "code": "I1",
@@ -13848,14 +13855,6 @@
           "code": "V1",
           "tier": 1,
           "start": 28.3,
-          "stop": 28.3,
-          "duration": null,
-          "lick": "V1"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 28.3,
           "stop": 56.5,
           "duration": 28.2,
           "lick": "V1"
@@ -13880,16 +13879,16 @@
           "code": "C1",
           "tier": 3,
           "start": 98.7,
-          "stop": 98.7,
-          "duration": null,
+          "stop": 98.8,
+          "duration": 0.1,
           "lick": "C1"
         },
         {
           "code": "C1",
           "tier": 3,
-          "start": 98.7,
+          "start": 98.8,
           "stop": 105.9,
-          "duration": 7.2,
+          "duration": 7.1,
           "lick": "C1"
         },
         {
@@ -13912,9 +13911,25 @@
           "code": "B1",
           "tier": 3,
           "start": 148.6,
+          "stop": 163,
+          "duration": 14.4,
+          "lick": "B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 163,
+          "stop": 184.6,
+          "duration": 21.6,
+          "lick": "S1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 184.6,
           "stop": null,
           "duration": null,
-          "lick": "B1"
+          "lick": "V1"
         }
       ]
     }
