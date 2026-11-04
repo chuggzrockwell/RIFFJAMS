@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:33:32.211Z",
+  "updatedAt": "2026-11-04T23:34:32.313Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -1104,20 +1104,15 @@
               "COTG-S1"
             ],
             [
-              "L1",
-              3,
-              "",
-              []
-            ],
-            [
               "V1",
               1,
               "COTG-V1",
               3
             ],
+            null,
             [
               "O1",
-              3,
+              2,
               "COTG-O1"
             ],
             null,
@@ -6445,33 +6440,25 @@
                 [],
                 223.4
               ],
-              null,
               [
-                "B2",
+                "I2",
                 3,
-                "COTG-B2",
-                []
-              ],
-              null,
-              [
-                "L1",
-                3,
-                "",
-                []
-              ],
-              [
-                "V1",
-                1,
-                "COTG-V1",
-                3
+                "COTG-I2",
+                [],
+                248.3
               ],
               [
                 "O1",
-                3,
+                2,
                 "COTG-O1",
                 [],
-                null
+                257.8,
+                267
               ],
+              null,
+              null,
+              null,
+              null,
               null,
               null,
               null,
@@ -14088,9 +14075,9 @@
     {
       "album": "Master of Reality",
       "song": "Children of the Grave",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 2.422,
+      "endSec": 267,
+      "complete": true,
+      "riffSaturationIndex": 2.41,
       "chips": [
         {
           "code": "I1",
@@ -14216,9 +14203,25 @@
           "code": "S1",
           "tier": 1,
           "start": 223.4,
-          "stop": null,
-          "duration": null,
+          "stop": 248.3,
+          "duration": 24.9,
           "lick": "COTG-S1"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 248.3,
+          "stop": 257.8,
+          "duration": 9.5,
+          "lick": "COTG-I2"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 257.8,
+          "stop": 267,
+          "duration": 9.2,
+          "lick": "COTG-O1"
         }
       ]
     }
