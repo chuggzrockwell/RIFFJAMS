@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:25:30.774Z",
+  "updatedAt": "2026-11-04T23:26:33.520Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -1085,8 +1085,7 @@
             [
               "I2",
               3,
-              "COTG-I2",
-              []
+              "COTG-I2"
             ],
             [
               "B1",
@@ -6347,8 +6346,31 @@
                 "I2",
                 3,
                 "COTG-I2",
-                []
+                [],
+                20.2
               ],
+              [
+                "I1",
+                1,
+                "COTG-I1",
+                3,
+                29.9
+              ],
+              [
+                "I2",
+                3,
+                "COTG-I2",
+                [],
+                36.4
+              ],
+              [
+                "I1",
+                1,
+                "COTG-I1",
+                3,
+                46.1
+              ],
+              null,
               [
                 "B1",
                 1,
@@ -6386,10 +6408,6 @@
                 [],
                 null
               ],
-              null,
-              null,
-              null,
-              null,
               null,
               null,
               null,
@@ -13991,12 +14009,44 @@
       "song": "Children of the Grave",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": null,
+      "riffSaturationIndex": 1.802,
       "chips": [
         {
           "code": "I1",
           "tier": 1,
           "start": 13.7,
+          "stop": 20.2,
+          "duration": 6.5,
+          "lick": "COTG-I1"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 20.2,
+          "stop": 29.9,
+          "duration": 9.7,
+          "lick": "COTG-I2"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 29.9,
+          "stop": 36.4,
+          "duration": 6.5,
+          "lick": "COTG-I1"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 36.4,
+          "stop": 46.1,
+          "duration": 9.7,
+          "lick": "COTG-I2"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 46.1,
           "stop": null,
           "duration": null,
           "lick": "COTG-I1"
