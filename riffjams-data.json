@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:29:44.132Z",
+  "updatedAt": "2026-11-04T23:31:19.283Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -6412,13 +6412,25 @@
                 165.5
               ],
               [
+                "I2",
+                3,
+                "COTG-I2",
+                [],
+                172.1
+              ],
+              [
+                "V1",
+                1,
+                "COTG-V1",
+                3,
+                52.6
+              ],
+              [
                 "B2",
                 3,
                 "COTG-B2",
                 []
               ],
-              null,
-              null,
               [
                 "S1",
                 1,
@@ -6471,6 +6483,11 @@
                 "name": "BRIDGE",
                 "start": 8,
                 "end": 9
+              },
+              {
+                "name": "VERSE 3",
+                "start": 10,
+                "end": 12
               }
             ]
           },
@@ -14056,7 +14073,7 @@
       "song": "Children of the Grave",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.455,
+      "riffSaturationIndex": 2.477,
       "chips": [
         {
           "code": "I1",
@@ -14102,6 +14119,14 @@
           "code": "V1",
           "tier": 1,
           "start": 52.6,
+          "stop": 52.6,
+          "duration": null,
+          "lick": "COTG-V1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 52.6,
           "stop": 78,
           "duration": 25.4,
           "lick": "COTG-V1"
@@ -14142,9 +14167,17 @@
           "code": "I1",
           "tier": 1,
           "start": 165.5,
+          "stop": 172.1,
+          "duration": 6.6,
+          "lick": "COTG-I1"
+        },
+        {
+          "code": "I2",
+          "tier": 3,
+          "start": 172.1,
           "stop": null,
           "duration": null,
-          "lick": "COTG-I1"
+          "lick": "COTG-I2"
         }
       ]
     }
