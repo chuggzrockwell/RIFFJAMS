@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:45:43.765Z",
+  "updatedAt": "2026-11-04T23:46:44.021Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -1021,14 +1021,12 @@
             [
               "S1",
               1,
-              "AF-S1",
-              []
+              "AF-S1"
             ],
             [
               "B3",
               2,
-              "AF-B3",
-              []
+              "AF-B3"
             ],
             null,
             null,
@@ -6277,18 +6275,33 @@
                 "4S",
                 175.7
               ],
-              null,
-              null,
+              [
+                "B3",
+                2,
+                "AF-B3",
+                1,
+                205.9
+              ],
               [
                 "S1",
                 1,
                 "AF-S1",
-                []
+                [],
+                215.9
               ],
               [
-                "B3",
-                2,
-                "AF-B3"
+                "I1",
+                1,
+                "AF-I1",
+                [],
+                235.9
+              ],
+              [
+                "V1",
+                1,
+                "AF-V1",
+                "4S",
+                255.5
               ],
               null,
               null,
@@ -6328,6 +6341,16 @@
                 "name": "VERSE 3",
                 "start": 6,
                 "end": 7
+              },
+              {
+                "name": "SOLO",
+                "start": 8,
+                "end": 9
+              },
+              {
+                "name": "VERSE 4",
+                "start": 10,
+                "end": 11
               }
             ]
           },
@@ -14282,7 +14305,7 @@
       "song": "After Forever",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.764,
+      "riffSaturationIndex": 2.799,
       "chips": [
         {
           "code": "I1",
@@ -14344,6 +14367,38 @@
           "code": "V1",
           "tier": 1,
           "start": 175.7,
+          "stop": 205.9,
+          "duration": 30.2,
+          "lick": "AF-V1"
+        },
+        {
+          "code": "B3",
+          "tier": 2,
+          "start": 205.9,
+          "stop": 215.9,
+          "duration": 10,
+          "lick": "AF-B3"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 215.9,
+          "stop": 235.9,
+          "duration": 20,
+          "lick": "AF-S1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 235.9,
+          "stop": 255.5,
+          "duration": 19.6,
+          "lick": "AF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 255.5,
           "stop": null,
           "duration": null,
           "lick": "AF-V1"
