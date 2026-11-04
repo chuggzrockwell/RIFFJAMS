@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:23:35.328Z",
+  "updatedAt": "2026-11-04T23:25:30.774Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -1121,8 +1121,7 @@
             [
               "O1",
               3,
-              "COTG-O1",
-              []
+              "COTG-O1"
             ],
             null,
             null,
@@ -6341,7 +6340,8 @@
                 "I1",
                 1,
                 "COTG-I1",
-                3
+                3,
+                13.7
               ],
               [
                 "I2",
@@ -6382,7 +6382,9 @@
               [
                 "O1",
                 3,
-                "COTG-O1"
+                "COTG-O1",
+                [],
+                null
               ],
               null,
               null,
@@ -13981,6 +13983,23 @@
           "stop": 238.9,
           "duration": 14.1,
           "lick": "V1"
+        }
+      ]
+    },
+    {
+      "album": "Master of Reality",
+      "song": "Children of the Grave",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 13.7,
+          "stop": null,
+          "duration": null,
+          "lick": "COTG-I1"
         }
       ]
     }
