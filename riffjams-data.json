@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:14:13.738Z",
+  "updatedAt": "2026-11-04T23:15:15.526Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -2412,8 +2412,7 @@
             [
               "B1",
               3,
-              "B1",
-              []
+              "B1"
             ],
             [
               "B2",
@@ -9086,14 +9085,28 @@
                 3,
                 "C1",
                 1,
-                14.3
+                56.5
               ],
-              null,
-              null,
+              [
+                "I1",
+                2,
+                "I1",
+                "1i⁵–ii⁵–♭III⁵",
+                63.6
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                1,
+                98.7
+              ],
               [
                 "B1",
                 3,
-                "B1"
+                "B1",
+                1,
+                105.9
               ],
               [
                 "B2",
@@ -9105,6 +9118,28 @@
                 1,
                 "S1"
               ]
+            ],
+            "sectionRulers": [
+              {
+                "name": "INTRO",
+                "start": 0,
+                "end": 2
+              },
+              {
+                "name": "VERSE 1",
+                "start": 3,
+                "end": 4
+              },
+              {
+                "name": "VERSE 2",
+                "start": 5,
+                "end": 6
+              },
+              {
+                "name": "Section",
+                "start": 7,
+                "end": 8
+              }
             ]
           },
           {
@@ -13762,7 +13797,7 @@
       "song": "Back Street Kids",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.753,
+      "riffSaturationIndex": 2.065,
       "chips": [
         {
           "code": "I1",
@@ -13771,14 +13806,6 @@
           "stop": 14.3,
           "duration": 14.3,
           "lick": "I1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 14.3,
-          "stop": 14.3,
-          "duration": null,
-          "lick": "C1"
         },
         {
           "code": "C1",
@@ -13800,9 +13827,41 @@
           "code": "V1",
           "tier": 1,
           "start": 28.3,
+          "stop": 56.5,
+          "duration": 28.2,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 56.5,
+          "stop": 63.6,
+          "duration": 7.1,
+          "lick": "C1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 63.6,
+          "stop": 98.7,
+          "duration": 35.1,
+          "lick": "I1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 98.7,
+          "stop": 105.9,
+          "duration": 7.2,
+          "lick": "C1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 105.9,
           "stop": null,
           "duration": null,
-          "lick": "V1"
+          "lick": "B1"
         }
       ]
     }
