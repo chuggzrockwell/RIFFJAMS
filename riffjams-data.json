@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:42:39.100Z",
+  "updatedAt": "2026-11-04T23:43:39.645Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -999,9 +999,8 @@
           "sections": [
             [
               "I1",
-              2,
-              "AF-I1",
-              []
+              1,
+              "AF-I1"
             ],
             [
               "V1",
@@ -6226,16 +6225,33 @@
             "chips": [
               [
                 "I1",
-                2,
+                1,
                 "AF-I1",
-                []
+                [],
+                0
               ],
               [
                 "V1",
                 1,
                 "AF-V1",
-                "4S"
+                "4S",
+                34.4
               ],
+              [
+                "I1",
+                1,
+                "AF-I1",
+                [],
+                64.7
+              ],
+              [
+                "V1",
+                1,
+                "AF-V1",
+                "4S",
+                34.4
+              ],
+              null,
               [
                 "B1",
                 3,
@@ -6278,9 +6294,6 @@
               null,
               null,
               null,
-              null,
-              null,
-              null,
               null
             ],
             "sectionRulers": [
@@ -6288,6 +6301,11 @@
                 "name": "VERSE 1",
                 "start": 0,
                 "end": 1
+              },
+              {
+                "name": "VERSE 2",
+                "start": 2,
+                "end": 3
               }
             ]
           },
@@ -14234,6 +14252,47 @@
           "stop": 267,
           "duration": 9.2,
           "lick": "COTG-O1"
+        }
+      ]
+    },
+    {
+      "album": "Master of Reality",
+      "song": "After Forever",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 3,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 0,
+          "stop": 34.4,
+          "duration": 34.4,
+          "lick": "AF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 34.4,
+          "stop": 34.4,
+          "duration": null,
+          "lick": "AF-V1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 34.4,
+          "stop": 64.7,
+          "duration": 30.3,
+          "lick": "AF-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 64.7,
+          "stop": null,
+          "duration": null,
+          "lick": "AF-I1"
         }
       ]
     }
