@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:43:39.645Z",
+  "updatedAt": "2026-11-04T23:44:41.177Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -1010,15 +1010,13 @@
             ],
             [
               "B1",
-              3,
-              "AF-B1",
-              []
+              2,
+              "AF-B1"
             ],
             [
               "B2",
-              3,
-              "AF-B2",
-              []
+              2,
+              "AF-B2"
             ],
             [
               "S1",
@@ -6249,20 +6247,21 @@
                 1,
                 "AF-V1",
                 "4S",
-                34.4
+                84.4
               ],
-              null,
               [
                 "B1",
-                3,
+                2,
                 "AF-B1",
-                []
+                [],
+                114.6
               ],
               [
                 "B2",
-                3,
+                2,
                 "AF-B2",
-                []
+                [],
+                135.4
               ],
               [
                 "S1",
@@ -6270,6 +6269,7 @@
                 "AF-S1",
                 []
               ],
+              null,
               [
                 "B3",
                 2,
@@ -6306,6 +6306,11 @@
                 "name": "VERSE 2",
                 "start": 2,
                 "end": 3
+              },
+              {
+                "name": "BRIDGE",
+                "start": 4,
+                "end": 4
               }
             ]
           },
@@ -14260,7 +14265,7 @@
       "song": "After Forever",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 3,
+      "riffSaturationIndex": 2.846,
       "chips": [
         {
           "code": "I1",
@@ -14274,14 +14279,6 @@
           "code": "V1",
           "tier": 1,
           "start": 34.4,
-          "stop": 34.4,
-          "duration": null,
-          "lick": "AF-V1"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 34.4,
           "stop": 64.7,
           "duration": 30.3,
           "lick": "AF-V1"
@@ -14290,9 +14287,33 @@
           "code": "I1",
           "tier": 1,
           "start": 64.7,
+          "stop": 84.4,
+          "duration": 19.7,
+          "lick": "AF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 84.4,
+          "stop": 114.6,
+          "duration": 30.2,
+          "lick": "AF-V1"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 114.6,
+          "stop": 135.4,
+          "duration": 20.8,
+          "lick": "AF-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 135.4,
           "stop": null,
           "duration": null,
-          "lick": "AF-I1"
+          "lick": "AF-B2"
         }
       ]
     }
