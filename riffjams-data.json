@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:46:44.021Z",
+  "updatedAt": "2026-11-04T23:47:56.677Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -1028,7 +1028,11 @@
               2,
               "AF-B3"
             ],
-            null,
+            [
+              "O1",
+              3,
+              "O1"
+            ],
             null,
             null,
             null,
@@ -6303,8 +6307,22 @@
                 "4S",
                 255.5
               ],
-              null,
-              null,
+              [
+                "I1",
+                1,
+                "AF-I1",
+                [],
+                285.4,
+                null
+              ],
+              [
+                "O1",
+                3,
+                "O1",
+                [],
+                null,
+                null
+              ],
               null,
               null,
               null,
@@ -6350,7 +6368,7 @@
               {
                 "name": "VERSE 4",
                 "start": 10,
-                "end": 11
+                "end": 12
               }
             ]
           },
@@ -14305,7 +14323,7 @@
       "song": "After Forever",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 2.799,
+      "riffSaturationIndex": 2.82,
       "chips": [
         {
           "code": "I1",
@@ -14399,9 +14417,17 @@
           "code": "V1",
           "tier": 1,
           "start": 255.5,
+          "stop": 285.4,
+          "duration": 29.9,
+          "lick": "AF-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 285.4,
           "stop": null,
           "duration": null,
-          "lick": "AF-V1"
+          "lick": "AF-I1"
         }
       ]
     }
