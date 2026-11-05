@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-04T23:47:56.677Z",
+  "updatedAt": "2026-11-05T00:28:51.674Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=7",
@@ -1084,7 +1084,8 @@
             [
               "I2",
               3,
-              "COTG-I2"
+              "COTG-I2",
+              []
             ],
             [
               "B1",
@@ -1095,12 +1096,14 @@
             [
               "B2",
               2,
-              "COTG-B2"
+              "COTG-B2",
+              []
             ],
             [
               "S1",
               1,
-              "COTG-S1"
+              "COTG-S1",
+              []
             ],
             [
               "V1",
@@ -1111,8 +1114,9 @@
             null,
             [
               "O1",
-              2,
-              "COTG-O1"
+              3,
+              "COTG-O1",
+              []
             ],
             null,
             null,
@@ -6320,8 +6324,8 @@
                 3,
                 "O1",
                 [],
-                null,
-                null
+                304.8,
+                314.4
               ],
               null,
               null,
@@ -6368,7 +6372,7 @@
               {
                 "name": "VERSE 4",
                 "start": 10,
-                "end": 12
+                "end": 13
               }
             ]
           },
@@ -6537,7 +6541,7 @@
               ],
               [
                 "O1",
-                2,
+                3,
                 "COTG-O1",
                 [],
                 257.8,
@@ -6579,11 +6583,6 @@
               {
                 "name": "VERSE 3",
                 "start": 13,
-                "end": 16
-              },
-              {
-                "name": "O",
-                "start": 17,
                 "end": 17
               }
             ]
@@ -14167,10 +14166,131 @@
     },
     {
       "album": "Master of Reality",
+      "song": "After Forever",
+      "endSec": 314.4,
+      "complete": true,
+      "riffSaturationIndex": 2.775,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 0,
+          "stop": 34.4,
+          "duration": 34.4,
+          "lick": "AF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 34.4,
+          "stop": 64.7,
+          "duration": 30.3,
+          "lick": "AF-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 64.7,
+          "stop": 84.4,
+          "duration": 19.7,
+          "lick": "AF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 84.4,
+          "stop": 114.6,
+          "duration": 30.2,
+          "lick": "AF-V1"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 114.6,
+          "stop": 135.4,
+          "duration": 20.8,
+          "lick": "AF-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 135.4,
+          "stop": 156,
+          "duration": 20.6,
+          "lick": "AF-B2"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 156,
+          "stop": 175.7,
+          "duration": 19.7,
+          "lick": "AF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 175.7,
+          "stop": 205.9,
+          "duration": 30.2,
+          "lick": "AF-V1"
+        },
+        {
+          "code": "B3",
+          "tier": 2,
+          "start": 205.9,
+          "stop": 215.9,
+          "duration": 10,
+          "lick": "AF-B3"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 215.9,
+          "stop": 235.9,
+          "duration": 20,
+          "lick": "AF-S1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 235.9,
+          "stop": 255.5,
+          "duration": 19.6,
+          "lick": "AF-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 255.5,
+          "stop": 285.4,
+          "duration": 29.9,
+          "lick": "AF-V1"
+        },
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 285.4,
+          "stop": 304.8,
+          "duration": 19.4,
+          "lick": "AF-I1"
+        },
+        {
+          "code": "O1",
+          "tier": 3,
+          "start": 304.8,
+          "stop": 314.4,
+          "duration": 9.6,
+          "lick": "O1"
+        }
+      ]
+    },
+    {
+      "album": "Master of Reality",
       "song": "Children of the Grave",
       "endSec": 267,
       "complete": true,
-      "riffSaturationIndex": 2.41,
+      "riffSaturationIndex": 2.374,
       "chips": [
         {
           "code": "I1",
@@ -14310,124 +14430,11 @@
         },
         {
           "code": "O1",
-          "tier": 2,
+          "tier": 3,
           "start": 257.8,
           "stop": 267,
           "duration": 9.2,
           "lick": "COTG-O1"
-        }
-      ]
-    },
-    {
-      "album": "Master of Reality",
-      "song": "After Forever",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 2.82,
-      "chips": [
-        {
-          "code": "I1",
-          "tier": 1,
-          "start": 0,
-          "stop": 34.4,
-          "duration": 34.4,
-          "lick": "AF-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 34.4,
-          "stop": 64.7,
-          "duration": 30.3,
-          "lick": "AF-V1"
-        },
-        {
-          "code": "I1",
-          "tier": 1,
-          "start": 64.7,
-          "stop": 84.4,
-          "duration": 19.7,
-          "lick": "AF-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 84.4,
-          "stop": 114.6,
-          "duration": 30.2,
-          "lick": "AF-V1"
-        },
-        {
-          "code": "B1",
-          "tier": 2,
-          "start": 114.6,
-          "stop": 135.4,
-          "duration": 20.8,
-          "lick": "AF-B1"
-        },
-        {
-          "code": "B2",
-          "tier": 2,
-          "start": 135.4,
-          "stop": 156,
-          "duration": 20.6,
-          "lick": "AF-B2"
-        },
-        {
-          "code": "I1",
-          "tier": 1,
-          "start": 156,
-          "stop": 175.7,
-          "duration": 19.7,
-          "lick": "AF-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 175.7,
-          "stop": 205.9,
-          "duration": 30.2,
-          "lick": "AF-V1"
-        },
-        {
-          "code": "B3",
-          "tier": 2,
-          "start": 205.9,
-          "stop": 215.9,
-          "duration": 10,
-          "lick": "AF-B3"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 215.9,
-          "stop": 235.9,
-          "duration": 20,
-          "lick": "AF-S1"
-        },
-        {
-          "code": "I1",
-          "tier": 1,
-          "start": 235.9,
-          "stop": 255.5,
-          "duration": 19.6,
-          "lick": "AF-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 255.5,
-          "stop": 285.4,
-          "duration": 29.9,
-          "lick": "AF-V1"
-        },
-        {
-          "code": "I1",
-          "tier": 1,
-          "start": 285.4,
-          "stop": null,
-          "duration": null,
-          "lick": "AF-I1"
         }
       ]
     }
