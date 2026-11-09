@@ -1846,6 +1846,8 @@
   .chip-editor label.chip-edit-chord-toggle input { width: 16px; height: 16px; margin: 0; accent-color: #18a050; }
   .chip-editor .chip-edit-chord-body { margin-top: 10px; }
   .chip-editor .ce-hint { font-weight: 500; text-transform: none; letter-spacing: 0; opacity: .8; }
+  .chip-editor .ce-scope { font-size: 0.72rem; font-weight: 600; color: rgba(0,0,0,.55); margin: 0 0 8px; }
+  .chip-editor .ce-scope[hidden] { display: none; }
   .chip-editor #chipEditChordProg {
     display: block; width: 100%; box-sizing: border-box;
     border: 1px solid rgba(0,0,0,.18); border-radius: 8px; padding: 8px 10px;
@@ -4950,6 +4952,7 @@
         <input type="checkbox" id="chipEditChordOn"> Chord change mode
       </label>
       <div class="chip-edit-chord-body" id="chipEditChordBody" hidden>
+        <div class="ce-scope" id="chipEditChordScope" hidden></div>
         <label for="chipEditChordProg">Chords <span class="ce-hint">| between bars · new line = new row</span></label>
         <textarea id="chipEditChordProg" rows="2" placeholder="C | G C | Ab | F | C" spellcheck="false" autocomplete="off"></textarea>
         <div class="ce-chord-tools">
@@ -5976,6 +5979,12 @@ function syncMirrorSectionArrangement(songName, pair, fromArrangement) {
       /* Repeat block: keep the block marker and apply the Riff edit to every pass. */
       var repHitM = arrRepeatInfo(arrSong.chips).byCi[aidx];
       var oldM = arrSong.chips[aidx];
+      /* Keep Chord change mode data (pair[7]) on the rebuilt chip. */
+      if (chipChords(oldM)) {
+        arrRepPad(arrEntry);
+        arrEntry[6] = null;
+        arrEntry[7] = cloneChords(chipChords(oldM));
+      }
       arrSong.chips[aidx] = arrEntry;
       if (repHitM) arrRepAfterEditorSave(arrSong, aidx, repHitM, oldM, true);
     }
@@ -14210,7 +14219,7 @@ function ensureChipEditResizeObserver() {
 }
 /* -- Chip editor: Chord change mode --
    Times are shown and typed as song times (like Start time); saved as offsets from the chip start. */
-var chordEdit = { song: "", code: "" };
+var chordEdit = { song: "", code: "", byCode: false, dirty: false };
 function chordEditorPlayerSec() {
   var sec = null;
   try { if (smYtPlayer && smYtPlayer.getCurrentTime) sec = smPlayerTimeNow(); } catch (eCh) { sec = null; }
@@ -14255,27 +14264,98 @@ function chordEditorRenderRows(abs) {
   chordEditorMarkTapNext();
   if (typeof clampChipEditorInView === "function") clampChipEditorInView();
 }
+/** Riff / Solo editors: the chords live on this song's Arrangement chips with the same code
+    (Arrangement list, plus Single Song's own list when unlinked). */
+function chordEditorTargetsByCode(songName, code) {
+  var want = String(code || "").trim().toUpperCase();
+  var out = [];
+  if (!songName || !want) return out;
+  try { if (!ARRANGEMENT_MAP) ARRANGEMENT_MAP = loadArrangementMap(); } catch (eMap) {}
+  var arrSong = smFindArrangementSongByName(songName);
+  if (!arrSong) return out;
+  [arrSong.chips, ssSongIsLinked(arrSong) ? null : arrSong.ssChips].forEach(function(list, li){
+    (list || []).forEach(function(p){
+      if (isChipPair(p) && arrRepCode(p) === want) out.push({ pair: p, list: li });
+    });
+  });
+  return out;
+}
+function chordEditorApplyByCode(songName, code) {
+  if (!chordEdit.dirty) return;
+  var data = chordEditorRead(null, null);
+  if (data === undefined) return;
+  var targets = chordEditorTargetsByCode(songName, code);
+  if (!targets.length) {
+    if (typeof rjToast === "function") rjToast("No " + code + " chip in this song's Arrangement yet - chords not saved.");
+    return;
+  }
+  var starts = targets.map(function(t){ return chipStartSec(t.pair); }).filter(function(s){ return s != null; });
+  if (data) {
+    var abs = data.at; /* read with base 0, so these are song times */
+    var firstT = null;
+    abs.forEach(function(t){ if (t != null && (firstT == null || t < firstT)) firstT = t; });
+    var base = 0;
+    if (starts.length) {
+      /* Offsets from the occurrence the chords were timed in (latest start at/before the first chord). */
+      base = Math.min.apply(null, starts);
+      if (firstT != null) starts.forEach(function(s){ if (s > base && s <= firstT + 0.05) base = s; });
+    } else if (firstT != null) {
+      /* No occurrence timed yet: the first one starts on its first chord. */
+      base = firstT;
+      var doneList = {};
+      targets.forEach(function(t){
+        if (doneList[t.list]) return;
+        doneList[t.list] = true;
+        arrRepPad(t.pair);
+        setChipStartSec(t.pair, firstT);
+      });
+    }
+    data.at = abs.map(function(t){ return t == null ? null : Math.round((t - base) * 100) / 100; });
+  }
+  targets.forEach(function(t){
+    if (data) {
+      arrRepPad(t.pair);
+      if (t.pair.length < 7) t.pair[6] = null;
+      t.pair[7] = cloneChords(data);
+    } else if (t.pair.length > 7) {
+      t.pair.length = 7;
+    }
+  });
+  try { localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP)); } catch (eSave) {}
+}
 function chordEditorFill(state) {
   var row = document.getElementById("chipEditChordRow");
   var on = document.getElementById("chipEditChordOn");
   var body = document.getElementById("chipEditChordBody");
   var prog = document.getElementById("chipEditChordProg");
+  var scope = document.getElementById("chipEditChordScope");
   if (!row || !on || !body || !prog) return;
-  if (!usesArrangementMap()) {
-    row.hidden = true;
-    return;
-  }
   row.hidden = false;
+  chordEdit.dirty = false;
   var es = getEditSong(state.ai, state.si);
-  var pair = (es && es.chips && !state.isNew) ? es.chips[state.ci] : null;
-  var c = chipChords(pair);
+  var pair = null;
+  var base = (state.startSec != null && isFinite(state.startSec)) ? state.startSec : 0;
   chordEdit.song = (es && es.song) || "";
   chordEdit.code = state.code || "";
+  chordEdit.byCode = !usesArrangementMap();
+  if (chordEdit.byCode) {
+    /* Riff / Solo: show the first same-code Arrangement chip that has chords. */
+    var targets = state.isNew ? [] : chordEditorTargetsByCode(chordEdit.song, chordEdit.code);
+    targets.some(function(t){ if (chipChords(t.pair)) { pair = t.pair; return true; } return false; });
+    base = (pair && chipStartSec(pair) != null) ? chipStartSec(pair) : 0;
+    if (scope) {
+      scope.hidden = false;
+      scope.textContent = "Applies to every " + (chordEdit.code || "chip with this ID") + " in this song's Arrangement / Single Song.";
+    }
+  } else {
+    pair = (es && es.chips && !state.isNew) ? es.chips[state.ci] : null;
+    if (scope) scope.hidden = true;
+  }
+  var c = chipChords(pair);
   on.checked = !!(c && c.on);
   prog.value = (c && c.prog) ? c.prog : "";
   if (on.checked && !prog.value) prog.value = chordProgDefault(chordEdit.song, chordEdit.code);
   body.hidden = !on.checked;
-  var base = (state.startSec != null && isFinite(state.startSec)) ? state.startSec : 0;
   var abs = [];
   ((c && Array.isArray(c.at)) ? c.at : []).forEach(function(off, i){
     abs[i] = (off != null && isFinite(off)) ? base + Number(off) : null;
@@ -14316,6 +14396,13 @@ function chordEditorRead(startSec, passStarts) {
   var tap = document.getElementById("chipEditChordTap");
   var clear = document.getElementById("chipEditChordClear");
   if (!on || !body || !prog || !list) return;
+  /* Riff / Solo only write chords when this section was touched (it rewrites every same-code chip). */
+  var rowEl = document.getElementById("chipEditChordRow");
+  if (rowEl) {
+    rowEl.addEventListener("input", function(){ chordEdit.dirty = true; });
+    rowEl.addEventListener("change", function(){ chordEdit.dirty = true; });
+    rowEl.addEventListener("click", function(e){ if (e.target.closest("button")) chordEdit.dirty = true; }, true);
+  }
   on.addEventListener("change", function(){
     body.hidden = !on.checked;
     if (on.checked && !prog.value.trim()) {
@@ -14778,6 +14865,7 @@ function saveChipEditor() {
     if (!song) return;
     song.licks[ci] = entry;
     saveSoloMap();
+    chordEditorApplyByCode(song.song, code);
     if (typeof window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES === "function") {
       window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES({ reason: "chip-save", song: song.song });
     }
@@ -14790,6 +14878,7 @@ function saveChipEditor() {
     saveAlbums();
     syncSoloFrettingFromSongChip(song.song, entry);
     syncMirrorSectionArrangement(song.song, entry, false);
+    chordEditorApplyByCode(song.song, code);
     if (typeof window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES === "function") {
       window.RIFFJAMS_SYNC_ARRANGEMENT_TIMES({ reason: "chip-save", song: song.song });
     }
