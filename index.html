@@ -4024,25 +4024,19 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    row-gap: calc(2.6rem + 22px);
+    gap: calc(2.6rem + 22px) .3em;
     margin: 0 0 calc(2.6rem + 22px);
   }
-  .ss-chords-bar { display: inline-flex; align-items: center; gap: .16em; padding: 0 .3em; }
-  .ss-chords-line > .ss-chords-bar:first-child { padding-left: 0; }
-  .ss-chords-sep {
-    flex: 0 0 auto;
-    width: 4px;
-    height: 1.15em;
-    background: rgba(255,255,255,.85);
-    border-radius: 2px;
-  }
+  /* Each chord in a light blue box; the one being played turns green. */
   .ss-chord {
     position: relative;
     display: inline-block;
     white-space: nowrap;
-    padding: .1em .22em;
-    border: 3px solid transparent;
+    padding: .1em .3em;
+    border: 3px solid #7cc0f2;
     border-radius: 12px;
+    background: #b9e0ff;
+    color: #0a1a2b;
   }
   .ss-chord.is-now {
     background: #18d060;
@@ -6676,8 +6670,7 @@ function ssRenderChordTab(el, songName, item) {
   if (el.getAttribute("data-ss-tab") !== key) {
     var html = '<div class="ss-chords" aria-label="' + ssEscAttr(item.code) + ' chords"><div class="ss-chords-line">';
     names.forEach(function(name, i){
-      if (i) html += '<span class="ss-chords-sep" aria-hidden="true"></span>';
-      html += '<span class="ss-chords-bar"><span class="ss-chord" data-i="' + i + '">' + ssEscAttr(name) + '</span></span>';
+      html += '<span class="ss-chord" data-i="' + i + '">' + ssEscAttr(name) + '</span>';
     });
     html += '</div><div class="ss-chord-cd" aria-hidden="true"></div></div>';
     el.innerHTML = html;
