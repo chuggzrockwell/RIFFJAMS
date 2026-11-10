@@ -1,17 +1,17 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-06T16:13:34.082Z",
+  "updatedAt": "2026-11-10T01:00:27.715Z",
   "assets": {
     "12": "user-tabs/12.png",
-    "V1": "user-tabs/V1.png?v=7",
+    "V1": "user-tabs/V1.png?v=8",
     "PC1": "user-tabs/PC1.png?v=3",
     "PC2": "user-tabs/PC2.png?v=2",
-    "B1": "user-tabs/B1.png?v=8",
+    "B1": "user-tabs/B1.png?v=9",
     "B2": "user-tabs/B2.png?v=5",
     "B3": "user-tabs/B3.png?v=2",
     "B4": "user-tabs/B4.png",
     "S1": "user-tabs/S1.png?v=6",
-    "I1": "user-tabs/I1.png?v=4",
+    "I1": "user-tabs/I1.png?v=5",
     "B5": "user-tabs/B5.png",
     "B6": "user-tabs/B6.png",
     "B7": "user-tabs/B7.png",
@@ -2431,7 +2431,39 @@
         },
         {
           "song": "You Won't Change Me",
-          "sections": []
+          "sections": [
+            [
+              "I1",
+              3,
+              "I1",
+              []
+            ],
+            [
+              "V1",
+              3,
+              "V1"
+            ],
+            [
+              "C1",
+              3,
+              "C1"
+            ],
+            [
+              "B1",
+              3,
+              "B1"
+            ],
+            [
+              "S1",
+              1,
+              "S1"
+            ],
+            [
+              "S2",
+              1,
+              "S2"
+            ]
+          ]
         },
         {
           "song": "It's Alright",
@@ -9389,7 +9421,222 @@
           },
           {
             "song": "You Won't Change Me",
-            "chips": []
+            "chips": [
+              [
+                "I1",
+                3,
+                "I1",
+                1,
+                23.1
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                62.1,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "C",
+                    "G | C",
+                    "Ab",
+                    "F",
+                    "C",
+                    "Ab",
+                    "F",
+                    "C"
+                  ],
+                  "at": [
+                    6.4,
+                    6.4,
+                    10.3,
+                    13.7,
+                    17.3,
+                    24.3,
+                    27.7,
+                    31
+                  ]
+                }
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                1,
+                96.4,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Eb",
+                    "Ab",
+                    "F",
+                    "C",
+                    "Ab",
+                    "F",
+                    "C",
+                    "G"
+                  ],
+                  "at": [
+                    0,
+                    3.5,
+                    7,
+                    10.5,
+                    14,
+                    17.5,
+                    21,
+                    24.5
+                  ]
+                }
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                131,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "G | C",
+                    "Ab",
+                    "F",
+                    "C",
+                    "Ab",
+                    "F",
+                    "C"
+                  ],
+                  "at": [
+                    0,
+                    4,
+                    7.3,
+                    10.8,
+                    17.7,
+                    21.2,
+                    24.7
+                  ]
+                }
+              ],
+              [
+                "B1",
+                3,
+                "B1",
+                1,
+                187.1
+              ],
+              [
+                "S1",
+                1,
+                "S1",
+                1,
+                207.8
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                258.7,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "G | C",
+                    "Ab",
+                    "F",
+                    "C",
+                    "Ab",
+                    "F",
+                    "C"
+                  ],
+                  "at": [
+                    0,
+                    3.9,
+                    7.3,
+                    10.7,
+                    17.6,
+                    21.1,
+                    24.6
+                  ]
+                }
+              ],
+              [
+                "C1",
+                3,
+                "C1",
+                1,
+                286.6,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Eb",
+                    "Ab",
+                    "F",
+                    "C",
+                    "Ab",
+                    "F",
+                    "C",
+                    "G"
+                  ],
+                  "at": [
+                    0,
+                    3.5,
+                    6.9,
+                    10.3,
+                    13.7,
+                    17.2,
+                    20.5,
+                    24
+                  ]
+                }
+              ],
+              [
+                "B1",
+                3,
+                "B1",
+                1,
+                314
+              ],
+              [
+                "S2",
+                1,
+                "S2",
+                1,
+                334,
+                390.5
+              ]
+            ],
+            "sectionRulers": [
+              {
+                "name": "INTRO",
+                "start": 0,
+                "end": 0
+              },
+              {
+                "name": "VERSE 1",
+                "start": 1,
+                "end": 2
+              },
+              {
+                "name": "VERSE 2",
+                "start": 3,
+                "end": 5
+              },
+              {
+                "name": "VERSE 3",
+                "start": 6,
+                "end": 9
+              }
+            ]
           },
           {
             "song": "It's Alright",
@@ -14444,6 +14691,95 @@
           "stop": 351.8,
           "duration": 84.2,
           "lick": "AHR-C1"
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "You Won't Change Me",
+      "endSec": 390.5,
+      "complete": true,
+      "riffSaturationIndex": 1.585,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 23.1,
+          "stop": 62.1,
+          "duration": 39,
+          "lick": "I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 62.1,
+          "stop": 96.4,
+          "duration": 34.3,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 96.4,
+          "stop": 131,
+          "duration": 34.6,
+          "lick": "C1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 131,
+          "stop": 187.1,
+          "duration": 56.1,
+          "lick": "V1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 187.1,
+          "stop": 207.8,
+          "duration": 20.7,
+          "lick": "B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 207.8,
+          "stop": 258.7,
+          "duration": 50.9,
+          "lick": "S1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 258.7,
+          "stop": 286.6,
+          "duration": 27.9,
+          "lick": "V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 286.6,
+          "stop": 314,
+          "duration": 27.4,
+          "lick": "C1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 314,
+          "stop": 334,
+          "duration": 20,
+          "lick": "B1"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 334,
+          "stop": 390.5,
+          "duration": 56.5,
+          "lick": "S2"
         }
       ]
     }
