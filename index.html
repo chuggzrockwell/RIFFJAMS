@@ -4152,7 +4152,7 @@
   }
   /* Repeat signs (chip editor "+ Repeat sign"): start / end bars with dots in the gap beside the
      boxes, the play count above the end bar. */
-  .ss-chords-grid.has-rep { column-gap: .64em; row-gap: .5em; padding: .32em .5em 0; }
+  .ss-chords-grid.has-rep { column-gap: .85em; row-gap: .5em; padding: .32em .6em 0; }
   .ss-chord { position: relative; }
   .ss-rep-bar {
     position: absolute; top: .06em; bottom: .06em; width: .38em;
@@ -6802,14 +6802,35 @@ function ssRenderChordTab(el, songName, item) {
     if (off == null || !isFinite(off)) return i === 0 ? start : null; /* untimed first chord = chip start */
     return start + Number(off);
   });
-  /* Hand-set repeat signs: shown as written, passes 2..n timed off pass 1 (chordPlaySeq). */
+  /* Hand-set repeat signs: a progression written out more than once inside the signs shows one
+     pass (Am F Am F x2 -> Am F x2); passes not written out are timed off pass 1 (chordPlaySeq). */
   var reps = chordRepeats(c, names.length);
   var endSec = reps.length ? ssChordChipEndSec(songName, start) : null;
-  /* Otherwise a progression entered as repeated passes (e.g. Bb Eb Ab F x6) shows one pass; the
-     green box cycles through it on every timed change. */
-  var period = reps.length ? names.length : chordRepeatPeriod(names);
-  var shown = names.slice(0, period);
-  var lineStarts = chordLineStarts(c, shown.length);
+  var dispOf = [], shown = [], foldTo = {};
+  if (reps.length) {
+    reps.forEach(function(r){
+      r.p = chordRepeatPeriod(names.slice(r.s, r.e + 1));
+      for (var fi = r.s + r.p; fi <= r.e; fi++) foldTo[fi] = r.s + ((fi - r.s) % r.p);
+    });
+    names.forEach(function(name, i){
+      if (foldTo[i] != null) { dispOf[i] = dispOf[foldTo[i]]; return; }
+      dispOf[i] = shown.length;
+      shown.push(name);
+    });
+  } else {
+    /* No signs: a progression entered as repeated passes (e.g. Bb Eb Ab F x6) shows one pass; the
+       green box cycles through it on every timed change. */
+    var period = chordRepeatPeriod(names);
+    shown = names.slice(0, period);
+    names.forEach(function(name, i){ dispOf[i] = i % period; });
+  }
+  /* Hand-set line breaks are chord indexes: move them onto the boxes shown. */
+  var lineSrc = (reps.length && Array.isArray(c.br))
+    ? { br: c.br.map(function(i){ return i | 0; })
+        .filter(function(i){ return i > 0 && i < names.length && foldTo[i] == null; })
+        .map(function(i){ return dispOf[i]; }) }
+    : c;
+  var lineStarts = chordLineStarts(lineSrc, shown.length);
   var repKey = reps.map(function(r){ return r.s + "-" + r.e + "x" + r.n; }).join(",");
   var key = "ch|" + item.ci + "|" + start + "|" + names.join(" ") + "|" + times.join(",") + "|" + lineStarts.join(",")
     + "|" + repKey + "|" + (endSec == null ? "" : endSec);
@@ -6817,7 +6838,7 @@ function ssRenderChordTab(el, songName, item) {
     /* Lines of 4 by default (or where the chip's line breaks say), every box the same size. */
     var line = 0, pos = 0, cols = 1, cells = [];
     var repS = {}, repE = {};
-    reps.forEach(function(r){ repS[r.s] = true; repE[r.e] = r.n; });
+    reps.forEach(function(r){ repS[dispOf[r.s]] = true; repE[dispOf[r.s + r.p - 1]] = r.n; });
     shown.forEach(function(name, i){
       if (i && lineStarts.indexOf(i) >= 0) { line++; pos = 0; }
       var signs = (repS[i] ? '<i class="ss-rep-bar ss-rep-l" aria-hidden="true"></i>' : '')
@@ -6839,7 +6860,7 @@ function ssRenderChordTab(el, songName, item) {
     if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel();
   }
   if (!ssChordView || ssChordView.key !== key) {
-    ssChordView = { key: key, times: times, seq: chordPlaySeq(times, reps, endSec), period: period, sig: "" };
+    ssChordView = { key: key, times: times, seq: chordPlaySeq(times, reps, endSec), dispOf: dispOf, sig: "" };
   }
   if (typeof ssUpdateNotesPanel === "function") {
     var occ = (typeof ssSectionOccurrenceIndex === "function") ? ssSectionOccurrenceIndex(songName, item.code, item.ci) : null;
@@ -6860,7 +6881,7 @@ function ssChordTick(force) {
      repeat passes are unrolled into seq). */
   var cur = -1, best = -Infinity, i;
   for (i = 0; i < seq.length; i++) if (seq[i].t <= t && seq[i].t >= best) { best = seq[i].t; cur = seq[i].i; }
-  if (cur >= 0 && v.period > 0) cur = cur % v.period; /* repeated passes map onto the one shown */
+  if (cur >= 0 && v.dispOf && v.dispOf[cur] != null) cur = v.dispOf[cur]; /* repeated passes map onto the one shown */
   var sig = String(cur);
   if (!force && sig === v.sig) return;
   v.sig = sig;
@@ -8151,28 +8172,37 @@ function chordRepeats(c, n) {
   return out.sort(function(a, b){ return a.s - b.s; });
 }
 /** Every timed chord change in play order with repeat passes unrolled: [{ i, t }].
-    Passes 2..n reuse pass 1's tapped timing shifted by one pass length = (time of the next
-    timed chord after the repeat, else the chip's end, minus the repeat's first chord) / n.
-    No end known: pass length = pass 1's average chord length x chords in the repeat. */
+    A repeat whose chords are its pass written out more than once (r.p = one pass) already has
+    those passes timed; the rest of its n passes reuse pass 1's tapped timing shifted by one pass
+    length = pass 2's start - pass 1's start when written out, else (next timed chord after the
+    repeat, or the chip's end, minus the repeat's first chord) / n, else pass 1's average chord
+    length x chords per pass. */
 function chordPlaySeq(times, reps, endSec) {
   var seq = [];
   times.forEach(function(t, i){ if (t != null) seq.push({ i: i, t: t }); });
   (reps || []).forEach(function(r){
+    var size = r.e - r.s + 1;
+    var p = (r.p > 0 && r.p <= size) ? r.p : size;
+    var written = Math.max(1, Math.floor(size / p));
     var t0 = times[r.s];
-    if (t0 == null) return;
+    if (r.n <= written || t0 == null) return;
+    var pe = r.s + p - 1;
     var j, last = null, lastI = r.s;
-    for (j = r.e; j > r.s; j--) if (times[j] != null) { last = times[j]; lastI = j; break; }
-    var after = null;
-    for (j = r.e + 1; j < times.length; j++) if (times[j] != null) { after = times[j]; break; }
-    if (after == null && endSec != null && isFinite(endSec)) after = endSec;
+    for (j = pe; j > r.s; j--) if (times[j] != null) { last = times[j]; lastI = j; break; }
     var len = null;
-    if (after != null && after > t0) len = (after - t0) / r.n;
+    if (written >= 2 && times[r.s + p] != null && times[r.s + p] > t0) len = times[r.s + p] - t0;
+    if (len == null) {
+      var after = null;
+      for (j = r.e + 1; j < times.length; j++) if (times[j] != null) { after = times[j]; break; }
+      if (after == null && endSec != null && isFinite(endSec)) after = endSec;
+      if (after != null && after > t0) len = (after - t0) / r.n;
+    }
     if ((len == null || (last != null && len <= last - t0)) && last != null && last > t0) {
-      len = (last - t0) / (lastI - r.s) * (r.e - r.s + 1);
+      len = (last - t0) / (lastI - r.s) * p;
     }
     if (!len || !(len > 0)) return;
-    for (var k = 1; k < r.n; k++) {
-      for (j = r.s; j <= r.e; j++) if (times[j] != null) seq.push({ i: j, t: times[j] + k * len });
+    for (var k = written; k < r.n; k++) {
+      for (j = r.s; j <= pe; j++) if (times[j] != null) seq.push({ i: j, t: times[j] + k * len });
     }
   });
   return seq;
