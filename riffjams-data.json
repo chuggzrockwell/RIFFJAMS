@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-10T02:01:44.889Z",
+  "updatedAt": "2026-11-10T16:25:22.844Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -75,7 +75,8 @@
     "AHR-C1": "user-tabs/AHR-C1.png",
     "AHR-I1": "user-tabs/AHR-I1.png",
     "AHR-S1": "user-tabs/AHR-S1.png",
-    "AHR-V1": "user-tabs/AHR-V1.png"
+    "AHR-V1": "user-tabs/AHR-V1.png",
+    "BSK-V1": "user-tabs/BSK-V1.png"
   },
   "albums": [
     {
