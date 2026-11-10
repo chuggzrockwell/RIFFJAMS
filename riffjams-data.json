@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-10T16:27:13.157Z",
+  "updatedAt": "2026-11-10T16:34:11.055Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -9690,7 +9690,28 @@
                 3,
                 "V1",
                 1,
-                0
+                0,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "C",
+                    "Cmaj7",
+                    "Am",
+                    "C",
+                    "F",
+                    "Csus"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                }
               ],
               [
                 "S1",
@@ -9705,7 +9726,27 @@
                 "V1",
                 1,
                 144.6,
-                231.2
+                231.2,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "C",
+                    "Cmaj7",
+                    "Am",
+                    "C",
+                    "F",
+                    "Csus"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                }
               ]
             ]
           },
@@ -13851,39 +13892,6 @@
       ]
     },
     {
-      "album": "Technical Ecstasy",
-      "song": "It's Alright",
-      "endSec": 231.2,
-      "complete": true,
-      "riffSaturationIndex": 1.403,
-      "chips": [
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 0,
-          "stop": 98,
-          "duration": 98,
-          "lick": "V1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 98,
-          "stop": 144.6,
-          "duration": 46.6,
-          "lick": "S1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 144.6,
-          "stop": 231.2,
-          "duration": 86.6,
-          "lick": "V1"
-        }
-      ]
-    },
-    {
       "album": "Sabotage",
       "song": "Symptom of the Universe",
       "endSec": 387.1,
@@ -14832,6 +14840,39 @@
           "stop": 226.4,
           "duration": 6.6,
           "lick": "BSK-C1"
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "It's Alright",
+      "endSec": 231.2,
+      "complete": true,
+      "riffSaturationIndex": 1.403,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 0,
+          "stop": 98,
+          "duration": 98,
+          "lick": "V1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 98,
+          "stop": 144.6,
+          "duration": 46.6,
+          "lick": "S1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 144.6,
+          "stop": 231.2,
+          "duration": 86.6,
+          "lick": "V1"
         }
       ]
     }
