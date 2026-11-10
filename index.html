@@ -1859,7 +1859,7 @@
   .chip-editor .ce-chord-list { display: flex; flex-direction: column; gap: 4px; }
   .chip-editor .ce-chord { display: flex; align-items: center; gap: 6px; }
   .chip-editor .ce-chord.is-tap-next .ce-chord-num { color: #18a050; }
-  .chip-editor .ce-chord-num { flex: 0 0 4.6em; font-size: 0.66rem; font-weight: 700; color: rgba(0,0,0,.45); white-space: nowrap; }
+  .chip-editor .ce-chord-num { flex: 0 0 4.1em; font-size: 0.66rem; font-weight: 700; color: rgba(0,0,0,.45); white-space: nowrap; }
   .chip-editor input[type="text"].ce-chord-name { flex: 1 1 0; width: auto; min-width: 0; margin: 0; padding: 6px 8px; font-size: 0.95rem; font-weight: 800; }
   .chip-editor input[type="text"].ce-chord-time { flex: 0 0 5.4em; width: 5.4em; min-width: 0; margin: 0; padding: 6px 8px; font-size: 0.9rem; }
   .chip-editor .ce-chord-del {
@@ -1872,6 +1872,12 @@
   }
   .chip-editor .ce-chord-add:hover { background: #f4f4f4; }
   .chip-editor .ce-chord-add { touch-action: none; }
+  .chip-editor .ce-chord-br {
+    flex: 0 0 auto; border: 0; border-radius: 6px; padding: 5px 6px; cursor: pointer;
+    font-size: 0.8rem; font-weight: 800; line-height: 1; background: #eee; color: rgba(0,0,0,.45);
+  }
+  .chip-editor .ce-chord-br.on { background: #18a050; color: #fff; }
+  .chip-editor .ce-chord-br:disabled { visibility: hidden; }
   .chip-editor .ce-chord-drag {
     flex: 0 0 auto; cursor: grab; touch-action: none; user-select: none;
     font-size: 1.1rem; line-height: 1; color: rgba(0,0,0,.35); padding: 4px 2px;
@@ -6662,15 +6668,19 @@ function ssRenderChordTab(el, songName, item) {
     if (off == null || !isFinite(off)) return i === 0 ? start : null; /* untimed first chord = chip start */
     return start + Number(off);
   });
-  var key = "ch|" + item.ci + "|" + start + "|" + names.join(" ") + "|" + times.join(",");
+  var lineStarts = chordLineStarts(c, names.length);
+  var key = "ch|" + item.ci + "|" + start + "|" + names.join(" ") + "|" + times.join(",") + "|" + lineStarts.join(",");
   if (el.getAttribute("data-ss-tab") !== key) {
-    /* Rows of 4 (chords 5-8 on the line below), every box the same size. */
-    var cols = Math.min(4, names.length);
-    var html = '<div class="ss-chords" aria-label="' + ssEscAttr(item.code) + ' chords">'
-      + '<div class="ss-chords-grid" style="grid-template-columns: repeat(' + cols + ', 1fr)">';
+    /* Lines of 4 by default (or where the chip's line breaks say), every box the same size. */
+    var line = 0, pos = 0, cols = 1, cells = [];
     names.forEach(function(name, i){
-      html += '<span class="ss-chord" data-i="' + i + '">' + ssEscAttr(name) + '</span>';
+      if (i && lineStarts.indexOf(i) >= 0) { line++; pos = 0; }
+      cells.push('<span class="ss-chord" data-i="' + i + '" style="grid-row:' + (line + 1) + ';grid-column:' + (pos + 1) + '">' + ssEscAttr(name) + '</span>');
+      pos++;
+      if (pos > cols) cols = pos;
     });
+    var html = '<div class="ss-chords" aria-label="' + ssEscAttr(item.code) + ' chords">'
+      + '<div class="ss-chords-grid" style="grid-template-columns: repeat(' + cols + ', 1fr)">' + cells.join("");
     html += '</div></div>';
     el.innerHTML = html;
     el.setAttribute("data-ss-tab", key);
@@ -7963,6 +7973,16 @@ function chipChordsOn(pair) {
 }
 function cloneChords(c) {
   return c ? JSON.parse(JSON.stringify(c)) : null;
+}
+/** Chord indexes that start a new line: c.br when set, otherwise every 4 chords. */
+function chordLineStarts(c, n) {
+  var out = [];
+  if (c && Array.isArray(c.br)) {
+    c.br.forEach(function(i){ i = i | 0; if (i > 0 && i < n && out.indexOf(i) < 0) out.push(i); });
+    return out.sort(function(a, b){ return a - b; });
+  }
+  for (var i = 4; i < n; i += 4) out.push(i);
+  return out;
 }
 function chordDefaultNames(songName, code) {
   var bySong = CHORD_DEFAULTS[songName];
@@ -14175,7 +14195,7 @@ function ensureChipEditResizeObserver() {
 }
 /* -- Chip editor: Chord change mode --
    Times are shown and typed as song times (like Start time); saved as offsets from the chip start. */
-var chordEdit = { song: "", code: "", byCode: false, dirty: false };
+var chordEdit = { song: "", code: "", byCode: false, dirty: false, brSet: false };
 function chordEditorPlayerSec() {
   var sec = null;
   try { if (smYtPlayer && smYtPlayer.getCurrentTime) sec = smPlayerTimeNow(); } catch (eCh) { sec = null; }
@@ -14193,7 +14213,8 @@ function chordEditorReadRows() {
     var timeInp = row.querySelector(".ce-chord-time");
     out.push({
       name: String((nameInp && nameInp.value) || "").trim(),
-      t: timeInp ? parseChipTimeInput(timeInp.value) : null
+      t: timeInp ? parseChipTimeInput(timeInp.value) : null,
+      br: !!row.querySelector(".ce-chord-br.on")
     });
   });
   return out;
@@ -14213,6 +14234,7 @@ function chordEditorRenderRows(rows) {
   if (!list) return;
   list.innerHTML = (rows || []).map(function(r, i){
     var v = (r.t != null && isFinite(r.t)) ? formatChipTime(r.t) : "";
+    var br = i > 0 && (chordEdit.brSet ? !!r.br : i % 4 === 0); /* no custom breaks yet: lines of 4 */
     return '<div class="ce-chord" data-i="' + i + '">'
       + '<span class="ce-chord-drag" title="Drag to move this chord" aria-hidden="true">&#8801;</span>'
       + '<span class="ce-chord-num">Chord ' + (i + 1) + '</span>'
@@ -14221,6 +14243,8 @@ function chordEditorRenderRows(rows) {
       + '<input type="text" class="ce-chord-time" value="' + v + '" maxlength="12"'
       + ' placeholder="' + (i === 0 ? "chip start" : "0:00") + '" autocomplete="off" inputmode="decimal" aria-label="Chord ' + (i + 1) + ' time">'
       + '<button type="button" class="ce-chord-grab" title="Grab current Song Map player time">Set</button>'
+      + '<button type="button" class="ce-chord-br' + (br ? ' on' : '') + '"' + (i === 0 ? ' disabled' : '')
+      + ' title="Start a new line at this chord" aria-pressed="' + (br ? 'true' : 'false') + '">&#8629;</button>'
       + '<button type="button" class="ce-chord-del" title="Remove this chord" aria-label="Remove chord ' + (i + 1) + '">&times;</button>'
       + '</div>';
   }).join("");
@@ -14312,9 +14336,11 @@ function chordEditorFill(state) {
   var names = chordNamesOf(c);
   if (on.checked && !names.length) names = chordDefaultNames(chordEdit.song, chordEdit.code);
   body.hidden = !on.checked;
+  chordEdit.brSet = !!(c && Array.isArray(c.br));
+  var starts = chordLineStarts(c, names.length);
   chordEditorRenderRows(names.map(function(name, i){
     var off = (c && Array.isArray(c.at)) ? c.at[i] : null;
-    return { name: name, t: (off != null && isFinite(off)) ? base + Number(off) : null };
+    return { name: name, t: (off != null && isFinite(off)) ? base + Number(off) : null, br: starts.indexOf(i) >= 0 };
   }));
 }
 /** Chord data to save on the chip: undefined = row not shown (keep what the chip has), null = none.
@@ -14332,13 +14358,19 @@ function chordEditorRead(startSec, passStarts) {
   if (firstT != null && passStarts) {
     passStarts.forEach(function(ps){ if (ps != null && ps > base && ps <= firstT + 0.05) base = ps; });
   }
-  return {
+  var data = {
     on: on,
     chords: rows.map(function(r){ return r.name; }),
     at: rows.map(function(r){
       return (r.t == null || !isFinite(r.t)) ? null : Math.round((r.t - base) * 100) / 100;
     })
   };
+  /* Line breaks are saved only once set by hand; otherwise the view keeps lines of 4. */
+  if (chordEdit.brSet) {
+    data.br = [];
+    rows.forEach(function(r, i){ if (i > 0 && r.br) data.br.push(i); });
+  }
+  return data;
 }
 (function(){
   var on = document.getElementById("chipEditChordOn");
@@ -14366,6 +14398,20 @@ function chordEditorRead(startSec, passStarts) {
     clampChipEditorInView();
   });
   list.addEventListener("click", function(e){
+    var brBtn = e.target.closest(".ce-chord-br");
+    if (brBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (brBtn.disabled) return;
+      if (!chordEdit.brSet) {
+        /* First hand-set break: keep the lines of 4 shown so far, then flip this one. */
+        chordEdit.brSet = true;
+      }
+      var onNow = !brBtn.classList.contains("on");
+      brBtn.classList.toggle("on", onNow);
+      brBtn.setAttribute("aria-pressed", onNow ? "true" : "false");
+      return;
+    }
     var grab = e.target.closest(".ce-chord-grab");
     var del = e.target.closest(".ce-chord-del");
     if (!grab && !del) return;
