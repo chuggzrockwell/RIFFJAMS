@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-10T21:53:43.396Z",
+  "updatedAt": "2026-11-10T21:55:52.446Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -9907,6 +9907,7 @@
                 1,
                 "GY-S1",
                 [],
+                260,
                 300.6
               ]
             ]
@@ -15036,9 +15037,9 @@
     {
       "album": "Technical Ecstasy",
       "song": "Gypsy",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.107,
+      "endSec": 300.6,
+      "complete": true,
+      "riffSaturationIndex": 1.391,
       "chips": [
         {
           "code": "V1",
@@ -15092,16 +15093,16 @@
           "code": "C1",
           "tier": 3,
           "start": 228.6,
-          "stop": 300.6,
-          "duration": 72,
+          "stop": 260,
+          "duration": 31.4,
           "lick": "BY-C1"
         },
         {
           "code": "S1",
           "tier": 1,
-          "start": 300.6,
-          "stop": null,
-          "duration": null,
+          "start": 260,
+          "stop": 300.6,
+          "duration": 40.6,
           "lick": "GY-S1"
         }
       ]
