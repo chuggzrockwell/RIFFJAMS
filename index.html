@@ -1969,10 +1969,11 @@
     flex: 0 0 4.1em; font-size: 1rem; font-weight: 900; color: #18a050; letter-spacing: 0.04em; white-space: nowrap;
   }
   .chip-editor .ce-rep-label { flex: 1 1 auto; font-size: 0.72rem; font-weight: 700; color: #1a1020; }
-  .chip-editor select.ce-rep-n {
-    flex: 0 0 auto; height: 30px; border-radius: 6px; border: 1px solid #18a050;
-    padding: 0 6px; font-weight: 800; background: #fff; color: #1a1020; cursor: pointer;
+  .chip-editor .ce-rep-count {
+    flex: 0 0 auto; min-width: 2.2em; text-align: center; padding: 4px 6px; border-radius: 999px;
+    font-size: 0.75rem; font-weight: 800; background: #fff; color: #1a1020; border: 1px solid #18a050;
   }
+  .chip-editor .ce-rep-count:empty { display: none; }
   .chip-editor .ce-chord.in-rep { box-shadow: inset 3px 0 0 #18a050; border-radius: 0; }
   .chip-editor .ce-chord.ce-rep.is-dangling { opacity: 0.55; }
   .sm-arr-next-countdown.is-end {
@@ -5079,7 +5080,7 @@
         <div class="ce-chord-list" id="chipEditChordList"></div>
         <div class="ce-chord-adds">
           <button type="button" class="ce-chord-add" id="chipEditChordAdd">+ Add chord</button>
-          <button type="button" class="ce-rep-add" id="chipEditRepAdd" title="Add repeat signs around the chords after the last repeat (drag the signs to move them), then pick how many times it plays">+ Repeat sign</button>
+          <button type="button" class="ce-rep-add" id="chipEditRepAdd" title="Add repeat signs around the chords after the last repeat (drag the signs to move them). The count comes from the passes written out inside.">+ Repeat sign</button>
         </div>
       </div>
     </div>
@@ -6783,18 +6784,6 @@ function ssPlaceSectionTab() {
 /* -- Single Song chord view: chips with Chord change mode on show their progression instead of
    the tab. The next chord to play sits in a green box with its countdown right under it. -- */
 var ssChordView = null;
-/** Where the chip starting at `start` ends in Single Song: the next timed chip, else the song End. */
-function ssChordChipEndSec(songName, start) {
-  try {
-    var song = smFindArrangementSongByName(songName);
-    if (!song) return null;
-    if (typeof ssSongView === "function") song = ssSongView(song);
-    var timed = smCollectTimedArrChips(song);
-    for (var i = 0; i < timed.length; i++) if (timed[i].start > start + 0.01) return timed[i].start;
-    var end = songArrangementEndSec(song);
-    return (end != null && isFinite(end) && end > start) ? end : null;
-  } catch (eEnd) { return null; }
-}
 function ssRenderChordTab(el, songName, item) {
   var pair = item && item.pair;
   if (!chipChordsOn(pair)) return false;
@@ -6806,14 +6795,15 @@ function ssRenderChordTab(el, songName, item) {
     if (off == null || !isFinite(off)) return i === 0 ? start : null; /* untimed first chord = chip start */
     return start + Number(off);
   });
-  /* Hand-set repeat signs: a progression written out more than once inside the signs shows one
-     pass (Am F Am F x2 -> Am F x2); passes not written out are timed off pass 1 (chordPlaySeq). */
+  /* Hand-set repeat signs: every pass is written out and timed, so the signs show one pass and
+     the count of passes written (Am F Am F -> Am F x2). */
   var reps = chordRepeats(c, names.length);
-  var endSec = reps.length ? ssChordChipEndSec(songName, start) : null;
   var dispOf = [], shown = [], foldTo = {};
   if (reps.length) {
     reps.forEach(function(r){
-      r.p = chordRepeatPeriod(names.slice(r.s, r.e + 1));
+      var rp = chordRepeatPasses(names.slice(r.s, r.e + 1));
+      r.p = rp.p;
+      r.n = rp.n;
       for (var fi = r.s + r.p; fi <= r.e; fi++) foldTo[fi] = r.s + ((fi - r.s) % r.p);
     });
     names.forEach(function(name, i){
@@ -6837,7 +6827,7 @@ function ssRenderChordTab(el, songName, item) {
   var lineStarts = chordLineStarts(lineSrc, shown.length);
   var repKey = reps.map(function(r){ return r.s + "-" + r.e + "x" + r.n; }).join(",");
   var key = "ch|" + item.ci + "|" + start + "|" + names.join(" ") + "|" + times.join(",") + "|" + lineStarts.join(",")
-    + "|" + repKey + "|" + (endSec == null ? "" : endSec);
+    + "|" + repKey;
   if (el.getAttribute("data-ss-tab") !== key) {
     /* Lines of 4 by default (or where the chip's line breaks say), every box the same size. */
     var line = 0, pos = 0, cols = 1, cells = [];
@@ -6865,7 +6855,7 @@ function ssRenderChordTab(el, songName, item) {
     if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel();
   }
   if (!ssChordView || ssChordView.key !== key) {
-    ssChordView = { key: key, times: times, seq: chordPlaySeq(times, reps, endSec), dispOf: dispOf, sig: "" };
+    ssChordView = { key: key, times: times, seq: chordPlaySeq(times, reps), dispOf: dispOf, sig: "" };
   }
   if (typeof ssUpdateNotesPanel === "function") {
     var occ = (typeof ssSectionOccurrenceIndex === "function") ? ssSectionOccurrenceIndex(songName, item.code, item.ci) : null;
@@ -6898,7 +6888,7 @@ function ssChordTick(force) {
   /* Repeat being played: count shows the passes left (this one included); green while another
      pass is coming, white on the last one. Other repeats show their full count. */
   el.querySelectorAll(".ss-rep-n").forEach(function(b){
-    var ri = parseInt(b.getAttribute("data-rep"), 10), n = parseInt(b.getAttribute("data-n"), 10) || 2;
+    var ri = parseInt(b.getAttribute("data-rep"), 10), n = parseInt(b.getAttribute("data-n"), 10) || 1;
     var left = (inRep && inRep.r === ri) ? Math.max(1, n - inRep.k + 1) : n;
     var more = !!(inRep && inRep.r === ri && left > 1);
     b.textContent = "\u00d7" + left;
@@ -8175,60 +8165,38 @@ function chordRepeatPeriod(names) {
   }
   return n;
 }
-/** Hand-set repeat signs (c.rep): [{ s, e, n }] = chords s..e (indexes) played n times.
-    Out-of-range or overlapping entries are dropped. */
+/** Hand-set repeat signs (c.rep): [{ s, e }] = chords s..e (indexes) with every pass written
+    out and timed. Out-of-range or overlapping entries are dropped. */
 function chordRepeats(c, n) {
   var out = [];
   if (!c || !Array.isArray(c.rep)) return out;
   c.rep.forEach(function(r){
     if (!r || typeof r !== "object") return;
-    var s = r.s | 0, e = r.e | 0, k = Math.max(2, Math.min(99, r.n | 0));
+    var s = r.s | 0, e = r.e | 0;
     if (s < 0 || e < s || e >= n) return;
     if (out.some(function(o){ return s <= o.e && e >= o.s; })) return;
-    out.push({ s: s, e: e, n: k });
+    out.push({ s: s, e: e });
   });
   return out.sort(function(a, b){ return a.s - b.s; });
 }
-/** Every timed chord change in play order with repeat passes unrolled: [{ i, t }].
-    A repeat whose chords are its pass written out more than once (r.p = one pass) already has
-    those passes timed; the rest of its n passes reuse pass 1's tapped timing shifted by one pass
-    length = pass 2's start - pass 1's start when written out, else (next timed chord after the
-    repeat, or the chip's end, minus the repeat's first chord) / n, else pass 1's average chord
-    length x chords per pass. */
-function chordPlaySeq(times, reps, endSec) {
-  var seq = [];
+/** One repeat's pass length p (chords) and play count n, read off the chords written inside it:
+    Am F Am F -> p 2, n 2. Not a repeated progression -> one pass (n 1). */
+function chordRepeatPasses(names) {
+  var size = names.length;
+  var p = Math.max(1, chordRepeatPeriod(names));
+  return { p: p, n: size ? Math.ceil(size / p) : 0 };
+}
+/** Every timed chord change in play order: [{ i, t, r, k }] - r = the repeat it sits in (-1 none),
+    k = which pass of that repeat (1-based; every pass is written out and timed). */
+function chordPlaySeq(times, reps) {
   var passOf = {};
   (reps || []).forEach(function(r, ri){
     var size = r.e - r.s + 1, p = (r.p > 0 && r.p <= size) ? r.p : size;
     for (var pi = r.s; pi <= r.e; pi++) passOf[pi] = { r: ri, k: Math.floor((pi - r.s) / p) + 1 };
   });
+  var seq = [];
   times.forEach(function(t, i){
     if (t != null) seq.push({ i: i, t: t, r: passOf[i] ? passOf[i].r : -1, k: passOf[i] ? passOf[i].k : 0 });
-  });
-  (reps || []).forEach(function(r, ri){
-    var size = r.e - r.s + 1;
-    var p = (r.p > 0 && r.p <= size) ? r.p : size;
-    var written = Math.max(1, Math.floor(size / p));
-    var t0 = times[r.s];
-    if (r.n <= written || t0 == null) return;
-    var pe = r.s + p - 1;
-    var j, last = null, lastI = r.s;
-    for (j = pe; j > r.s; j--) if (times[j] != null) { last = times[j]; lastI = j; break; }
-    var len = null;
-    if (written >= 2 && times[r.s + p] != null && times[r.s + p] > t0) len = times[r.s + p] - t0;
-    if (len == null) {
-      var after = null;
-      for (j = r.e + 1; j < times.length; j++) if (times[j] != null) { after = times[j]; break; }
-      if (after == null && endSec != null && isFinite(endSec)) after = endSec;
-      if (after != null && after > t0) len = (after - t0) / r.n;
-    }
-    if ((len == null || (last != null && len <= last - t0)) && last != null && last > t0) {
-      len = (last - t0) / (lastI - r.s) * p;
-    }
-    if (!len || !(len > 0)) return;
-    for (var k = written; k < r.n; k++) {
-      for (j = r.s; j <= pe; j++) if (times[j] != null) seq.push({ i: j, t: times[j] + k * len, r: ri, k: k + 1 });
-    }
   });
   return seq;
 }
@@ -14485,15 +14453,12 @@ function chordEditorPlayerSec() {
   return sec;
 }
 /** Editor rows in order: { name, t } (t = song time in seconds, or null); repeat sign rows are
-    { rep: "s" } (start) and { rep: "e", n } (end, played n times). */
+    { rep: "s" } (start) and { rep: "e" } (end). */
 function chordEditorReadRows() {
   var out = [];
   document.querySelectorAll("#chipEditChordList .ce-chord").forEach(function(row){
     if (row.classList.contains("ce-rep")) {
-      var nSel = row.querySelector(".ce-rep-n");
-      out.push(row.classList.contains("ce-rep-e")
-        ? { rep: "e", n: Math.max(2, parseInt((nSel && nSel.value) || "2", 10) || 2) }
-        : { rep: "s" });
+      out.push({ rep: row.classList.contains("ce-rep-e") ? "e" : "s" });
       return;
     }
     var nameInp = row.querySelector(".ce-chord-name");
@@ -14518,8 +14483,9 @@ function chordEditorMarkTapNext() {
 }
 /** Pair the repeat sign rows: each end sign closes the nearest open start sign above it (no start:
     it repeats from the previous end sign, or the top, like sheet music). Returns
-    { reps: [{ from, to, n, sRow, eRow }] (rows from..to-1 are inside; sRow -1 when no start),
-      dangling: { rowIndex: true } for a start with no end below it }. */
+    { reps: [{ from, to, n, sRow, eRow }] (rows from..to-1 are inside; sRow -1 when no start;
+      n = passes written out inside, from the chord names), dangling: { rowIndex: true } for a
+      start with no end below it }. */
 function chordEditorRepPairs(rows) {
   var reps = [], dangling = {}, open = -1, from = 0;
   (rows || []).forEach(function(r, ri){
@@ -14527,7 +14493,9 @@ function chordEditorRepPairs(rows) {
       if (open >= 0) dangling[open] = true;
       open = ri;
     } else if (r.rep === "e") {
-      reps.push({ from: open >= 0 ? open + 1 : from, to: ri, n: r.n || 2, sRow: open, eRow: ri });
+      var f = open >= 0 ? open + 1 : from;
+      var inside = rows.slice(f, ri).filter(function(x){ return !x.rep && x.name; }).map(function(x){ return x.name; });
+      reps.push({ from: f, to: ri, n: chordRepeatPasses(inside).n, sRow: open, eRow: ri });
       open = -1;
       from = ri + 1;
     }
@@ -14535,17 +14503,15 @@ function chordEditorRepPairs(rows) {
   if (open >= 0) dangling[open] = true;
   return { reps: reps, dangling: dangling };
 }
-function chordEditorRepRowHtml(r, i, dangling) {
+/** Repeat sign row; an end sign shows the play count read off the chords inside (not editable). */
+function chordEditorRepRowHtml(r, i, dangling, count) {
   var isEnd = r.rep === "e";
-  var n = Math.max(2, r.n | 0 || 2), opts = "";
-  for (var k = 2; k <= 16; k++) opts += '<option value="' + k + '"' + (k === n ? ' selected' : '') + '>&times;' + k + '</option>';
-  if (n > 16) opts += '<option value="' + n + '" selected>&times;' + n + '</option>';
   return '<div class="ce-chord ce-rep ' + (isEnd ? 'ce-rep-e' : 'ce-rep-s') + (dangling ? ' is-dangling' : '') + '" data-i="' + i + '"'
     + (dangling ? ' title="Needs a repeat end sign below it"' : '') + '>'
     + '<span class="ce-chord-drag" title="Drag to move this repeat sign" aria-hidden="true">&#8801;</span>'
     + '<span class="ce-rep-sign" aria-hidden="true">' + (isEnd ? ':&#8214;' : '&#8214;:') + '</span>'
-    + '<span class="ce-rep-label">' + (isEnd ? 'End repeat, play' : 'Start repeat') + '</span>'
-    + (isEnd ? '<select class="ce-rep-n" title="How many times this part is played" aria-label="Times played">' + opts + '</select>' : '')
+    + '<span class="ce-rep-label">' + (isEnd ? 'End repeat' : 'Start repeat') + '</span>'
+    + (isEnd ? '<span class="ce-rep-count" title="Times played: counted from the chords written out inside the repeat">' + (count ? '&times;' + count : '') + '</span>' : '')
     + '<button type="button" class="ce-chord-del" title="Remove this repeat (start and end signs)" aria-label="Remove repeat">&times;</button>'
     + '</div>';
 }
@@ -14553,11 +14519,14 @@ function chordEditorRenderRows(rows) {
   var list = document.getElementById("chipEditChordList");
   if (!list) return;
   var pairs = chordEditorRepPairs(rows || []);
-  var inRep = {};
-  pairs.reps.forEach(function(p){ for (var ri = p.from; ri < p.to; ri++) inRep[ri] = true; });
+  var inRep = {}, countAt = {};
+  pairs.reps.forEach(function(p){
+    for (var ri = p.from; ri < p.to; ri++) inRep[ri] = true;
+    countAt[p.eRow] = p.n;
+  });
   var ci = -1;
   list.innerHTML = (rows || []).map(function(r, i){
-    if (r.rep) return chordEditorRepRowHtml(r, i, !!pairs.dangling[i]);
+    if (r.rep) return chordEditorRepRowHtml(r, i, !!pairs.dangling[i], countAt[i]);
     ci++;
     var v = (r.t != null && isFinite(r.t)) ? formatChipTime(r.t) : "";
     var br = ci > 0 && (chordEdit.brSet ? !!r.br : ci % 4 === 0); /* no custom breaks yet: lines of 4 */
@@ -14665,13 +14634,13 @@ function chordEditorFill(state) {
   chordEdit.brSet = !!(c && Array.isArray(c.br));
   var starts = chordLineStarts(c, names.length);
   var repS = {}, repE = {};
-  chordRepeats(c, names.length).forEach(function(r){ repS[r.s] = true; repE[r.e] = r.n; });
+  chordRepeats(c, names.length).forEach(function(r){ repS[r.s] = true; repE[r.e] = true; });
   var rows = [];
   names.forEach(function(name, i){
     var off = (c && Array.isArray(c.at)) ? c.at[i] : null;
     if (repS[i]) rows.push({ rep: "s" });
     rows.push({ name: name, t: (off != null && isFinite(off)) ? base + Number(off) : null, br: starts.indexOf(i) >= 0 });
-    if (repE[i]) rows.push({ rep: "e", n: repE[i] });
+    if (repE[i]) rows.push({ rep: "e" });
   });
   chordEditorRenderRows(rows);
 }
@@ -14692,7 +14661,7 @@ function chordEditorRead(startSec, passStarts) {
   var rep = [];
   chordEditorRepPairs(all).reps.forEach(function(p){
     var s = chordIdxAt[p.from], e = chordIdxAt[p.to] - 1;
-    if (e >= s) rep.push({ s: s, e: e, n: p.n });
+    if (e >= s) rep.push({ s: s, e: e });
   });
   var base = (startSec != null && isFinite(startSec)) ? startSec : 0;
   var firstT = null;
@@ -14785,6 +14754,13 @@ function chordEditorRead(startSec, passStarts) {
     chordEditorMarkTapNext();
   });
   list.addEventListener("input", chordEditorMarkTapNext);
+  list.addEventListener("input", function(){
+    var rows = chordEditorReadRows(), ends = list.querySelectorAll(".ce-chord");
+    chordEditorRepPairs(rows).reps.forEach(function(p){
+      var cnt = ends[p.eRow] && ends[p.eRow].querySelector(".ce-rep-count");
+      if (cnt) cnt.textContent = p.n ? "\u00d7" + p.n : "";
+    });
+  });
   list.addEventListener("keydown", function(e){
     if (!e.target.classList) return;
     if (!e.target.classList.contains("ce-chord-time") && !e.target.classList.contains("ce-chord-name")) return;
@@ -14864,7 +14840,7 @@ function chordEditorRead(startSec, passStarts) {
     if (names.length) names[names.length - 1].focus();
   };
   /* "+ Repeat sign": start + end signs around every chord after the last repeat (all of them
-     the first time), x2 to start; drag the signs to move them, pick the count on the end sign. */
+     the first time); drag the signs to move them. The count comes from the chords inside. */
   var repAdd = document.getElementById("chipEditRepAdd");
   if (repAdd) repAdd.onclick = function(e){
     e.preventDefault();
@@ -14873,10 +14849,8 @@ function chordEditorRead(startSec, passStarts) {
     var at = 0;
     rows.forEach(function(r, ri){ if (r.rep === "e") at = ri + 1; });
     rows.splice(at, 0, { rep: "s" });
-    rows.push({ rep: "e", n: 2 });
+    rows.push({ rep: "e" });
     chordEditorRenderRows(rows);
-    var sel = list.querySelector(".ce-rep-e:last-child .ce-rep-n");
-    if (sel) sel.focus();
   };
   if (tap) tap.onclick = function(e){
     e.preventDefault();
