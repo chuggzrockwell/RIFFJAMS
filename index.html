@@ -1179,6 +1179,75 @@
   }
   .sec-play-clear:hover { filter: brightness(1.15); border-color: #7a8090; }
   .sec-play-meta strong { color: #fff; font-weight: 800; }
+  /* Playboard lick refresh mode: toggle + options bar + countdown */
+  .sec-play-clear.board-rf-toggle.on {
+    background: #a349a4; border-color: #d27fd3; color: #fff;
+    box-shadow: 0 0 10px 1px rgba(163,73,164,.75);
+  }
+  .board-rf {
+    position: relative;
+    flex: 0 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    margin: -2px 0 8px;
+    padding: 8px 12px 11px;
+    background: #15151b;
+    border: 1px solid #2a2d38;
+    border-radius: 10px;
+    font-family: "Segoe UI", system-ui, sans-serif;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: rgba(255,255,255,.72);
+  }
+  .board-rf[hidden] { display: none; }
+  .board-rf-group { display: inline-flex; align-items: center; gap: 6px; }
+  .board-rf-label { text-transform: uppercase; letter-spacing: .06em; font-size: 0.66rem; color: rgba(255,255,255,.5); }
+  .board-rf-seg { display: inline-flex; border: 1px solid #3a3f4d; border-radius: 999px; overflow: hidden; }
+  .board-rf-seg button, .board-rf-step button, .board-rf-pos button, .board-rf-songs-btn, .board-rf-next {
+    appearance: none; margin: 0; border: 0; cursor: pointer; font-family: inherit;
+    font-size: 0.74rem; font-weight: 700; color: #e8e6e1; background: #1a1d26;
+  }
+  .board-rf-seg button { padding: 4px 12px; }
+  .board-rf-seg button.on { background: #a349a4; color: #fff; }
+  .board-rf-step { display: inline-flex; align-items: center; border: 1px solid #3a3f4d; border-radius: 999px; overflow: hidden; }
+  .board-rf-step button { width: 26px; padding: 4px 0; font-size: 0.9rem; line-height: 1; }
+  .board-rf-step button:hover, .board-rf-pos button:hover, .board-rf-songs-btn:hover, .board-rf-next:hover { filter: brightness(1.25); }
+  .board-rf-step output { min-width: 34px; text-align: center; color: #fff; font-weight: 800; }
+  .board-rf-pos { display: inline-flex; gap: 4px; }
+  .board-rf-pos button { width: 26px; height: 24px; border: 1px solid #3a3f4d; border-radius: 6px; }
+  .board-rf-pos button.on { background: #a349a4; border-color: #d27fd3; color: #fff; }
+  .board-rf-songs-btn, .board-rf-next {
+    padding: 4px 12px; border: 1px solid #3a3f4d; border-radius: 999px;
+    max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .board-rf-songs-btn.filtered { border-color: #d27fd3; color: #fff; }
+  .board-rf-pool { margin-left: auto; color: rgba(255,255,255,.55); white-space: nowrap; }
+  .board-rf-pool strong { color: #fff; }
+  .board-rf-progress { position: absolute; left: 10px; right: 10px; bottom: 4px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; }
+  .board-rf-progress > div { height: 100%; width: 0; background: #a349a4; }
+  .board-rf-panel {
+    position: absolute; z-index: 30; top: calc(100% + 6px); left: 12px;
+    width: min(420px, calc(100vw - 48px)); max-height: min(60vh, 520px); overflow: auto;
+    padding: 8px; background: #15151b; border: 1px solid #3a3f4d; border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(0,0,0,.6);
+  }
+  .board-rf-panel[hidden] { display: none; }
+  .board-rf-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 4px 8px; }
+  .board-rf-panel-head button { appearance: none; border: 1px solid #3a3f4d; border-radius: 999px; background: #1a1d26; color: #e8e6e1; font: inherit; font-weight: 700; padding: 3px 10px; cursor: pointer; }
+  .board-rf-album, .board-rf-song {
+    appearance: none; display: flex; align-items: center; gap: 8px; width: 100%; margin: 0;
+    padding: 5px 6px; border: 0; border-radius: 6px; background: transparent; color: #e8e6e1;
+    font: inherit; text-align: left; cursor: pointer;
+  }
+  .board-rf-album { margin-top: 4px; font-weight: 800; color: #fff; }
+  .board-rf-song { padding-left: 28px; font-weight: 600; }
+  .board-rf-album:hover, .board-rf-song:hover { background: #222533; }
+  .board-rf-box { flex: 0 0 auto; width: 14px; height: 14px; border: 1.5px solid #7a8090; border-radius: 3px; box-sizing: border-box; }
+  .board-rf-album.on .board-rf-box, .board-rf-song.on .board-rf-box { background: #a349a4; border-color: #d27fd3; box-shadow: inset 0 0 0 2px #15151b; }
+  .board-rf-album.part .board-rf-box { background: linear-gradient(#a349a4,#a349a4) center/8px 2px no-repeat; border-color: #d27fd3; }
+  .board-rf-count { margin-left: auto; color: rgba(255,255,255,.45); font-weight: 600; }
   .sec-play-board {
     flex: 1 1 auto;
     min-height: 0;
@@ -10212,6 +10281,8 @@ function publishPlayQueue() {
 }
 var boardActiveKey = null;
 function clearPlayQueue() {
+  /* Clear on the Playboard also stops lick refresh mode (otherwise the next batch refills it). */
+  if (typeof boardRefreshState !== "undefined" && boardRefreshState.on) boardRefreshSetOn(false);
   playQueue = [];
   boardActiveKey = null;
   publishPlayQueue();
@@ -10250,7 +10321,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=290";
+  var url = base + "?playboard=1&v=291";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -10279,7 +10350,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=290") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=291") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -10541,8 +10612,10 @@ function initPlayboardPage() {
     + '</select></label>'
     + '<button type="button" class="sec-play-clear" id="secPlayRandomize" title="Shuffle Board order (Z)">Randomize</button>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or 0 then Enter)">Clear</button>'
+    + '<button type="button" class="sec-play-clear board-rf-toggle" id="boardRefreshToggle" aria-pressed="false" title="Lick refresh mode: new batch every few seconds (R)">Refresh</button>'
     + '<div class="sec-play-meta" id="secPlayMeta">Solo — album+song|0[.pos] + NP Enter</div>'
     + '</div>'
+    + boardRefreshBarHtml()
     + '<div class="board-player" id="boardPlayer" aria-label="Board player">'
     + '<div id="boardYtHost" aria-hidden="true"></div>'
     + '<button type="button" class="board-player-btn" id="boardPlay" title="Play" aria-label="Play">'
@@ -10588,6 +10661,7 @@ function initPlayboardPage() {
     e.preventDefault();
     clearPlayQueue();
   };
+  initBoardRefresh();
   /* Explicit Board player only — empty board clicks must not pause / claim SM leadership */
   if (typeof initBoardPlayer === "function") initBoardPlayer();
   window.addEventListener("resize", function(){
@@ -10613,6 +10687,19 @@ function initPlayboardPage() {
       randomizePlayBoard();
       return;
     }
+    /* R: lick refresh mode on/off · N: next batch now (while refresh is on) */
+    if (!e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && (k === "r" || e.code === "KeyR")) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      boardRefreshSetOn(!boardRefreshState.on);
+      return;
+    }
+    if (!e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && (k === "n" || e.code === "KeyN") && boardRefreshState.on) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      boardRefreshNext();
+      return;
+    }
     /* A–E: clear that lick class from the Board (A then B clears A, then B) */
     if (!e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && /^[a-e]$/.test(k)) {
       e.preventDefault();
@@ -10625,6 +10712,7 @@ function initPlayboardPage() {
     if (e.key === "Escape") {
       e.preventDefault();
       e.stopImmediatePropagation();
+      if (boardRefreshPanelOpen()) { boardRefreshTogglePanel(false); return; }
       if (boardEntryBuf) { boardEntryBuf = ""; updateBoardEntryMeta(); return; }
       window.close();
       return;
@@ -13834,6 +13922,8 @@ function renderPlayBoard() {
   if (meta) {
     if (typeof boardEntryBuf !== "undefined" && boardEntryBuf) {
       meta.innerHTML = "Entry <strong>" + boardEntryBuf + "</strong> · " + boardEntryLabel(boardEntryBuf) + " · NP Enter to show";
+    } else if (typeof boardRefreshMetaHtml === "function" && boardRefreshMetaHtml()) {
+      meta.innerHTML = boardRefreshMetaHtml();
     } else {
       meta.innerHTML = playQueue.length
         ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · A–E clear class · album+song|0[.pos] + Enter · 0 clear")
@@ -15212,6 +15302,415 @@ function randomizeCoverBoard() {
   saveOrder();
 }
 /** Shuffle Board (playQueue) card order. */
+/* ---------- Playboard lick refresh mode ----------
+   Shows a small batch of licks and swaps in a new batch every N seconds.
+   Options: Licks (Solo Map) / Riffs (Song Map sections), seconds per batch, licks per batch,
+   positions 1-5 (none = all) and a song/album selector (none = all songs).
+   Shuffle bag: every lick in the pool shows once before any comes back. */
+var BOARD_RF_KEY = "riffjams-board-refresh-v1";
+var BOARD_RF_SPEEDS = [2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 25, 30, 45, 60];
+var boardRefreshState = { on: false, kind: "lick", speed: 8, batch: 4, pos: [], songs: [] };
+var boardRefreshTimer = null;
+var boardRefreshToken = 0;
+var boardRefreshBag = [];
+var boardRefreshBagSig = "";
+var boardRefreshBad = {};
+var boardRefreshPoolSize = 0;
+var boardRefreshOptTimer = null;
+(function loadBoardRefreshState(){
+  try {
+    var raw = JSON.parse(localStorage.getItem(BOARD_RF_KEY) || "null");
+    if (!raw || typeof raw !== "object") return;
+    if (raw.kind === "riff" || raw.kind === "lick") boardRefreshState.kind = raw.kind;
+    if (BOARD_RF_SPEEDS.indexOf(raw.speed) >= 0) boardRefreshState.speed = raw.speed;
+    if (raw.batch >= 1 && raw.batch <= 12) boardRefreshState.batch = Math.round(raw.batch);
+    if (Array.isArray(raw.pos)) boardRefreshState.pos = raw.pos.filter(function(p){ return p >= 1 && p <= 5; });
+    if (Array.isArray(raw.songs)) boardRefreshState.songs = raw.songs.filter(function(s){ return typeof s === "string"; });
+  } catch (e) {}
+})();
+function saveBoardRefreshState() {
+  var s = boardRefreshState;
+  try { localStorage.setItem(BOARD_RF_KEY, JSON.stringify({ kind: s.kind, speed: s.speed, batch: s.batch, pos: s.pos, songs: s.songs })); } catch (e) {}
+}
+function boardRefreshBarHtml() {
+  var pos = "";
+  for (var p = 1; p <= 5; p++) pos += '<button type="button" data-rf-pos="'+p+'" aria-pressed="false" title="Position '+p+'">'+p+'</button>';
+  return '<div class="board-rf" id="boardRefreshBar" hidden>'
+    + '<div class="board-rf-group"><span class="board-rf-seg" role="group" aria-label="Licks or riffs">'
+    +   '<button type="button" data-rf-kind="lick">Licks</button><button type="button" data-rf-kind="riff">Riffs</button>'
+    + '</span></div>'
+    + '<div class="board-rf-group"><span class="board-rf-label">Every</span><span class="board-rf-step">'
+    +   '<button type="button" data-rf-step="speed" data-rf-dir="-1" aria-label="Faster">−</button><output id="boardRfSpeed"></output>'
+    +   '<button type="button" data-rf-step="speed" data-rf-dir="1" aria-label="Slower">+</button></span></div>'
+    + '<div class="board-rf-group"><span class="board-rf-label">Per batch</span><span class="board-rf-step">'
+    +   '<button type="button" data-rf-step="batch" data-rf-dir="-1" aria-label="Fewer licks">−</button><output id="boardRfBatch"></output>'
+    +   '<button type="button" data-rf-step="batch" data-rf-dir="1" aria-label="More licks">+</button></span></div>'
+    + '<div class="board-rf-group"><span class="board-rf-label">Position</span><span class="board-rf-pos" id="boardRfPos">'+pos+'</span></div>'
+    + '<div class="board-rf-group"><span class="board-rf-label">Songs</span>'
+    +   '<button type="button" class="board-rf-songs-btn" id="boardRfSongsBtn" aria-expanded="false">All songs</button></div>'
+    + '<button type="button" class="board-rf-next" id="boardRfNext" title="Next batch now (N)">Next ›</button>'
+    + '<span class="board-rf-pool" id="boardRfPool"></span>'
+    + '<div class="board-rf-progress" aria-hidden="true"><div id="boardRfProgress"></div></div>'
+    + '<div class="board-rf-panel" id="boardRfPanel" hidden></div>'
+    + '</div>';
+}
+function boardRefreshSongKey(album, song) { return String(album || "") + "|" + String(song || ""); }
+/** Bare ids (V1, B1, S1 ...) that several songs point at are shared placeholder crops: we can't
+ *  tell which song the picture belongs to, so riff refresh skips them. */
+function boardRefreshSharedRiffIds() {
+  var bySong = {}, shared = {};
+  (ALBUMS || []).forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      (s.sections || []).forEach(function(pair){
+        if (!isChipPair(pair)) return;
+        var id = sectionLickId(s.song, pair[0], pair[2]);
+        if (!id) return;
+        if (!bySong[id]) bySong[id] = s.song;
+        else if (bySong[id] !== s.song) shared[id] = true;
+      });
+    });
+  });
+  return shared;
+}
+/** Every lick/riff the refresh can draw from for a kind, before the song and position filters. */
+function boardRefreshAllItems(kind) {
+  var out = [], seen = {};
+  function add(album, song, code, lick, tier, positions) {
+    lick = String(lick || "").trim();
+    if (!lick || seen[lick]) return;
+    seen[lick] = true;
+    var letter = (typeof lickLetter === "function") ? lickLetter(lick) : "B";
+    out.push({
+      key: (kind === "riff" ? "rf|riff|" : "lib|" + letter + "|") + lick,
+      code: String(code || lick), song: song || "", album: album || "", lick: lick,
+      tier: tier, positions: positions || [], src: lickSrc(lick)
+    });
+  }
+  if (kind === "riff") {
+    var shared = boardRefreshSharedRiffIds();
+    (ALBUMS || []).forEach(function(a){
+      (a.songs || []).forEach(function(s){
+        (s.sections || []).forEach(function(pair){
+          if (!isChipPair(pair)) return;
+          var id = sectionLickId(s.song, pair[0], pair[2]);
+          if (!id || shared[id]) return;
+          var positions = pair.length > 3 ? (posBasesFromRaw(pair[3]) || []) : [1];
+          add(a.name, s.song, pair[0], id, chipTier(pair), positions);
+        });
+      });
+    });
+    return out;
+  }
+  var soloAlbums = (typeof SOLO_MAP !== "undefined" && SOLO_MAP && SOLO_MAP.albums) ? SOLO_MAP.albums : [];
+  soloAlbums.forEach(function(a){
+    (a.songs || []).forEach(function(s){
+      (s.licks || []).forEach(function(pair){
+        if (!isChipPair(pair) || !pair[0]) return;
+        var id = String((pair[2] != null && pair[2] !== "") ? pair[2] : pair[0]).trim();
+        add(a.name, s.song, pair[0], id, chipTier(pair), boardEntryPositions(pair, s.song));
+      });
+    });
+  });
+  return out;
+}
+function boardRefreshPool() {
+  var st = boardRefreshState;
+  var songs = {};
+  st.songs.forEach(function(k){ songs[k] = true; });
+  return boardRefreshAllItems(st.kind).filter(function(it){
+    if (boardRefreshBad[it.lick]) return false;
+    if (st.songs.length && !songs[boardRefreshSongKey(it.album, it.song)]) return false;
+    if (st.pos.length && !it.positions.some(function(p){ return st.pos.indexOf(p) >= 0; })) return false;
+    return true;
+  });
+}
+/** Next lick from the shuffle bag (refilled, reshuffled, when it runs dry or the pool changes). */
+function boardRefreshDraw(pool, avoid) {
+  var sig = boardRefreshState.kind + "|" + pool.map(function(it){ return it.key; }).join(",");
+  if (sig !== boardRefreshBagSig) { boardRefreshBagSig = sig; boardRefreshBag = []; }
+  if (!boardRefreshBag.length) {
+    boardRefreshBag = shuffleInPlace(pool.slice());
+    /* licks still on the Board go to the back of the new bag so they don't repeat back to back */
+    if (avoid && pool.length > boardRefreshState.batch) {
+      boardRefreshBag.sort(function(a, b){ return (avoid[a.key] ? 1 : 0) - (avoid[b.key] ? 1 : 0); });
+    }
+  }
+  return boardRefreshBag.shift() || null;
+}
+/** Pick + preload a batch so the new cards appear together; crops that fail to load are skipped. */
+function boardRefreshLoadBatch(token, done) {
+  var pool = boardRefreshPool();
+  boardRefreshPoolSize = pool.length;
+  var want = Math.min(boardRefreshState.batch, pool.length);
+  var avoid = {};
+  playQueue.forEach(function(it){ avoid[it.key] = true; });
+  var chosen = [], picked = {}, pending = 0, draws = 0, finished = false;
+  function finish() {
+    if (finished || token !== boardRefreshToken) return;
+    finished = true;
+    done(chosen);
+  }
+  function fill() {
+    if (token !== boardRefreshToken) return;
+    while (chosen.length + pending < want && draws < pool.length * 2 + 4) {
+      draws++;
+      var it = boardRefreshDraw(pool, avoid);
+      if (!it || picked[it.key] || boardRefreshBad[it.lick]) continue;
+      picked[it.key] = true;
+      pending++;
+      (function(item){
+        var img = new Image(), settled = false;
+        function settle(ok) {
+          if (settled) return;
+          settled = true;
+          pending--;
+          if (ok) chosen.push(item);
+          else boardRefreshBad[item.lick] = true;
+          fill();
+        }
+        img.onload = function(){ settle(true); };
+        img.onerror = function(){ settle(false); };
+        img.src = item.src;
+      })(it);
+    }
+    if (!pending) finish();
+  }
+  fill();
+}
+function boardRefreshShowBatch() {
+  var token = ++boardRefreshToken;
+  if (boardRefreshTimer) { clearTimeout(boardRefreshTimer); boardRefreshTimer = null; }
+  boardRefreshLoadBatch(token, function(batch){
+    if (!boardRefreshState.on || token !== boardRefreshToken) return;
+    playQueue = batch.map(function(it){
+      return { key: it.key, code: it.code, song: it.song, lick: it.lick, tier: it.tier, src: it.src };
+    });
+    boardActiveKey = null;
+    publishPlayQueue();
+    renderPlayBoard();
+    if (typeof syncAllPlaySelections === "function") syncAllPlaySelections();
+    boardRefreshSyncUi();
+    if (!batch.length) { boardRefreshRunProgress(0); return; }
+    boardRefreshRunProgress(boardRefreshState.speed);
+    boardRefreshTimer = setTimeout(boardRefreshShowBatch, boardRefreshState.speed * 1000);
+  });
+}
+function boardRefreshNext() {
+  if (boardRefreshState.on) boardRefreshShowBatch();
+}
+function boardRefreshRunProgress(sec) {
+  var bar = document.getElementById("boardRfProgress");
+  if (!bar) return;
+  bar.style.transition = "none";
+  bar.style.width = sec ? "100%" : "0";
+  void bar.offsetWidth;
+  if (!sec) return;
+  bar.style.transition = "width " + sec + "s linear";
+  bar.style.width = "0";
+}
+function boardRefreshSetOn(on) {
+  on = !!on;
+  boardRefreshState.on = on;
+  boardRefreshToken++;
+  if (boardRefreshTimer) { clearTimeout(boardRefreshTimer); boardRefreshTimer = null; }
+  var bar = document.getElementById("boardRefreshBar");
+  if (bar) bar.hidden = !on;
+  if (!on) boardRefreshTogglePanel(false);
+  boardRefreshRunProgress(0);
+  if (on) {
+    boardRefreshBad = {};
+    boardRefreshBagSig = "";
+    boardRefreshShowBatch();
+  }
+  boardRefreshSyncUi();
+  if (typeof updateBoardEntryMeta === "function") updateBoardEntryMeta();
+}
+/** Option changed: save, and (when running) bring up a fresh batch right away. */
+function boardRefreshOptionsChanged(immediate) {
+  saveBoardRefreshState();
+  boardRefreshSyncUi();
+  if (!boardRefreshState.on) return;
+  if (boardRefreshOptTimer) clearTimeout(boardRefreshOptTimer);
+  boardRefreshOptTimer = setTimeout(function(){
+    boardRefreshOptTimer = null;
+    boardRefreshShowBatch();
+  }, immediate ? 0 : 450);
+}
+function boardRefreshSongsLabel() {
+  var sel = boardRefreshState.songs;
+  if (!sel.length) return "All songs";
+  if (sel.length === 1) return sel[0].split("|").slice(1).join("|");
+  var albums = {};
+  sel.forEach(function(k){ albums[k.split("|")[0]] = true; });
+  var names = Object.keys(albums);
+  if (names.length === 1) {
+    var all = boardRefreshSongTree().filter(function(g){ return g.album === names[0]; })[0];
+    if (all && all.songs.every(function(s){ return sel.indexOf(s.key) >= 0; })) return names[0];
+  }
+  return sel.length + " songs";
+}
+function boardRefreshMetaHtml() {
+  var st = boardRefreshState;
+  if (!st.on) return "";
+  if (!boardRefreshPoolSize) return "<strong>Refresh</strong> · no " + (st.kind === "riff" ? "riffs" : "licks") + " match these options";
+  return "<strong>Refresh</strong> · " + st.batch + " every " + st.speed + "s · R off · N next";
+}
+/** Albums → songs that have at least one lick/riff of the current kind (counts ignore position). */
+function boardRefreshSongTree() {
+  var groups = [], byAlbum = {};
+  boardRefreshAllItems(boardRefreshState.kind).forEach(function(it){
+    if (boardRefreshBad[it.lick]) return;
+    var g = byAlbum[it.album];
+    if (!g) { g = byAlbum[it.album] = { album: it.album, songs: [], bySong: {} }; groups.push(g); }
+    var s = g.bySong[it.song];
+    if (!s) { s = g.bySong[it.song] = { song: it.song, key: boardRefreshSongKey(it.album, it.song), n: 0 }; g.songs.push(s); }
+    s.n++;
+  });
+  return groups;
+}
+function boardRefreshRenderPanel() {
+  var panel = document.getElementById("boardRfPanel");
+  if (!panel) return;
+  var sel = {};
+  boardRefreshState.songs.forEach(function(k){ sel[k] = true; });
+  var noun = boardRefreshState.kind === "riff" ? "riffs" : "licks";
+  var html = '<div class="board-rf-panel-head"><span>Pick songs or whole albums · none = all ' + noun + '</span>'
+    + '<button type="button" data-rf-songs-all="1">All songs</button></div>';
+  boardRefreshSongTree().forEach(function(g){
+    var nOn = g.songs.filter(function(s){ return sel[s.key]; }).length;
+    var total = g.songs.reduce(function(n, s){ return n + s.n; }, 0);
+    var cls = nOn && nOn === g.songs.length ? " on" : (nOn ? " part" : "");
+    html += '<button type="button" class="board-rf-album' + cls + '" data-rf-album="' + ssEscAttr(g.album) + '" aria-pressed="' + (nOn === g.songs.length) + '">'
+      + '<span class="board-rf-box"></span><span>' + ssEscAttr(g.album) + '</span><span class="board-rf-count">' + total + '</span></button>';
+    g.songs.forEach(function(s){
+      html += '<button type="button" class="board-rf-song' + (sel[s.key] ? " on" : "") + '" data-rf-song="' + ssEscAttr(s.key) + '" aria-pressed="' + !!sel[s.key] + '">'
+        + '<span class="board-rf-box"></span><span>' + ssEscAttr(s.song) + '</span><span class="board-rf-count">' + s.n + '</span></button>';
+    });
+  });
+  panel.innerHTML = html;
+}
+function boardRefreshPanelOpen() {
+  var panel = document.getElementById("boardRfPanel");
+  return !!(panel && !panel.hidden);
+}
+function boardRefreshTogglePanel(open) {
+  var panel = document.getElementById("boardRfPanel");
+  var btn = document.getElementById("boardRfSongsBtn");
+  if (!panel) return;
+  if (open) boardRefreshRenderPanel();
+  panel.hidden = !open;
+  if (btn) btn.setAttribute("aria-expanded", open ? "true" : "false");
+}
+function boardRefreshSyncUi() {
+  var st = boardRefreshState;
+  var tog = document.getElementById("boardRefreshToggle");
+  if (tog) { tog.classList.toggle("on", st.on); tog.setAttribute("aria-pressed", st.on ? "true" : "false"); }
+  var bar = document.getElementById("boardRefreshBar");
+  if (!bar) return;
+  [].forEach.call(bar.querySelectorAll("[data-rf-kind]"), function(b){
+    var on = b.getAttribute("data-rf-kind") === st.kind;
+    b.classList.toggle("on", on);
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  [].forEach.call(bar.querySelectorAll("[data-rf-pos]"), function(b){
+    var on = st.pos.indexOf(parseInt(b.getAttribute("data-rf-pos"), 10)) >= 0;
+    b.classList.toggle("on", on);
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  var sp = document.getElementById("boardRfSpeed");
+  if (sp) sp.textContent = st.speed + "s";
+  var ba = document.getElementById("boardRfBatch");
+  if (ba) ba.textContent = String(st.batch);
+  var sb = document.getElementById("boardRfSongsBtn");
+  if (sb) {
+    sb.textContent = boardRefreshSongsLabel() + " ▾";
+    sb.classList.toggle("filtered", st.songs.length > 0);
+    sb.title = st.songs.length ? st.songs.map(function(k){ return k.replace("|", " · "); }).join("\n") : "All songs";
+  }
+  var pool = document.getElementById("boardRfPool");
+  if (pool) pool.innerHTML = st.on ? ("<strong>" + boardRefreshPoolSize + "</strong> in pool") : "";
+  if (boardRefreshPanelOpen()) boardRefreshRenderPanel();
+}
+function initBoardRefresh() {
+  var tog = document.getElementById("boardRefreshToggle");
+  var bar = document.getElementById("boardRefreshBar");
+  if (!tog || !bar) return;
+  tog.onclick = function(e){ e.preventDefault(); boardRefreshSetOn(!boardRefreshState.on); };
+  bar.addEventListener("click", function(e){
+    var st = boardRefreshState;
+    var t = e.target.closest("button");
+    if (!t || !bar.contains(t)) return;
+    e.preventDefault();
+    if (t.hasAttribute("data-rf-kind")) {
+      var kind = t.getAttribute("data-rf-kind");
+      if (kind === st.kind) return;
+      st.kind = kind;
+      boardRefreshOptionsChanged(true);
+      return;
+    }
+    if (t.hasAttribute("data-rf-step")) {
+      var dir = parseInt(t.getAttribute("data-rf-dir"), 10) || 0;
+      if (t.getAttribute("data-rf-step") === "speed") {
+        var i = BOARD_RF_SPEEDS.indexOf(st.speed);
+        if (i < 0) i = BOARD_RF_SPEEDS.indexOf(8);
+        st.speed = BOARD_RF_SPEEDS[Math.max(0, Math.min(BOARD_RF_SPEEDS.length - 1, i + dir))];
+        /* speed only changes the countdown; keep the batch that's up */
+        saveBoardRefreshState();
+        boardRefreshSyncUi();
+        if (st.on && typeof updateBoardEntryMeta === "function") updateBoardEntryMeta();
+        if (st.on && boardRefreshTimer) {
+          clearTimeout(boardRefreshTimer);
+          boardRefreshRunProgress(st.speed);
+          boardRefreshTimer = setTimeout(boardRefreshShowBatch, st.speed * 1000);
+        }
+        return;
+      }
+      st.batch = Math.max(1, Math.min(12, st.batch + dir));
+      boardRefreshOptionsChanged(false);
+      return;
+    }
+    if (t.hasAttribute("data-rf-pos")) {
+      var p = parseInt(t.getAttribute("data-rf-pos"), 10);
+      var at = st.pos.indexOf(p);
+      if (at >= 0) st.pos.splice(at, 1); else st.pos.push(p);
+      st.pos.sort();
+      boardRefreshOptionsChanged(false);
+      return;
+    }
+    if (t.id === "boardRfSongsBtn") { boardRefreshTogglePanel(!boardRefreshPanelOpen()); return; }
+    if (t.id === "boardRfNext") { boardRefreshNext(); return; }
+    if (t.hasAttribute("data-rf-songs-all")) {
+      st.songs = [];
+      boardRefreshOptionsChanged(false);
+      return;
+    }
+    if (t.hasAttribute("data-rf-album")) {
+      var album = t.getAttribute("data-rf-album");
+      var g = boardRefreshSongTree().filter(function(x){ return x.album === album; })[0];
+      if (!g) return;
+      var keys = g.songs.map(function(s){ return s.key; });
+      var allOn = keys.every(function(k){ return st.songs.indexOf(k) >= 0; });
+      st.songs = st.songs.filter(function(k){ return keys.indexOf(k) < 0; });
+      if (!allOn) st.songs = st.songs.concat(keys);
+      boardRefreshOptionsChanged(false);
+      return;
+    }
+    if (t.hasAttribute("data-rf-song")) {
+      var key = t.getAttribute("data-rf-song");
+      var idx = st.songs.indexOf(key);
+      if (idx >= 0) st.songs.splice(idx, 1); else st.songs.push(key);
+      boardRefreshOptionsChanged(false);
+    }
+  });
+  document.addEventListener("pointerdown", function(e){
+    if (!boardRefreshPanelOpen()) return;
+    var panel = document.getElementById("boardRfPanel");
+    var btn = document.getElementById("boardRfSongsBtn");
+    if (panel.contains(e.target) || (btn && btn.contains(e.target))) return;
+    boardRefreshTogglePanel(false);
+  }, true);
+  boardRefreshSyncUi();
+}
 function randomizePlayBoard() {
   if (!playQueue || playQueue.length < 2) return;
   shuffleInPlace(playQueue);
@@ -16132,6 +16631,10 @@ function updateBoardEntryMeta() {
   if (!meta) return;
   if (boardEntryBuf) {
     meta.innerHTML = "Entry <strong>" + boardEntryBuf + "</strong> · " + boardEntryLabel(boardEntryBuf) + " · NP Enter to show";
+    return;
+  }
+  if (typeof boardRefreshMetaHtml === "function" && boardRefreshMetaHtml()) {
+    meta.innerHTML = boardRefreshMetaHtml();
     return;
   }
   meta.innerHTML = playQueue.length
