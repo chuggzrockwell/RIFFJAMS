@@ -1871,6 +1871,16 @@
     border-radius: 8px; padding: 6px 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; width: 100%;
   }
   .chip-editor .ce-chord-add:hover { background: #f4f4f4; }
+  .chip-editor .ce-chord-add { touch-action: none; }
+  .chip-editor .ce-chord-drag {
+    flex: 0 0 auto; cursor: grab; touch-action: none; user-select: none;
+    font-size: 1.1rem; line-height: 1; color: rgba(0,0,0,.35); padding: 4px 2px;
+  }
+  .chip-editor .ce-chord-drag:hover { color: rgba(0,0,0,.65); }
+  .chip-editor .ce-chord.is-dragging {
+    background: #e6f3ff; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.15);
+  }
+  body.ce-chord-dragging, body.ce-chord-dragging * { cursor: grabbing !important; user-select: none !important; }
   .sm-arr-next-countdown.is-end {
     /* same look as normal; marker for End-target countdown */
   }
@@ -6687,8 +6697,9 @@ function ssChordTick(force) {
   if (!el || el.getAttribute("data-ss-tab") !== v.key) { ssChordView = null; return; }
   var t = smPlayerTimeNow();
   var times = v.times;
-  var cur = -1, i;
-  for (i = 0; i < times.length; i++) if (times[i] != null && times[i] <= t) cur = i;
+  /* Latest chord change at/before now (list order may differ from time order after a drag). */
+  var cur = -1, best = -Infinity, i;
+  for (i = 0; i < times.length; i++) if (times[i] != null && times[i] <= t && times[i] >= best) { best = times[i]; cur = i; }
   var sig = String(cur);
   if (!force && sig === v.sig) return;
   v.sig = sig;
@@ -14203,6 +14214,7 @@ function chordEditorRenderRows(rows) {
   list.innerHTML = (rows || []).map(function(r, i){
     var v = (r.t != null && isFinite(r.t)) ? formatChipTime(r.t) : "";
     return '<div class="ce-chord" data-i="' + i + '">'
+      + '<span class="ce-chord-drag" title="Drag to move this chord" aria-hidden="true">&#8801;</span>'
       + '<span class="ce-chord-num">Chord ' + (i + 1) + '</span>'
       + '<input type="text" class="ce-chord-name" value="' + songMetaEscapeAttr(r.name || "") + '" maxlength="40"'
       + ' placeholder="C or G | C" autocomplete="off" spellcheck="false" aria-label="Chord ' + (i + 1) + '">'
@@ -14380,9 +14392,72 @@ function chordEditorRead(startSec, passStarts) {
     if (e.key === "Enter") { e.preventDefault(); saveChipEditor(); }
     if (e.key === "Escape") { e.preventDefault(); closeChipEditor(); }
   });
+  /* Drag to reorder: grab a row's handle, or drag "+ Add chord" into the list to drop a new
+     blank chord at that spot (a plain click still adds one at the end). Values ride along in
+     the row's inputs; numbering is redrawn on drop. */
+  var addDragged = false;
+  function dragRow(row, startEv) {
+    row.classList.add("is-dragging");
+    document.body.classList.add("ce-chord-dragging");
+    function move(ev) {
+      var y = ev.clientY;
+      var before = null;
+      Array.prototype.some.call(list.children, function(r){
+        if (r === row) return false;
+        var rc = r.getBoundingClientRect();
+        if (y < rc.top + rc.height / 2) { before = r; return true; }
+        return false;
+      });
+      if (before) { if (row.nextSibling !== before) list.insertBefore(row, before); }
+      else if (list.lastElementChild !== row) list.appendChild(row);
+    }
+    function end() {
+      document.removeEventListener("pointermove", move);
+      document.removeEventListener("pointerup", end);
+      document.removeEventListener("pointercancel", end);
+      row.classList.remove("is-dragging");
+      document.body.classList.remove("ce-chord-dragging");
+      chordEdit.dirty = true;
+      var idx = Array.prototype.indexOf.call(list.children, row);
+      chordEditorRenderRows(chordEditorReadRows());
+      var nameInp = list.children[idx] && list.children[idx].querySelector(".ce-chord-name");
+      if (nameInp && !nameInp.value) nameInp.focus();
+    }
+    document.addEventListener("pointermove", move);
+    document.addEventListener("pointerup", end);
+    document.addEventListener("pointercancel", end);
+    if (startEv) move(startEv);
+  }
+  list.addEventListener("pointerdown", function(e){
+    var handle = e.target.closest(".ce-chord-drag");
+    if (!handle || (e.button != null && e.button !== 0)) return;
+    e.preventDefault();
+    dragRow(handle.closest(".ce-chord"), null);
+  });
+  if (add) add.addEventListener("pointerdown", function(e){
+    if (e.button != null && e.button !== 0) return;
+    var sx = e.clientX, sy = e.clientY;
+    addDragged = false;
+    function pre(ev) {
+      if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 6) return;
+      stop();
+      addDragged = true;
+      var rows = chordEditorReadRows();
+      rows.push({ name: "", t: null });
+      chordEditorRenderRows(rows);
+      dragRow(list.lastElementChild, ev);
+    }
+    function stop() {
+      document.removeEventListener("pointermove", pre);
+      document.removeEventListener("pointerup", stop);
+    }
+    document.addEventListener("pointermove", pre);
+    document.addEventListener("pointerup", stop);
+  });
   if (add) add.onclick = function(e){
     e.preventDefault();
     e.stopPropagation();
+    if (addDragged) { addDragged = false; return; }
     var rows = chordEditorReadRows();
     rows.push({ name: "", t: null });
     chordEditorRenderRows(rows);
