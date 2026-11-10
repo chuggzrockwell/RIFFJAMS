@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-10T16:41:41.907Z",
+  "updatedAt": "2026-11-10T20:53:42.246Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -2482,7 +2482,13 @@
         },
         {
           "song": "Gypsy",
-          "sections": []
+          "sections": [
+            [
+              "V1",
+              3,
+              "V1-G"
+            ]
+          ]
         },
         {
           "song": "All Moving Parts (Stand Still)",
@@ -9755,7 +9761,32 @@
           },
           {
             "song": "Gypsy",
-            "chips": []
+            "chips": [
+              [
+                "V1",
+                3,
+                "V1-G",
+                1,
+                15.5,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Bb",
+                    "Eb",
+                    "Ab",
+                    "F"
+                  ],
+                  "at": [
+                    0,
+                    null,
+                    null,
+                    null
+                  ]
+                }
+              ]
+            ]
           },
           {
             "song": "All Moving Parts (Stand Still)",
@@ -14876,6 +14907,23 @@
           "stop": 231.2,
           "duration": 86.6,
           "lick": ""
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "Gypsy",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 15.5,
+          "stop": null,
+          "duration": null,
+          "lick": "V1-G"
         }
       ]
     }
