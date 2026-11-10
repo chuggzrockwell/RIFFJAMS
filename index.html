@@ -4020,19 +4020,21 @@
     color: #fff;
     padding: 6px 2px 0;
   }
-  .ss-chords-line {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: calc(2.6rem + 22px) .3em;
-    margin: 0 0 calc(2.6rem + 22px);
+  .ss-chords-grid {
+    display: inline-grid;
+    grid-auto-rows: 1fr;
+    gap: .3em;
+    max-width: 100%;
   }
-  /* Each chord in a light blue box; the one being played turns green. */
+  /* Each chord in a light blue box (all the same size); the one being played turns green. */
   .ss-chord {
-    position: relative;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 3.2em; /* same box size across sections unless one entry is longer */
     white-space: nowrap;
-    padding: .1em .3em;
+    padding: .14em .3em;
     border: 3px solid #7cc0f2;
     border-radius: 12px;
     background: #b9e0ff;
@@ -4044,21 +4046,6 @@
     color: #06150b;
     box-shadow: 0 6px 20px rgba(24,208,96,.35);
   }
-  .ss-chord-cd {
-    display: none;
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: "Vol4 Title", "Paranoid Title", "Impact", sans-serif;
-    font-size: 2.6rem;
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: .04em;
-    color: #fff;
-    white-space: nowrap;
-  }
-  .ss-chord-cd.is-on { display: block; }
   /* Single Song notes — under the section tab (per-section slots) */
   .ss-notes {
     flex: 0 0 auto;
@@ -6668,11 +6655,14 @@ function ssRenderChordTab(el, songName, item) {
   });
   var key = "ch|" + item.ci + "|" + start + "|" + names.join(" ") + "|" + times.join(",");
   if (el.getAttribute("data-ss-tab") !== key) {
-    var html = '<div class="ss-chords" aria-label="' + ssEscAttr(item.code) + ' chords"><div class="ss-chords-line">';
+    /* Rows of 4 (chords 5-8 on the line below), every box the same size. */
+    var cols = Math.min(4, names.length);
+    var html = '<div class="ss-chords" aria-label="' + ssEscAttr(item.code) + ' chords">'
+      + '<div class="ss-chords-grid" style="grid-template-columns: repeat(' + cols + ', 1fr)">';
     names.forEach(function(name, i){
       html += '<span class="ss-chord" data-i="' + i + '">' + ssEscAttr(name) + '</span>';
     });
-    html += '</div><div class="ss-chord-cd" aria-hidden="true"></div></div>';
+    html += '</div></div>';
     el.innerHTML = html;
     el.setAttribute("data-ss-tab", key);
     el.classList.remove("ss-tab-below-cue");
@@ -6690,7 +6680,7 @@ function ssRenderChordTab(el, songName, item) {
   ssChordTick(true);
   return true;
 }
-/** Per frame: move the green box to the next chord and count down to it. */
+/** Per frame: the chord being played gets the green box. */
 function ssChordTick(force) {
   var v = ssChordView;
   if (!v) return;
@@ -6698,32 +6688,14 @@ function ssChordTick(force) {
   if (!el || el.getAttribute("data-ss-tab") !== v.key) { ssChordView = null; return; }
   var t = smPlayerTimeNow();
   var times = v.times;
-  var cur = -1, next = -1, i;
+  var cur = -1, i;
   for (i = 0; i < times.length; i++) if (times[i] != null && times[i] <= t) cur = i;
-  for (i = cur + 1; i < times.length; i++) if (times[i] != null && times[i] > t) { next = i; break; }
-  var secs = (next >= 0) ? Math.max(1, Math.ceil(times[next] - t)) : 0;
-  var sig = cur + "|" + next + "|" + secs;
+  var sig = String(cur);
   if (!force && sig === v.sig) return;
   v.sig = sig;
-  /* Green box = chord being played. Countdown to the next change sits under it
-     (under the first chord before the section starts; none on the last chord). */
-  var cdAt = (cur >= 0) ? (next >= 0 ? cur : -1) : next;
-  var host = null;
   el.querySelectorAll(".ss-chord").forEach(function(s){
-    var k = parseInt(s.getAttribute("data-i"), 10);
-    s.classList.toggle("is-now", k === cur);
-    if (k === cdAt) host = s;
+    s.classList.toggle("is-now", parseInt(s.getAttribute("data-i"), 10) === cur);
   });
-  var cd = el.querySelector(".ss-chord-cd");
-  if (!cd) return;
-  if (host) {
-    if (cd.parentNode !== host) host.appendChild(cd);
-    cd.textContent = "IN: " + secs;
-    cd.classList.add("is-on");
-  } else {
-    cd.textContent = "";
-    cd.classList.remove("is-on");
-  }
 }
 function ssUpdateSectionTab(songName, pick) {
   var el = document.getElementById("ssSectionTab");
