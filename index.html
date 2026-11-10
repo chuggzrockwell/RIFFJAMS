@@ -18097,6 +18097,12 @@ document.addEventListener("keydown", function(e){
   }
   if (document.getElementById("chipEditor") && document.getElementById("chipEditor").classList.contains("open")) {
     if (k === "escape") { e.preventDefault(); closeChipEditor(); return; }
+    /* Shift+←/→ ±5s still works while the chip editor is open (even with focus in its fields),
+       so chord / section times can be grabbed without closing it. */
+    if (smPlayerMode === "player" && e.shiftKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+      e.preventDefault();
+      smSeekBy(e.key === "ArrowLeft" ? -5 : 5);
+    }
     return;
   }
   if (document.getElementById("songMetaEditor") && document.getElementById("songMetaEditor").classList.contains("open")) {
