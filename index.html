@@ -1900,6 +1900,22 @@
     white-space: nowrap;
   }
   .chip-editor #chipEditEndTimeFromPlayer:hover { filter: brightness(1.08); }
+  /* Chip layers: "+ Add layer" / A-B switch at the top of the chip editor */
+  .chip-editor .chip-edit-layer-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; margin: 0 0 10px; }
+  .chip-editor .chip-edit-layer-row[hidden] { display: none; }
+  .chip-editor .ce-layer-add {
+    border: 1px dashed #7030a0; background: transparent; color: #7030a0; border-radius: 8px;
+    padding: 6px 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer;
+  }
+  .chip-editor .ce-layer-add:hover { background: #f3eef8; }
+  .chip-editor .ce-layer-tabs { display: inline-flex; border: 1px solid #7030a0; border-radius: 8px; overflow: hidden; }
+  .chip-editor .ce-layer-tab {
+    border: 0; background: #fff; color: #7030a0; padding: 6px 12px;
+    font-size: 0.75rem; font-weight: 800; cursor: pointer; white-space: nowrap;
+  }
+  .chip-editor .ce-layer-tab + .ce-layer-tab { border-left: 1px solid #7030a0; }
+  .chip-editor .ce-layer-tab.on { background: #7030a0; color: #fff; }
+  .chip-editor .ce-layer-note { font-size: 0.68rem; color: rgba(0,0,0,.55); }
   /* Chord change mode (per chip) */
   .chip-editor .chip-edit-chord-row {
     margin: 0 0 10px;
@@ -3151,6 +3167,7 @@
   /* Link (L): ON = black on white like the active mode button; OFF = white on black. Edit-only. */
   body.sections-mode .sec-link-btn { min-width: 32px; padding-left: 10px; padding-right: 10px; }
   body.sections-mode .sec-link-btn[hidden] { display: none !important; }
+  body.sections-mode .sec-solo-btn[hidden] { display: none !important; }
   body.sections-mode .sec-link-btn:disabled { opacity: .38; cursor: not-allowed; }
   body.sections-mode .sec-tool-btn {
     background: #12141a;
@@ -4988,6 +5005,7 @@
         </div>
       </div>
       <button type="button" class="sec-mode-btn sec-link-btn on" id="secLinkBtn" hidden aria-pressed="true" title="Link Single Song ↔ Arrangement">L</button>
+      <button type="button" class="sec-mode-btn sec-solo-btn on" id="secSoloBtn" hidden aria-pressed="true" title="Solo: ON shows each chip's layer A (the solo); OFF flips chips that have a layer B (e.g. S1-b, the chords under it)">Solo</button>
       <div class="map-mode-dd map-tools-dd map-sort-dd" id="mapSortDd" hidden>
         <button type="button" class="map-tools-btn" id="mapSortBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="mapSortMenu" title="Sort songs (display only)">Sort: Album</button>
         <div class="map-tools-menu" id="mapSortMenu" role="menu">
@@ -5018,6 +5036,7 @@
   </section>
   <div id="secHighlightTip" aria-hidden="true"></div>
   <div id="chipEditor" class="chip-editor" aria-hidden="true">
+    <div class="chip-edit-layer-row" id="chipEditLayerRow" hidden></div>
     <label for="chipEditId" id="chipEditIdLabel">Section ID</label>
     <input type="text" id="chipEditId" maxlength="16" placeholder="e.g. V1" autocomplete="off">
     <label for="chipEditLick">Lick (for Play)</label>
@@ -6107,6 +6126,7 @@ function syncMirrorSectionArrangement(songName, pair, fromArrangement) {
         arrEntry[6] = null;
         arrEntry[7] = cloneChords(chipChords(oldM));
       }
+      if (chipLayerB(oldM)) chipSetLayerB(arrEntry, chipLayerB(oldM));
       arrSong.chips[aidx] = arrEntry;
       if (repHitM) arrRepAfterEditorSave(arrSong, aidx, repHitM, oldM, true);
     }
@@ -6524,7 +6544,7 @@ function buildSingleSongArrRowHtml(focusName) {
   var repInfo = arrRepeatInfo(chips);
   var dispCols = 0;
   for (ci = 0; ci < maxCols; ci++) {
-    var ap = (ci < chips.length) ? chips[ci] : null;
+    var ap = (ci < chips.length) ? ssLayerPair(chips[ci]) : null; /* Solo off: layer B */
     var repCell = arrRepCell(repInfo, ci);
     if (repCell && repCell.hide) continue;
     dispCols++;
@@ -6900,7 +6920,7 @@ function ssChordTick(force) {
 function ssUpdateSectionTab(songName, pick) {
   var el = document.getElementById("ssSectionTab");
   if (!el) return;
-  var item = pick && pick.current ? pick.current : null;
+  var item = pick && pick.current ? ssLayerItem(pick.current) : null; /* Solo off: layer B */
   if (item && item.code && ssRenderChordTab(el, songName, item)) return;
   ssChordView = null;
   el.classList.remove("ss-chords-on");
@@ -8154,6 +8174,58 @@ function chipChordsOn(pair) {
 function cloneChords(c) {
   return c ? JSON.parse(JSON.stringify(c)) : null;
 }
+/* -- Chip layers (Single Song "Solo" toggle) --
+   pair[8] = layer B: [code, tier, lick, positions, null, null, null, chords] - a second chip on the
+   same time slot (e.g. S1 = the solo, S1-b = the chords under it). Its time is always layer A's.
+   Solo ON (default) shows layer A; Solo OFF shows layer B on every chip that has one. */
+var SS_SOLO_KEY = "riffjams-ss-solo-v1";
+var ssSoloOn = true;
+try { ssSoloOn = localStorage.getItem(SS_SOLO_KEY) !== "0"; } catch (eSolo) {}
+function chipLayerB(pair) {
+  var b = (pair && pair.length > 8) ? pair[8] : null;
+  return (Array.isArray(b) && b[0]) ? b : null;
+}
+/** Layer B dressed as a chip on layer A's slot (A's start/end/block marker, B's code..chords). */
+function chipLayerView(pair) {
+  var b = chipLayerB(pair);
+  if (!b) return pair;
+  var v = pair.slice(0, 7);
+  while (v.length < 7) v.push(null);
+  v[0] = b[0];
+  v[1] = b[1];
+  v[2] = b[2] || "";
+  v[3] = arrRepPosValue(b);
+  v[7] = (b.length > 7) ? b[7] : null;
+  return v;
+}
+/** What Single Song shows for a chip right now. */
+function ssLayerPair(pair) {
+  return (singleSongMode && ssSoloOn === false && chipLayerB(pair)) ? chipLayerView(pair) : pair;
+}
+function ssLayerItem(item) {
+  if (!item || !item.pair) return item;
+  var lp = ssLayerPair(item.pair);
+  return lp === item.pair ? item : Object.assign({}, item, { pair: lp, code: lp[0] });
+}
+/** Set (or with null, remove) a chip's layer B. */
+function chipSetLayerB(pair, b) {
+  if (!pair) return;
+  if (b) {
+    arrRepPad(pair);
+    while (pair.length < 8) pair.push(null);
+    pair[8] = b;
+    return;
+  }
+  if (pair.length > 8) pair.length = 8;
+  while (pair.length > 6 && pair[pair.length - 1] == null) pair.pop();
+}
+/** Cut a chip back to its first n slots (dropping block marker [6] / chords [7]) - a chip with a
+    layer B keeps it: those slots are nulled instead. */
+function chipTruncate(pair, n) {
+  if (!pair) return;
+  if (chipLayerB(pair)) { for (var i = n; i < 8; i++) pair[i] = null; }
+  else pair.length = n;
+}
 /** Length of one pass when the list is the same progression repeated at least twice
     (e.g. Bb Eb Ab F Bb Eb Ab F -> 4); otherwise the whole list length. */
 function chordRepeatPeriod(names) {
@@ -9350,6 +9422,7 @@ function arrRepeatStripInvalid(song) {
   song.chips.forEach(function(p, ci){
     if (p && p.length > 6 && !info.byCi[ci]) {
       if (chipChords(p)) { if (p[6] == null) return; p[6] = null; } /* keep chord data in [7] */
+      else if (chipLayerB(p)) { if (p[6] == null) return; p[6] = null; } /* keep layer B in [8] */
       else p.length = 6;
       n++;
     }
@@ -9380,7 +9453,7 @@ function arrRepSetMark(pair, rep, unit, k) {
 function arrRepClearMark(pair) {
   if (!pair || pair.length <= 6) return;
   if (chipChords(pair)) pair[6] = null; /* keep chord data in [7] */
-  else pair.length = 6;
+  else chipTruncate(pair, 6); /* keeps layer B in [8] */
 }
 /** Display column for a data ci (passes 2..N fold onto the first pass). */
 function arrRepDispCol(info, ci) {
@@ -9617,6 +9690,7 @@ function arrRepeatSetCount() {
       arrRepPad(src);
       src[4] = null; src[5] = null;
       if (chipChords(srcPair)) { src[6] = null; src[7] = cloneChords(chipChords(srcPair)); }
+      if (chipLayerB(srcPair)) chipSetLayerB(src, JSON.parse(JSON.stringify(chipLayerB(srcPair))));
       copies.push(src);
     }
     chips.splice.apply(chips, [oldEnd, 0].concat(copies));
@@ -9721,7 +9795,9 @@ function arrRepAfterEditorSave(song, ci, hit, oldPair, noTimes) {
     pair[3] = arrRepPosValue(entry);
     /* Chord change mode: same progression + offsets on every pass. */
     if (chipChords(entry)) { if (pair.length < 7) pair[6] = null; pair[7] = cloneChords(chipChords(entry)); }
-    else if (pair.length > 7) pair.length = 7;
+    else if (pair.length > 7) chipTruncate(pair, 7);
+    /* Layer B: same on every pass. */
+    chipSetLayerB(pair, chipLayerB(entry) ? JSON.parse(JSON.stringify(chipLayerB(entry))) : null);
     if (times && p >= 1 && times[p - 1] != null) {
       var tok = String(times[p - 1]).trim();
       if (!tok || tok === "—") setChipStartSec(pair, null);
@@ -12832,7 +12908,25 @@ function ssLinkVisible() {
   var v = songMapViewValue();
   return document.body.classList.contains("sections-mode") && (v === "single" || v === "arrangement");
 }
+/** Single Song "Solo" toggle: ON = layer A on every chip, OFF = layer B where a chip has one. */
+function syncSsSoloUi() {
+  var btn = document.getElementById("secSoloBtn");
+  if (!btn) return;
+  btn.hidden = !(document.body.classList.contains("sections-mode") && songMapViewValue() === "single");
+  btn.classList.toggle("on", ssSoloOn !== false);
+  btn.setAttribute("aria-pressed", ssSoloOn !== false ? "true" : "false");
+}
+function toggleSsSolo() {
+  ssSoloOn = (ssSoloOn === false);
+  try { localStorage.setItem(SS_SOLO_KEY, ssSoloOn ? "1" : "0"); } catch (eSoloSave) {}
+  closeChipEditor();
+  syncSsSoloUi();
+  showSections(true);
+  smArrCueSig = "";
+  if (typeof smUpdateArrNextCue === "function") smUpdateArrNextCue(true);
+}
 function syncSsLinkUi() {
+  syncSsSoloUi();
   var btn = document.getElementById("secLinkBtn");
   if (!btn) return;
   var vis = ssLinkVisible();
@@ -13006,10 +13100,10 @@ function smUpdateArrNextCue(force) {
     }
   } else {
     /* Current: last timed chip with start <= t (or — before first) */
-    smPaintArrCueChip(curEl, "sm-arr-next-chip sm-arr-cur-chip", pick.current, "—");
+    smPaintArrCueChip(curEl, "sm-arr-next-chip sm-arr-cur-chip", inSingle ? ssLayerItem(pick.current) : pick.current, "—");
     /* Next: first with start > t; past last => End */
     if (pick.next) {
-      smPaintArrCueChip(chipEl, "sm-arr-next-chip", pick.next, "—");
+      smPaintArrCueChip(chipEl, "sm-arr-next-chip", inSingle ? ssLayerItem(pick.next) : pick.next, "—");
     } else {
       chipEl.className = "sm-arr-next-chip is-empty is-end";
       chipEl.style.background = "";
@@ -14600,7 +14694,7 @@ function chordEditorApplyByCode(songName, code) {
       if (t.pair.length < 7) t.pair[6] = null;
       t.pair[7] = cloneChords(data);
     } else if (t.pair.length > 7) {
-      t.pair.length = 7;
+      chipTruncate(t.pair, 7);
     }
   });
   try { localStorage.setItem(ARRANGEMENT_MAP_KEY, JSON.stringify(ARRANGEMENT_MAP)); } catch (eSave) {}
@@ -14625,9 +14719,10 @@ function chordEditorFill(state) {
     base = (pair && chipStartSec(pair) != null) ? chipStartSec(pair) : 0;
   } else {
     pair = (es && es.chips && !state.isNew) ? es.chips[state.ci] : null;
+    if (state.layer === "b") pair = chipLayerB(pair) ? chipLayerView(pair) : null; /* layer B's chords */
   }
   var c = chipChords(pair);
-  on.checked = !!(c && c.on);
+  on.checked = !!(c && c.on) || !!state.layerNew; /* new layer B: ready for its chords */
   var names = chordNamesOf(c);
   if (on.checked && !names.length) names = chordDefaultNames(chordEdit.song, chordEdit.code);
   body.hidden = !on.checked;
@@ -14642,6 +14737,7 @@ function chordEditorFill(state) {
     rows.push({ name: name, t: (off != null && isFinite(off)) ? base + Number(off) : null, br: starts.indexOf(i) >= 0 });
     if (repE[i]) rows.push({ rep: "e" });
   });
+  if (!rows.length && state.layerNew) rows.push({ name: "", t: null });
   chordEditorRenderRows(rows);
 }
 /** Chord data to save on the chip: undefined = row not shown (keep what the chip has), null = none.
@@ -14872,9 +14968,155 @@ function chordEditorRead(startSec, passStarts) {
     chordEditorMarkTapNext();
   };
 })();
+/* -- Chip editor layers: Single Song / Arrangement chips can carry a layer B (pair[8]) -- */
+var chipEditLayerBase = null; /* ai/si/ci/times the editor was opened with (layer switches reuse it) */
+function chipEditorLayerPair(state) {
+  if (!state || state.isNew || !usesArrangementMap()) return null;
+  var song = getEditSong(state.ai, state.si);
+  var pair = song && song.chips ? song.chips[state.ci] : null;
+  return isChipPair(pair) ? { song: song, pair: pair } : null;
+}
+/** Which layer the editor shows: as asked (A/B switch, + Add layer), else whatever Single Song is
+    showing (Solo off -> layer B). Fills code/tier/lick/positions from that layer. */
+function chipEditorResolveLayer(state) {
+  if (!state) return state;
+  if (!state.layerSwitch) chipEditLayerBase = Object.assign({}, state);
+  var hit = chipEditorLayerPair(state);
+  if (!hit) { state.layer = "a"; return state; }
+  var pair = hit.pair, b = chipLayerB(pair);
+  if (!state.layer) state.layer = (b && singleSongMode && ssSoloOn === false) ? "b" : "a";
+  var src = (state.layer === "b") ? b : pair;
+  state.layerNew = (state.layer === "b" && !b);
+  if (state.layerNew) {
+    /* + Add layer: a blank S1-b on the same time slot */
+    state.code = String(pair[0] || "") + "-b";
+    state.lick = "";
+    state.tier = 3;
+    state.positions = [];
+  } else if (state.layerSwitch) {
+    state.code = String(src[0] || "");
+    state.lick = (state.layer === "b") ? String(src[2] || "") : sectionLickId(hit.song.song, src[0], src[2] || "");
+    state.tier = normalizeSlot(state.layer === "b" ? chipTier(src) : riffSectionTierFor(hit.song.song, src[0], chipTier(src)), 3);
+    state.positions = chipPositions(src);
+  } else if (state.layer === "b") {
+    state.code = String(b[0] || "");
+    state.lick = String(b[2] || "");
+    state.tier = normalizeSlot(chipTier(b), 3);
+    state.positions = chipPositions(b);
+  }
+  state.position = undefined;
+  return state;
+}
+/** Top row of the editor: "+ Add layer" on a one-layer chip; an A / B switch once it has two. */
+function chipEditorLayerUi(state) {
+  var row = document.getElementById("chipEditLayerRow");
+  if (!row) return;
+  var hit = chipEditorLayerPair(state);
+  if (!hit) { row.hidden = true; row.innerHTML = ""; return; }
+  var pair = hit.pair, b = chipLayerB(pair), onB = state.layer === "b";
+  var aName = ssEscText(String(pair[0] || "A")), bName = ssEscText(b ? String(b[0]) : (onB ? state.code : ""));
+  var html = "";
+  if (b || onB) {
+    html += '<div class="ce-layer-tabs" role="tablist" aria-label="Chip layer">'
+      + '<button type="button" class="ce-layer-tab' + (onB ? '' : ' on') + '" data-layer="a" role="tab" aria-selected="' + (onB ? 'false' : 'true') + '" title="Layer A (Solo on)">' + aName + '</button>'
+      + '<button type="button" class="ce-layer-tab' + (onB ? ' on' : '') + '" data-layer="b" role="tab" aria-selected="' + (onB ? 'true' : 'false') + '" title="Layer B (Solo off)">' + bName + '</button>'
+      + '</div>';
+    if (onB) {
+      var st = chipStartSec(pair);
+      html += '<span class="ce-layer-note">Plays on ' + aName + "'s time" + (st != null ? ' (' + formatChipTime(st) + ')' : '') + (state.layerNew ? ' - Save to add it' : '') + '</span>';
+    }
+  } else {
+    html += '<button type="button" class="ce-layer-add" id="chipEditLayerAdd" title="Add a second layer on this chip\'s time slot (e.g. the chords under a solo). Solo off in Single Song shows it.">+ Add layer</button>';
+  }
+  row.innerHTML = html;
+  row.hidden = false;
+  /* Layer B: the time is layer A's, so its time rows stay hidden. */
+  if (onB) {
+    ["chipEditTimeRow", "chipEditEndTimeRow", "chipEditPassTimesRow"].forEach(function(id){
+      var el = document.getElementById(id);
+      if (el) el.hidden = true;
+    });
+  }
+  var del = document.getElementById("chipEditDelete");
+  if (del) {
+    del.style.display = (state.isNew || state.layerNew) ? "none" : "";
+    del.textContent = onB ? "Delete layer" : "Delete";
+  }
+  var copy = document.getElementById("chipEditCopy");
+  if (copy) copy.style.display = onB ? "none" : "";
+}
+function chipEditorSwitchLayer(layer) {
+  if (!chipEditState || !chipEditLayerBase) return;
+  var st = Object.assign({}, chipEditLayerBase, { layer: layer, layerSwitch: true });
+  openChipEditor(chipEditAnchor, st);
+}
+document.addEventListener("click", function(e){
+  var row = e.target.closest && e.target.closest("#chipEditLayerRow");
+  if (!row) return;
+  var add = e.target.closest("#chipEditLayerAdd");
+  var tab = e.target.closest(".ce-layer-tab");
+  if (!add && !tab) return;
+  e.preventDefault();
+  e.stopPropagation();
+  if (add) { chipEditorSwitchLayer("b"); return; }
+  var want = tab.getAttribute("data-layer");
+  if (want && chipEditState && want !== chipEditState.layer) chipEditorSwitchLayer(want);
+});
+/** Save the editor into the chip's layer B (layer A and the chip's time untouched). */
+function saveChipLayerB() {
+  var st = chipEditState;
+  var code = fixZeroOCode((document.getElementById("chipEditId").value || "").trim());
+  if (!code) { document.getElementById("chipEditId").focus(); return; }
+  var tierBtn = document.querySelector("#chipEditTiers .tier-pick.on");
+  var tier = tierBtn ? parseInt(tierBtn.getAttribute("data-tier"), 10) : 3;
+  if (!(tier >= 1 && tier <= 5)) tier = 3;
+  var lick = fixZeroOCode((document.getElementById("chipEditLick").value || "").trim());
+  var posList = readChipEditPosList();
+  var hit = chipEditorLayerPair(st);
+  if (!hit) return;
+  pushArrangementHistory();
+  hit = chipEditorLayerPair(st);
+  if (!hit) return;
+  var song = hit.song, pair = hit.pair;
+  var repHit = singleSongMode ? arrRepeatInfo(song.chips).byCi[st.ci] : null;
+  var cis = repHit ? arrRepPassCis(repHit.b, repHit.k) : [st.ci];
+  var b = makeChipEntry(code, tier, lick, posList);
+  var chordData = chordEditorRead(chipStartSec(pair), repHit
+    ? cis.map(function(pc){ return chipStartSec(song.chips[pc]); })
+    : null);
+  if (chordData === undefined) chordData = cloneChords(chipChords(chipLayerView(pair)));
+  if (chordData) {
+    arrRepPad(b);
+    b[6] = null;
+    b[7] = chordData;
+  }
+  /* A repeat block's passes share one layer B, like they share layer A. */
+  cis.forEach(function(pc){
+    if (isChipPair(song.chips[pc])) chipSetLayerB(song.chips[pc], JSON.parse(JSON.stringify(b)));
+  });
+  saveArrangementMap();
+  closeChipEditor();
+  showSections(true);
+}
+function deleteChipLayerB() {
+  var st = chipEditState;
+  var hit = chipEditorLayerPair(st);
+  if (!hit || !chipLayerB(hit.pair)) { closeChipEditor(); return; }
+  pushArrangementHistory();
+  hit = chipEditorLayerPair(st);
+  if (!hit) return;
+  var song = hit.song;
+  var repHit = singleSongMode ? arrRepeatInfo(song.chips).byCi[st.ci] : null;
+  var cis = repHit ? arrRepPassCis(repHit.b, repHit.k) : [st.ci];
+  cis.forEach(function(pc){ if (isChipPair(song.chips[pc])) chipSetLayerB(song.chips[pc], null); });
+  saveArrangementMap();
+  closeChipEditor();
+  showSections(true);
+}
 function openChipEditor(anchor, state) {
   if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (typeof closeSongMetaEditor === "function") closeSongMetaEditor();
+  state = chipEditorResolveLayer(state);
   chipEditState = state;
   chipEditAnchor = anchor || null;
   var ed = document.getElementById("chipEditor");
@@ -14945,6 +15187,7 @@ function openChipEditor(anchor, state) {
   }
   arrRepEditorFill(state);
   chordEditorFill(state);
+  chipEditorLayerUi(state);
   ed.classList.add("open");
   ed.setAttribute("aria-hidden", "false");
   ensureChipEditResizeObserver();
@@ -15205,6 +15448,7 @@ function readChipEditPosList() {
 function saveChipEditor() {
   if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (!chipEditState) return;
+  if (chipEditState.layer === "b") { saveChipLayerB(); return; }
   var code = (document.getElementById("chipEditId").value || "").trim();
   if (!soloMode && !usesArrangementMap()) code = code.toUpperCase();
   if (!soloMode || usesArrangementMap()) code = fixZeroOCode(code);
@@ -15263,6 +15507,8 @@ function saveChipEditor() {
       if (entry.length < 7) entry[6] = null;
       entry[7] = chordData;
     }
+    /* Layer B rides along when layer A is edited. */
+    if (chipLayerB(repOld)) chipSetLayerB(entry, chipLayerB(repOld));
     song.chips[ci] = entry;
     if (repHit) arrRepAfterEditorSave(song, ci, repHit, repOld);
     else if (repOld && repOld.length > 6 && repOld[6]) arrRepSetMark(entry, repOld[6].rep, repOld[6].unit, repOld[6].k);
@@ -15320,6 +15566,7 @@ function saveChipEditor() {
 function deleteChipEditor() {
   if (rjMobileEditBlocked()) return; /* mobile: no editing */
   if (!chipEditState || chipEditState.isNew) return;
+  if (chipEditState.layer === "b") { if (!chipEditState.layerNew) deleteChipLayerB(); return; }
   var song = getEditSong(chipEditState.ai, chipEditState.si);
   if (!song) return;
   var delCode = "";
@@ -17615,6 +17862,10 @@ document.getElementById("secModes").onclick = function(e){
     toggleSsLink();
     return;
   }
+  if (e.target.closest("#secSoloBtn")) {
+    toggleSsSolo();
+    return;
+  }
   if (e.target.closest("#secRepeatBtn")) {
     if (e.shiftKey) arrRepeatSetCount(); else arrRepeatFoldSelection();
     return;
@@ -17744,8 +17995,8 @@ document.getElementById("chipEditTiers").onclick = function(e){
   if (!b) return;
   document.querySelectorAll("#chipEditTiers .tier-pick").forEach(function(x){ x.classList.remove("on"); });
   b.classList.add("on");
-  /* Live-apply tier so Song Map / LL update without relying only on Save */
-  if (!chipEditState || chipEditState.isNew) return;
+  /* Live-apply tier so Song Map / LL update without relying only on Save (layer B: on Save) */
+  if (!chipEditState || chipEditState.isNew || chipEditState.layer === "b") return;
   var tier = parseInt(b.getAttribute("data-tier"), 10);
   if (!(tier >= 1 && tier <= 5)) return;
   tier = (tier >= 3) ? 3 : tier;
