@@ -6736,12 +6736,16 @@ function ssRenderChordTab(el, songName, item) {
     if (off == null || !isFinite(off)) return i === 0 ? start : null; /* untimed first chord = chip start */
     return start + Number(off);
   });
-  var lineStarts = chordLineStarts(c, names.length);
+  /* A progression entered as repeated passes (e.g. Bb Eb Ab F x6) shows one pass; the green box
+     cycles through it on every timed change. */
+  var period = chordRepeatPeriod(names);
+  var shown = names.slice(0, period);
+  var lineStarts = chordLineStarts(c, shown.length);
   var key = "ch|" + item.ci + "|" + start + "|" + names.join(" ") + "|" + times.join(",") + "|" + lineStarts.join(",");
   if (el.getAttribute("data-ss-tab") !== key) {
     /* Lines of 4 by default (or where the chip's line breaks say), every box the same size. */
     var line = 0, pos = 0, cols = 1, cells = [];
-    names.forEach(function(name, i){
+    shown.forEach(function(name, i){
       if (i && lineStarts.indexOf(i) >= 0) { line++; pos = 0; }
       cells.push('<span class="ss-chord" data-i="' + i + '" style="grid-row:' + (line + 1) + ';grid-column:' + (pos + 1) + '">' + ssEscAttr(name) + '</span>');
       pos++;
@@ -6759,7 +6763,7 @@ function ssRenderChordTab(el, songName, item) {
     if (layout && before && el.parentNode !== layout) layout.insertBefore(el, before);
     if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel();
   }
-  if (!ssChordView || ssChordView.key !== key) ssChordView = { key: key, times: times, sig: "" };
+  if (!ssChordView || ssChordView.key !== key) ssChordView = { key: key, times: times, period: period, sig: "" };
   if (typeof ssUpdateNotesPanel === "function") {
     var occ = (typeof ssSectionOccurrenceIndex === "function") ? ssSectionOccurrenceIndex(songName, item.code, item.ci) : null;
     ssUpdateNotesPanel(songName, item.code, occ);
@@ -6778,6 +6782,7 @@ function ssChordTick(force) {
   /* Latest chord change at/before now (list order may differ from time order after a drag). */
   var cur = -1, best = -Infinity, i;
   for (i = 0; i < times.length; i++) if (times[i] != null && times[i] <= t && times[i] >= best) { best = times[i]; cur = i; }
+  if (cur >= 0 && v.period > 0) cur = cur % v.period; /* repeated passes map onto the one shown */
   var sig = String(cur);
   if (!force && sig === v.sig) return;
   v.sig = sig;
@@ -8041,6 +8046,17 @@ function chipChordsOn(pair) {
 }
 function cloneChords(c) {
   return c ? JSON.parse(JSON.stringify(c)) : null;
+}
+/** Length of one pass when the list is the same progression repeated at least twice
+    (e.g. Bb Eb Ab F Bb Eb Ab F -> 4); otherwise the whole list length. */
+function chordRepeatPeriod(names) {
+  var n = names ? names.length : 0;
+  for (var p = 1; p * 2 <= n; p++) {
+    var ok = true;
+    for (var i = p; i < n; i++) if (names[i] !== names[i % p]) { ok = false; break; }
+    if (ok) return p;
+  }
+  return n;
 }
 /** Chord indexes that start a new line: c.br when set, otherwise every 4 chords. */
 function chordLineStarts(c, n) {
