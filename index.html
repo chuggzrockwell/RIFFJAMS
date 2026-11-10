@@ -4029,9 +4029,9 @@
      next chord in a green box, its countdown right under the box. */
   body.sections-mode.sections-single-song .ss-section-tab.ss-chords-on { min-height: 0; }
   .ss-chords {
-    font-family: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    font-family: "Vol4 Title", "Impact", sans-serif; /* Gadget, like the chips */
     font-size: clamp(2.2rem, 3.6vw, 3.8rem);
-    font-weight: 800;
+    font-weight: 400;
     line-height: 1;
     color: #fff;
     padding: 6px 2px 0;
@@ -4042,7 +4042,7 @@
     gap: .3em;
     max-width: 100%;
   }
-  /* Each chord in a light blue box (all the same size); the one being played turns green. */
+  /* Each chord in a box the same size: I1 red when waiting, B1 green while being played. */
   .ss-chord {
     display: flex;
     align-items: center;
@@ -4053,13 +4053,14 @@
     padding: .14em .3em;
     border: 0;
     border-radius: 12px;
-    background: #b9e0ff;
-    color: #0a1a2b;
+    background: #e02020;
+    color: #fff;
+    box-shadow: inset -2px 0 0 rgba(0,0,0,.25), inset 0 -2px 0 rgba(0,0,0,.25);
   }
   .ss-chord.is-now {
     background: #18d060;
-    color: #06150b;
-    box-shadow: 0 6px 20px rgba(24,208,96,.35);
+    color: #fff;
+    box-shadow: inset -2px 0 0 rgba(0,0,0,.25), inset 0 -2px 0 rgba(0,0,0,.25), 0 6px 20px rgba(24,208,96,.35);
   }
   /* Single Song notes — under the section tab (per-section slots) */
   .ss-notes {
