@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-10T16:34:11.055Z",
+  "updatedAt": "2026-11-10T16:37:06.692Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -9701,9 +9701,11 @@
                     "Am",
                     "C",
                     "F",
+                    "C",
                     "Csus"
                   ],
                   "at": [
+                    null,
                     null,
                     null,
                     null,
@@ -9736,9 +9738,11 @@
                     "Am",
                     "C",
                     "F",
+                    "C",
                     "Csus"
                   ],
                   "at": [
+                    null,
                     null,
                     null,
                     null,
