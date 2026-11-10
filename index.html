@@ -1860,8 +1860,8 @@
   .chip-editor .ce-chord { display: flex; align-items: center; gap: 6px; }
   .chip-editor .ce-chord.is-tap-next .ce-chord-num { color: #18a050; }
   .chip-editor .ce-chord-num { flex: 0 0 4.6em; font-size: 0.66rem; font-weight: 700; color: rgba(0,0,0,.45); white-space: nowrap; }
-  .chip-editor input[type="text"].ce-chord-name { flex: 0 0 4.2em; width: 4.2em; margin: 0; padding: 6px 8px; font-size: 0.95rem; font-weight: 800; }
-  .chip-editor input[type="text"].ce-chord-time { flex: 1; width: auto; min-width: 0; margin: 0; padding: 6px 8px; font-size: 0.9rem; }
+  .chip-editor input[type="text"].ce-chord-name { flex: 1 1 0; width: auto; min-width: 0; margin: 0; padding: 6px 8px; font-size: 0.95rem; font-weight: 800; }
+  .chip-editor input[type="text"].ce-chord-time { flex: 0 0 5.4em; width: 5.4em; min-width: 0; margin: 0; padding: 6px 8px; font-size: 0.9rem; }
   .chip-editor .ce-chord-del {
     flex: 0 0 auto; border: 0; background: transparent; color: #c0392b;
     font-size: 1.05rem; font-weight: 700; line-height: 1; padding: 4px 4px; cursor: pointer;
@@ -4039,6 +4039,7 @@
   .ss-chord {
     position: relative;
     display: inline-block;
+    white-space: nowrap;
     padding: .1em .22em;
     border: 3px solid transparent;
     border-radius: 12px;
@@ -14236,8 +14237,8 @@ function chordEditorRenderRows(rows) {
     var v = (r.t != null && isFinite(r.t)) ? formatChipTime(r.t) : "";
     return '<div class="ce-chord" data-i="' + i + '">'
       + '<span class="ce-chord-num">Chord ' + (i + 1) + '</span>'
-      + '<input type="text" class="ce-chord-name" value="' + songMetaEscapeAttr(r.name || "") + '" maxlength="12"'
-      + ' placeholder="C" autocomplete="off" spellcheck="false" aria-label="Chord ' + (i + 1) + '">'
+      + '<input type="text" class="ce-chord-name" value="' + songMetaEscapeAttr(r.name || "") + '" maxlength="40"'
+      + ' placeholder="C or G | C" autocomplete="off" spellcheck="false" aria-label="Chord ' + (i + 1) + '">'
       + '<input type="text" class="ce-chord-time" value="' + v + '" maxlength="12"'
       + ' placeholder="' + (i === 0 ? "chip start" : "0:00") + '" autocomplete="off" inputmode="decimal" aria-label="Chord ' + (i + 1) + ' time">'
       + '<button type="button" class="ce-chord-grab" title="Grab current Song Map player time">Set</button>'
