@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-10T22:43:44.415Z",
+  "updatedAt": "2026-11-10T22:44:56.762Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -9947,18 +9947,13 @@
                   "chords": [
                     "Am",
                     "F",
-                    "E",
                     "Am",
                     "F",
-                    "E",
                     "Am",
-                    "E",
                     "F",
                     "Am",
-                    "E",
                     "F",
                     "Am",
-                    "E",
                     "F"
                   ],
                   "at": [
@@ -9971,12 +9966,14 @@
                     null,
                     null,
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
                     null
+                  ],
+                  "rep": [
+                    {
+                      "s": 0,
+                      "e": 9,
+                      "n": 2
+                    }
                   ]
                 }
               ],
