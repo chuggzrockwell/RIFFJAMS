@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-10T20:53:42.246Z",
+  "updatedAt": "2026-11-10T20:58:58.387Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -76,7 +76,8 @@
     "AHR-I1": "user-tabs/AHR-I1.png",
     "AHR-S1": "user-tabs/AHR-S1.png",
     "AHR-V1": "user-tabs/AHR-V1.png",
-    "BSK-V1": "user-tabs/BSK-V1.png"
+    "BSK-V1": "user-tabs/BSK-V1.png",
+    "GY-V2": "user-tabs/GY-V2.png"
   },
   "albums": [
     {
@@ -2486,7 +2487,32 @@
             [
               "V1",
               3,
-              "V1-G"
+              "GY-V1"
+            ],
+            [
+              "V2",
+              2,
+              "GY-V2"
+            ],
+            [
+              "B1",
+              3,
+              "GY-B1"
+            ],
+            [
+              "B2",
+              3,
+              "GY-B2"
+            ],
+            [
+              "C1",
+              3,
+              "BY-C1"
+            ],
+            [
+              "S1",
+              1,
+              "GY-S1"
             ]
           ]
         },
@@ -9765,7 +9791,7 @@
               [
                 "V1",
                 3,
-                "V1-G",
+                "GY-V1",
                 1,
                 15.5,
                 null,
@@ -9785,6 +9811,102 @@
                     null
                   ]
                 }
+              ],
+              [
+                "V2",
+                2,
+                "GY-V2",
+                1,
+                62.7
+              ],
+              [
+                "B1",
+                3,
+                "GY-B1",
+                1,
+                93.1,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "D",
+                    "E",
+                    "F",
+                    "G"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                }
+              ],
+              [
+                "B2",
+                3,
+                "GY-B2",
+                1,
+                110.1
+              ],
+              [
+                "C1",
+                3,
+                "BY-C1",
+                1,
+                161.5,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Am",
+                    "F",
+                    "E"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null
+                  ]
+                }
+              ],
+              [
+                "B2",
+                3,
+                "GY-B2",
+                1,
+                185
+              ],
+              [
+                "C1",
+                3,
+                "BY-C1",
+                1,
+                228.6,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Am",
+                    "F",
+                    "E"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null
+                  ]
+                }
+              ],
+              [
+                "S1",
+                1,
+                "GY-S1",
+                [],
+                300.6
               ]
             ]
           },
@@ -14915,15 +15037,71 @@
       "song": "Gypsy",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": null,
+      "riffSaturationIndex": 1.107,
       "chips": [
         {
           "code": "V1",
           "tier": 3,
           "start": 15.5,
+          "stop": 62.7,
+          "duration": 47.2,
+          "lick": "GY-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 62.7,
+          "stop": 93.1,
+          "duration": 30.4,
+          "lick": "GY-V2"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 93.1,
+          "stop": 110.1,
+          "duration": 17,
+          "lick": "GY-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 110.1,
+          "stop": 161.5,
+          "duration": 51.4,
+          "lick": "GY-B2"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 161.5,
+          "stop": 185,
+          "duration": 23.5,
+          "lick": "BY-C1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 185,
+          "stop": 228.6,
+          "duration": 43.6,
+          "lick": "GY-B2"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 228.6,
+          "stop": 300.6,
+          "duration": 72,
+          "lick": "BY-C1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 300.6,
           "stop": null,
           "duration": null,
-          "lick": "V1-G"
+          "lick": "GY-S1"
         }
       ]
     }
