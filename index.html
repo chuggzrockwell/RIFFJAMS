@@ -4044,7 +4044,7 @@
     border: 3px solid transparent;
     border-radius: 12px;
   }
-  .ss-chord.is-next {
+  .ss-chord.is-now {
     background: #18d060;
     border-color: #0f9d48;
     color: #06150b;
@@ -6709,14 +6709,17 @@ function ssChordTick(force) {
   for (i = 0; i < times.length; i++) if (times[i] != null && times[i] <= t) cur = i;
   for (i = cur + 1; i < times.length; i++) if (times[i] != null && times[i] > t) { next = i; break; }
   var secs = (next >= 0) ? Math.max(1, Math.ceil(times[next] - t)) : 0;
-  var sig = next + "|" + secs;
+  var sig = cur + "|" + next + "|" + secs;
   if (!force && sig === v.sig) return;
   v.sig = sig;
+  /* Green box = chord being played. Countdown to the next change sits under it
+     (under the first chord before the section starts; none on the last chord). */
+  var cdAt = (cur >= 0) ? (next >= 0 ? cur : -1) : next;
   var host = null;
   el.querySelectorAll(".ss-chord").forEach(function(s){
-    var on = parseInt(s.getAttribute("data-i"), 10) === next;
-    s.classList.toggle("is-next", on);
-    if (on) host = s;
+    var k = parseInt(s.getAttribute("data-i"), 10);
+    s.classList.toggle("is-now", k === cur);
+    if (k === cdAt) host = s;
   });
   var cd = el.querySelector(".ss-chord-cd");
   if (!cd) return;
@@ -18061,7 +18064,8 @@ document.addEventListener("keydown", function(e){
   /* Numpad 7 rulers / Numpad 8 meta: handled in capture on window (see bindSectionRulersShortcut / bindSongMetaColsShortcut). */
   if (handleModeEntryKey(e)) return;
   /* Shift+C: clear Board queue / Song Map filters / LL filters */
-  if (e.shiftKey && ((e.key || "").toLowerCase() === "c" || e.code === "KeyC")) {
+  var tagShiftC = (e.target && e.target.tagName) || "";
+  if (e.shiftKey && ((e.key || "").toLowerCase() === "c" || e.code === "KeyC") && tagShiftC !== "INPUT" && tagShiftC !== "TEXTAREA") {
     if (document.body.classList.contains("playboard-mode")) {
       e.preventDefault();
       clearPlayQueue();
