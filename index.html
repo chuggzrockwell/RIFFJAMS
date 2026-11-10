@@ -4152,7 +4152,7 @@
   }
   /* Repeat signs (chip editor "+ Repeat sign"): start / end bars with dots in the gap beside the
      boxes, the play count above the end bar. */
-  .ss-chords-grid.has-rep { column-gap: .85em; row-gap: .5em; padding: .32em .6em 0; }
+  .ss-chords-grid.has-rep { column-gap: .64em; row-gap: .5em; padding: .32em .5em 0; }
   .ss-chord { position: relative; }
   .ss-rep-bar {
     position: absolute; top: .06em; bottom: .06em; width: .38em;
@@ -4182,6 +4182,10 @@
     padding: .22em .5em; border-radius: 999px;
     background: #fff; color: #111; white-space: nowrap; pointer-events: none;
   }
+  /* While a repeat is playing and another pass is still coming: end sign + count go green; the
+     count shows the passes left (this one included), back to white on the last pass. */
+  .ss-rep-r.is-more { color: #18d060; }
+  .ss-rep-n.is-more { background: #18d060; color: #fff; }
   /* Single Song notes — under the section tab (per-section slots) */
   .ss-notes {
     flex: 0 0 auto;
@@ -6838,11 +6842,12 @@ function ssRenderChordTab(el, songName, item) {
     /* Lines of 4 by default (or where the chip's line breaks say), every box the same size. */
     var line = 0, pos = 0, cols = 1, cells = [];
     var repS = {}, repE = {};
-    reps.forEach(function(r){ repS[dispOf[r.s]] = true; repE[dispOf[r.s + r.p - 1]] = r.n; });
+    reps.forEach(function(r, ri){ repS[dispOf[r.s]] = true; repE[dispOf[r.s + r.p - 1]] = { n: r.n, ri: ri }; });
     shown.forEach(function(name, i){
       if (i && lineStarts.indexOf(i) >= 0) { line++; pos = 0; }
       var signs = (repS[i] ? '<i class="ss-rep-bar ss-rep-l" aria-hidden="true"></i>' : '')
-        + (repE[i] ? '<i class="ss-rep-bar ss-rep-r" aria-hidden="true"></i><i class="ss-rep-n" title="Repeat: play ' + repE[i] + ' times">&times;' + repE[i] + '</i>' : '');
+        + (repE[i] ? '<i class="ss-rep-bar ss-rep-r" data-rep="' + repE[i].ri + '" aria-hidden="true"></i>'
+          + '<i class="ss-rep-n" data-rep="' + repE[i].ri + '" data-n="' + repE[i].n + '" title="Repeat: play ' + repE[i].n + ' times">&times;' + repE[i].n + '</i>' : '');
       cells.push('<span class="ss-chord" data-i="' + i + '" style="grid-row:' + (line + 1) + ';grid-column:' + (pos + 1) + '">' + ssEscAttr(name) + signs + '</span>');
       pos++;
       if (pos > cols) cols = pos;
@@ -6879,14 +6884,27 @@ function ssChordTick(force) {
   var seq = v.seq || [];
   /* Latest chord change at/before now (list order may differ from time order after a drag;
      repeat passes are unrolled into seq). */
-  var cur = -1, best = -Infinity, i;
-  for (i = 0; i < seq.length; i++) if (seq[i].t <= t && seq[i].t >= best) { best = seq[i].t; cur = seq[i].i; }
+  var cur = -1, best = -Infinity, hit = null, i;
+  for (i = 0; i < seq.length; i++) if (seq[i].t <= t && seq[i].t >= best) { best = seq[i].t; hit = seq[i]; }
+  if (hit) cur = hit.i;
   if (cur >= 0 && v.dispOf && v.dispOf[cur] != null) cur = v.dispOf[cur]; /* repeated passes map onto the one shown */
-  var sig = String(cur);
+  var inRep = (hit && hit.r >= 0) ? hit : null;
+  var sig = cur + "|" + (inRep ? inRep.r + ":" + inRep.k : "");
   if (!force && sig === v.sig) return;
   v.sig = sig;
   el.querySelectorAll(".ss-chord").forEach(function(s){
     s.classList.toggle("is-now", parseInt(s.getAttribute("data-i"), 10) === cur);
+  });
+  /* Repeat being played: count shows the passes left (this one included); green while another
+     pass is coming, white on the last one. Other repeats show their full count. */
+  el.querySelectorAll(".ss-rep-n").forEach(function(b){
+    var ri = parseInt(b.getAttribute("data-rep"), 10), n = parseInt(b.getAttribute("data-n"), 10) || 2;
+    var left = (inRep && inRep.r === ri) ? Math.max(1, n - inRep.k + 1) : n;
+    var more = !!(inRep && inRep.r === ri && left > 1);
+    b.textContent = "\u00d7" + left;
+    b.classList.toggle("is-more", more);
+    var bar = el.querySelector('.ss-rep-r[data-rep="' + ri + '"]');
+    if (bar) bar.classList.toggle("is-more", more);
   });
 }
 function ssUpdateSectionTab(songName, pick) {
@@ -8179,8 +8197,15 @@ function chordRepeats(c, n) {
     length x chords per pass. */
 function chordPlaySeq(times, reps, endSec) {
   var seq = [];
-  times.forEach(function(t, i){ if (t != null) seq.push({ i: i, t: t }); });
-  (reps || []).forEach(function(r){
+  var passOf = {};
+  (reps || []).forEach(function(r, ri){
+    var size = r.e - r.s + 1, p = (r.p > 0 && r.p <= size) ? r.p : size;
+    for (var pi = r.s; pi <= r.e; pi++) passOf[pi] = { r: ri, k: Math.floor((pi - r.s) / p) + 1 };
+  });
+  times.forEach(function(t, i){
+    if (t != null) seq.push({ i: i, t: t, r: passOf[i] ? passOf[i].r : -1, k: passOf[i] ? passOf[i].k : 0 });
+  });
+  (reps || []).forEach(function(r, ri){
     var size = r.e - r.s + 1;
     var p = (r.p > 0 && r.p <= size) ? r.p : size;
     var written = Math.max(1, Math.floor(size / p));
@@ -8202,7 +8227,7 @@ function chordPlaySeq(times, reps, endSec) {
     }
     if (!len || !(len > 0)) return;
     for (var k = written; k < r.n; k++) {
-      for (j = r.s; j <= pe; j++) if (times[j] != null) seq.push({ i: j, t: times[j] + k * len });
+      for (j = r.s; j <= pe; j++) if (times[j] != null) seq.push({ i: j, t: times[j] + k * len, r: ri, k: k + 1 });
     }
   });
   return seq;
