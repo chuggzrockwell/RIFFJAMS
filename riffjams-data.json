@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-10T16:25:22.844Z",
+  "updatedAt": "2026-11-10T16:27:13.157Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -2400,7 +2400,7 @@
             ],
             [
               "C1",
-              3,
+              2,
               "BSK-C1",
               []
             ],
@@ -9308,7 +9308,7 @@
               ],
               [
                 "C1",
-                3,
+                2,
                 "BSK-C1",
                 1,
                 14.3
@@ -14627,119 +14627,6 @@
     },
     {
       "album": "Technical Ecstasy",
-      "song": "Back Street Kids",
-      "endSec": 226.4,
-      "complete": true,
-      "riffSaturationIndex": 1.971,
-      "chips": [
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 0,
-          "stop": 14.3,
-          "duration": 14.3,
-          "lick": "BSK-I1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 14.3,
-          "stop": 21.3,
-          "duration": 7,
-          "lick": "BSK-C1"
-        },
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 21.3,
-          "stop": 28.3,
-          "duration": 7,
-          "lick": "BSK-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 1,
-          "start": 28.3,
-          "stop": 56.5,
-          "duration": 28.2,
-          "lick": "BSK-V1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 56.5,
-          "stop": 63.6,
-          "duration": 7.1,
-          "lick": "BSK-C1"
-        },
-        {
-          "code": "V1",
-          "tier": 2,
-          "start": 63.6,
-          "stop": 98.8,
-          "duration": 35.2,
-          "lick": "BSK-V1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 98.8,
-          "stop": 105.9,
-          "duration": 7.1,
-          "lick": "BSK-C1"
-        },
-        {
-          "code": "B1",
-          "tier": 3,
-          "start": 105.9,
-          "stop": 120.1,
-          "duration": 14.2,
-          "lick": "BSK-B1"
-        },
-        {
-          "code": "B2",
-          "tier": 2,
-          "start": 120.1,
-          "stop": 148.6,
-          "duration": 28.5,
-          "lick": "BSK-B2"
-        },
-        {
-          "code": "B1",
-          "tier": 3,
-          "start": 148.6,
-          "stop": 163,
-          "duration": 14.4,
-          "lick": "BSK-B1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 163,
-          "stop": 184.6,
-          "duration": 21.6,
-          "lick": "S1"
-        },
-        {
-          "code": "V1",
-          "tier": 2,
-          "start": 184.6,
-          "stop": 219.8,
-          "duration": 35.2,
-          "lick": "BSK-V1"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 219.8,
-          "stop": 226.4,
-          "duration": 6.6,
-          "lick": "BSK-C1"
-        }
-      ]
-    },
-    {
-      "album": "Technical Ecstasy",
       "song": "You Won't Change Me",
       "endSec": 390.5,
       "complete": true,
@@ -14832,6 +14719,119 @@
           "stop": 390.5,
           "duration": 56.5,
           "lick": "YWCM-S2"
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "Back Street Kids",
+      "endSec": 226.4,
+      "complete": true,
+      "riffSaturationIndex": 2.002,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": 14.3,
+          "duration": 14.3,
+          "lick": "BSK-I1"
+        },
+        {
+          "code": "C1",
+          "tier": 2,
+          "start": 14.3,
+          "stop": 21.3,
+          "duration": 7,
+          "lick": "BSK-C1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 21.3,
+          "stop": 28.3,
+          "duration": 7,
+          "lick": "BSK-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 28.3,
+          "stop": 56.5,
+          "duration": 28.2,
+          "lick": "BSK-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 56.5,
+          "stop": 63.6,
+          "duration": 7.1,
+          "lick": "BSK-C1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 63.6,
+          "stop": 98.8,
+          "duration": 35.2,
+          "lick": "BSK-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 98.8,
+          "stop": 105.9,
+          "duration": 7.1,
+          "lick": "BSK-C1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 105.9,
+          "stop": 120.1,
+          "duration": 14.2,
+          "lick": "BSK-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 120.1,
+          "stop": 148.6,
+          "duration": 28.5,
+          "lick": "BSK-B2"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 148.6,
+          "stop": 163,
+          "duration": 14.4,
+          "lick": "BSK-B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 163,
+          "stop": 184.6,
+          "duration": 21.6,
+          "lick": "S1"
+        },
+        {
+          "code": "V1",
+          "tier": 2,
+          "start": 184.6,
+          "stop": 219.8,
+          "duration": 35.2,
+          "lick": "BSK-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 219.8,
+          "stop": 226.4,
+          "duration": 6.6,
+          "lick": "BSK-C1"
         }
       ]
     }
