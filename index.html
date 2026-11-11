@@ -5019,7 +5019,7 @@
         </div>
       </div>
       <button type="button" class="sec-mode-btn sec-link-btn on" id="secLinkBtn" hidden aria-pressed="true" title="Link Single Song ↔ Arrangement">L</button>
-      <button type="button" class="sec-mode-btn sec-solo-btn on" id="secSoloBtn" hidden aria-pressed="true" title="Solo: ON shows each chip's layer A (the solo); OFF flips chips that have a layer B (e.g. S1-b, the chords under it)">Solo</button>
+      <button type="button" class="sec-mode-btn sec-solo-btn on" id="secSoloBtn" hidden aria-pressed="true" title="Solo: ON shows each chip's layer A (the solo); OFF = rhythm, flips chips that have a layer B (e.g. S1-b, the chords under it) - Single Song and Arrangement">Solo</button>
       <div class="map-mode-dd map-tools-dd map-sort-dd" id="mapSortDd" hidden>
         <button type="button" class="map-tools-btn" id="mapSortBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="mapSortMenu" title="Sort songs (display only)">Sort: Album</button>
         <div class="map-tools-menu" id="mapSortMenu" role="menu">
@@ -8240,9 +8240,13 @@ function chipLayerView(pair) {
   v[7] = (b.length > 7) ? b[7] : null;
   return v;
 }
-/** What Single Song shows for a chip right now. */
+/** Solo OFF flips layer-B chips in Single Song and in the Arrangement grid (same toggle, same state). */
+function layerBShown() {
+  return ssSoloOn === false && (!!singleSongMode || !!arrangementMode);
+}
+/** What Single Song / Arrangement shows for a chip right now. */
 function ssLayerPair(pair) {
-  return (singleSongMode && ssSoloOn === false && chipLayerB(pair)) ? chipLayerView(pair) : pair;
+  return (layerBShown() && chipLayerB(pair)) ? chipLayerView(pair) : pair;
 }
 function ssLayerItem(item) {
   if (!item || !item.pair) return item;
@@ -10345,7 +10349,7 @@ function showSections(keepScroll) {
         ensureArrangementSlots(s);
         var achips = (s.chips || []);
         for (ci = 0; ci < maxCols; ci++) {
-          var ap = (ci < achips.length) ? achips[ci] : null;
+          var ap = (ci < achips.length) ? ssLayerPair(achips[ci]) : null; /* Solo off: layer B */
           if (!isChipPair(ap)) {
             chipArr.push('<button type="button" class="sec-chip empty" data-arrange="1" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'" aria-label="Empty arrangement slot"></button>');
           } else {
@@ -12964,11 +12968,12 @@ function ssLinkVisible() {
   var v = songMapViewValue();
   return document.body.classList.contains("sections-mode") && (v === "single" || v === "arrangement");
 }
-/** Single Song "Solo" toggle: ON = layer A on every chip, OFF = layer B where a chip has one. */
+/** Single Song / Arrangement "Solo" toggle: ON = layer A on every chip, OFF = layer B (rhythm) where a chip has one. */
 function syncSsSoloUi() {
   var btn = document.getElementById("secSoloBtn");
   if (!btn) return;
-  btn.hidden = !(document.body.classList.contains("sections-mode") && songMapViewValue() === "single");
+  var soloView = songMapViewValue();
+  btn.hidden = !(document.body.classList.contains("sections-mode") && (soloView === "single" || soloView === "arrangement"));
   btn.classList.toggle("on", ssSoloOn !== false);
   btn.setAttribute("aria-pressed", ssSoloOn !== false ? "true" : "false");
 }
@@ -13156,10 +13161,10 @@ function smUpdateArrNextCue(force) {
     }
   } else {
     /* Current: last timed chip with start <= t (or — before first) */
-    smPaintArrCueChip(curEl, "sm-arr-next-chip sm-arr-cur-chip", inSingle ? ssLayerItem(pick.current) : pick.current, "—");
+    smPaintArrCueChip(curEl, "sm-arr-next-chip sm-arr-cur-chip", ssLayerItem(pick.current), "—");
     /* Next: first with start > t; past last => End */
     if (pick.next) {
-      smPaintArrCueChip(chipEl, "sm-arr-next-chip", inSingle ? ssLayerItem(pick.next) : pick.next, "—");
+      smPaintArrCueChip(chipEl, "sm-arr-next-chip", ssLayerItem(pick.next), "—");
     } else {
       chipEl.className = "sm-arr-next-chip is-empty is-end";
       chipEl.style.background = "";
@@ -15039,7 +15044,7 @@ function chipEditorResolveLayer(state) {
   var hit = chipEditorLayerPair(state);
   if (!hit) { state.layer = "a"; return state; }
   var pair = hit.pair, b = chipLayerB(pair);
-  if (!state.layer) state.layer = (b && singleSongMode && ssSoloOn === false) ? "b" : "a";
+  if (!state.layer) state.layer = (b && layerBShown()) ? "b" : "a";
   var src = (state.layer === "b") ? b : pair;
   state.layerNew = (state.layer === "b" && !b);
   if (state.layerNew) {
