@@ -19382,7 +19382,6 @@ if (isPlayboardPage()) {
 (function () {
   var KEY = "riffjams_timer_v1", RESET_HOUR = 5, st = { ms: 0, since: null, resetAt: Date.now() };
   try { var s = JSON.parse(localStorage.getItem(KEY)); if (s) st = s; } catch (e) {}
-  if (!st.resetAt) st.resetAt = Date.now();
   var box = document.getElementById("rjTimer"), t = document.getElementById("rjtTime"), pl = document.getElementById("rjtPlay"), pa = document.getElementById("rjtPause"),
       ed = document.getElementById("rjtEdit"), rs = document.getElementById("rjtReset"), inp = null;
   function cur() { return st.ms + (st.since ? Date.now() - st.since : 0); }
