@@ -7145,41 +7145,73 @@ function ssRenderTabSheet(el, songName) {
   }
   return true;
 }
-/** Per frame: green on the chord being played, yellow on the next one, and keep the playing row at
-    the top of the scroll box. */
+/** Per frame: green on the chord being played, yellow on the next one, and a gradual scroll that
+    glides the next row up to the top over the last stretch before it starts (no jump at the change). */
 function ssSheetTick(force) {
   var v = ssSheetView;
   if (!v) return;
   var el = document.getElementById("ssSectionTab");
   if (!el || el.getAttribute("data-ss-tab") !== v.key) { ssSheetView = null; return; }
   /* Scroll box fills the screen below the chip strip. */
-  var top = el.getBoundingClientRect().top;
-  var maxH = Math.max(220, Math.floor((window.innerHeight || 800) - Math.max(top, 0) - 12));
+  var boxTop = el.getBoundingClientRect().top;
+  var maxH = Math.max(220, Math.floor((window.innerHeight || 800) - Math.max(boxTop, 0) - 12));
   if (Math.abs((parseFloat(el.style.maxHeight) || 0) - maxH) > 2) el.style.maxHeight = maxH + "px";
   var t = smPlayerTimeNow();
-  var cur = -1, best = -Infinity, firstTimed = -1;
-  v.times.forEach(function(tt, i){
-    if (tt == null) return;
+  var times = v.times;
+  var cur = -1, best = -Infinity, firstTimed = -1, i;
+  for (i = 0; i < times.length; i++) {
+    if (times[i] == null) continue;
     if (firstTimed < 0) firstTimed = i;
-    if (tt <= t && tt >= best) { best = tt; cur = i; }
-  });
-  if (!force && cur === v.cur) return;
-  var moved = cur !== v.cur;
-  v.cur = cur;
-  var next = cur >= 0 ? (cur + 1 < v.times.length ? cur + 1 : -1) : firstTimed;
-  el.querySelectorAll(".ss-chord-cell").forEach(function(cell){
-    var i = parseInt(cell.getAttribute("data-i"), 10);
-    cell.classList.toggle("is-now", i === cur);
-    cell.classList.toggle("is-next", i === next);
-    var lab = cell.querySelector(".ss-chord");
-    if (lab) { lab.classList.toggle("is-now", i === cur); lab.classList.toggle("is-next", i === next); }
-  });
-  if (!moved && !force) return;
-  var target = cur >= 0 ? el.querySelector('.ss-chord-cell[data-i="' + cur + '"]') : null;
+    if (times[i] <= t && times[i] >= best) { best = times[i]; cur = i; }
+  }
+  if (force || cur !== v.cur) {
+    v.cur = cur;
+    var next = cur >= 0 ? (cur + 1 < times.length ? cur + 1 : -1) : firstTimed;
+    el.querySelectorAll(".ss-chord-cell").forEach(function(cell){
+      var k = parseInt(cell.getAttribute("data-i"), 10);
+      cell.classList.toggle("is-now", k === cur);
+      cell.classList.toggle("is-next", k === next);
+      var lab = cell.querySelector(".ss-chord");
+      if (lab) { lab.classList.toggle("is-now", k === cur); lab.classList.toggle("is-next", k === next); }
+    });
+  }
+  /* Scroll target: the playing row at the top; while the last chord of that row plays, ease toward
+     the next row (up to 3s, at least 1.2s) so it lands at the top right as its first chord starts. */
+  var scrollBase = el.scrollTop - el.getBoundingClientRect().top;
+  function rowY(k) {
+    var cell = el.querySelector('.ss-chord-cell[data-i="' + k + '"]');
+    return cell ? Math.round(cell.getBoundingClientRect().top + scrollBase) : null;
+  }
   var y = 0;
-  if (target) y = Math.max(0, el.scrollTop + target.getBoundingClientRect().top - el.getBoundingClientRect().top - 14);
-  if (Math.abs(el.scrollTop - y) > 2) {
-    try { el.scrollTo({ top: y, behavior: force ? "auto" : "smooth" }); } catch (eSc) { el.scrollTop = y; }
+  var anchor = cur >= 0 ? cur : -1;
+  if (anchor >= 0) {
+    var yCur = rowY(anchor);
+    y = yCur;
+    var n = -1;
+    for (i = anchor + 1; i < times.length; i++) {
+      var yi = rowY(i);
+      if (yi != null && yCur != null && Math.abs(yi - yCur) > 4) { n = i; break; }
+    }
+    if (n >= 0 && times[n] != null && times[n] > t) {
+      var prevT = null;
+      for (i = n - 1; i >= 0; i--) if (times[i] != null) { prevT = times[i]; break; }
+      var span = (prevT != null && times[n] > prevT) ? times[n] - prevT : 2;
+      var dur = Math.min(3, Math.max(1.2, span * 0.6));
+      var from = times[n] - dur;
+      if (t > from) {
+        var p = Math.min(1, (t - from) / dur);
+        p = p * p * (3 - 2 * p); /* ease in-out */
+        y = yCur + (rowY(n) - yCur) * p;
+      }
+    }
+  } else if (firstTimed >= 0) {
+    y = rowY(firstTimed) || 0;
+  }
+  y = Math.max(0, y - 14);
+  /* Only move when the target moves (playing), so a manual scroll while paused is left alone. */
+  if (force || v.lastY == null || Math.abs(y - v.lastY) > 0.5) {
+    v.lastY = y;
+    if (Math.abs(el.scrollTop - y) > 0.5) el.scrollTop = y;
   }
 }
 function ssUpdateSectionTab(songName, pick) {
