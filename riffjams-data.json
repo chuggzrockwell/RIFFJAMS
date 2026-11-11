@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T01:00:36.456Z",
+  "updatedAt": "2026-11-11T01:02:28.026Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -2477,7 +2477,8 @@
           "sections": [
             [
               "V1",
-              3
+              3,
+              "V1"
             ],
             [
               "S1",
@@ -9784,12 +9785,74 @@
                 }
               ],
               [
+                "V1",
+                3,
+                "V1",
+                1,
+                25.3,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "C",
+                    "Cmaj7",
+                    "Am",
+                    "C",
+                    "F",
+                    "C",
+                    "Csus"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                }
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                25.3,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "C",
+                    "Cmaj7",
+                    "Am",
+                    "C",
+                    "F",
+                    "C",
+                    "Csus"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ]
+                }
+              ],
+              null,
+              [
                 "S1",
                 1,
                 "S1",
                 1,
                 98
               ],
+              null,
               [
                 "V1",
                 3,
@@ -10171,9 +10234,29 @@
             ],
             "sectionRulers": [
               {
-                "name": "Section",
+                "name": "VERSE 1",
                 "start": 0,
                 "end": 1
+              },
+              {
+                "name": "BRIDGE",
+                "start": 2,
+                "end": 3
+              },
+              {
+                "name": "CHORUS",
+                "start": 4,
+                "end": 4
+              },
+              {
+                "name": "B2",
+                "start": 5,
+                "end": 5
+              },
+              {
+                "name": "CHORUS 2",
+                "start": 6,
+                "end": 7
               }
             ]
           },
@@ -15376,112 +15459,6 @@
     },
     {
       "album": "Technical Ecstasy",
-      "song": "It's Alright",
-      "endSec": 231.2,
-      "complete": true,
-      "riffSaturationIndex": 1.403,
-      "chips": [
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 0,
-          "stop": 98,
-          "duration": 98,
-          "lick": ""
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 98,
-          "stop": 144.6,
-          "duration": 46.6,
-          "lick": "S1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 144.6,
-          "stop": 231.2,
-          "duration": 86.6,
-          "lick": ""
-        }
-      ]
-    },
-    {
-      "album": "Technical Ecstasy",
-      "song": "Gypsy",
-      "endSec": 300.6,
-      "complete": true,
-      "riffSaturationIndex": 1.391,
-      "chips": [
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 15.5,
-          "stop": 62.7,
-          "duration": 47.2,
-          "lick": "GY-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 62.7,
-          "stop": 93.1,
-          "duration": 30.4,
-          "lick": "GY-V2"
-        },
-        {
-          "code": "B1",
-          "tier": 3,
-          "start": 93.1,
-          "stop": 110.1,
-          "duration": 17,
-          "lick": "GY-B1"
-        },
-        {
-          "code": "B2",
-          "tier": 3,
-          "start": 110.1,
-          "stop": 161.5,
-          "duration": 51.4,
-          "lick": "GY-B2"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 161.5,
-          "stop": 185,
-          "duration": 23.5,
-          "lick": "BY-C1"
-        },
-        {
-          "code": "B2",
-          "tier": 3,
-          "start": 185,
-          "stop": 228.6,
-          "duration": 43.6,
-          "lick": "GY-B2"
-        },
-        {
-          "code": "C1",
-          "tier": 3,
-          "start": 228.6,
-          "stop": 260,
-          "duration": 31.4,
-          "lick": "BY-C1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 260,
-          "stop": 300.6,
-          "duration": 40.6,
-          "lick": "GY-S1"
-        }
-      ]
-    },
-    {
-      "album": "Technical Ecstasy",
       "song": "All Moving Parts (Stand Still)",
       "endSec": 282.9,
       "complete": true,
@@ -15582,6 +15559,128 @@
           "stop": 282.9,
           "duration": 40.3,
           "lick": "AMPSS-V1"
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "It's Alright",
+      "endSec": 231.2,
+      "complete": false,
+      "riffSaturationIndex": 1.403,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 0,
+          "stop": 25.3,
+          "duration": 25.3,
+          "lick": ""
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 25.3,
+          "stop": 25.3,
+          "duration": null,
+          "lick": "V1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 25.3,
+          "stop": 98,
+          "duration": 72.7,
+          "lick": "V1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 98,
+          "stop": 144.6,
+          "duration": 46.6,
+          "lick": "S1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 144.6,
+          "stop": 231.2,
+          "duration": 86.6,
+          "lick": ""
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "Gypsy",
+      "endSec": 300.6,
+      "complete": true,
+      "riffSaturationIndex": 1.391,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 15.5,
+          "stop": 62.7,
+          "duration": 47.2,
+          "lick": "GY-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 62.7,
+          "stop": 93.1,
+          "duration": 30.4,
+          "lick": "GY-V2"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 93.1,
+          "stop": 110.1,
+          "duration": 17,
+          "lick": "GY-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 110.1,
+          "stop": 161.5,
+          "duration": 51.4,
+          "lick": "GY-B2"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 161.5,
+          "stop": 185,
+          "duration": 23.5,
+          "lick": "BY-C1"
+        },
+        {
+          "code": "B2",
+          "tier": 3,
+          "start": 185,
+          "stop": 228.6,
+          "duration": 43.6,
+          "lick": "GY-B2"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 228.6,
+          "stop": 260,
+          "duration": 31.4,
+          "lick": "BY-C1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 260,
+          "stop": 300.6,
+          "duration": 40.6,
+          "lick": "GY-S1"
         }
       ]
     }
