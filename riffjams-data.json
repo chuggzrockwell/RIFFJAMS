@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T00:57:28.884Z",
+  "updatedAt": "2026-11-11T00:58:32.064Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -2553,6 +2553,11 @@
               "B3",
               3,
               "AMPSS-B3"
+            ],
+            [
+              "V1",
+              2,
+              "AMPSS-VI"
             ]
           ]
         },
@@ -10173,9 +10178,9 @@
             "song": "All Moving Parts (Stand Still)",
             "chips": [
               [
-                "I1",
+                "V1",
                 2,
-                "AMPSS-1I",
+                "AMPSS-VI",
                 1,
                 0
               ],
@@ -10256,6 +10261,28 @@
                 1,
                 242.6
               ]
+            ],
+            "sectionRulers": [
+              {
+                "name": "VERSE 1",
+                "start": 0,
+                "end": 1
+              },
+              {
+                "name": "VERSE 2",
+                "start": 2,
+                "end": 3
+              },
+              {
+                "name": "BRIDGE",
+                "start": 4,
+                "end": 8
+              },
+              {
+                "name": "VERSE 3",
+                "start": 9,
+                "end": 11
+              }
             ]
           },
           {
@@ -15457,12 +15484,12 @@
       "riffSaturationIndex": 1.761,
       "chips": [
         {
-          "code": "I1",
+          "code": "V1",
           "tier": 2,
           "start": 0,
           "stop": 35,
           "duration": 35,
-          "lick": "AMPSS-1I"
+          "lick": "AMPSS-VI"
         },
         {
           "code": "PC1",
