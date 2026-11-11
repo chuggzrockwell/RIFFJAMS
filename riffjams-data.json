@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-10T23:47:21.232Z",
+  "updatedAt": "2026-11-11T00:57:28.884Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -78,7 +78,11 @@
     "AHR-V1": "user-tabs/AHR-V1.png",
     "BSK-V1": "user-tabs/BSK-V1.png",
     "GY-V2": "user-tabs/GY-V2.png",
-    "GY-B2": "user-tabs/GY-B2.png"
+    "GY-B2": "user-tabs/GY-B2.png",
+    "AMPSS-1I": "user-tabs/AMPSS-1I.png",
+    "AMPSS-PC1": "user-tabs/AMPSS-PC1.png",
+    "AMPSS-PC2": "user-tabs/AMPSS-PC2.png",
+    "AMPSS-B1": "user-tabs/AMPSS-B1.png"
   },
   "albums": [
     {
@@ -2519,7 +2523,38 @@
         },
         {
           "song": "All Moving Parts (Stand Still)",
-          "sections": []
+          "sections": [
+            [
+              "I1",
+              2,
+              "AMPSS-1I"
+            ],
+            [
+              "PC1",
+              3,
+              "AMPSS-PC1"
+            ],
+            [
+              "PC2",
+              3,
+              "AMPSS-PC2"
+            ],
+            [
+              "B1",
+              2,
+              "AMPSS-B1"
+            ],
+            [
+              "B2",
+              2,
+              "AMPSS-B2"
+            ],
+            [
+              "B3",
+              3,
+              "AMPSS-B3"
+            ]
+          ]
         },
         {
           "song": "Rock 'n' Roll Doctor",
@@ -10136,7 +10171,92 @@
           },
           {
             "song": "All Moving Parts (Stand Still)",
-            "chips": []
+            "chips": [
+              [
+                "I1",
+                2,
+                "AMPSS-1I",
+                1,
+                0
+              ],
+              [
+                "PC1",
+                3,
+                "AMPSS-PC1",
+                [],
+                35
+              ],
+              [
+                "I1",
+                2,
+                "AMPSS-1I",
+                1,
+                46.4
+              ],
+              [
+                "PC2",
+                3,
+                "AMPSS-PC2",
+                [],
+                81.1
+              ],
+              [
+                "B1",
+                2,
+                "AMPSS-B1",
+                [],
+                98.3
+              ],
+              [
+                "B2",
+                2,
+                "AMPSS-B2",
+                [],
+                129.5
+              ],
+              [
+                "B1",
+                2,
+                "AMPSS-B1",
+                [],
+                138.4
+              ],
+              [
+                "B2",
+                2,
+                "AMPSS-B2",
+                [],
+                169.1
+              ],
+              [
+                "B3",
+                3,
+                "AMPSS-B3",
+                1,
+                178.1
+              ],
+              [
+                "I1",
+                2,
+                "AMPSS-1I",
+                1,
+                190.3
+              ],
+              [
+                "PC2",
+                3,
+                "AMPSS-PC2",
+                [],
+                225.5
+              ],
+              [
+                "I1",
+                2,
+                "AMPSS-1I",
+                1,
+                242.6
+              ]
+            ]
           },
           {
             "song": "Rock 'n' Roll Doctor",
@@ -15326,6 +15446,111 @@
           "stop": 300.6,
           "duration": 40.6,
           "lick": "GY-S1"
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "All Moving Parts (Stand Still)",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": 1.761,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": 35,
+          "duration": 35,
+          "lick": "AMPSS-1I"
+        },
+        {
+          "code": "PC1",
+          "tier": 3,
+          "start": 35,
+          "stop": 46.4,
+          "duration": 11.4,
+          "lick": "AMPSS-PC1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 46.4,
+          "stop": 81.1,
+          "duration": 34.7,
+          "lick": "AMPSS-1I"
+        },
+        {
+          "code": "PC2",
+          "tier": 3,
+          "start": 81.1,
+          "stop": 98.3,
+          "duration": 17.2,
+          "lick": "AMPSS-PC2"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 98.3,
+          "stop": 129.5,
+          "duration": 31.2,
+          "lick": "AMPSS-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 129.5,
+          "stop": 138.4,
+          "duration": 8.9,
+          "lick": "AMPSS-B2"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 138.4,
+          "stop": 169.1,
+          "duration": 30.7,
+          "lick": "AMPSS-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 169.1,
+          "stop": 178.1,
+          "duration": 9,
+          "lick": "AMPSS-B2"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 178.1,
+          "stop": 190.3,
+          "duration": 12.2,
+          "lick": "AMPSS-B3"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 190.3,
+          "stop": 225.5,
+          "duration": 35.2,
+          "lick": "AMPSS-1I"
+        },
+        {
+          "code": "PC2",
+          "tier": 3,
+          "start": 225.5,
+          "stop": 242.6,
+          "duration": 17.1,
+          "lick": "AMPSS-PC2"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 242.6,
+          "stop": null,
+          "duration": null,
+          "lick": "AMPSS-1I"
         }
       ]
     }
