@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T01:42:14.200Z",
+  "updatedAt": "2026-11-11T01:43:28.444Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -10005,6 +10005,36 @@
                 "V1",
                 1,
                 192.4,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "C",
+                    "Cmaj7",
+                    "Am",
+                    "C",
+                    "F",
+                    "C",
+                    "Csus"
+                  ],
+                  "at": [
+                    0,
+                    3,
+                    6,
+                    9,
+                    12,
+                    18,
+                    20.9
+                  ]
+                }
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                192.4,
                 230.4,
                 null,
                 {
@@ -10042,9 +10072,9 @@
                 "end": 4
               },
               {
-                "name": "VERSE 5-7",
+                "name": "VERSE 5-8",
                 "start": 5,
-                "end": 7
+                "end": 9
               }
             ]
           },
@@ -15802,7 +15832,7 @@
       "album": "Technical Ecstasy",
       "song": "It's Alright",
       "endSec": 230.4,
-      "complete": true,
+      "complete": false,
       "riffSaturationIndex": 1.404,
       "chips": [
         {
@@ -15859,6 +15889,14 @@
           "start": 168.5,
           "stop": 192.4,
           "duration": 23.9,
+          "lick": "V1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 192.4,
+          "stop": 192.4,
+          "duration": null,
           "lick": "V1"
         },
         {
