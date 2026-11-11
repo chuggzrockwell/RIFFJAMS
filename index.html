@@ -4215,6 +4215,20 @@
   .ss-chord-tabwrap { position: relative; display: block; width: fit-content; max-width: 100%; line-height: 0; }
   .ss-chord-tabwrap .ss-rep-bar { top: 0; bottom: 0; }
   .ss-chords.has-tabs .ss-chords-grid.has-rep { padding-right: calc(1em + var(--rep-extra, 0em)); } /* end sign clear of NEXT */
+  .ss-chord-linebr { display: none; }
+  /* Tab-sheet songs (SS_TAB_SHEET_SONGS, e.g. She's Gone): no NEXT megachip / countdown; crops never
+     resize (natural size, 10px white border); chord labels half size; lines wrap if too wide. */
+  body.sections-single-song.ss-tab-sheet #smArrNextPanel { display: none !important; }
+  body.sections-mode.sections-single-song.ss-tab-sheet .ss-section-tab { width: 100%; max-width: none; overflow-x: auto; }
+  body.ss-tab-sheet .ss-chords.has-tabs .ss-chords-grid {
+    display: flex; flex-wrap: wrap; align-items: flex-start; width: auto;
+    column-gap: 52px; row-gap: 0;
+  }
+  body.ss-tab-sheet .ss-chords.has-tabs .ss-chord-cell { flex: 0 0 auto; margin-bottom: 30px; }
+  body.ss-tab-sheet .ss-chords.has-tabs .ss-chord-linebr { display: block; flex: 0 0 100%; height: 0; }
+  body.ss-tab-sheet .ss-chords.has-tabs .ss-chord { font-size: .5em; }
+  body.ss-tab-sheet .ss-chord-tabwrap { max-width: none; }
+  body.ss-tab-sheet .ss-chord-tab { max-width: none; max-height: none; padding: 10px; box-sizing: content-box; }
   .ss-chord-tab {
     display: block;
     width: auto;
@@ -6969,6 +6983,7 @@ function ssRenderChordTab(el, songName, item) {
         }).join("") + '</i>';
       }
       var place = 'grid-row:' + (line + 1) + ';grid-column:' + (pos + 1);
+      if (hasTabs && i && pos === 0) cells.push('<i class="ss-chord-linebr" aria-hidden="true"></i>');
       if (hasTabs) {
         /* Chord box centered over its tab crop (no tab: just the box). */
         /* Repeat signs frame the tab crop (its full width), not the chord box. */
@@ -7046,7 +7061,15 @@ function ssChordTick(force) {
     bar.classList.toggle("is-more", String(bar.getAttribute("data-reps") || "").split(",").some(function(ri){ return moreSet[ri]; }));
   });
 }
+/* Songs whose chord tabs show as a tab sheet (Jacob, 2026-11-11): no NEXT megachip / countdown,
+   crops at their own size with a 10px white border, chord labels at half size. */
+var SS_TAB_SHEET_SONGS = { "She's Gone": true };
+function ssSyncTabSheetClass(songName) {
+  var on = !!(singleSongMode && SS_TAB_SHEET_SONGS[songName != null ? songName : singleSongName]);
+  if (document.body.classList.contains("ss-tab-sheet") !== on) document.body.classList.toggle("ss-tab-sheet", on);
+}
 function ssUpdateSectionTab(songName, pick) {
+  ssSyncTabSheetClass(songName);
   var el = document.getElementById("ssSectionTab");
   if (!el) return;
   var item = pick && pick.current ? ssLayerItem(pick.current) : null; /* Solo off: layer B */
@@ -10340,6 +10363,7 @@ function showSections(keepScroll) {
   syncModeSelects();
   smBuildPlaylist();
   smUpdateMeta();
+  if (typeof ssSyncTabSheetClass === "function") ssSyncTabSheetClass();
   var sx = window.scrollX || window.pageXOffset || 0;
   var sy = window.scrollY || window.pageYOffset || 0;
   var sheetEl = document.getElementById("sectionsSheet");
