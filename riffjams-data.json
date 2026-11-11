@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T21:40:11.241Z",
+  "updatedAt": "2026-11-11T21:42:25.036Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -10795,7 +10795,7 @@
                 3,
                 "SG-I1",
                 [],
-                null,
+                15.1,
                 null,
                 null,
                 {
@@ -10813,14 +10813,24 @@
                   ],
                   "at": [
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    0,
+                    4.6,
+                    9.6,
+                    14.5,
+                    19.3,
+                    24.1,
+                    26.5,
+                    28.9
+                  ],
+                  "br": [
+                    4,
+                    6
+                  ],
+                  "rep": [
+                    {
+                      "s": 0,
+                      "e": 3
+                    }
                   ],
                   "tabs": [
                     "SG-M1",
@@ -10832,16 +10842,6 @@
                     "SG-M13",
                     "SG-M14",
                     "SG-M3"
-                  ],
-                  "br": [
-                    4,
-                    6
-                  ],
-                  "rep": [
-                    {
-                      "s": 0,
-                      "e": 3
-                    }
                   ]
                 }
               ],
@@ -16594,6 +16594,23 @@
           "stop": 195.6,
           "duration": 28.8,
           "lick": "RNRD-O1"
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "She's Gone",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 3,
+          "start": 15.1,
+          "stop": null,
+          "duration": null,
+          "lick": "SG-I1"
         }
       ]
     }
