@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T00:58:32.064Z",
+  "updatedAt": "2026-11-11T00:59:32.264Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -2524,11 +2524,7 @@
         {
           "song": "All Moving Parts (Stand Still)",
           "sections": [
-            [
-              "I1",
-              2,
-              "AMPSS-1I"
-            ],
+            null,
             [
               "PC1",
               3,
@@ -2557,7 +2553,7 @@
             [
               "V1",
               2,
-              "AMPSS-VI"
+              "AMPSS-V1"
             ]
           ]
         },
@@ -10192,9 +10188,9 @@
                 35
               ],
               [
-                "I1",
+                "V1",
                 2,
-                "AMPSS-1I",
+                "AMPSS-V1",
                 1,
                 46.4
               ],
@@ -10241,9 +10237,9 @@
                 178.1
               ],
               [
-                "I1",
+                "V1",
                 2,
-                "AMPSS-1I",
+                "AMPSS-V1",
                 1,
                 190.3
               ],
@@ -10255,9 +10251,9 @@
                 225.5
               ],
               [
-                "I1",
+                "V1",
                 2,
-                "AMPSS-1I",
+                "AMPSS-V1",
                 1,
                 242.6
               ]
@@ -15500,12 +15496,12 @@
           "lick": "AMPSS-PC1"
         },
         {
-          "code": "I1",
+          "code": "V1",
           "tier": 2,
           "start": 46.4,
           "stop": 81.1,
           "duration": 34.7,
-          "lick": "AMPSS-1I"
+          "lick": "AMPSS-V1"
         },
         {
           "code": "PC2",
@@ -15556,12 +15552,12 @@
           "lick": "AMPSS-B3"
         },
         {
-          "code": "I1",
+          "code": "V1",
           "tier": 2,
           "start": 190.3,
           "stop": 225.5,
           "duration": 35.2,
-          "lick": "AMPSS-1I"
+          "lick": "AMPSS-V1"
         },
         {
           "code": "PC2",
@@ -15572,12 +15568,12 @@
           "lick": "AMPSS-PC2"
         },
         {
-          "code": "I1",
+          "code": "V1",
           "tier": 2,
           "start": 242.6,
           "stop": null,
           "duration": null,
-          "lick": "AMPSS-1I"
+          "lick": "AMPSS-V1"
         }
       ]
     }
