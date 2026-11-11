@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T20:55:49.590Z",
+  "updatedAt": "2026-11-11T21:38:19.969Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -10733,7 +10733,396 @@
           },
           {
             "song": "She's Gone",
-            "chips": []
+            "chips": [
+              [
+                "I1",
+                3,
+                "SG-I1",
+                [],
+                null,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Em/B",
+                    "Badd11",
+                    "Em/B",
+                    "Badd11",
+                    "D6/9",
+                    "C#m7b5",
+                    "Cmaj7",
+                    "E5/A#",
+                    "Badd11"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  "tabs": [
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M9",
+                    "SG-M11",
+                    "SG-M13",
+                    "SG-M14",
+                    "SG-M3"
+                  ],
+                  "br": [
+                    4,
+                    6
+                  ],
+                  "rep": [
+                    {
+                      "s": 0,
+                      "e": 3
+                    }
+                  ]
+                }
+              ],
+              [
+                "V1",
+                3,
+                "SG-V1",
+                [],
+                null,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Em/B",
+                    "Badd11",
+                    "Em/B",
+                    "Badd11",
+                    "D6/9",
+                    "C#m7b5",
+                    "Cmaj7",
+                    "E5/A#",
+                    "Badd11"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  "tabs": [
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M9",
+                    "SG-M11",
+                    "SG-M13",
+                    "SG-M14",
+                    "SG-M3"
+                  ],
+                  "br": [
+                    4,
+                    6
+                  ],
+                  "rep": [
+                    {
+                      "s": 0,
+                      "e": 3
+                    }
+                  ]
+                }
+              ],
+              [
+                "V1",
+                3,
+                "SG-V1",
+                [],
+                null,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Em/B",
+                    "Badd11",
+                    "Em/B",
+                    "Badd11",
+                    "D6/9",
+                    "C#m7b5",
+                    "Cmaj7",
+                    "E5/A#",
+                    "Badd11"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  "tabs": [
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M9",
+                    "SG-M11",
+                    "SG-M13",
+                    "SG-M14",
+                    "SG-M3"
+                  ],
+                  "br": [
+                    4,
+                    6
+                  ],
+                  "rep": [
+                    {
+                      "s": 0,
+                      "e": 3
+                    }
+                  ]
+                }
+              ],
+              [
+                "C1",
+                3,
+                "SG-C1",
+                [],
+                null,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "E5",
+                    "Bm/D",
+                    "E5",
+                    "Bm/D"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  "tabs": [
+                    "SG-M17",
+                    "SG-M19",
+                    "SG-M17",
+                    "SG-M19"
+                  ],
+                  "rep": [
+                    {
+                      "s": 0,
+                      "e": 3
+                    }
+                  ]
+                }
+              ],
+              [
+                "B1",
+                3,
+                "SG-B1",
+                [],
+                null,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Am",
+                    "Am/G#",
+                    "Am/G",
+                    "Am/F#",
+                    "Em/G",
+                    "Aadd9",
+                    "Badd11"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  "tabs": [
+                    "SG-M25",
+                    "SG-M26",
+                    "SG-M27",
+                    "SG-M28",
+                    "SG-M29",
+                    "SG-M30",
+                    "SG-M3"
+                  ],
+                  "br": [
+                    4
+                  ]
+                }
+              ],
+              [
+                "V2",
+                3,
+                "SG-V2",
+                [],
+                null,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Em/B",
+                    "Badd11",
+                    "Em/B",
+                    "Badd11",
+                    "Em/B",
+                    "Badd11",
+                    "Em/B",
+                    "Badd11",
+                    "D6/9",
+                    "C#m7b5",
+                    "Cmaj7",
+                    "E5/A#",
+                    "Badd11"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  "tabs": [
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M9",
+                    "SG-M11",
+                    "SG-M13",
+                    "SG-M14",
+                    "SG-M3"
+                  ],
+                  "br": [
+                    8,
+                    10
+                  ],
+                  "rep": [
+                    {
+                      "s": 0,
+                      "e": 7
+                    }
+                  ]
+                }
+              ],
+              [
+                "C1",
+                3,
+                "SG-C1",
+                [],
+                null,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "E5",
+                    "Bm/D",
+                    "E5",
+                    "Bm/D"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  "tabs": [
+                    "SG-M17",
+                    "SG-M19",
+                    "SG-M17",
+                    "SG-M19"
+                  ],
+                  "rep": [
+                    {
+                      "s": 0,
+                      "e": 3
+                    }
+                  ]
+                }
+              ],
+              [
+                "B1",
+                3,
+                "SG-B1",
+                [],
+                null,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Am",
+                    "Am/G#",
+                    "Am/G",
+                    "Am/F#",
+                    "Em/G",
+                    "Aadd9",
+                    "Badd11"
+                  ],
+                  "at": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  "tabs": [
+                    "SG-M25",
+                    "SG-M26",
+                    "SG-M27",
+                    "SG-M28",
+                    "SG-M29",
+                    "SG-M30",
+                    "SG-M3"
+                  ],
+                  "br": [
+                    4
+                  ]
+                }
+              ]
+            ]
           },
           {
             "song": "Dirty Women",
