@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T01:51:56.137Z",
+  "updatedAt": "2026-11-11T01:52:59.053Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -10034,7 +10034,7 @@
                 3,
                 "IA-V1",
                 1,
-                216.2,
+                216.3,
                 null,
                 null,
                 {
@@ -10049,46 +10049,17 @@
                     "Csus"
                   ],
                   "at": [
-                    -23.8,
+                    -23.9,
                     3,
-                    6,
-                    8.9,
-                    12,
-                    15,
+                    5.9,
+                    8.8,
+                    11.9,
+                    14.9,
                     17.8
                   ]
                 }
               ],
-              [
-                "V1",
-                3,
-                "V1",
-                1,
-                192.4,
-                230.4,
-                null,
-                {
-                  "on": true,
-                  "chords": [
-                    "C",
-                    "Cmaj7",
-                    "Am",
-                    "C",
-                    "F",
-                    "C",
-                    "Csus"
-                  ],
-                  "at": [
-                    23.8,
-                    26.8,
-                    29.8,
-                    32.7,
-                    35.8,
-                    38.7,
-                    41.5
-                  ]
-                }
-              ]
+              null
             ],
             "sectionRulers": [
               {
@@ -15861,9 +15832,9 @@
     {
       "album": "Technical Ecstasy",
       "song": "It's Alright",
-      "endSec": 230.4,
+      "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.404,
+      "riffSaturationIndex": 1.43,
       "chips": [
         {
           "code": "V1",
@@ -15925,24 +15896,16 @@
           "code": "V1",
           "tier": 3,
           "start": 192.4,
-          "stop": 192.4,
-          "duration": null,
+          "stop": 216.3,
+          "duration": 23.9,
           "lick": "IA-V1"
         },
         {
           "code": "V1",
           "tier": 3,
-          "start": 192.4,
-          "stop": 216.2,
-          "duration": 23.8,
-          "lick": "V1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 216.2,
-          "stop": 230.4,
-          "duration": 14.2,
+          "start": 216.3,
+          "stop": null,
+          "duration": null,
           "lick": "IA-V1"
         }
       ]
