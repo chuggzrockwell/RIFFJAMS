@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T01:50:57.349Z",
+  "updatedAt": "2026-11-11T01:51:56.137Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -10034,7 +10034,7 @@
                 3,
                 "IA-V1",
                 1,
-                192.4,
+                216.2,
                 null,
                 null,
                 {
@@ -10049,13 +10049,13 @@
                     "Csus"
                   ],
                   "at": [
-                    0,
+                    -23.8,
                     3,
                     6,
-                    9,
+                    8.9,
                     12,
-                    18,
-                    20.9
+                    15,
+                    17.8
                   ]
                 }
               ],
@@ -15933,17 +15933,17 @@
           "code": "V1",
           "tier": 3,
           "start": 192.4,
-          "stop": 192.4,
-          "duration": null,
-          "lick": "IA-V1"
+          "stop": 216.2,
+          "duration": 23.8,
+          "lick": "V1"
         },
         {
           "code": "V1",
           "tier": 3,
-          "start": 192.4,
+          "start": 216.2,
           "stop": 230.4,
-          "duration": 38,
-          "lick": "V1"
+          "duration": 14.2,
+          "lick": "IA-V1"
         }
       ]
     }
