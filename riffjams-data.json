@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T16:02:36.291Z",
+  "updatedAt": "2026-11-11T19:23:25.397Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -83,7 +83,10 @@
     "AMPSS-PC1": "user-tabs/AMPSS-PC1.png",
     "AMPSS-PC2": "user-tabs/AMPSS-PC2.png",
     "AMPSS-B1": "user-tabs/AMPSS-B1.png",
-    "AMPSS-VI": "user-tabs/AMPSS-VI.png"
+    "AMPSS-VI": "user-tabs/AMPSS-VI.png",
+    "RARD-I1": "user-tabs/RARD-I1.png",
+    "RNRD-V1": "user-tabs/RNRD-V1.png",
+    "RNRD-C1": "user-tabs/RNRD-C1.png"
   },
   "albums": [
     {
@@ -2567,7 +2570,23 @@
         },
         {
           "song": "Rock 'n' Roll Doctor",
-          "sections": []
+          "sections": [
+            [
+              "I1",
+              2,
+              "RNRD-I1"
+            ],
+            [
+              "V1",
+              3,
+              "RNRD-V1"
+            ],
+            [
+              "C1",
+              3,
+              "RNRD-C1"
+            ]
+          ]
         },
         {
           "song": "She's Gone",
@@ -10574,7 +10593,43 @@
           },
           {
             "song": "Rock 'n' Roll Doctor",
-            "chips": []
+            "chips": [
+              [
+                "I1",
+                2,
+                "RNRD-I1",
+                1,
+                0
+              ],
+              [
+                "V1",
+                3,
+                "RNRD-V1",
+                [],
+                null
+              ],
+              [
+                "C1",
+                3,
+                "RNRD-C1",
+                [],
+                null
+              ],
+              [
+                "V1",
+                3,
+                "RNRD-V1",
+                [],
+                null
+              ],
+              [
+                "C1",
+                3,
+                "RNRD-C1",
+                [],
+                null
+              ]
+            ]
           },
           {
             "song": "She's Gone",
@@ -15913,6 +15968,23 @@
           "stop": null,
           "duration": null,
           "lick": "IA-V1"
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "Rock 'n' Roll Doctor",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "RNRD-I1"
         }
       ]
     }
