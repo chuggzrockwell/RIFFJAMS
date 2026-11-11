@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T19:25:54.304Z",
+  "updatedAt": "2026-11-11T19:30:45.430Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -2590,6 +2590,11 @@
               "S1",
               1,
               "S1"
+            ],
+            [
+              "O1",
+              3,
+              "RNRD-O1"
             ]
           ]
         },
@@ -10638,6 +10643,52 @@
                 "S1",
                 1,
                 "S1",
+                [],
+                null,
+                null,
+                null,
+                null,
+                [
+                  "S1-b",
+                  3,
+                  "",
+                  [],
+                  null,
+                  null,
+                  null,
+                  {
+                    "on": true,
+                    "chords": [
+                      "Dm",
+                      "C | G/B | Am",
+                      "C | G/B | G"
+                    ],
+                    "at": [
+                      103.6,
+                      117.7,
+                      121.5
+                    ]
+                  }
+                ]
+              ],
+              [
+                "V1",
+                3,
+                "RNRD-V1",
+                [],
+                null
+              ],
+              [
+                "C1",
+                3,
+                "RNRD-C1",
+                [],
+                null
+              ],
+              [
+                "O1",
+                3,
+                "RNRD-O1",
                 [],
                 null
               ]
