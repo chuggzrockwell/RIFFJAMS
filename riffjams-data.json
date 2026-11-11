@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T00:59:32.264Z",
+  "updatedAt": "2026-11-11T01:00:36.456Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=8",
@@ -10168,6 +10168,13 @@
                   }
                 ]
               ]
+            ],
+            "sectionRulers": [
+              {
+                "name": "Section",
+                "start": 0,
+                "end": 1
+              }
             ]
           },
           {
@@ -10255,7 +10262,8 @@
                 2,
                 "AMPSS-V1",
                 1,
-                242.6
+                242.6,
+                282.9
               ]
             ],
             "sectionRulers": [
@@ -15475,9 +15483,9 @@
     {
       "album": "Technical Ecstasy",
       "song": "All Moving Parts (Stand Still)",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.761,
+      "endSec": 282.9,
+      "complete": true,
+      "riffSaturationIndex": 1.795,
       "chips": [
         {
           "code": "V1",
@@ -15571,8 +15579,8 @@
           "code": "V1",
           "tier": 2,
           "start": 242.6,
-          "stop": null,
-          "duration": null,
+          "stop": 282.9,
+          "duration": 40.3,
           "lick": "AMPSS-V1"
         }
       ]
