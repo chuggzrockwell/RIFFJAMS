@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T01:52:59.053Z",
+  "updatedAt": "2026-11-11T15:42:11.437Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -2526,37 +2526,43 @@
         {
           "song": "All Moving Parts (Stand Still)",
           "sections": [
-            null,
+            [
+              "V1",
+              2,
+              "AMPSS-V1",
+              []
+            ],
             [
               "PC1",
               3,
-              "AMPSS-PC1"
+              "AMPSS-PC1",
+              []
             ],
             [
               "PC2",
               3,
-              "AMPSS-PC2"
+              "AMPSS-PC2",
+              []
             ],
             [
               "B1",
               2,
-              "AMPSS-B1"
+              "AMPSS-B1",
+              []
             ],
             [
               "B2",
               2,
-              "AMPSS-B2"
+              "AMPSS-B2",
+              []
             ],
             [
               "B3",
               3,
-              "AMPSS-B3"
+              "AMPSS-B3",
+              []
             ],
-            [
-              "V1",
-              2,
-              "AMPSS-V1"
-            ]
+            null
           ]
         },
         {
@@ -10075,7 +10081,7 @@
               {
                 "name": "VERSE 5-8",
                 "start": 5,
-                "end": 9
+                "end": 8
               }
             ]
           },
