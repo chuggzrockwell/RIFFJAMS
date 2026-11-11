@@ -1951,6 +1951,24 @@
     flex: 0 0 auto; border: 0; background: transparent; color: #c0392b;
     font-size: 1.05rem; font-weight: 700; line-height: 1; padding: 4px 4px; cursor: pointer;
   }
+  /* Chord tabs: Paste a crop per chord; its preview sits on a line under the chord. */
+  .chip-editor .ce-chord { flex-wrap: wrap; }
+  .chip-editor .ce-chord-paste {
+    flex: 0 0 auto; border: 0; border-radius: 8px; padding: 7px 6px; cursor: pointer; white-space: nowrap;
+    font-size: 0.66rem; font-weight: 800; background: #7030a0; color: #fff;
+  }
+  .chip-editor .ce-chord-paste:hover { filter: brightness(1.12); }
+  .chip-editor .ce-chord.has-tab .ce-chord-paste { background: #f3eef8; color: #7030a0; }
+  .chip-editor .ce-chord-tabprev {
+    flex: 0 0 100%; position: relative; box-sizing: border-box;
+    margin: 2px 0 4px; padding: 4px; border: 1px solid #ddd; border-radius: 9px; background: #fff;
+  }
+  .chip-editor .ce-chord-tabprev img { display: block; width: 100%; max-height: 110px; object-fit: contain; border-radius: 6px; }
+  .chip-editor .ce-chord-tabid { display: block; margin-top: 2px; font-size: 0.6rem; font-weight: 700; color: rgba(0,0,0,.45); }
+  .chip-editor .ce-chord-tabdel {
+    position: absolute; top: 5px; right: 5px; width: 22px; height: 22px; border: 0; border-radius: 50%;
+    background: #111; color: #fff; font-size: 15px; line-height: 1; cursor: pointer;
+  }
   .chip-editor .ce-chord-add {
     margin-top: 6px; border: 1px dashed rgba(0,0,0,.25); background: transparent; color: #1a1020;
     border-radius: 8px; padding: 6px 10px; font-size: 0.72rem; font-weight: 700; cursor: pointer; width: 100%;
@@ -4172,6 +4190,45 @@
     background: #18d060;
     color: #fff;
     box-shadow: inset -2px 0 0 rgba(0,0,0,.25), inset 0 -2px 0 rgba(0,0,0,.25), 0 6px 20px rgba(24,208,96,.35);
+  }
+  /* Chord tabs (chip editor Paste per chord): each chord box centered over its tab crop; the crops
+     get the Peek tab look (white, rounded, red neon glow), green glow on the chord being played. */
+  .ss-chords.has-tabs { width: 100%; box-sizing: border-box; padding: 6px 34px 22px 10px; } /* right: keep the glow off the NEXT panel */
+  .ss-chords.has-tabs .ss-chords-grid {
+    display: grid;
+    width: 100%;
+    grid-auto-rows: auto;
+    column-gap: 34px;
+    row-gap: 34px;
+    align-items: start;
+  }
+  .ss-chord-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+  }
+  .ss-chord-cell .ss-chord { min-width: min(3.2em, 100%); max-width: 100%; }
+  .ss-chord-tab {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: min(40vh, 360px);
+    background: #fff;
+    border-radius: 10px;
+    box-shadow:
+      0 0 6px 1px rgba(237,28,36,.95),
+      0 0 18px 4px rgba(237,28,36,.7),
+      0 0 40px 10px rgba(237,28,36,.4);
+    transition: box-shadow .15s ease;
+  }
+  .ss-chord-cell.is-now .ss-chord-tab {
+    box-shadow:
+      0 0 6px 1px rgba(24,208,96,.95),
+      0 0 18px 4px rgba(24,208,96,.7),
+      0 0 40px 10px rgba(24,208,96,.4);
   }
   /* Repeat signs (chip editor "+ Repeat sign"): start / end bars with dots in the gap beside the
      boxes, the play count above the end bar. */
@@ -6864,8 +6921,19 @@ function ssRenderChordTab(el, songName, item) {
     : c;
   var lineStarts = chordLineStarts(lineSrc, shown.length);
   var repKey = reps.map(function(r){ return r.s + "-" + r.e + "x" + r.n; }).join(",");
+  /* Chord tabs (pasted per chord in the chip editor): each box shown gets the tab of the first
+     chord folded onto it that has one. */
+  var tabShown = [], hasTabs = false;
+  if (Array.isArray(c.tabs)) {
+    names.forEach(function(name, i){
+      var id = c.tabs[i] ? String(c.tabs[i]) : "";
+      var d = dispOf[i];
+      if (id && d != null && !tabShown[d]) { tabShown[d] = id; hasTabs = true; }
+    });
+  }
+  var tabKey = hasTabs ? tabShown.map(function(id){ return id ? id + "=" + lickSrc(id) : ""; }).join(",") : "";
   var key = "ch|" + item.ci + "|" + start + "|" + names.join(" ") + "|" + times.join(",") + "|" + lineStarts.join(",")
-    + "|" + repKey;
+    + "|" + repKey + "|" + tabKey;
   if (el.getAttribute("data-ss-tab") !== key) {
     /* Lines of 4 by default (or where the chip's line breaks say), every box the same size. */
     var line = 0, pos = 0, cols = 1, cells = [];
@@ -6895,15 +6963,28 @@ function ssRenderChordTab(el, songName, item) {
           return '<i class="ss-rep-n" data-rep="' + x.ri + '" data-n="' + x.n + '" title="Repeat: play ' + x.n + ' times">&times;' + x.n + '</i>';
         }).join("") + '</i>';
       }
-      cells.push('<span class="ss-chord" data-i="' + i + '" style="grid-row:' + (line + 1) + ';grid-column:' + (pos + 1) + '">' + ssEscAttr(name) + signs + '</span>');
+      var place = 'grid-row:' + (line + 1) + ';grid-column:' + (pos + 1);
+      if (hasTabs) {
+        /* Chord box centered over its tab crop (no tab: just the box). */
+        cells.push('<div class="ss-chord-cell" data-i="' + i + '" style="' + place + '">'
+          + '<span class="ss-chord" data-i="' + i + '">' + ssEscAttr(name) + signs + '</span>'
+          + (tabShown[i] ? '<img class="ss-chord-tab" alt="' + ssEscAttr(name) + ' tab" src="' + ssEscAttr(lickSrc(tabShown[i])) + '">' : '')
+          + '</div>');
+      } else {
+        cells.push('<span class="ss-chord" data-i="' + i + '" style="' + place + '">' + ssEscAttr(name) + signs + '</span>');
+      }
       pos++;
       if (pos > cols) cols = pos;
     });
-    var html = '<div class="ss-chords" aria-label="' + ssEscAttr(item.code) + ' chords">'
-      + '<div class="ss-chords-grid' + (reps.length ? ' has-rep' : '') + '" style="grid-template-columns: repeat(' + cols + ', 1fr)'
+    var html = '<div class="ss-chords' + (hasTabs ? ' has-tabs' : '') + '" aria-label="' + ssEscAttr(item.code) + ' chords">'
+      + '<div class="ss-chords-grid' + (reps.length ? ' has-rep' : '') + '" style="grid-template-columns: repeat(' + cols + ', ' + (hasTabs ? 'minmax(0, 1fr)' : '1fr') + ')'
       + (reps.length ? ';--rep-extra:' + ((stack - 1) * 0.44).toFixed(2) + 'em' : '') + '">' + cells.join("");
     html += '</div></div>';
     el.innerHTML = html;
+    el.querySelectorAll("img.ss-chord-tab").forEach(function(img){
+      img.onerror = function(){ img.hidden = true; }; /* not uploaded yet on this browser: just the chord */
+      img.onload = function(){ if (typeof ssPlaceNextPanel === "function") ssPlaceNextPanel(); };
+    });
     el.setAttribute("data-ss-tab", key);
     el.classList.remove("ss-tab-below-cue");
     el.classList.add("ss-chords-on");
@@ -6940,7 +7021,7 @@ function ssChordTick(force) {
   var sig = cur + "|" + Object.keys(passes).map(function(k){ return k + ":" + passes[k]; }).join(",");
   if (!force && sig === v.sig) return;
   v.sig = sig;
-  el.querySelectorAll(".ss-chord").forEach(function(s){
+  el.querySelectorAll(".ss-chord, .ss-chord-cell").forEach(function(s){
     s.classList.toggle("is-now", parseInt(s.getAttribute("data-i"), 10) === cur);
   });
   /* Repeats being played (nested ones too): count shows the passes left (this one included);
@@ -14597,7 +14678,7 @@ function ensureChipEditResizeObserver() {
 }
 /* -- Chip editor: Chord change mode --
    Times are shown and typed as song times (like Start time); saved as offsets from the chip start. */
-var chordEdit = { song: "", code: "", byCode: false, dirty: false, brSet: false };
+var chordEdit = { song: "", code: "", byCode: false, dirty: false, brSet: false, pending: {} };
 function chordEditorPlayerSec() {
   var sec = null;
   try { if (smYtPlayer && smYtPlayer.getCurrentTime) sec = smPlayerTimeNow(); } catch (eCh) { sec = null; }
@@ -14623,7 +14704,8 @@ function chordEditorReadRows() {
     out.push({
       name: String((nameInp && nameInp.value) || "").trim(),
       t: timeInp ? parseChipTimeInput(timeInp.value) : null,
-      br: !!row.querySelector(".ce-chord-br.on")
+      br: !!row.querySelector(".ce-chord-br.on"),
+      tab: row.getAttribute("data-tab") || ""
     });
   });
   return out;
@@ -14689,7 +14771,10 @@ function chordEditorRenderRows(rows) {
     ci++;
     var v = (r.t != null && isFinite(r.t)) ? formatChipTime(r.t) : "";
     var br = ci > 0 && (chordEdit.brSet ? !!r.br : ci % 4 === 0); /* no custom breaks yet: lines of 4 */
-    return '<div class="ce-chord' + (inRep[i] ? ' in-rep' : '') + (inRep[i] > 1 ? ' in-rep-2' : '') + '" data-i="' + i + '">'
+    var tab = String(r.tab || "");
+    var tabSrc = tab ? chordTabSrc(tab) : "";
+    return '<div class="ce-chord' + (inRep[i] ? ' in-rep' : '') + (inRep[i] > 1 ? ' in-rep-2' : '') + (tab ? ' has-tab' : '') + '" data-i="' + i + '"'
+      + (tab ? ' data-tab="' + songMetaEscapeAttr(tab) + '"' : '') + '>'
       + '<span class="ce-chord-drag" title="Drag to move this chord" aria-hidden="true">&#8801;</span>'
       + '<span class="ce-chord-num">Chord ' + (ci + 1) + '</span>'
       + '<input type="text" class="ce-chord-name" value="' + songMetaEscapeAttr(r.name || "") + '" maxlength="40"'
@@ -14697,9 +14782,13 @@ function chordEditorRenderRows(rows) {
       + '<input type="text" class="ce-chord-time" value="' + v + '" maxlength="12"'
       + ' placeholder="' + (ci === 0 ? "chip start" : "0:00") + '" autocomplete="off" inputmode="decimal" aria-label="Chord ' + (ci + 1) + ' time">'
       + '<button type="button" class="ce-chord-grab" title="Grab current Song Map player time">Set</button>'
+      + '<button type="button" class="ce-chord-paste" title="Paste a tab crop for this chord (shows under it in Single Song)">Paste</button>'
       + '<button type="button" class="ce-chord-br' + (br ? ' on' : '') + '"' + (ci === 0 ? ' disabled' : '')
       + ' title="Start a new line at this chord" aria-pressed="' + (br ? 'true' : 'false') + '">&#8629;</button>'
       + '<button type="button" class="ce-chord-del" title="Remove this chord" aria-label="Remove chord ' + (ci + 1) + '">&times;</button>'
+      + (tab ? '<div class="ce-chord-tabprev"><img src="' + songMetaEscapeAttr(tabSrc) + '" alt="Chord ' + (ci + 1) + ' tab">'
+        + '<span class="ce-chord-tabid">' + songMetaEscapeAttr(tab) + '</span>'
+        + '<button type="button" class="ce-chord-tabdel" title="Remove this chord\'s tab" aria-label="Remove chord ' + (ci + 1) + ' tab">&times;</button></div>' : '')
       + '</div>';
   }).join("");
   chordEditorMarkTapNext();
@@ -14771,6 +14860,7 @@ function chordEditorFill(state) {
   if (!row || !on || !body) return;
   row.hidden = false;
   chordEdit.dirty = false;
+  chordTabDropPending();
   var es = getEditSong(state.ai, state.si);
   var pair = null;
   var base = (state.startSec != null && isFinite(state.startSec)) ? state.startSec : 0;
@@ -14800,7 +14890,8 @@ function chordEditorFill(state) {
     /* Bracket order for nesting: outer starts first, inner ends first. */
     reps.filter(function(r){ return r.s === i; }).sort(function(a, b){ return b.e - a.e; })
       .forEach(function(){ rows.push({ rep: "s" }); });
-    rows.push({ name: name, t: (off != null && isFinite(off)) ? base + Number(off) : null, br: starts.indexOf(i) >= 0 });
+    rows.push({ name: name, t: (off != null && isFinite(off)) ? base + Number(off) : null, br: starts.indexOf(i) >= 0,
+      tab: (c && Array.isArray(c.tabs) && c.tabs[i]) ? String(c.tabs[i]) : "" });
     reps.filter(function(r){ return r.e === i; }).sort(function(a, b){ return b.s - a.s; })
       .forEach(function(){ rows.push({ rep: "e" }); });
   });
@@ -14845,7 +14936,103 @@ function chordEditorRead(startSec, passStarts) {
     rows.forEach(function(r, i){ if (i > 0 && r.br) data.br.push(i); });
   }
   if (rep.length) data.rep = rep;
+  /* Chord tabs (Paste on a chord row): one tab id per chord, like `at`; pasted crops get staged
+     for the Batch upload as the chip is saved. */
+  if (rows.some(function(r){ return !!r.tab; })) {
+    data.tabs = rows.map(function(r){ return r.tab || null; });
+    chordTabStagePending(data.tabs);
+  }
   return data;
+}
+/* -- Chord tabs: a pasted tab crop per chord (Chord change mode). Held in the editor until Save,
+   then staged under its own id (e.g. SG-V1-CH2) so it rides the Batch upload like chip crops. -- */
+function chordTabSrc(id) {
+  var p = chordEdit.pending && chordEdit.pending[id];
+  return p ? p.url : lickSrc(id);
+}
+function chordTabDropPending() {
+  var pend = chordEdit.pending || {};
+  Object.keys(pend).forEach(function(id){ try { URL.revokeObjectURL(pend[id].url); } catch (eRv) {} });
+  chordEdit.pending = {};
+}
+function chordTabStagePending(ids) {
+  var api = window.RIFFJAMS_TAB_CROPS;
+  var pend = chordEdit.pending || {};
+  (ids || []).forEach(function(id){
+    if (!id || !pend[id]) return;
+    if (api && typeof api.stage === "function") {
+      api.stage(id, pend[id].blob);
+    } else {
+      window.RIFFJAMS_ASSETS = window.RIFFJAMS_ASSETS || {};
+      window.RIFFJAMS_ASSETS[id] = pend[id].url; /* no uploader: at least show it this session */
+    }
+    delete pend[id];
+  });
+}
+/** New tab id for a chord row: the chip's tab name (or song prefix + chip code) + -CH<n>, never
+    one already used by this chip's rows, a pending paste, or an existing asset. */
+function chordTabNewId(chordNum) {
+  var api = window.RIFFJAMS_TAB_CROPS;
+  function clean(v) {
+    return api && api.safeId ? api.safeId(v)
+      : String(v || "").trim().replace(/\s+/g, "-").replace(/[^A-Za-z0-9_-]/g, "").replace(/-+/g, "-");
+  }
+  var code = String((document.getElementById("chipEditId") || {}).value || chordEdit.code || "").trim().toUpperCase();
+  var lick = String((document.getElementById("chipEditLick") || {}).value || "").trim();
+  var pref = SECTION_SONG_PREFIX[chordEdit.song] || "";
+  if (!pref && chordEdit.song) {
+    pref = String(chordEdit.song).split(/[\s\/]+/).map(function(w){
+      return (w.replace(/[^A-Za-z0-9]/g, "").charAt(0) || "");
+    }).join("").toUpperCase();
+    if (pref) pref += "-";
+  }
+  /* A tab name that is just the chip code (e.g. "V1") is not song-unique: use the song prefix. */
+  var ownLick = lick && lick.indexOf("-") > 0 && lick.toUpperCase() !== code;
+  var base = clean(ownLick ? lick : ((pref + code) || code || "CHORD"));
+  var used = {};
+  document.querySelectorAll("#chipEditChordList .ce-chord[data-tab]").forEach(function(r){ used[r.getAttribute("data-tab")] = true; });
+  Object.keys(chordEdit.pending || {}).forEach(function(id){ used[id] = true; });
+  var assets = window.RIFFJAMS_ASSETS || {};
+  var n = Math.max(1, chordNum | 0);
+  while (used[base + "-CH" + n] || assets[base + "-CH" + n]) n++;
+  return base + "-CH" + n;
+}
+/** Put an image (Blob/File) on a chord row: normalized to PNG, kept pending until Save. */
+async function chordTabAccept(row, file) {
+  if (!row || !file) return;
+  var list = document.getElementById("chipEditChordList");
+  if (!list) return;
+  try {
+    var api = window.RIFFJAMS_TAB_CROPS;
+    var blob = (api && typeof api.normalize === "function") ? await api.normalize(file) : file;
+    var idx = Array.prototype.indexOf.call(list.children, row);
+    if (idx < 0) return;
+    var rows = chordEditorReadRows();
+    var chordNum = 0;
+    for (var k = 0; k <= idx; k++) if (!rows[k].rep) chordNum++;
+    var id = rows[idx].tab || chordTabNewId(chordNum);
+    var old = chordEdit.pending[id];
+    if (old) { try { URL.revokeObjectURL(old.url); } catch (eRv) {} }
+    chordEdit.pending[id] = { blob: blob, url: URL.createObjectURL(blob) };
+    rows[idx].tab = id;
+    chordEdit.dirty = true;
+    chordEditorRenderRows(rows);
+  } catch (err) {
+    alert((err && err.message) || "Could not use that image.");
+  }
+}
+async function chordTabPasteFromClipboard(row) {
+  try {
+    if (!navigator.clipboard || !navigator.clipboard.read) throw new Error("Clipboard paste is not available in this browser - click the chord, then press Ctrl+V.");
+    var items = await navigator.clipboard.read();
+    for (var i = 0; i < items.length; i++) {
+      var type = items[i].types.find(function(t){ return t.indexOf("image/") === 0; });
+      if (type) { await chordTabAccept(row, await items[i].getType(type)); return; }
+    }
+    throw new Error("There is no screenshot on the clipboard.");
+  } catch (err) {
+    alert((err && err.message) || "The screenshot could not be pasted.");
+  }
 }
 (function(){
   var on = document.getElementById("chipEditChordOn");
@@ -14887,6 +15074,24 @@ function chordEditorRead(startSec, passStarts) {
       brBtn.setAttribute("aria-pressed", onNow ? "true" : "false");
       return;
     }
+    var pasteBtn = e.target.closest(".ce-chord-paste");
+    if (pasteBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      chordTabPasteFromClipboard(pasteBtn.closest(".ce-chord"));
+      return;
+    }
+    var tabDel = e.target.closest(".ce-chord-tabdel");
+    if (tabDel) {
+      e.preventDefault();
+      e.stopPropagation();
+      var tabRow = tabDel.closest(".ce-chord");
+      var tabIdx = Array.prototype.indexOf.call(list.children, tabRow);
+      var tabRows = chordEditorReadRows();
+      if (tabRows[tabIdx]) tabRows[tabIdx].tab = "";
+      chordEditorRenderRows(tabRows);
+      return;
+    }
     var grab = e.target.closest(".ce-chord-grab");
     var del = e.target.closest(".ce-chord-del");
     if (!grab && !del) return;
@@ -14905,6 +15110,21 @@ function chordEditorRead(startSec, passStarts) {
     var inp = row && row.querySelector(".ce-chord-time");
     if (inp) inp.value = formatChipTime(sec);
     chordEditorMarkTapNext();
+  });
+  /* Ctrl+V with a chord row focused: the image goes on that chord (not the chip's own crop). */
+  list.addEventListener("paste", function(e){
+    var row = e.target && e.target.closest ? e.target.closest(".ce-chord") : null;
+    if (!row || row.classList.contains("ce-rep")) return;
+    var items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+    for (var pi = 0; pi < items.length; pi++) {
+      if (items[pi].type.indexOf("image/") === 0) {
+        e.preventDefault();
+        e.stopPropagation();
+        chordTabAccept(row, items[pi].getAsFile());
+        return;
+      }
+    }
   });
   list.addEventListener("input", chordEditorMarkTapNext);
   list.addEventListener("change", function(e){
@@ -19375,7 +19595,7 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=442"></script>
+<script src="riffjams-admin.js?v=443"></script>
 <div id="rjTimer" aria-label="Practice timer">
   <span class="rjt-time" id="rjtTime">0:00:00</span>
   <button type="button" id="rjtPlay" title="Play" aria-label="Play">&#9654;</button>

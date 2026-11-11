@@ -361,6 +361,27 @@
     updateBatchButton();
   }
 
+  /* Chord change tabs: the chip editor pastes a crop onto a chord and stages it here under its
+     own id (e.g. SG-V1-CH2) on Save, so it shows right away and rides the next Batch upload. */
+  async function stageCrop(id, blob) {
+    id = safeId(id);
+    if (!id || !blob) return "";
+    var old = staged[id];
+    if (old && old.url) URL.revokeObjectURL(old.url);
+    var url = URL.createObjectURL(blob);
+    staged[id] = { blob: blob, url: url };
+    window.RIFFJAMS_ASSETS = window.RIFFJAMS_ASSETS || {};
+    window.RIFFJAMS_ASSETS[id] = url;
+    updateBatchButton();
+    await idbRun("readwrite", function (store) { return store.put(blob, id); });
+    return url;
+  }
+  window.RIFFJAMS_TAB_CROPS = {
+    normalize: normalizeToPng,
+    stage: stageCrop,
+    safeId: safeId
+  };
+
   async function restoreStaged() {
     var db = await idb();
     if (!db) return;
