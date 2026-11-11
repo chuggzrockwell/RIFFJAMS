@@ -4212,6 +4212,9 @@
     min-width: 0;
   }
   .ss-chord-cell .ss-chord { min-width: min(3.2em, 100%); max-width: 100%; }
+  .ss-chord-tabwrap { position: relative; display: block; width: fit-content; max-width: 100%; line-height: 0; }
+  .ss-chord-tabwrap .ss-rep-bar { top: 0; bottom: 0; }
+  .ss-chords.has-tabs .ss-chords-grid.has-rep { padding-right: calc(1em + var(--rep-extra, 0em)); } /* end sign clear of NEXT */
   .ss-chord-tab {
     display: block;
     width: auto;
@@ -6968,9 +6971,10 @@ function ssRenderChordTab(el, songName, item) {
       var place = 'grid-row:' + (line + 1) + ';grid-column:' + (pos + 1);
       if (hasTabs) {
         /* Chord box centered over its tab crop (no tab: just the box). */
+        /* Repeat signs frame the tab crop (its full width), not the chord box. */
         cells.push('<div class="ss-chord-cell" data-i="' + i + '" style="' + place + '">'
-          + '<span class="ss-chord" data-i="' + i + '">' + ssEscAttr(name) + signs + '</span>'
-          + (tabShown[i] ? '<img class="ss-chord-tab" alt="' + ssEscAttr(name) + ' tab" src="' + ssEscAttr(lickSrc(tabShown[i])) + '">' : '')
+          + '<span class="ss-chord" data-i="' + i + '">' + ssEscAttr(name) + (tabShown[i] ? '' : signs) + '</span>'
+          + (tabShown[i] ? '<span class="ss-chord-tabwrap"><img class="ss-chord-tab" alt="' + ssEscAttr(name) + ' tab" src="' + ssEscAttr(lickSrc(tabShown[i])) + '">' + signs + '</span>' : '')
           + '</div>');
       } else {
         cells.push('<span class="ss-chord" data-i="' + i + '" style="' + place + '">' + ssEscAttr(name) + signs + '</span>');
