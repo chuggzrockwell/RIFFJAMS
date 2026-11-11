@@ -4175,14 +4175,17 @@
   }
   /* Repeat signs (chip editor "+ Repeat sign"): start / end bars with dots in the gap beside the
      boxes, the play count above the end bar. */
-  .ss-chords-grid.has-rep { column-gap: .64em; row-gap: .5em; padding: .32em .5em 0; }
+  .ss-chords-grid.has-rep {
+    column-gap: calc(.64em + var(--rep-extra, 0em)); row-gap: .5em;
+    padding: .32em calc(.5em + var(--rep-extra, 0em)) 0;
+  }
   .ss-chord { position: relative; }
   .ss-rep-bar {
     position: absolute; top: .06em; bottom: .06em; width: .38em;
     color: #fff; pointer-events: none;
   }
   .ss-rep-l {
-    right: 100%; margin-right: .1em;
+    right: 100%; margin-right: calc(.1em + var(--rep-k, 0) * .44em);
     background:
       linear-gradient(currentColor, currentColor) 0 0 / .11em 100% no-repeat,
       linear-gradient(currentColor, currentColor) .17em 0 / .045em 100% no-repeat,
@@ -4190,7 +4193,7 @@
       radial-gradient(circle closest-side, currentColor 90%, transparent) .25em 67% / .13em .13em no-repeat;
   }
   .ss-rep-r {
-    left: 100%; margin-left: .1em;
+    left: 100%; margin-left: calc(.1em + var(--rep-k, 0) * .44em);
     background:
       radial-gradient(circle closest-side, currentColor 90%, transparent) 0 33% / .13em .13em no-repeat,
       radial-gradient(circle closest-side, currentColor 90%, transparent) 0 67% / .13em .13em no-repeat,
@@ -6865,27 +6868,39 @@ function ssRenderChordTab(el, songName, item) {
   if (el.getAttribute("data-ss-tab") !== key) {
     /* Lines of 4 by default (or where the chip's line breaks say), every box the same size. */
     var line = 0, pos = 0, cols = 1, cells = [];
-    var repS = {}, repE = {};
+    var repS = {}, repE = {}, stack = 1;
     reps.forEach(function(r, ri){
-      repS[dispOf[r.s]] = true;
+      var ds = dispOf[r.s];
+      repS[ds] = (repS[ds] || 0) + 1;
       var d = dispOf[r.s + r.p - 1];
-      (repE[d] = repE[d] || []).push({ n: r.n, ri: ri });
+      (repE[d] = repE[d] || []).push({ n: r.n, ri: ri, s: r.s });
     });
+    Object.keys(repS).forEach(function(k){ stack = Math.max(stack, repS[k]); });
+    Object.keys(repE).forEach(function(k){ stack = Math.max(stack, repE[k].length); });
     shown.forEach(function(name, i){
       if (i && lineStarts.indexOf(i) >= 0) { line++; pos = 0; }
-      /* Nested repeats ending on the same box share one end bar; each keeps its own count. */
-      var ends = repE[i] || [];
-      var signs = (repS[i] ? '<i class="ss-rep-bar ss-rep-l" aria-hidden="true"></i>' : '')
-        + (ends.length ? '<i class="ss-rep-bar ss-rep-r" data-reps="' + ends.map(function(x){ return x.ri; }).join(",") + '" aria-hidden="true"></i>'
-          + '<i class="ss-rep-ns">' + ends.map(function(x){
-            return '<i class="ss-rep-n" data-rep="' + x.ri + '" data-n="' + x.n + '" title="Repeat: play ' + x.n + ' times">&times;' + x.n + '</i>';
-          }).join("") + '</i>' : '');
+      /* One sign per repeat: nested repeats starting / ending on the same box stack outward
+         (||: ||: F ... Cm :|| ... G :|| :||), innermost next to the box, each end with its count. */
+      var ends = (repE[i] || []).slice().sort(function(a, b){ return b.s - a.s; });
+      var signs = "", k;
+      for (k = 0; k < (repS[i] || 0); k++) {
+        signs += '<i class="ss-rep-bar ss-rep-l" style="--rep-k:' + k + '" aria-hidden="true"></i>';
+      }
+      ends.forEach(function(x, k2){
+        signs += '<i class="ss-rep-bar ss-rep-r" style="--rep-k:' + k2 + '" data-reps="' + x.ri + '" aria-hidden="true"></i>';
+      });
+      if (ends.length) {
+        signs += '<i class="ss-rep-ns">' + ends.map(function(x){
+          return '<i class="ss-rep-n" data-rep="' + x.ri + '" data-n="' + x.n + '" title="Repeat: play ' + x.n + ' times">&times;' + x.n + '</i>';
+        }).join("") + '</i>';
+      }
       cells.push('<span class="ss-chord" data-i="' + i + '" style="grid-row:' + (line + 1) + ';grid-column:' + (pos + 1) + '">' + ssEscAttr(name) + signs + '</span>');
       pos++;
       if (pos > cols) cols = pos;
     });
     var html = '<div class="ss-chords" aria-label="' + ssEscAttr(item.code) + ' chords">'
-      + '<div class="ss-chords-grid' + (reps.length ? ' has-rep' : '') + '" style="grid-template-columns: repeat(' + cols + ', 1fr)">' + cells.join("");
+      + '<div class="ss-chords-grid' + (reps.length ? ' has-rep' : '') + '" style="grid-template-columns: repeat(' + cols + ', 1fr)'
+      + (reps.length ? ';--rep-extra:' + ((stack - 1) * 0.44).toFixed(2) + 'em' : '') + '">' + cells.join("");
     html += '</div></div>';
     el.innerHTML = html;
     el.setAttribute("data-ss-tab", key);
