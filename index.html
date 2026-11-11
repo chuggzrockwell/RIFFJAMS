@@ -4229,6 +4229,23 @@
   body.ss-tab-sheet .ss-chords.has-tabs .ss-chord { font-size: .5em; }
   body.ss-tab-sheet .ss-chord-tabwrap { max-width: none; }
   body.ss-tab-sheet .ss-chord-tab { max-width: none; max-height: none; padding: 10px; box-sizing: content-box; }
+  /* Whole-song tab sheet: scroll box under the chip strip, auto-scrolled to the row being played. */
+  body.sections-mode.sections-single-song.ss-tab-sheet .ss-section-tab.ss-sheet-on {
+    overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-top: 14px;
+  }
+  .ss-sheet .ss-chord-cell { position: relative; }
+  .ss-sheet-sec {
+    position: absolute; left: 0; top: 0;
+    font-family: "Montserrat", "Segoe UI", system-ui, sans-serif; font-size: .3em; font-weight: 800; line-height: 1;
+    padding: .3em .7em; border-radius: 999px; background: #fff; color: #111; letter-spacing: .04em;
+  }
+  .ss-chord.is-next { background: #ffd21f; color: #111; }
+  .ss-chord-cell.is-next .ss-chord-tab {
+    box-shadow:
+      0 0 6px 1px rgba(255,210,31,.95),
+      0 0 18px 4px rgba(255,210,31,.7),
+      0 0 40px 10px rgba(255,210,31,.4);
+  }
   .ss-chord-tab {
     display: block;
     width: auto;
@@ -7068,9 +7085,113 @@ function ssSyncTabSheetClass(songName) {
   var on = !!(singleSongMode && SS_TAB_SHEET_SONGS[songName != null ? songName : singleSongName]);
   if (document.body.classList.contains("ss-tab-sheet") !== on) document.body.classList.toggle("ss-tab-sheet", on);
 }
+/* Tab-sheet view: the whole song's chords in play order (repeats written out, a new line at each
+   section), auto-scrolled so the row being played sits at the top and the next chords are always on
+   screen. Current chord green, next chord yellow. */
+var ssSheetView = null;
+function ssSheetSeq(songName) {
+  var song = smFindArrangementSongByName(songName);
+  if (song && singleSongMode) song = ssSongView(song);
+  var out = [];
+  ((song && song.chips) || []).forEach(function(p, ci){
+    if (!isChipPair(p)) return;
+    var lp = ssLayerPair(p), c = chipChords(lp);
+    if (!c || !c.on) return;
+    var start = chipStartSec(p);
+    chordNamesOf(c).forEach(function(name, i){
+      var off = Array.isArray(c.at) ? c.at[i] : null, t = null;
+      if (start != null) {
+        if (off != null && isFinite(off)) t = start + Number(off);
+        else if (i === 0) t = start;
+      }
+      out.push({ name: name, tab: (Array.isArray(c.tabs) && c.tabs[i]) ? String(c.tabs[i]) : "", t: t,
+        code: String(lp[0] || ""), first: i === 0 });
+    });
+  });
+  return out;
+}
+function ssRenderTabSheet(el, songName) {
+  var seq = ssSheetSeq(songName);
+  if (!seq.length) return false;
+  var key = "sheet|" + songName + "|" + seq.map(function(x){
+    return x.code + ":" + x.name + "~" + (x.tab ? x.tab + "=" + lickSrc(x.tab) : "") + "~" + x.t;
+  }).join(",");
+  if (el.getAttribute("data-ss-tab") !== key) {
+    var html = seq.map(function(x, i){
+      return (x.first && i ? '<i class="ss-chord-linebr" aria-hidden="true"></i>' : '')
+        + '<div class="ss-chord-cell" data-i="' + i + '">'
+        + (x.first ? '<span class="ss-sheet-sec">' + ssEscText(x.code) + '</span>' : '')
+        + '<span class="ss-chord" data-i="' + i + '">' + ssEscText(x.name) + '</span>'
+        + (x.tab ? '<span class="ss-chord-tabwrap"><img class="ss-chord-tab" alt="' + ssEscAttr(x.name) + ' tab" src="' + ssEscAttr(lickSrc(x.tab)) + '"></span>' : '')
+        + '</div>';
+    }).join("");
+    el.innerHTML = '<div class="ss-chords has-tabs ss-sheet" aria-label="' + ssEscAttr(songName) + ' chords"><div class="ss-chords-grid">' + html + '</div></div>';
+    el.setAttribute("data-ss-tab", key);
+    el.classList.remove("ss-tab-below-cue");
+    el.classList.add("ss-chords-on");
+    el.classList.add("ss-sheet-on");
+    el.scrollTop = 0;
+    el.querySelectorAll("img.ss-chord-tab").forEach(function(img){
+      img.onerror = function(){ img.hidden = true; };
+    });
+    var layout = document.querySelector("#sectionsSheet .ss-layout");
+    var before = document.getElementById("ssNotesPanel") || document.getElementById("smArrNextPanel");
+    if (layout && before && el.parentNode !== layout) layout.insertBefore(el, before);
+    ssChordView = null;
+    ssSheetView = { key: key, times: seq.map(function(x){ return x.t; }), cur: -2 };
+    ssSheetTick(true);
+  } else {
+    ssSheetTick(false);
+  }
+  return true;
+}
+/** Per frame: green on the chord being played, yellow on the next one, and keep the playing row at
+    the top of the scroll box. */
+function ssSheetTick(force) {
+  var v = ssSheetView;
+  if (!v) return;
+  var el = document.getElementById("ssSectionTab");
+  if (!el || el.getAttribute("data-ss-tab") !== v.key) { ssSheetView = null; return; }
+  /* Scroll box fills the screen below the chip strip. */
+  var top = el.getBoundingClientRect().top;
+  var maxH = Math.max(220, Math.floor((window.innerHeight || 800) - Math.max(top, 0) - 12));
+  if (Math.abs((parseFloat(el.style.maxHeight) || 0) - maxH) > 2) el.style.maxHeight = maxH + "px";
+  var t = smPlayerTimeNow();
+  var cur = -1, best = -Infinity, firstTimed = -1;
+  v.times.forEach(function(tt, i){
+    if (tt == null) return;
+    if (firstTimed < 0) firstTimed = i;
+    if (tt <= t && tt >= best) { best = tt; cur = i; }
+  });
+  if (!force && cur === v.cur) return;
+  var moved = cur !== v.cur;
+  v.cur = cur;
+  var next = cur >= 0 ? (cur + 1 < v.times.length ? cur + 1 : -1) : firstTimed;
+  el.querySelectorAll(".ss-chord-cell").forEach(function(cell){
+    var i = parseInt(cell.getAttribute("data-i"), 10);
+    cell.classList.toggle("is-now", i === cur);
+    cell.classList.toggle("is-next", i === next);
+    var lab = cell.querySelector(".ss-chord");
+    if (lab) { lab.classList.toggle("is-now", i === cur); lab.classList.toggle("is-next", i === next); }
+  });
+  if (!moved && !force) return;
+  var target = cur >= 0 ? el.querySelector('.ss-chord-cell[data-i="' + cur + '"]') : null;
+  var y = 0;
+  if (target) y = Math.max(0, el.scrollTop + target.getBoundingClientRect().top - el.getBoundingClientRect().top - 14);
+  if (Math.abs(el.scrollTop - y) > 2) {
+    try { el.scrollTo({ top: y, behavior: force ? "auto" : "smooth" }); } catch (eSc) { el.scrollTop = y; }
+  }
+}
 function ssUpdateSectionTab(songName, pick) {
   ssSyncTabSheetClass(songName);
   var el = document.getElementById("ssSectionTab");
+  if (el && SS_TAB_SHEET_SONGS[songName] && ssRenderTabSheet(el, songName)) return;
+  ssSheetView = null;
+  if (el && el.classList.contains("ss-sheet-on")) {
+    el.classList.remove("ss-sheet-on");
+    el.style.maxHeight = "";
+    el.setAttribute("data-ss-tab", "~");
+  }
   if (!el) return;
   var item = pick && pick.current ? ssLayerItem(pick.current) : null; /* Solo off: layer B */
   if (item && item.code && ssRenderChordTab(el, songName, item)) return;
@@ -13233,6 +13354,7 @@ function smUpdateArrNextCue(force) {
   var timed = smCollectTimedArrChips(song);
   var t = smPlayerTimeNow();
   if (inSingle && ssChordView) ssChordTick(false);
+  if (inSingle && ssSheetView) ssSheetTick(false);
   var pick = smPickArrNextCue(timed, t);
   /* Single Song Loop: inside the loop, NEXT after the last looped chip is the loop start. */
   var loopWrapAt = null;
