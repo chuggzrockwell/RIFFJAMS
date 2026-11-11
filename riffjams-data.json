@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T15:42:11.437Z",
+  "updatedAt": "2026-11-11T16:02:36.291Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -82,7 +82,8 @@
     "AMPSS-1I": "user-tabs/AMPSS-1I.png",
     "AMPSS-PC1": "user-tabs/AMPSS-PC1.png",
     "AMPSS-PC2": "user-tabs/AMPSS-PC2.png",
-    "AMPSS-B1": "user-tabs/AMPSS-B1.png"
+    "AMPSS-B1": "user-tabs/AMPSS-B1.png",
+    "AMPSS-VI": "user-tabs/AMPSS-VI.png"
   },
   "albums": [
     {
@@ -2529,8 +2530,7 @@
             [
               "V1",
               2,
-              "AMPSS-V1",
-              []
+              "AMPSS-VI"
             ],
             [
               "PC1",
