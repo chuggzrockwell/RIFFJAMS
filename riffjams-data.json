@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T01:02:28.026Z",
+  "updatedAt": "2026-11-11T01:42:14.200Z",
   "assets": {
     "12": "user-tabs/12.png",
-    "V1": "user-tabs/V1.png?v=8",
+    "V1": "user-tabs/V1.png?v=9",
     "PC1": "user-tabs/PC1.png?v=3",
     "PC2": "user-tabs/PC2.png?v=2",
     "B1": "user-tabs/B1.png?v=9",
@@ -2483,7 +2483,8 @@
             [
               "S1",
               1,
-              "S1"
+              "S1",
+              []
             ]
           ]
         },
@@ -9757,7 +9758,7 @@
               [
                 "V1",
                 3,
-                "",
+                "V1",
                 1,
                 0,
                 null,
@@ -9775,12 +9776,12 @@
                   ],
                   "at": [
                     null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    3.4,
+                    6.6,
+                    9.8,
+                    13,
+                    19.3,
+                    22.4
                   ]
                 }
               ],
@@ -9789,7 +9790,7 @@
                 3,
                 "V1",
                 1,
-                25.3,
+                25.4,
                 null,
                 null,
                 {
@@ -9804,13 +9805,13 @@
                     "Csus"
                   ],
                   "at": [
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    0,
+                    3.1,
+                    6.3,
+                    9.4,
+                    12.4,
+                    18.5,
+                    21.5
                   ]
                 }
               ],
@@ -9819,7 +9820,7 @@
                 3,
                 "V1",
                 1,
-                25.3,
+                49.9,
                 null,
                 null,
                 {
@@ -9834,32 +9835,117 @@
                     "Csus"
                   ],
                   "at": [
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    0.1,
+                    3.1,
+                    6.2,
+                    9.2,
+                    12.2,
+                    18.2,
+                    21.2
                   ]
                 }
               ],
-              null,
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                74.1,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "C",
+                    "Cmaj7",
+                    "Am",
+                    "C",
+                    "F",
+                    "C",
+                    "Csus"
+                  ],
+                  "at": [
+                    0,
+                    3,
+                    6,
+                    9.1,
+                    12.1,
+                    18,
+                    21.1
+                  ]
+                }
+              ],
               [
                 "S1",
                 1,
                 "S1",
                 1,
-                98
+                98,
+                null,
+                null,
+                null,
+                [
+                  "S1-b",
+                  3,
+                  "",
+                  [],
+                  null,
+                  null,
+                  null,
+                  {
+                    "on": true,
+                    "chords": [
+                      "F",
+                      "Cm",
+                      "F",
+                      "Cm",
+                      "Ab",
+                      "Bb",
+                      "G",
+                      "F",
+                      "Cm",
+                      "F",
+                      "Cm",
+                      "Ab",
+                      "Bb",
+                      "G"
+                    ],
+                    "at": [
+                      -0.1,
+                      3,
+                      5.8,
+                      8.8,
+                      11.7,
+                      14.6,
+                      17.6,
+                      23.5,
+                      26.5,
+                      29.3,
+                      32.2,
+                      35.1,
+                      38,
+                      40.9
+                    ],
+                    "rep": [
+                      {
+                        "s": 0,
+                        "e": 13
+                      },
+                      {
+                        "s": 0,
+                        "e": 3
+                      }
+                    ]
+                  }
+                ]
               ],
-              null,
               [
                 "V1",
                 3,
-                "",
+                "V1",
                 1,
-                144.6,
-                231.2,
+                144.5,
+                null,
                 null,
                 {
                   "on": true,
@@ -9873,16 +9959,93 @@
                     "Csus"
                   ],
                   "at": [
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    0.1,
+                    3.1,
+                    6.1,
+                    9.1,
+                    12.1,
+                    18.1,
+                    21.2
+                  ]
+                }
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                168.5,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "C",
+                    "Cmaj7",
+                    "Am",
+                    "C",
+                    "F",
+                    "C",
+                    "Csus"
+                  ],
+                  "at": [
+                    0,
+                    3,
+                    6,
+                    9,
+                    12,
+                    18,
+                    21
+                  ]
+                }
+              ],
+              [
+                "V1",
+                3,
+                "V1",
+                1,
+                192.4,
+                230.4,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "C",
+                    "Cmaj7",
+                    "Am",
+                    "C",
+                    "F",
+                    "C",
+                    "Csus"
+                  ],
+                  "at": [
+                    0,
+                    3,
+                    6,
+                    9,
+                    12,
+                    18,
+                    20.9
                   ]
                 }
               ]
+            ],
+            "sectionRulers": [
+              {
+                "name": "VERSE 1-4",
+                "start": 0,
+                "end": 3
+              },
+              {
+                "name": "S",
+                "start": 4,
+                "end": 4
+              },
+              {
+                "name": "VERSE 5-7",
+                "start": 5,
+                "end": 7
+              }
             ]
           },
           {
@@ -15564,55 +15727,6 @@
     },
     {
       "album": "Technical Ecstasy",
-      "song": "It's Alright",
-      "endSec": 231.2,
-      "complete": false,
-      "riffSaturationIndex": 1.403,
-      "chips": [
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 0,
-          "stop": 25.3,
-          "duration": 25.3,
-          "lick": ""
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 25.3,
-          "stop": 25.3,
-          "duration": null,
-          "lick": "V1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 25.3,
-          "stop": 98,
-          "duration": 72.7,
-          "lick": "V1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 98,
-          "stop": 144.6,
-          "duration": 46.6,
-          "lick": "S1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 144.6,
-          "stop": 231.2,
-          "duration": 86.6,
-          "lick": ""
-        }
-      ]
-    },
-    {
-      "album": "Technical Ecstasy",
       "song": "Gypsy",
       "endSec": 300.6,
       "complete": true,
@@ -15681,6 +15795,79 @@
           "stop": 300.6,
           "duration": 40.6,
           "lick": "GY-S1"
+        }
+      ]
+    },
+    {
+      "album": "Technical Ecstasy",
+      "song": "It's Alright",
+      "endSec": 230.4,
+      "complete": true,
+      "riffSaturationIndex": 1.404,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 0,
+          "stop": 25.4,
+          "duration": 25.4,
+          "lick": "V1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 25.4,
+          "stop": 49.9,
+          "duration": 24.5,
+          "lick": "V1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 49.9,
+          "stop": 74.1,
+          "duration": 24.2,
+          "lick": "V1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 74.1,
+          "stop": 98,
+          "duration": 23.9,
+          "lick": "V1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 98,
+          "stop": 144.5,
+          "duration": 46.5,
+          "lick": "S1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 144.5,
+          "stop": 168.5,
+          "duration": 24,
+          "lick": "V1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 168.5,
+          "stop": 192.4,
+          "duration": 23.9,
+          "lick": "V1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 192.4,
+          "stop": 230.4,
+          "duration": 38,
+          "lick": "V1"
         }
       ]
     }
