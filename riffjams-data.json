@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T21:38:19.969Z",
+  "updatedAt": "2026-11-11T21:40:11.241Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -2391,7 +2391,13 @@
         },
         {
           "song": "The Writ",
-          "sections": []
+          "sections": [
+            [
+              "6",
+              3,
+              "6"
+            ]
+          ]
         }
       ]
     },
@@ -2601,7 +2607,33 @@
         },
         {
           "song": "She's Gone",
-          "sections": []
+          "sections": [
+            [
+              "I1",
+              3,
+              "SG-I1"
+            ],
+            [
+              "V1",
+              3,
+              "SG-V1"
+            ],
+            [
+              "C1",
+              3,
+              "SG-C1"
+            ],
+            [
+              "B1",
+              3,
+              "SG-B1"
+            ],
+            [
+              "V2",
+              3,
+              "SG-V2"
+            ]
+          ]
         },
         {
           "song": "Dirty Women",
@@ -9393,7 +9425,31 @@
           },
           {
             "song": "The Writ",
-            "chips": []
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              [
+                "6",
+                3,
+                "6",
+                [],
+                null
+              ]
+            ]
           }
         ]
       },
