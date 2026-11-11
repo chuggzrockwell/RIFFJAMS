@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T19:30:45.430Z",
+  "updatedAt": "2026-11-11T19:33:44.549Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -86,7 +86,8 @@
     "AMPSS-VI": "user-tabs/AMPSS-VI.png",
     "RARD-I1": "user-tabs/RARD-I1.png",
     "RNRD-V1": "user-tabs/RNRD-V1.png",
-    "RNRD-C1": "user-tabs/RNRD-C1.png"
+    "RNRD-C1": "user-tabs/RNRD-C1.png",
+    "RNRD-I1": "user-tabs/RNRD-I1.png"
   },
   "albums": [
     {
@@ -10616,35 +10617,35 @@
                 3,
                 "RNRD-V1",
                 [],
-                null
+                23.3
               ],
               [
                 "C1",
                 3,
                 "RNRD-C1",
                 [],
-                null
+                45.8
               ],
               [
                 "V1",
                 3,
                 "RNRD-V1",
                 [],
-                null
+                63.5
               ],
               [
                 "C1",
                 3,
                 "RNRD-C1",
                 [],
-                null
+                85.9
               ],
               [
                 "S1",
                 1,
                 "S1",
                 [],
-                null,
+                103.6,
                 null,
                 null,
                 null,
@@ -10676,22 +10677,50 @@
                 3,
                 "RNRD-V1",
                 [],
-                null
+                127
               ],
               [
                 "C1",
                 3,
                 "RNRD-C1",
                 [],
-                null
+                149.4
               ],
               [
                 "O1",
                 3,
                 "RNRD-O1",
                 [],
-                null
+                166.8,
+                195.6
               ]
+            ],
+            "sectionRulers": [
+              {
+                "name": "VERSE 1",
+                "start": 0,
+                "end": 2
+              },
+              {
+                "name": "VERSE 2",
+                "start": 3,
+                "end": 4
+              },
+              {
+                "name": "S",
+                "start": 5,
+                "end": 5
+              },
+              {
+                "name": "VERSE 3",
+                "start": 6,
+                "end": 7
+              },
+              {
+                "name": "O",
+                "start": 8,
+                "end": 8
+              }
             ]
           },
           {
@@ -16037,17 +16066,81 @@
     {
       "album": "Technical Ecstasy",
       "song": "Rock 'n' Roll Doctor",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": null,
+      "endSec": 195.6,
+      "complete": true,
+      "riffSaturationIndex": 1.358,
       "chips": [
         {
           "code": "I1",
           "tier": 2,
           "start": 0,
-          "stop": null,
-          "duration": null,
+          "stop": 23.3,
+          "duration": 23.3,
           "lick": "RNRD-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 23.3,
+          "stop": 45.8,
+          "duration": 22.5,
+          "lick": "RNRD-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 45.8,
+          "stop": 63.5,
+          "duration": 17.7,
+          "lick": "RNRD-C1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 63.5,
+          "stop": 85.9,
+          "duration": 22.4,
+          "lick": "RNRD-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 85.9,
+          "stop": 103.6,
+          "duration": 17.7,
+          "lick": "RNRD-C1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 103.6,
+          "stop": 127,
+          "duration": 23.4,
+          "lick": "S1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 127,
+          "stop": 149.4,
+          "duration": 22.4,
+          "lick": "RNRD-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 149.4,
+          "stop": 166.8,
+          "duration": 17.4,
+          "lick": "RNRD-C1"
+        },
+        {
+          "code": "O1",
+          "tier": 3,
+          "start": 166.8,
+          "stop": 195.6,
+          "duration": 28.8,
+          "lick": "RNRD-O1"
         }
       ]
     }
