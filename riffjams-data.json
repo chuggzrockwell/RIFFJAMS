@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-12T00:36:24.687Z",
+  "updatedAt": "2026-11-12T00:55:09.101Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -10804,7 +10804,7 @@
                     "Badd11"
                   ],
                   "at": [
-                    null,
+                    -4.5,
                     0,
                     4.6,
                     9.6,
@@ -11123,7 +11123,7 @@
                 3,
                 "SG-B1",
                 [],
-                null,
+                243,
                 null,
                 null,
                 {
@@ -11142,17 +11142,27 @@
                     "Badd11"
                   ],
                   "at": [
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    0,
+                    4.7,
+                    9.5,
+                    14.4,
+                    19.1,
+                    21.6,
+                    23.9,
+                    26.4,
+                    28.7,
+                    31.1,
+                    33.5
+                  ],
+                  "br": [
+                    4,
+                    8
+                  ],
+                  "rep": [
+                    {
+                      "s": 0,
+                      "e": 3
+                    }
                   ],
                   "tabs": [
                     "SG-M17",
@@ -11166,16 +11176,6 @@
                     "SG-M29",
                     "SG-M30",
                     "SG-M3"
-                  ],
-                  "rep": [
-                    {
-                      "s": 0,
-                      "e": 3
-                    }
-                  ],
-                  "br": [
-                    4,
-                    8
                   ]
                 }
               ],
@@ -16650,9 +16650,17 @@
           "code": "V1",
           "tier": 3,
           "start": 204.2,
+          "stop": 243,
+          "duration": 38.8,
+          "lick": "SG-V1"
+        },
+        {
+          "code": "B1",
+          "tier": 3,
+          "start": 243,
           "stop": null,
           "duration": null,
-          "lick": "SG-V1"
+          "lick": "SG-B1"
         }
       ]
     }
