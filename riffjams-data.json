@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-12T00:30:44.639Z",
+  "updatedAt": "2026-11-12T00:33:54.554Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -11064,6 +11064,61 @@
                 }
               ],
               [
+                "V1",
+                3,
+                "SG-V1",
+                [],
+                204.2,
+                null,
+                null,
+                {
+                  "on": true,
+                  "chords": [
+                    "Em/B",
+                    "Badd11",
+                    "Em/B",
+                    "Badd11",
+                    "D6/9",
+                    "C#m7b5",
+                    "Cmaj7",
+                    "E5/A#",
+                    "Badd11"
+                  ],
+                  "at": [
+                    0,
+                    0.1,
+                    4.8,
+                    9.7,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                  ],
+                  "tabs": [
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M1",
+                    "SG-M3",
+                    "SG-M9",
+                    "SG-M11",
+                    "SG-M13",
+                    "SG-M14",
+                    "SG-M3"
+                  ],
+                  "rep": [
+                    {
+                      "s": 0,
+                      "e": 3
+                    }
+                  ],
+                  "br": [
+                    4,
+                    6
+                  ]
+                }
+              ],
+              [
                 "B1",
                 3,
                 "SG-B1",
@@ -11124,7 +11179,6 @@
                   ]
                 }
               ],
-              null,
               null
             ]
           },
@@ -16588,6 +16642,14 @@
           "code": "V1",
           "tier": 3,
           "start": 165.4,
+          "stop": 204.2,
+          "duration": 38.8,
+          "lick": "SG-V1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 204.2,
           "stop": null,
           "duration": null,
           "lick": "SG-V1"
