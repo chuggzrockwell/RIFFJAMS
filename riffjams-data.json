@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-11T23:59:51.161Z",
+  "updatedAt": "2026-11-12T00:02:13.525Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -11038,7 +11038,7 @@
                 3,
                 "SG-V2",
                 [],
-                null,
+                165.4,
                 null,
                 null,
                 {
@@ -11059,19 +11059,19 @@
                     "Badd11"
                   ],
                   "at": [
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
+                    0,
+                    4.9,
+                    9.8,
+                    14.6,
+                    19.4,
+                    24.3,
+                    29.1,
+                    31.5,
+                    34,
+                    38.8,
+                    38.9,
+                    43.6,
+                    48.5
                   ],
                   "br": [
                     8,
@@ -11080,7 +11080,11 @@
                   "rep": [
                     {
                       "s": 0,
-                      "e": 7
+                      "e": 3
+                    },
+                    {
+                      "s": 4,
+                      "e": 8
                     }
                   ],
                   "tabs": [
@@ -16640,9 +16644,17 @@
           "code": "B1",
           "tier": 3,
           "start": 146,
+          "stop": 165.4,
+          "duration": 19.4,
+          "lick": "SG-B1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 165.4,
           "stop": null,
           "duration": null,
-          "lick": "SG-B1"
+          "lick": "SG-V2"
         }
       ]
     }
