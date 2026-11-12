@@ -66,6 +66,9 @@
       "Authorization": "Bearer " + TOKEN,
       "X-GitHub-Api-Version": "2022-11-28"
     }, options.headers || {});
+    /* no-store: GitHub's GETs are cacheable for 60s, so a second save within a minute read a stale
+       branch head and failed with "Update is not a fast forward". */
+    if (!options.cache) options.cache = "no-store";
     var response = await fetch("https://api.github.com" + path, options);
     var body = null;
     try { body = await response.json(); } catch (e) {}
