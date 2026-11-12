@@ -1839,6 +1839,8 @@
     display: none;
   }
   .chip-editor.open { display: block; }
+  /* Chord change mode: wider, so chord names stay readable next to Set / Paste / the tab thumbnail. */
+  .chip-editor:has(#chipEditChordOn:checked) { width: min(450px, calc(100vw - 32px)); }
 
   .chip-editor .chip-edit-time-row {
     display: none;
@@ -6132,6 +6134,8 @@ function undoArrangementMap() {
   saveArrangementMap();
   showSections(true);
   setSaveStatus("Undid");
+  /* Single Song hides the save status: say it out loud, so an undo is never silent. */
+  if (singleSongMode && typeof rjToast === "function") rjToast("Undo: last chip edit rolled back (Ctrl+Z)");
 }
 function saveArrangementMapNow() {
   if (rjMobileEditBlocked()) return; /* mobile: no editing */
@@ -19559,6 +19563,10 @@ document.addEventListener("keydown", function(e){
       var key = (e.key || "").toLowerCase();
       if (key === "z" && !e.shiftKey) {
         e.preventDefault();
+        /* Ctrl+Z while the chip editor is open (focus on Set / Tap / Paste etc.) must not roll the
+           whole map back to an earlier save - that silently wiped chord times. */
+        var edOpen = document.getElementById("chipEditor");
+        if (edOpen && edOpen.classList.contains("open")) return;
         if (arrangementMode) undoArrangementMap();
         else if (soloMode) undoSoloMap();
         else undoAlbums();
