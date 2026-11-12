@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-12T00:03:23.130Z",
+  "updatedAt": "2026-11-12T00:05:32.811Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -11122,17 +11122,17 @@
                     null,
                     null
                   ],
-                  "tabs": [
-                    "SG-M17",
-                    "SG-M19",
-                    "SG-M17",
-                    "SG-M19"
-                  ],
                   "rep": [
                     {
                       "s": 0,
                       "e": 3
                     }
+                  ],
+                  "tabs": [
+                    "SG-M17",
+                    "SG-M19",
+                    "SG-M17",
+                    "SG-M19"
                   ]
                 }
               ],
