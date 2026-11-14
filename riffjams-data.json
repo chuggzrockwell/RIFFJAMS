@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-14T18:43:13.693Z",
+  "updatedAt": "2026-11-14T18:48:58.804Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -534,7 +534,7 @@
             ],
             [
               "V3",
-              2,
+              1,
               "WP-V3"
             ],
             [
@@ -5245,7 +5245,7 @@
               ],
               [
                 "V3",
-                2,
+                1,
                 "WP-V3",
                 1,
                 126.9
@@ -14219,143 +14219,6 @@
     },
     {
       "album": "Paranoid",
-      "song": "War Pigs",
-      "endSec": 467.1,
-      "complete": true,
-      "riffSaturationIndex": 2.123,
-      "chips": [
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 0,
-          "stop": 51.9,
-          "duration": 51.9,
-          "lick": "WP-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 51.9,
-          "stop": 105.9,
-          "duration": 54,
-          "lick": "WP-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 105.9,
-          "stop": 126.9,
-          "duration": 21,
-          "lick": "WP-V2"
-        },
-        {
-          "code": "V3",
-          "tier": 2,
-          "start": 126.9,
-          "stop": 137.5,
-          "duration": 10.6,
-          "lick": "WP-V3"
-        },
-        {
-          "code": "V4",
-          "tier": 1,
-          "start": 137.5,
-          "stop": 158.2,
-          "duration": 20.7,
-          "lick": "WP-V4"
-        },
-        {
-          "code": "V3",
-          "tier": 2,
-          "start": 158.2,
-          "stop": 168.6,
-          "duration": 10.4,
-          "lick": "WP-V3"
-        },
-        {
-          "code": "V4",
-          "tier": 1,
-          "start": 168.6,
-          "stop": 189.5,
-          "duration": 20.9,
-          "lick": "WP-V4"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 189.5,
-          "stop": 210.4,
-          "duration": 20.9,
-          "lick": "WP-V2"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 210.4,
-          "stop": 269.2,
-          "duration": 58.8,
-          "lick": "WP-S1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 269.2,
-          "stop": 322.6,
-          "duration": 53.4,
-          "lick": "WP-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 2,
-          "start": 322.6,
-          "stop": 343.3,
-          "duration": 20.7,
-          "lick": "WP-V2"
-        },
-        {
-          "code": "O1",
-          "tier": 2,
-          "start": 343.3,
-          "stop": 394.4,
-          "duration": 51.1,
-          "lick": "WP-O1"
-        },
-        {
-          "code": "O2",
-          "tier": 1,
-          "start": 394.4,
-          "stop": 416.1,
-          "duration": 21.7,
-          "lick": "WP-O2"
-        },
-        {
-          "code": "S2",
-          "tier": 1,
-          "start": 416.1,
-          "stop": 437.2,
-          "duration": 21.1,
-          "lick": "WP-S2"
-        },
-        {
-          "code": "O2",
-          "tier": 1,
-          "start": 437.2,
-          "stop": 458.7,
-          "duration": 21.5,
-          "lick": "WP-O2"
-        },
-        {
-          "code": "O1",
-          "tier": 2,
-          "start": 458.7,
-          "stop": 467.1,
-          "duration": 8.4,
-          "lick": "WP-O1"
-        }
-      ]
-    },
-    {
-      "album": "Paranoid",
       "song": "Paranoid",
       "endSec": 164.2,
       "complete": true,
@@ -16661,6 +16524,143 @@
           "stop": 428,
           "duration": 22.6,
           "lick": "HOD-V1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "War Pigs",
+      "endSec": 467.1,
+      "complete": true,
+      "riffSaturationIndex": 2.145,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 0,
+          "stop": 51.9,
+          "duration": 51.9,
+          "lick": "WP-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 51.9,
+          "stop": 105.9,
+          "duration": 54,
+          "lick": "WP-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 105.9,
+          "stop": 126.9,
+          "duration": 21,
+          "lick": "WP-V2"
+        },
+        {
+          "code": "V3",
+          "tier": 1,
+          "start": 126.9,
+          "stop": 137.5,
+          "duration": 10.6,
+          "lick": "WP-V3"
+        },
+        {
+          "code": "V4",
+          "tier": 1,
+          "start": 137.5,
+          "stop": 158.2,
+          "duration": 20.7,
+          "lick": "WP-V4"
+        },
+        {
+          "code": "V3",
+          "tier": 2,
+          "start": 158.2,
+          "stop": 168.6,
+          "duration": 10.4,
+          "lick": "WP-V3"
+        },
+        {
+          "code": "V4",
+          "tier": 1,
+          "start": 168.6,
+          "stop": 189.5,
+          "duration": 20.9,
+          "lick": "WP-V4"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 189.5,
+          "stop": 210.4,
+          "duration": 20.9,
+          "lick": "WP-V2"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 210.4,
+          "stop": 269.2,
+          "duration": 58.8,
+          "lick": "WP-S1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 269.2,
+          "stop": 322.6,
+          "duration": 53.4,
+          "lick": "WP-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 2,
+          "start": 322.6,
+          "stop": 343.3,
+          "duration": 20.7,
+          "lick": "WP-V2"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 343.3,
+          "stop": 394.4,
+          "duration": 51.1,
+          "lick": "WP-O1"
+        },
+        {
+          "code": "O2",
+          "tier": 1,
+          "start": 394.4,
+          "stop": 416.1,
+          "duration": 21.7,
+          "lick": "WP-O2"
+        },
+        {
+          "code": "S2",
+          "tier": 1,
+          "start": 416.1,
+          "stop": 437.2,
+          "duration": 21.1,
+          "lick": "WP-S2"
+        },
+        {
+          "code": "O2",
+          "tier": 1,
+          "start": 437.2,
+          "stop": 458.7,
+          "duration": 21.5,
+          "lick": "WP-O2"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 458.7,
+          "stop": 467.1,
+          "duration": 8.4,
+          "lick": "WP-O1"
         }
       ]
     }
