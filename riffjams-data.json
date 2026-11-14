@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-14T18:48:58.804Z",
+  "updatedAt": "2026-11-14T18:50:18.959Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -580,7 +580,7 @@
           "sections": [
             [
               "I1",
-              2,
+              1,
               "P-I1",
               "4S"
             ],
@@ -5392,7 +5392,7 @@
             "chips": [
               [
                 "I1",
-                2,
+                1,
                 "P-I1",
                 "4S",
                 0
@@ -14219,111 +14219,6 @@
     },
     {
       "album": "Paranoid",
-      "song": "Paranoid",
-      "endSec": 164.2,
-      "complete": true,
-      "riffSaturationIndex": 1.502,
-      "chips": [
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 0,
-          "stop": 12.2,
-          "duration": 12.2,
-          "lick": "P-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 12.2,
-          "stop": 23.9,
-          "duration": 11.7,
-          "lick": "P-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 3,
-          "start": 23.9,
-          "stop": 35.7,
-          "duration": 11.8,
-          "lick": "P-V2"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 35.7,
-          "stop": 47.4,
-          "duration": 11.7,
-          "lick": "P-V1"
-        },
-        {
-          "code": "V3",
-          "tier": 3,
-          "start": 47.4,
-          "stop": 59.2,
-          "duration": 11.8,
-          "lick": "P-V3"
-        },
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 59.2,
-          "stop": 70.9,
-          "duration": 11.7,
-          "lick": "P-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 70.9,
-          "stop": 82.7,
-          "duration": 11.8,
-          "lick": "P-V1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 82.7,
-          "stop": 106.1,
-          "duration": 23.4,
-          "lick": "P-S1"
-        },
-        {
-          "code": "I1",
-          "tier": 2,
-          "start": 106.1,
-          "stop": 117.8,
-          "duration": 11.7,
-          "lick": "P-I1"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 117.8,
-          "stop": 129.6,
-          "duration": 11.8,
-          "lick": "P-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 3,
-          "start": 129.6,
-          "stop": 141.3,
-          "duration": 11.7,
-          "lick": "P-V2"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 141.3,
-          "stop": 164.2,
-          "duration": 22.9,
-          "lick": "P-V1"
-        }
-      ]
-    },
-    {
-      "album": "Paranoid",
       "song": "Iron Man",
       "endSec": 351,
       "complete": true,
@@ -16661,6 +16556,111 @@
           "stop": 467.1,
           "duration": 8.4,
           "lick": "WP-O1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "Paranoid",
+      "endSec": 164.2,
+      "complete": true,
+      "riffSaturationIndex": 1.576,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 0,
+          "stop": 12.2,
+          "duration": 12.2,
+          "lick": "P-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 12.2,
+          "stop": 23.9,
+          "duration": 11.7,
+          "lick": "P-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 23.9,
+          "stop": 35.7,
+          "duration": 11.8,
+          "lick": "P-V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 35.7,
+          "stop": 47.4,
+          "duration": 11.7,
+          "lick": "P-V1"
+        },
+        {
+          "code": "V3",
+          "tier": 3,
+          "start": 47.4,
+          "stop": 59.2,
+          "duration": 11.8,
+          "lick": "P-V3"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 59.2,
+          "stop": 70.9,
+          "duration": 11.7,
+          "lick": "P-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 70.9,
+          "stop": 82.7,
+          "duration": 11.8,
+          "lick": "P-V1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 82.7,
+          "stop": 106.1,
+          "duration": 23.4,
+          "lick": "P-S1"
+        },
+        {
+          "code": "I1",
+          "tier": 2,
+          "start": 106.1,
+          "stop": 117.8,
+          "duration": 11.7,
+          "lick": "P-I1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 117.8,
+          "stop": 129.6,
+          "duration": 11.8,
+          "lick": "P-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 129.6,
+          "stop": 141.3,
+          "duration": 11.7,
+          "lick": "P-V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 141.3,
+          "stop": 164.2,
+          "duration": 22.9,
+          "lick": "P-V1"
         }
       ]
     }
