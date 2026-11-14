@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-12T00:55:09.101Z",
+  "updatedAt": "2026-11-14T18:43:13.693Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -779,7 +779,7 @@
             ],
             [
               "B1",
-              2,
+              1,
               "HOD-B1"
             ],
             [
@@ -5937,7 +5937,7 @@
               ],
               [
                 "B1",
-                2,
+                1,
                 "HOD-B1",
                 1,
                 125
@@ -14726,151 +14726,6 @@
       ]
     },
     {
-      "album": "Paranoid",
-      "song": "Hand of Doom",
-      "endSec": 428,
-      "complete": true,
-      "riffSaturationIndex": 1.478,
-      "chips": [
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 0,
-          "stop": 42.6,
-          "duration": 42.6,
-          "lick": "HOD-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 3,
-          "start": 42.6,
-          "stop": 86.7,
-          "duration": 44.1,
-          "lick": "V2"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 86.7,
-          "stop": 125,
-          "duration": 38.3,
-          "lick": "HOD-V1"
-        },
-        {
-          "code": "B1",
-          "tier": 2,
-          "start": 125,
-          "stop": 138.8,
-          "duration": 13.8,
-          "lick": "HOD-B1"
-        },
-        {
-          "code": "B2",
-          "tier": 1,
-          "start": 138.8,
-          "stop": 166.2,
-          "duration": 27.4,
-          "lick": "HOD-B2"
-        },
-        {
-          "code": "B1",
-          "tier": 2,
-          "start": 166.2,
-          "stop": 179.9,
-          "duration": 13.7,
-          "lick": "HOD-B1"
-        },
-        {
-          "code": "B2",
-          "tier": 1,
-          "start": 179.9,
-          "stop": 207.2,
-          "duration": 27.3,
-          "lick": "HOD-B2"
-        },
-        {
-          "code": "B3",
-          "tier": 3,
-          "start": 207.2,
-          "stop": 217.1,
-          "duration": 9.9,
-          "lick": "HOD-B3"
-        },
-        {
-          "code": "B4",
-          "tier": 3,
-          "start": 217.1,
-          "stop": 250.8,
-          "duration": 33.7,
-          "lick": "HOD-B4"
-        },
-        {
-          "code": "B1",
-          "tier": 2,
-          "start": 250.8,
-          "stop": 264.6,
-          "duration": 13.8,
-          "lick": "HOD-B1"
-        },
-        {
-          "code": "S1",
-          "tier": 1,
-          "start": 264.6,
-          "stop": 291.5,
-          "duration": 26.9,
-          "lick": "HOD-S1"
-        },
-        {
-          "code": "B5",
-          "tier": 3,
-          "start": 291.5,
-          "stop": 297,
-          "duration": 5.5,
-          "lick": "B5"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 297,
-          "stop": 340.6,
-          "duration": 43.6,
-          "lick": "HOD-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 3,
-          "start": 340.6,
-          "stop": 361.9,
-          "duration": 21.3,
-          "lick": "V2"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 361.9,
-          "stop": 384.2,
-          "duration": 22.3,
-          "lick": "HOD-V1"
-        },
-        {
-          "code": "V2",
-          "tier": 3,
-          "start": 384.2,
-          "stop": 405.4,
-          "duration": 21.2,
-          "lick": "V2"
-        },
-        {
-          "code": "V1",
-          "tier": 3,
-          "start": 405.4,
-          "stop": 428,
-          "duration": 22.6,
-          "lick": "HOD-V1"
-        }
-      ]
-    },
-    {
       "album": "Black Sabbath",
       "song": "Sleeping Village/ Bit of Finger",
       "endSec": null,
@@ -16661,6 +16516,151 @@
           "stop": null,
           "duration": null,
           "lick": "SG-B1"
+        }
+      ]
+    },
+    {
+      "album": "Paranoid",
+      "song": "Hand of Doom",
+      "endSec": 428,
+      "complete": true,
+      "riffSaturationIndex": 1.51,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 0,
+          "stop": 42.6,
+          "duration": 42.6,
+          "lick": "HOD-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 42.6,
+          "stop": 86.7,
+          "duration": 44.1,
+          "lick": "V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 86.7,
+          "stop": 125,
+          "duration": 38.3,
+          "lick": "HOD-V1"
+        },
+        {
+          "code": "B1",
+          "tier": 1,
+          "start": 125,
+          "stop": 138.8,
+          "duration": 13.8,
+          "lick": "HOD-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 1,
+          "start": 138.8,
+          "stop": 166.2,
+          "duration": 27.4,
+          "lick": "HOD-B2"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 166.2,
+          "stop": 179.9,
+          "duration": 13.7,
+          "lick": "HOD-B1"
+        },
+        {
+          "code": "B2",
+          "tier": 1,
+          "start": 179.9,
+          "stop": 207.2,
+          "duration": 27.3,
+          "lick": "HOD-B2"
+        },
+        {
+          "code": "B3",
+          "tier": 3,
+          "start": 207.2,
+          "stop": 217.1,
+          "duration": 9.9,
+          "lick": "HOD-B3"
+        },
+        {
+          "code": "B4",
+          "tier": 3,
+          "start": 217.1,
+          "stop": 250.8,
+          "duration": 33.7,
+          "lick": "HOD-B4"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 250.8,
+          "stop": 264.6,
+          "duration": 13.8,
+          "lick": "HOD-B1"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 264.6,
+          "stop": 291.5,
+          "duration": 26.9,
+          "lick": "HOD-S1"
+        },
+        {
+          "code": "B5",
+          "tier": 3,
+          "start": 291.5,
+          "stop": 297,
+          "duration": 5.5,
+          "lick": "B5"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 297,
+          "stop": 340.6,
+          "duration": 43.6,
+          "lick": "HOD-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 340.6,
+          "stop": 361.9,
+          "duration": 21.3,
+          "lick": "V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 361.9,
+          "stop": 384.2,
+          "duration": 22.3,
+          "lick": "HOD-V1"
+        },
+        {
+          "code": "V2",
+          "tier": 3,
+          "start": 384.2,
+          "stop": 405.4,
+          "duration": 21.2,
+          "lick": "V2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 405.4,
+          "stop": 428,
+          "duration": 22.6,
+          "lick": "HOD-V1"
         }
       ]
     }
