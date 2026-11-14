@@ -4743,6 +4743,12 @@
   .sec-chip.tier-3 { background: #d4bbe3; color: #1a1020; }
   .sec-chip.tier-4 { background: #d4bbe3; color: #1a1020; }
   .sec-chip.tier-5 { background: #f3edf7; color: #1a1020; }
+  /* Lick map: licks with a position tag are shaded by their lowest position (P1 darkest → P5 lightest); untagged keep tier fills */
+  body.sections-solo .sec-chip.lpos-1 { background: #7030a0; color: #fff; }
+  body.sections-solo .sec-chip.lpos-2 { background: #a365d1; color: #fff; }
+  body.sections-solo .sec-chip.lpos-3 { background: #bc90da; color: #1a1020; }
+  body.sections-solo .sec-chip.lpos-4 { background: #d4bbe3; color: #1a1020; }
+  body.sections-solo .sec-chip.lpos-5 { background: #f3edf7; color: #1a1020; }
 
   @media (max-width: 900px) {
     .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 100%; }
@@ -10645,7 +10651,9 @@ function showSections(keepScroll) {
             var ltyp = "S";
             n++;
             var gMem = (hasSoloGroup && (ci + 1) >= groupStart) ? " col-group-member" : "";
-            chipArr.push('<button type="button" class="sec-chip '+ltyp+' '+slotCss("tier", ltier)+gMem+'" data-solo="1" data-song="'+s.song+'" data-sec="'+lcode+'" data-type="'+ltyp+'" data-tier="'+ltier+'" data-lick="'+llick+'" data-position="'+lpos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+lcode+'</button>');
+            var lLab = soloLabeledPositions(lp, s.song);
+            var lPosCss = lLab.length ? " lpos-" + Math.min.apply(null, lLab) : "";
+            chipArr.push('<button type="button" class="sec-chip '+ltyp+' '+slotCss("tier", ltier)+gMem+lPosCss+'" data-solo="1" data-song="'+s.song+'" data-sec="'+lcode+'" data-type="'+ltyp+'" data-tier="'+ltier+'" data-lick="'+llick+'" data-position="'+lpos+'" data-ai="'+ai+'" data-si="'+si+'" data-ci="'+ci+'">'+lcode+'</button>');
           }
         }
       } else {
@@ -10883,7 +10891,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=291";
+  var url = base + "?playboard=1&v=292";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -10912,7 +10920,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=291") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=292") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -17505,6 +17513,15 @@ function posBasesFromRaw(raw) {
   return out;
 }
 /** Song Map section fretting for a lick id. null if no section explicitly stores pair[3] for that lick. */
+/** Positions the user actually tagged on a lick (its own tag, else its Song Map chip's) — [] if untagged. */
+function soloLabeledPositions(pair, songName) {
+  if (!pair) return [];
+  var own = (pair.length > 3) ? (posBasesFromRaw(pair[3]) || []) : [];
+  if (pair.length > 3) return own.filter(function(p){ return p >= 1 && p <= 5; });
+  var lick = String(pair[2] || "").trim();
+  var inh = (songName && lick) ? songMapPosBasesForLick(songName, lick) : null;
+  return (inh || []).filter(function(p){ return p >= 1 && p <= 5; });
+}
 function songMapPosBasesForLick(songName, lickId) {
   if (!songName || !lickId) return null;
   var want = String(lickId).trim();
