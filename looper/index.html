@@ -167,7 +167,26 @@
   /* Same-song chip picker (empty slot): big Song Map chips in the Song Map tier purples */
   .picker { position: fixed; inset: 0; z-index: 40; background: rgba(10,10,10,.82); display: flex; align-items: center; justify-content: center; padding: 16px; }
   .picker-card { width: min(760px, 100%); max-height: 100%; overflow-y: auto; background: #1b1b1b; border: 1px solid var(--line2); border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
-  .picker-head { display: flex; align-items: center; gap: 12px; }
+  .picker-nav { display: flex; align-items: center; gap: 8px; margin: -20px -22px 2px; padding: 10px 14px; border-bottom: 1px solid var(--line2); }
+  .picker-nav .spacer { flex: 1; }
+  .picker-navbtn { padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line2); background: transparent; color: #ddd; font-weight: 700; font-size: 13px; }
+  .picker-navbtn:disabled { opacity: .35; cursor: default; }
+  .picker-navbtn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .palbums { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .palbum { padding: 0; border: 0; background: none; color: #ddd; text-align: left; cursor: pointer; }
+  .palbum-art { aspect-ratio: 1 / 1; border-radius: 8px; background: #000 center / cover no-repeat; }
+  .palbum:hover .palbum-art { filter: brightness(1.12); outline: 3px solid var(--accent); }
+  .palbum-name { margin-top: 6px; font-size: 13px; font-weight: 700; }
+  .psongs { display: flex; flex-direction: column; gap: 6px; }
+  .psong { display: flex; align-items: baseline; gap: 12px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--line2); background: #232323; color: #fff; text-align: left; }
+  .psong:hover { border-color: var(--accent); }
+  .psong-name { flex: 1; font-family: var(--gadget); font-size: 20px; }
+  .psong-n { font-size: 12px; color: var(--dim); }
+  .psong.none .psong-name { color: var(--muted); }
+  .pchip:disabled { cursor: default; filter: none; }
+  .pchip.off { opacity: .3; }
+  .pchip.in { opacity: .45; outline: 2px solid #fff; outline-offset: -4px; }
+  @media (max-width: 600px) { .palbums { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .picker-title { flex: 1; font-family: var(--gadget); font-size: 28px; color: #fff; }
   .picker-x { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line2); background: transparent; color: var(--muted); font-size: 20px; line-height: 1; }
   .picker-sub { font-size: 13px; color: var(--dim); margin-top: -6px; }
@@ -254,6 +273,6 @@
   </div>
 
 <script src="vendor/SignalsmithStretch.js"></script>
-<script src="looper.js?v=27"></script><!-- bump v on every change so the browser can't use a stale copy -->
+<script src="looper.js?v=28"></script><!-- bump v on every change so the browser can't use a stale copy -->
 </body>
 </html>

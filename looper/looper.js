@@ -904,10 +904,8 @@
       add.type = 'button';
       add.setAttribute('aria-label', 'Add a chip to slot ' + (i + 1));
       add.addEventListener('click', () => {
-        // Looper holds one song only: pick from that song's other chips. Otherwise the Song Map, with "Add to looper" on.
-        const slug = looperSong();
-        if (slug && pickable(slug).length) openPicker(slug);
-        else openSongMapAdd();
+        // Chip picker: opens on the looper's song when it holds just one, else on the albums.
+        openPicker(looperSong());   // that song's chips, or the albums
       });
       dropTarget(add, null);
       grid.append(add);
@@ -1803,9 +1801,10 @@
     setStatus(added ? 'Added ' + added + ' chips to the Playboard' : 'Those chips are already on the Playboard');
   }
 
-  /* ---------- same-song chip picker ----------
-     An empty slot, when every looper chip comes from one song, shows that song's other chips
-     as big Song Map chips (tier purples, song order). Click one to add it; the picker stays open. */
+  /* ---------- chip picker ----------
+     An empty slot opens it: Album → album covers → songs → that song's chips as big Song Map
+     chips (tier purples, Song Map order). When every looper chip comes from one song it opens
+     on that song. Click a chip to add it; the picker stays open. */
   function openSongMapAdd() {
     if (!state.panels.includes('songmap')) state.panels.push('songmap');
     setPanel('songmap');
@@ -1815,11 +1814,35 @@
     const slugs = new Set(state.looper.map((id) => chipsByCode[id] && chipsByCode[id].slug));
     return slugs.size === 1 ? [...slugs][0] : null;
   }
-  function pickable(slug) {
-    const s = songs.find((x) => x.slug === slug);
-    if (!s) return [];
-    return s.chips.map((c) => c.id).filter((id) => !state.looper.includes(id))
-      .sort((a, b) => chipsByCode[a].start - chipsByCode[b].start);
+  /* Albums, songs and chips as the Song Map has them (same site, so its saved data is readable);
+     without it, just the songs in the chip folder. Only chips in the chip folder can be added. */
+  function albumData() {
+    try {
+      const a = JSON.parse(localStorage.getItem('lick-sections-albums-v3'));
+      if (Array.isArray(a) && a.length) return a;
+    } catch (e) { /* no Song Map data */ }
+    const by = {};
+    songs.forEach((s) => {
+      const a = by[s.album] || (by[s.album] = { name: s.album, cover: '', songs: [] });
+      a.songs.push({ song: s.song, sections: s.chips.map((c) => [c.code, c.tier]) });
+    });
+    return Object.values(by);
+  }
+  const norm = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  function folderSong(albumName, songName) {
+    return songs.find((s) => norm(s.album) === norm(albumName) && norm(s.song) === norm(songName)) || null;
+  }
+  // The song's chips in Song Map order with Song Map tiers; chips only in the folder go last.
+  function songChips(albumName, sm) {
+    const fs = folderSong(albumName, sm.song);
+    const out = [], seen = new Set();
+    (sm.sections || []).forEach((sec) => {
+      if (!sec || !sec[0] || seen.has(sec[0])) return;
+      seen.add(sec[0]);
+      out.push({ code: sec[0], tier: sec[1] || 3, id: fs && chipsByCode[fs.slug + '/' + sec[0]] ? fs.slug + '/' + sec[0] : null });
+    });
+    if (fs) fs.chips.forEach((c) => { if (!seen.has(c.code)) out.push({ code: c.code, tier: c.tier || 3, id: c.id }); });
+    return out;
   }
   let pickerEl = null;
   function closePicker() {
@@ -1831,47 +1854,99 @@
   function pickerKeys(ev) {
     if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); closePicker(); }
   }
+  // view: { kind: 'albums' } | { kind: 'songs', album } | { kind: 'chips', album, song }
   function openPicker(slug) {
     closePicker();
-    const song = songs.find((x) => x.slug === slug);
+    const albums = albumData();
+    let view = { kind: 'albums' };
+    const fs = slug && songs.find((x) => x.slug === slug);
+    if (fs) {
+      const al = albums.find((a) => norm(a.name) === norm(fs.album));
+      const sm = al && al.songs.find((s) => norm(s.song) === norm(fs.song));
+      if (al && sm) view = { kind: 'chips', album: al, song: sm };
+    }
     const ov = el('div', 'picker');
     ov.setAttribute('role', 'dialog');
-    ov.setAttribute('aria-label', 'Add a chip from ' + song.song);
+    ov.setAttribute('aria-label', 'Add chips to the looper');
     const card = el('div', 'picker-card');
-    const head = el('div', 'picker-head');
-    head.append(el('div', 'picker-title', song.song));
+    // Nav strip along the top: Back, Album, and close.
+    const nav = el('div', 'picker-nav');
+    const back = el('button', 'picker-navbtn', '‹ Back');
+    const albumBtn = el('button', 'picker-navbtn', 'Album');
     const x = el('button', 'picker-x', '×');
-    x.type = 'button';
+    [back, albumBtn, x].forEach((b) => { b.type = 'button'; });
     x.setAttribute('aria-label', 'Close');
+    nav.append(back, albumBtn, el('div', 'spacer'), x);
+    const title = el('div', 'picker-title');
+    const sub = el('div', 'picker-sub');
+    const body = el('div', 'picker-body');
+    const go = (v) => { view = v; show(); };
+    back.addEventListener('click', () => {
+      if (view.kind === 'chips') go({ kind: 'songs', album: view.album });
+      else if (view.kind === 'songs') go({ kind: 'albums' });
+    });
+    albumBtn.addEventListener('click', () => go({ kind: 'albums' }));
     x.addEventListener('click', closePicker);
-    head.append(x);
-    const sub = el('div', 'picker-sub', '');
-    const row = el('div', 'pchips');
-    const fill = () => {
-      row.textContent = '';
-      const ids = pickable(slug);
-      const room = 16 - state.looper.length;
-      sub.textContent = room <= 0 ? 'The looper is full' : 'Click a chip to add it · ' + room + ' slot' + (room === 1 ? '' : 's') + ' left';
-      if (!ids.length || room <= 0) { closePicker(); return; }
-      ids.forEach((id) => {
-        const c = chipsByCode[id];
-        const b = el('button', 'pchip t' + Math.min(5, Math.max(1, c.tier || 3)), c.code);
-        b.type = 'button';
-        b.title = (SECTION_NAME[sectionType(c.code)] || 'Section') + ' ' + sectionNum(c.code) + ' · Tier ' + c.tier;
-        b.addEventListener('click', () => { addToLooper(id); fill(); });
-        row.append(b);
-      });
-    };
-    const other = el('button', 'picker-link', 'Other songs: open the Song Map');
+    const room = () => 16 - state.looper.length;
+    function show() {
+      body.textContent = '';
+      back.disabled = view.kind === 'albums';
+      albumBtn.classList.toggle('on', view.kind === 'albums');
+      if (view.kind === 'albums') {
+        title.textContent = 'Albums';
+        sub.textContent = 'Choose an album';
+        body.className = 'picker-body palbums';
+        albums.forEach((a) => {
+          const b = el('button', 'palbum');
+          b.type = 'button';
+          const art = el('div', 'palbum-art');
+          if (a.cover) art.style.backgroundImage = 'url("../' + a.cover + '")';
+          b.append(art, el('div', 'palbum-name', a.name));
+          b.addEventListener('click', () => go({ kind: 'songs', album: a }));
+          body.append(b);
+        });
+      } else if (view.kind === 'songs') {
+        title.textContent = view.album.name;
+        sub.textContent = 'Choose a song';
+        body.className = 'picker-body psongs';
+        view.album.songs.forEach((s) => {
+          const ready = songChips(view.album.name, s).filter((c) => c.id).length;
+          const b = el('button', 'psong' + (ready ? '' : ' none'));
+          b.type = 'button';
+          b.append(el('span', 'psong-name', s.song), el('span', 'psong-n', ready ? ready + ' chip' + (ready === 1 ? '' : 's') : 'no chips yet'));
+          b.addEventListener('click', () => go({ kind: 'chips', album: view.album, song: s }));
+          body.append(b);
+        });
+      } else {
+        title.textContent = view.song.song;
+        const list = songChips(view.album.name, view.song);
+        const left = room();
+        sub.textContent = view.album.name + ' · ' + (left <= 0 ? 'the looper is full'
+          : list.some((c) => c.id) ? 'click a chip to add it · ' + left + ' slot' + (left === 1 ? '' : 's') + ' left'
+            : 'none of these chips are in the chip folder yet');
+        body.className = 'picker-body pchips';
+        list.forEach((c) => {
+          const inLooper = c.id && state.looper.includes(c.id);
+          const b = el('button', 'pchip t' + Math.min(5, Math.max(1, c.tier)) + (c.id ? '' : ' off') + (inLooper ? ' in' : ''), c.code);
+          b.type = 'button';
+          b.title = (SECTION_NAME[sectionType(c.code)] || 'Section') + ' ' + sectionNum(c.code) + ' · Tier ' + c.tier +
+            (inLooper ? ' · already in the looper' : c.id ? '' : ' · not in the chip folder yet');
+          b.disabled = !c.id || inLooper || left <= 0;
+          b.addEventListener('click', () => { addToLooper(c.id); show(); });
+          body.append(b);
+        });
+      }
+    }
+    const other = el('button', 'picker-link', 'Or add from the Song Map');
     other.type = 'button';
     other.addEventListener('click', () => { closePicker(); openSongMapAdd(); });
-    card.append(head, sub, row, other);
+    card.append(nav, title, sub, body, other);
     ov.append(card);
     ov.addEventListener('click', (ev) => { if (ev.target === ov) closePicker(); });
     document.body.append(ov);
     pickerEl = ov;
     window.addEventListener('keydown', pickerKeys, true);
-    fill();
+    show();
   }
 
   /* ---------- actions ---------- */
