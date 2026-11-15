@@ -211,6 +211,7 @@
   .gate-card .gate-err { color: #ff7b7b; font-size: 13px; }
   .gate-card .gate-err:empty { display: none; }
   a.brand { color: inherit; text-decoration: none; }
+  .timerslot { margin-left: 12px; }
   .folderbtn { margin-left: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line2); background: transparent; color: var(--muted); font-size: 12px; }
 
   @media (max-width: 860px) {
@@ -225,7 +226,7 @@
     <div class="nav"><span>Song Map</span><span>Playboard</span><span class="on">Loop Station</span><span>Lick Library</span></div>
     <div class="spacer"></div>
     <div class="songtag" id="songTag"></div>
-    <button type="button" class="folderbtn" id="folderBtn" hidden>Chip folder</button>
+    <button type="button" class="folderbtn" id="folderBtn" hidden>Chip folder</button><div class="timerslot" data-rj-timer></div>
   </div>
 
   <div class="banner" id="banner" hidden></div>
@@ -272,6 +273,7 @@
     <div class="status" id="statusText"></div>
   </div>
 
+<script src="../rj-timer.js?v=1"></script><!-- RIFFJAMS practice timer (same time as the other pages) -->
 <script src="vendor/SignalsmithStretch.js"></script>
 <script src="looper.js?v=28"></script><!-- bump v on every change so the browser can't use a stale copy -->
 </body>
