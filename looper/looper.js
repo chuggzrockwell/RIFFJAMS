@@ -29,10 +29,10 @@
   const A4 = 440;
   const PANELS = [
     { id: 'now', label: 'Now', width: 340 },
-    { id: 'stems', label: 'Stems', width: 340 },
+    { id: 'stems', label: 'Mix', width: 340 },
     { id: 'tune', label: 'Tempo & Key', width: 340 },
     { id: 'needs', label: 'Needs improvement', width: 340 },
-    { id: 'playboard', label: 'Playboard', width: 520, embed: true },
+    { id: 'playboard', label: 'Tab', width: 520, embed: true },
     { id: 'songmap', label: 'Song Map', width: 680, embed: true }
   ];
   const PANEL_IDS = PANELS.map((p) => p.id);
@@ -1504,14 +1504,14 @@
         sb.append(ch);
       }
       const stems = vstack(10);
-      stems.append(el('div', 'label', 'STEMS'));
+      stems.append(el('div', 'label', 'MIX'));
       stemControls(stems, false);
       sb.append(stems);
       sb.append(el('div', 'note', 'Click a chip to queue it for the next loop boundary. Shift-click switches right away. Keys: 1–9 slots 1–9 · Space play/stop · Esc stop · Shift+←/→ jump 5 s · Shift+C clear looper · G guitar · L loop · K click.'));
     } else if (state.panel === 'needs') {
       renderNeeds(sb);
     } else if (state.panel === 'stems') {
-      sb.append(el('div', 'label', 'STEMS'));
+      sb.append(el('div', 'label', 'MIX'));
       const box = vstack(12);
       stemControls(box, true);
       sb.append(box);
@@ -1543,14 +1543,6 @@
     $('loopBtn').textContent = state.loopOn ? 'LOOP ON' : 'LOOP OFF';
     $('clickBtn').setAttribute('aria-pressed', String(state.clickOn));
     $('clickBtn').textContent = state.clickOn ? 'CLICK ON' : 'CLICK OFF';
-    // Header pill: what the click is doing for the chip you hear (or the selected one).
-    const pc = playingCode() || focusCode || state.looper[0];
-    const pcc = pc && chipsByCode[pc];
-    const pill = $('clickPill');
-    if (!state.clickOn) pill.textContent = 'Click off';
-    else if (pcc && pcc.quantized) pill.textContent = 'Click · ' + (pcc.quantized.bpm * state.rate).toFixed(1) + ' BPM';
-    else pill.textContent = pcc ? 'No click · free timing' : 'Click on';
-    pill.title = state.clickOn && pcc && !pcc.quantized ? lab(pc) + ' isn’t tempo-locked, so it has no steady beat to click to.' : '';
     const act = isActive();
     $('playBtn').textContent = act ? '❚❚' : '▶';
     $('playBtn').setAttribute('aria-label', act ? 'Stop' : 'Play');
@@ -1642,7 +1634,7 @@
   ].join('\n');
   const SONGMAP_CSS = 'html.looper-embed, html.looper-embed body { background: #121212; }\nhtml.looper-embed #rjTimer { display: none !important; }';
   const EMBEDS = {
-    playboard: { title: 'Playboard', src: '../index.html?playboard=1', css: PLAYBOARD_CSS },
+    playboard: { title: 'Tab', src: '../index.html?playboard=1', css: PLAYBOARD_CSS },
     songmap: {
       title: 'Song Map', src: '../index.html', css: SONGMAP_CSS,
       onload(d, w) {
