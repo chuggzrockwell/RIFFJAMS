@@ -5094,10 +5094,9 @@
 <div class="wrap">
   <section id="home">
     <h1>RIFFJAMS</h1>
-    <p class="keys" style="margin:0 0 10px 4px">Numpad 1 Song Map · 2 SBS · 3 Paranoid · 0 home</p>
+    <p class="keys" style="margin:0 0 10px 4px">Numpad 1 Song Map · 3 Lick Library · 0 home</p>
     <div class="grid">
       <button type="button" class="tile hp" id="btnHP"><small>Song Map</small>Sabbath<span class="tile-label">Song Map</span></button>
-      <button type="button" class="tile a" id="btnA"><small>Licks</small>A</button>
       <button type="button" class="tile b" id="btnB"><small>Paranoid</small>B<span class="tile-label">Lick Library</span></button>
       <button type="button" class="tile b2" id="btnB2"><small>Paranoid</small>B2<span class="tile-label">Lick Library 2</span></button>
       <button type="button" class="tile lp" id="btnLP"><small>Loop Station</small>Looper<span class="tile-label">Looper</span></button>
@@ -18182,7 +18181,6 @@ function showHome() {
   document.getElementById("series").className = "hidden";
   document.getElementById("sections").className = "hidden";
 }
-document.getElementById("btnA").onclick = function(){ showSeries("A"); };
 document.getElementById("btnB").onclick = function(){ showSeries("B"); };
 document.getElementById("btnB2").onclick = function(){ showSeries("B2"); };
 document.getElementById("btnLP").onclick = function(){ location.href = "looper/"; };
@@ -19687,10 +19685,8 @@ document.addEventListener("keydown", function(e){
   var k = e.key.toLowerCase();
   if (document.body.classList.contains("home-mode")) {
     if (isNumpadKey(e, "1")) { showSections(); return; }
-    if (isNumpadKey(e, "2")) { showSeries("A"); return; }
     if (isNumpadKey(e, "3")) { showSeries("B"); return; }
-    if (k === "a") showSeries("A");
-    else if (k === "b") showSeries("B");
+    if (k === "b") showSeries("B");
     else if (k === "c") showSeries("C");
     else if (k === "d") showSeries("D");
     return;
