@@ -62,7 +62,7 @@
     hzGlobal: 0,          // fine tune for every chip, Hz relative to A = 440
     chipPitch: {},        // per chip: { key: semitones, hz: Hz }
     chainOn: false,       // chain: move through chips automatically
-    chainSet: [],         // chips linked into the chain (none = the run of neighbouring chips)
+    chainSet: [],         // chips linked into the chain (none = no chain)
     chainPasses: 1,       // passes per chip before moving on
     chainPer: {},         // per-chip passes override
     clickOn: false,       // click track
@@ -505,8 +505,8 @@
   /* ---------- chain ----------
      With CHAIN on, the looper moves through the chain chips by itself: each plays its number of
      passes, then the next chain chip (looper order, wrapping) is queued and takes over on the
-     seam like a manual queue. Chain chips are the ones linked (chain-link button on each chip
-     while CHAIN is on), or every looper chip when none are. A chain is always contiguous: chips
+     seam like a manual queue. Chain chips are only the ones linked (chain-link button on each
+     chip while CHAIN is on); with none linked there is no chain. A chain is always contiguous: chips
      side by side on the board with no empty slot between. If it gets split (a chip dragged
      away), the piece holding the playing chip runs. A manual tap still queues as usual; the
      chain carries on from whatever is playing. */
@@ -523,8 +523,7 @@
   }
   function linkedChips() { return state.looper.filter((id) => state.chainSet.includes(id)); }
   function chainList() {
-    const linked = linkedChips();
-    const runs = runsOf(linked.length ? linked : state.looper.slice());
+    const runs = runsOf(linkedChips());   // only chips with their chain link on; none linked = no chain
     const pc = playingCode();
     return runs.find((r) => r.includes(pc)) || runs[0] || [];
   }
@@ -550,12 +549,13 @@
     // The chain's own queue follows the current settings: if repeats went up (or the chain
     // changed) after it lined up the next chip, take that back or swap it. A chip you queued
     // yourself is left alone.
+    const linked = chainList().includes(code);   // an unlinked chip just loops, even with CHAIN on
     if (queued && queued === chain.autoQueued) {
-      const want = state.chainOn && chain.hold !== chain.done && chain.done >= chainPassesOf(code) - 1 ? nextInChain(code) : null;
+      const want = state.chainOn && linked && chain.hold !== chain.done && chain.done >= chainPassesOf(code) - 1 ? nextInChain(code) : null;
       if (want !== queued) { queued = want; chain.autoQueued = want; render(); }
       return;
     }
-    if (!state.chainOn || queued || chain.hold === chain.done) return;
+    if (!state.chainOn || !linked || queued || chain.hold === chain.done) return;
     if (chain.done >= chainPassesOf(code) - 1) {     // this is its last pass: line up the next chip
       const nx = nextInChain(code);
       if (nx) { queued = nx; chain.autoQueued = nx; render(); }
@@ -1505,7 +1505,7 @@
         const list = chainList();
         const nx = list.length > 1 ? nextInChain(code) : null;
         ch.append(el('div', 'note',
-          (linkedChips().length ? list.length + ' linked chips are in the chain.' : 'Nothing is linked, so the chips side by side with no gap are the chain.') +
+          (linkedChips().length ? list.length + ' linked chips are in the chain.' : 'Nothing is linked yet, so there is no chain.') +
           (state.chainOn && nx ? ' After ' + c.code + ' plays ×' + chainPassesOf(code) + ', ' + lab(nx) + ' (' + chipsByCode[nx].song + ') comes next.' : '') +
           ' A chain is chips next to each other on the board. With CHAIN on (key N), the link button on each chip adds it; the chain moves through them on the seams. Tapping a chip still queues it.'));
         sb.append(ch);
