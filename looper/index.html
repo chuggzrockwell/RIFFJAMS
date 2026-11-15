@@ -164,6 +164,23 @@
   .time { font-size: 13px; font-variant-numeric: tabular-nums; color: #cfcfcf; min-width: 90px; text-align: right; }
   .status { font-size: 12px; color: var(--dim); min-width: 120px; }
 
+  /* Same-song chip picker (empty slot): big Song Map chips in the Song Map tier purples */
+  .picker { position: fixed; inset: 0; z-index: 40; background: rgba(10,10,10,.82); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .picker-card { width: min(760px, 100%); max-height: 100%; overflow-y: auto; background: #1b1b1b; border: 1px solid var(--line2); border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+  .picker-head { display: flex; align-items: center; gap: 12px; }
+  .picker-title { flex: 1; font-family: var(--gadget); font-size: 28px; color: #fff; }
+  .picker-x { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line2); background: transparent; color: var(--muted); font-size: 20px; line-height: 1; }
+  .picker-sub { font-size: 13px; color: var(--dim); margin-top: -6px; }
+  .pchips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pchip { width: 116px; height: 68px; border: 0; border-radius: 0; font-family: var(--gadget); font-size: 30px; letter-spacing: .02em; color: #fff; background: #a064d0;
+    box-shadow: inset -2px 0 0 rgba(0,0,0,.14), inset 0 -2px 0 rgba(0,0,0,.14); cursor: pointer; }
+  .pchip:hover { filter: brightness(1.12); }
+  .pchip:active { filter: brightness(.95); }
+  .pchip.t1 { background: #7030a0; color: #fff; }
+  .pchip.t2 { background: #a365d1; color: #fff; }
+  .pchip.t3, .pchip.t4 { background: #d4bbe3; color: #1a1020; }
+  .pchip.t5 { background: #f3edf7; color: #1a1020; }
+  .picker-link { align-self: flex-start; padding: 0; border: 0; background: none; color: var(--muted); text-decoration: underline; font-size: 13px; }
   /* Chip folder: the audio lives on your computer, never in the repo */
   .gate { position: fixed; inset: 0; z-index: 50; background: rgba(10,10,10,.92); display: flex; align-items: center; justify-content: center; padding: 16px; }
   .gate[hidden] { display: none; }
@@ -237,6 +254,6 @@
   </div>
 
 <script src="vendor/SignalsmithStretch.js"></script>
-<script src="looper.js?v=26"></script><!-- bump v on every change so the browser can't use a stale copy -->
+<script src="looper.js?v=27"></script><!-- bump v on every change so the browser can't use a stale copy -->
 </body>
 </html>
