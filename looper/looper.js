@@ -2140,6 +2140,7 @@
   $('loopBtn').addEventListener('click', () => { state.loopOn = !state.loopOn; saveState(); renderTransport(); });
   $('clickBtn').addEventListener('click', () => setClick(!state.clickOn));
   $('chainBtn').addEventListener('click', () => setChain(!state.chainOn));
+  $('sbClose').addEventListener('click', () => setPanel('off'));   // same as the "Off" panel button
   document.addEventListener('click', (ev) => {
     const m = $('panelMenu');
     if (!m.hidden && !m.contains(ev.target)) { m.hidden = true; renderSeg(); }

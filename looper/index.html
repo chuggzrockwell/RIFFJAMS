@@ -99,9 +99,11 @@
   .add-tile { margin: 8px; aspect-ratio: 16 / 9; border-radius: 12px; border: 2px dashed var(--line2); background: transparent; color: var(--dim); font-size: 14px; font-weight: 700; }
   .add-tile:hover { border-color: var(--accent); color: var(--accent); }
 
-  .sidebar { width: var(--sbw, 340px); flex: 0 0 auto; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .sidebar { position: relative; width: var(--sbw, 340px); flex: 0 0 auto; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .sb-close { position: absolute; top: 8px; right: 8px; z-index: 5; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line2); background: #1b1b1b; color: #ddd; font-size: 17px; line-height: 1; padding: 0; }
+  .sb-close:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
   .sidebar[hidden] { display: none; }
-  #sbContent { flex: 1; min-height: 0; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+  #sbContent { flex: 1; min-height: 0; padding: 18px 44px 18px 20px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
   #sbContent[hidden] { display: none; }
   /* Drag handle between the looper and the sidebar */
   .divider { flex: 0 0 9px; position: relative; cursor: col-resize; touch-action: none; }
@@ -116,7 +118,7 @@
   #embeds:empty { display: none; }
   .embed { flex: 1; min-height: 0; display: flex; flex-direction: column; }
   .embed[hidden] { display: none; }
-  .embed-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .embed-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 44px 10px 14px; border-bottom: 1px solid var(--line); }
   .embed-head .grow { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .embed-keys { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line2); color: var(--muted); white-space: nowrap; }
   .embed.focused .embed-keys { border-color: var(--accent); background: var(--accent); color: #fff; }
@@ -261,6 +263,7 @@
     </section>
     <div class="divider" id="divider" role="separator" aria-orientation="vertical" aria-label="Resize sidebar" tabindex="0"></div>
     <aside class="sidebar" id="sidebar" aria-label="Sidebar">
+      <button type="button" class="sb-close" id="sbClose" title="Close the side panel" aria-label="Close the side panel">&times;</button>
       <div id="sbContent"></div>
       <div id="embeds"></div>
     </aside>
@@ -279,6 +282,6 @@
 
 <script src="../rj-timer.js?v=1"></script><!-- RIFFJAMS practice timer (same time as the other pages) -->
 <script src="vendor/SignalsmithStretch.js"></script>
-<script src="looper.js?v=32"></script><!-- bump v on every change so the browser can't use a stale copy -->
+<script src="looper.js?v=33"></script><!-- bump v on every change so the browser can't use a stale copy -->
 </body>
 </html>
