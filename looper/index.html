@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loop Station</title>
+<style>
+  @font-face { font-family: "Vol4 Title"; src: url("assets/K22Gadget.ttf") format("truetype"); }
+  :root {
+    --bg: #121212; --panel: #1c1c1c; --line: #2a2a2a; --line2: #3a3a3a;
+    --fg: #f2f2f2; --muted: #9a9a9a; --dim: #8a8a8a;
+    --accent: #7030a0;            /* RIFFJAMS tier-1 purple (Song Map tier-1 glow) */
+    --yellow: #ffd400; --red: #ed1c24;
+    --gadget: "Vol4 Title", Impact, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--bg); color: var(--fg); font-family: Inter, "Segoe UI", system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+  .topbar { display: flex; align-items: center; gap: 22px; padding: 12px 24px; border-bottom: 1px solid var(--line); }
+  .brand { font-family: var(--gadget); font-size: 22px; letter-spacing: .02em; }
+  .nav { display: flex; gap: 4px; font-size: 13px; }
+  .nav span { padding: 7px 12px; color: var(--muted); }
+  .nav span.on { border-radius: 6px; background: #1f1f1f; color: var(--fg); box-shadow: inset 0 -2px 0 var(--accent); }
+  .spacer { flex: 1; }
+  .songtag { font-size: 12px; color: var(--muted); }
+
+  .banner { margin: 12px 24px 0; padding: 10px 14px; border-radius: 8px; background: #3a1414; border: 1px solid #7a2020; color: #ffd6d6; font-size: 13px; }
+  .banner[hidden] { display: none; }
+
+  .main { flex: 1; display: flex; min-height: 0; }
+  .looper { flex: 1; min-width: 0; padding: 18px 24px; display: flex; flex-direction: column; gap: 14px; container: looper / inline-size; }
+  .looper-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .looper-title { font-family: var(--gadget); font-size: 24px; }
+  .looper-sub { font-size: 12px; color: var(--muted); }
+  .pill { font-size: 12px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line2); color: #cfcfcf; }
+  .seg { display: flex; gap: 3px; padding: 3px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); }
+  .seg button { border: 0; background: transparent; color: var(--muted); font-size: 12px; font-weight: 700; padding: 6px 10px; border-radius: 7px; }
+  .seg button.on { background: #2a2a2a; color: var(--fg); }
+  .seg button.cfg { padding: 6px 8px; font-size: 14px; line-height: 1; }
+  .segwrap { position: relative; max-width: 100%; }
+  .seg { flex-wrap: wrap; }
+  .panelmenu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 5; min-width: 190px; padding: 12px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line2); box-shadow: 0 8px 24px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 8px; }
+  .panelmenu[hidden] { display: none; }
+  .menurow { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+  .menurow input { accent-color: var(--accent); width: 16px; height: 16px; }
+  .stepper { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; }
+  .stepper .name { color: var(--dim); font-size: 13px; width: 52px; flex: 0 0 auto; }
+  .stepbtn { width: 34px; height: 30px; border-radius: 6px; border: 1px solid var(--line2); background: transparent; font-size: 18px; line-height: 1; }
+  .stepbtn:hover { border-color: var(--accent); background: rgba(112,48,160,.25); }
+  .stepval { flex: 1; text-align: center; font-family: var(--gadget); font-size: 18px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .chip .pitchtag { font-size: clamp(9px, 3.8cqi, 13px); font-weight: 700; margin-top: 4px; padding: 2px 6px; border-radius: 999px; background: rgba(112,48,160,.85); display: inline-block; text-shadow: none; }
+
+  /* Chips scale with the looper's width: column count from container queries, chip text from the chip's own width (cqi). */
+  /* The looper is a fixed 4×4 board: 16 slots, chips first, dotted add slots after. */
+  .grid { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: auto; gap: 4px; padding: 4px; align-content: start; }
+  .cell[draggable="true"] { cursor: grab; }
+  .cell.dragging { opacity: .35; }
+  .cell.dropover .chip { outline-color: var(--yellow); }
+  .add-tile.dropover { border-color: var(--yellow); color: var(--yellow); }
+  .cell { position: relative; margin: 8px; aspect-ratio: 16 / 9; container-type: inline-size; }
+  .chip { position: absolute; inset: 0; width: 100%; border-radius: 12px; padding: clamp(8px, 5cqi, 16px); display: flex; flex-direction: column; justify-content: space-between; border: 0; text-align: left; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.8); background-size: cover; background-position: center; }
+  .chip.full { background-image: linear-gradient(180deg, rgba(0,0,0,.05) 30%, rgba(0,0,0,.78) 100%), url("assets/paranoid.png"); }
+  .chip.wash { background-image: linear-gradient(180deg, rgba(0,0,0,.05) 30%, rgba(0,0,0,.78) 100%), url("assets/paranoid-tier2.png"); }
+  .chip { outline: 4px solid #fff; outline-offset: 3px; }          /* idle */
+  .chip.t1 { outline: 4px solid var(--red); outline-offset: 3px; } /* idle tier 1 keeps its red ring */
+  .chip.queued { outline: 4px solid var(--yellow); outline-offset: 3px; }
+  .chip.playing { outline: 4px solid var(--accent); outline-offset: 3px; }
+  .chip:hover { filter: brightness(1.08); }
+  .chip .row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .chip .code { font-family: var(--gadget); font-size: clamp(14px, 10.5cqi, 42px); line-height: 1; }
+  .chip .key { font-size: clamp(9px, 4cqi, 13px); font-weight: 700; opacity: .75; }
+  .chip .song { font-family: var(--gadget); font-size: clamp(14px, 11cqi, 46px); line-height: 1; }
+  .chip .chord { font-size: clamp(9px, 4.2cqi, 14px); margin-bottom: 2px; }
+  .chip .badge { display: inline-block; font-size: clamp(9px, 3.8cqi, 13px); font-weight: 700; padding: 3px 8px; border-radius: 999px; background: #fff; color: #121212; text-shadow: none; margin-bottom: 6px; }
+  .chip .bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,.3); overflow: hidden; margin-top: 10px; }
+  .chip .bar i { display: block; height: 100%; width: 0; background: #fff; }
+  .remove { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; font-size: 14px; line-height: 1; opacity: 0; z-index: 1; }
+  .cell:hover .remove, .remove:focus-visible { opacity: 1; }
+  .cell:hover .chip .key { opacity: 0; }
+  /* Chain marker on a looper chip: shown while CHAIN is on or when marked, otherwise on hover */
+  .chainpill { position: absolute; right: calc(clamp(8px, 5cqi, 16px) + 44px); top: calc(clamp(8px, 5cqi, 16px) - 2px);   /* left of the C, grows leftwards */ z-index: 1; white-space: nowrap; display: flex; align-items: stretch; border-radius: 999px; border: 1px solid rgba(255,255,255,.7); background: rgba(0,0,0,.6); color: #fff; overflow: hidden; opacity: 0; }
+  .chainpill.on, .chainpill.marked, .cell:hover .chainpill, .chainpill:focus-within { opacity: 1; }
+  .chainpill.marked { background: var(--accent); border-color: var(--accent); }
+  .chainpill button { border: 0; background: transparent; color: inherit; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
+  .chainpill .cp-label { padding: 3px 8px; }
+  .chainpill .cp-step { width: 22px; font-size: 13px; line-height: 1; padding: 0; display: none; }
+  .cell:hover .chainpill .cp-step, .chainpill:focus-within .cp-step { display: block; }   /* −/+ on hover */
+  .chainpill .cp-step:hover:not(:disabled) { background: rgba(255,255,255,.2); }
+  .chainpill .cp-step:disabled { opacity: .35; cursor: default; }
+  /* "C" count-in button, top right just left of the key number (the chip's padding + the number's width) */
+  .countin { position: absolute; right: calc(clamp(8px, 5cqi, 16px) + 16px); top: calc(clamp(8px, 5cqi, 16px) - 3px); z-index: 1; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,.6); color: #fff; font-family: var(--gadget); font-size: 12px; line-height: 1; padding: 0; }
+  .countin:hover { background: var(--accent); border-color: var(--accent); }
+  .add-tile { margin: 8px; aspect-ratio: 16 / 9; border-radius: 12px; border: 2px dashed var(--line2); background: transparent; color: var(--dim); font-size: 14px; font-weight: 700; }
+  .add-tile:hover { border-color: var(--accent); color: var(--accent); }
+
+  .sidebar { width: var(--sbw, 340px); flex: 0 0 auto; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .sidebar[hidden] { display: none; }
+  #sbContent { flex: 1; min-height: 0; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+  #sbContent[hidden] { display: none; }
+  /* Drag handle between the looper and the sidebar */
+  .divider { flex: 0 0 9px; position: relative; cursor: col-resize; touch-action: none; }
+  .divider[hidden] { display: none; }
+  .divider::after { content: ""; position: absolute; top: 0; bottom: 0; left: 4px; width: 1px; background: var(--line); }
+  .divider:hover::after, .divider.dragging::after, .divider:focus-visible::after { left: 3px; width: 3px; background: var(--accent); }
+  .divider:focus-visible { outline: none; }
+  body.resizing { cursor: col-resize; user-select: none; }
+  body.resizing iframe { pointer-events: none; }
+  /* Embedded RIFFJAMS pages (Playboard, Song Map) */
+  #embeds { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  #embeds:empty { display: none; }
+  .embed { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .embed[hidden] { display: none; }
+  .embed-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .embed-head .grow { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .embed-keys { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line2); color: var(--muted); white-space: nowrap; }
+  .embed.focused .embed-keys { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .embed iframe { flex: 1; min-height: 0; width: 100%; border: 0; background: var(--bg); display: block; }
+  .embed.focused iframe { box-shadow: inset 0 0 0 2px var(--accent); }
+  .label { font-size: 11px; letter-spacing: .08em; color: var(--dim); font-weight: 700; }
+  .big { font-family: var(--gadget); font-size: 28px; margin-top: 4px; }
+  .note { font-size: 12px; color: var(--dim); line-height: 1.5; }
+  .stem { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14px; }
+  .switch { width: 40px; height: 22px; border-radius: 999px; border: 0; background: #3a3a3a; position: relative; flex: 0 0 auto; }
+  .switch::after { content: ""; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .12s; }
+  .switch[aria-checked="true"] { background: var(--accent); }
+  .switch[aria-checked="true"]::after { left: 21px; }
+  .stem input[type=range] { flex: 1; accent-color: var(--accent); }
+  .pointrow { display: flex; align-items: center; gap: 6px; font-size: 14px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; }
+  .pointrow { gap: 4px; }
+  .pointrow .name { color: var(--dim); width: 38px; flex: 0 0 auto; font-size: 13px; }
+  .pointrow .val { flex: 1; min-width: 0; font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pointrow button { padding: 4px 5px; }
+  .pointrow button, .smallbtn { border: 1px solid var(--line2); background: transparent; border-radius: 6px; font-size: 12px; }
+  .smallbtn { padding: 4px 7px; }
+  .pointrow button:hover, .smallbtn:hover { border-color: var(--accent); }
+  select { font: inherit; background: var(--panel); color: var(--fg); border: 1px solid var(--line2); border-radius: 6px; padding: 4px 6px; }
+  .lockbtn:not(:disabled) { border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 700; }
+  .lockbtn:disabled { opacity: .4; cursor: default; }
+
+  /* Needs improvement list in the sidebar: looper-style chips, × on hover */
+  .needs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 2px; margin: -8px; }
+
+  /* Waveform in the Now panel */
+  .wave { display: flex; flex-direction: column; gap: 6px; }
+  .wave-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .wave-read { font-variant-numeric: tabular-nums; }
+  .wave canvas { display: block; width: 100%; height: 64px; border-radius: 8px; background: #0d0d0d; touch-action: none; user-select: none; }
+  .wave-zlabel { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--dim); margin-bottom: -2px; }
+
+  /* "Add to looper" toggle in the Song Map panel header */
+  .addmode { font-weight: 700; }
+  .addmode[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .transport { border-top: 1px solid var(--line); padding: 12px 24px; display: flex; align-items: center; gap: 16px; }
+  .tbtn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line2); background: transparent; font-size: 14px; }
+  .tbtn.play { width: 50px; height: 50px; background: var(--accent); border: 0; color: #fff; font-size: 18px; }
+  .loopbtn { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font-family: var(--gadget); font-size: 16px; letter-spacing: .03em; }
+  .loopbtn[aria-pressed="false"] { background: transparent; border-color: var(--line2); color: var(--muted); }
+  .progress { flex: 1; height: 4px; background: #2e2e2e; border-radius: 2px; position: relative; }
+  .progress i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); border-radius: 2px; }
+  .time { font-size: 13px; font-variant-numeric: tabular-nums; color: #cfcfcf; min-width: 90px; text-align: right; }
+  .status { font-size: 12px; color: var(--dim); min-width: 120px; }
+
+  /* Chip folder: the audio lives on your computer, never in the repo */
+  .gate { position: fixed; inset: 0; z-index: 50; background: rgba(10,10,10,.92); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .gate[hidden] { display: none; }
+  .gate-card { max-width: 440px; background: #1b1b1b; border: 1px solid var(--line2); border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+  .gate-title { font-family: var(--gadget); font-size: 26px; color: #fff; }
+  .gate-card p { margin: 0; color: #cfcfcf; font-size: 14px; line-height: 1.45; }
+  .gate-btn { padding: 9px 16px; border-radius: 999px; border: 0; background: var(--accent); color: #fff; font-weight: 700; font-size: 14px; }
+  .gate-link { padding: 0; border: 0; background: none; color: var(--muted); text-decoration: underline; font-size: 13px; }
+  .gate-card .gate-err { color: #ff7b7b; font-size: 13px; }
+  .gate-card .gate-err:empty { display: none; }
+  a.brand { color: inherit; text-decoration: none; }
+  .folderbtn { margin-left: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line2); background: transparent; color: var(--muted); font-size: 12px; }
+
+  @media (max-width: 860px) {
+    .sidebar, .divider { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .switch::after { transition: none; } }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="brand" href="../" title="RIFFJAMS home">RIFFJAMS</a>
+    <div class="nav"><span>Song Map</span><span>Playboard</span><span class="on">Loop Station</span><span>Lick Library</span></div>
+    <div class="spacer"></div>
+    <div class="songtag" id="songTag"></div>
+    <button type="button" class="folderbtn" id="folderBtn" hidden>Chip folder</button>
+  </div>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <div class="gate" id="gate" hidden>
+    <div class="gate-card">
+      <div class="gate-title">Loop Station</div>
+      <p id="gateMsg"></p>
+      <button type="button" class="gate-btn" id="gateBtn">Choose chip folder</button>
+      <button type="button" class="gate-link" id="gateOther" hidden>Choose a different folder</button>
+      <p class="gate-err" id="gateErr"></p>
+    </div>
+  </div>
+
+  <div class="main">
+    <section class="looper" aria-label="Looper">
+      <div class="looper-head">
+        <div class="looper-title">Looper</div>
+        <div class="looper-sub" id="looperSub"></div>
+        <div class="spacer"></div>
+        <span class="pill" id="clickPill">Click off</span>
+        <div class="segwrap">
+          <div class="seg" id="panelSeg" role="group" aria-label="Sidebar"></div>
+          <div class="panelmenu" id="panelMenu" hidden></div>
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+    <div class="divider" id="divider" role="separator" aria-orientation="vertical" aria-label="Resize sidebar" tabindex="0"></div>
+    <aside class="sidebar" id="sidebar" aria-label="Sidebar">
+      <div id="sbContent"></div>
+      <div id="embeds"></div>
+    </aside>
+  </div>
+
+  <div class="transport">
+    <button type="button" class="tbtn" id="stopBtn" aria-label="Stop">■</button>
+    <button type="button" class="tbtn play" id="playBtn" aria-label="Play">▶</button>
+    <button type="button" class="loopbtn" id="loopBtn" aria-pressed="true">LOOP ON</button>
+    <button type="button" class="loopbtn" id="chainBtn" aria-pressed="false" title="Chain: move through the chips by itself (N)">CHAIN OFF</button>
+    <button type="button" class="loopbtn" id="clickBtn" aria-pressed="false" title="Click track (K)">CLICK OFF</button>
+    <div class="progress" aria-hidden="true"><i id="progressFill"></i></div>
+    <div class="time" id="timeText">0:00 / 0:00</div>
+    <div class="status" id="statusText"></div>
+  </div>
+
+<script src="vendor/SignalsmithStretch.js"></script>
+<script src="looper.js?v=26"></script><!-- bump v on every change so the browser can't use a stale copy -->
+</body>
+</html>

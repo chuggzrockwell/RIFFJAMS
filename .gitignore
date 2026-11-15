@@ -3,3 +3,8 @@
 Thumbs.db
 __pycache__/
 *.pyc
+
+# Loop Station audio and chip timings stay on your computer (copyrighted)
+looper/audio/
+looper/manifest.json*
+*.flac
