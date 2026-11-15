@@ -116,6 +116,7 @@
     color: transparent;
   }
   .tile.hp small { color: transparent; }
+  .tile.lp { background: #7030a0; }
   .tile.c { background: #ffe44a; color: #111; }
   .tile.d { background: #ff3d4e; }
   .tile:hover { filter: brightness(1.12); }
@@ -5086,6 +5087,7 @@
       <button type="button" class="tile a" id="btnA"><small>Licks</small>A</button>
       <button type="button" class="tile b" id="btnB"><small>Paranoid</small>B</button>
       <button type="button" class="tile b2" id="btnB2"><small>Paranoid</small>B2</button>
+      <button type="button" class="tile lp" id="btnLP"><small>Loop Station</small>Looper</button>
     </div>
   </section>
   <section id="sections" class="hidden">
@@ -18170,6 +18172,7 @@ function showHome() {
 document.getElementById("btnA").onclick = function(){ showSeries("A"); };
 document.getElementById("btnB").onclick = function(){ showSeries("B"); };
 document.getElementById("btnB2").onclick = function(){ showSeries("B2"); };
+document.getElementById("btnLP").onclick = function(){ location.href = "looper/"; };
 document.getElementById("btnHP").onclick = showSections;
 document.getElementById("back").onclick = showHome;
 var _btnRand = document.getElementById("btnRandomize");
