@@ -80,6 +80,7 @@
   /* Chip buttons stacked under the slot number: repeat counter, chain link, metronome (count-in) */
   .ctrls { position: absolute; right: clamp(6px, 5cqi, 16px); top: calc(clamp(6px, 5cqi, 16px) + clamp(11px, 6cqi, 20px)); z-index: 1; display: flex; flex-direction: column; align-items: flex-end; gap: clamp(2px, 1.5cqi, 4px); }
   .iconbtn { width: clamp(16px, 11cqi, 24px); height: clamp(16px, 11cqi, 24px); border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,.6); color: #fff; padding: 0; display: flex; align-items: center; justify-content: center; }
+  .ctrl-row { display: flex; align-items: center; gap: clamp(2px, 1.5cqi, 4px); }   /* counter, then chain link */
   .iconbtn svg { width: 62%; height: 62%; }
   .iconbtn:hover { background: var(--accent); border-color: var(--accent); }
   .iconbtn.link.on { background: var(--accent); border-color: var(--accent); }
@@ -278,6 +279,6 @@
 
 <script src="../rj-timer.js?v=1"></script><!-- RIFFJAMS practice timer (same time as the other pages) -->
 <script src="vendor/SignalsmithStretch.js"></script>
-<script src="looper.js?v=31"></script><!-- bump v on every change so the browser can't use a stale copy -->
+<script src="looper.js?v=32"></script><!-- bump v on every change so the browser can't use a stale copy -->
 </body>
 </html>

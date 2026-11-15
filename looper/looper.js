@@ -909,6 +909,7 @@
       // Buttons in a row under the slot number: repeat counter, chain link (while CHAIN is on),
       // then the metronome (count-in).
       const ctr = el('div', 'ctrls');
+      const chainRow = el('div', 'ctrl-row');   // counter to the left of the chain link
       if (state.chainOn && inChain) {
         const passes = chainPassesOf(code);
         // While the chain runs, the playing chip shows which pass it's on, e.g. "2/8".
@@ -927,7 +928,7 @@
           return b2;
         };
         cnt.append(mk('−', -1), lbl, mk('+', 1));
-        ctr.append(cnt);
+        chainRow.append(cnt);
       }
       if (state.chainOn) {
         const lk = el('button', 'iconbtn link' + (linked ? ' on' : ''));
@@ -937,8 +938,9 @@
         lk.setAttribute('aria-pressed', String(linked));
         lk.setAttribute('aria-label', (linked ? 'Take ' : 'Add ') + c.code + ' ' + c.song + (linked ? ' out of' : ' to') + ' the chain');
         lk.addEventListener('click', () => toggleChainChip(code));
-        ctr.append(lk);
+        chainRow.append(lk);
       }
+      if (chainRow.childNodes.length) ctr.append(chainRow);
       if (c.quantized) {                         // count-in needs a locked tempo
         const ci = el('button', 'iconbtn countin');
         ci.type = 'button';
