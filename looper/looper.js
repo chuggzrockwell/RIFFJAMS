@@ -62,7 +62,7 @@
     hzGlobal: 0,          // fine tune for every chip, Hz relative to A = 440
     chipPitch: {},        // per chip: { key: semitones, hz: Hz }
     chainOn: false,       // chain: move through chips automatically
-    chainSet: [],         // chips marked for the chain (none marked = every looper chip)
+    chainSet: [],         // chips linked into the chain (none = the run of neighbouring chips)
     chainPasses: 1,       // passes per chip before moving on
     chainPer: {},         // per-chip passes override
     clickOn: false,       // click track
@@ -505,12 +505,28 @@
   /* ---------- chain ----------
      With CHAIN on, the looper moves through the chain chips by itself: each plays its number of
      passes, then the next chain chip (looper order, wrapping) is queued and takes over on the
-     seam like a manual queue. Chain chips are the ones marked, or every looper chip when none
-     are. A manual tap still queues as usual; the chain carries on from whatever is playing. */
+     seam like a manual queue. Chain chips are the ones linked (chain-link button on each chip
+     while CHAIN is on), or every looper chip when none are. A chain is always contiguous: chips
+     side by side on the board with no empty slot between. If it gets split (a chip dragged
+     away), the piece holding the playing chip runs. A manual tap still queues as usual; the
+     chain carries on from whatever is playing. */
   const chain = { code: null, done: 0, seamAt: null, hold: -1 };   // done = passes finished of chain.code
+  // Split chips (board order) into runs of neighbouring slots.
+  function runsOf(ids) {
+    const runs = [];
+    ids.forEach((id) => {
+      const r = runs[runs.length - 1];
+      if (r && state.slots[id] === state.slots[r[r.length - 1]] + 1) r.push(id);
+      else runs.push([id]);
+    });
+    return runs;
+  }
+  function linkedChips() { return state.looper.filter((id) => state.chainSet.includes(id)); }
   function chainList() {
-    const marked = state.looper.filter((id) => state.chainSet.includes(id));
-    return marked.length ? marked : state.looper.slice();
+    const linked = linkedChips();
+    const runs = runsOf(linked.length ? linked : state.looper.slice());
+    const pc = playingCode();
+    return runs.find((r) => r.includes(pc)) || runs[0] || [];
   }
   function chainPassesOf(code) { return state.chainPer[code] || state.chainPasses; }
   function nextInChain(code) {
@@ -551,8 +567,19 @@
     saveState();
     render();
   }
+  // Link / unlink a chip. Only a chip next to the chain can join it, and only an end can leave
+  // it, so the chain stays in one piece.
   function toggleChainChip(id) {
-    state.chainSet = state.chainSet.includes(id) ? state.chainSet.filter((x) => x !== id) : state.chainSet.concat([id]);
+    const linked = linkedChips();
+    const s = state.slots[id];
+    const at = (slot) => linked.some((x) => state.slots[x] === slot);
+    if (state.chainSet.includes(id)) {
+      if (at(s - 1) && at(s + 1)) { setStatus('Unlink ' + lab(id) + ' from an end of the chain: the chain has to stay in one piece'); return; }
+      state.chainSet = state.chainSet.filter((x) => x !== id);
+    } else {
+      if (linked.length && !at(s - 1) && !at(s + 1)) { setStatus('Only a chip right next to the chain can join it'); return; }
+      state.chainSet = state.chainSet.filter((x) => state.looper.includes(x)).concat([id]);
+    }
     saveState(); render();
   }
   function setChainPasses(v) { state.chainPasses = clamp(v, 1, 16); saveState(); render(); }
@@ -795,6 +822,13 @@
   }
   function chipInSlot(i) { return state.looper.find((id) => state.slots[id] === i) || null; }
 
+  // Small line icons for the chip buttons (currentColor, so they follow the button's colour).
+  const ICON_LINK = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">' +
+    '<path d="M10 13.5a4.5 4.5 0 0 0 6.4.4l2.8-2.8a4.5 4.5 0 0 0-6.4-6.4l-1.3 1.3"/>' +
+    '<path d="M14 10.5a4.5 4.5 0 0 0-6.4-.4l-2.8 2.8a4.5 4.5 0 0 0 6.4 6.4l1.3-1.3"/></svg>';
+  const ICON_METRONOME = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">' +
+    '<path d="M9 3h6l4 18H5z"/><path d="M7.2 16h9.6"/><path d="M12 16 17 6"/></svg>';
+
   /* ---------- drag to move ---------- */
   let gridDrag = null;   // chip id being dragged; the grid isn't rebuilt mid-drag
   // Drop on an empty slot: the chip moves there. Drop on another chip: the two swap places.
@@ -867,48 +901,57 @@
       rm.setAttribute('aria-label', 'Remove ' + c.code + ' ' + c.song + ' from looper');
       rm.addEventListener('click', () => removeFromLooper(code));
 
-      // Chain marker: shows each chain chip's passes while CHAIN is on; click to mark/unmark.
-      const marked = state.chainSet.includes(code);
+      // Chained chips get their code underlined.
+      const linked = state.chainSet.includes(code);
       const inChain = chainList().includes(code);
-      const cp = el('div', 'chainpill' + (marked ? ' marked' : '') + (state.chainOn && inChain ? ' on' : ''));
-      const passes = chainPassesOf(code);
-      const own = state.chainPer[code] != null;
-      // While the chain runs, the playing chip shows which pass it's on, e.g. "PASS 2 / 8".
-      const counting = state.chainOn && code === pc && chain.code === code;
-      // Compact so it fits between the code and the key number on a 4-across board: "×8", or "2/8" while counting.
-      const lbl = el('button', 'cp-label', counting ? Math.min(chain.done + 1, passes) + '/' + passes
-        : (marked || (state.chainOn && inChain) ? '×' + passes : '+ CHAIN'));
-      if (counting) lbl.title = 'Pass ' + Math.min(chain.done + 1, passes) + ' of ' + passes + '. ';
-      lbl.type = 'button';
-      lbl.title = (lbl.title || '') + (marked ? 'In the chain, ' + passes + ' passes. Click to unmark.' : 'Mark for the chain (with nothing marked, every chip is in it)');
-      lbl.setAttribute('aria-pressed', String(marked));
-      lbl.setAttribute('aria-label', (marked ? 'Unmark ' : 'Mark ') + c.code + ' ' + c.song + ' for the chain');
-      lbl.addEventListener('click', () => toggleChainChip(code));
-      if (marked || (state.chainOn && inChain)) {
+      if (linked && inChain) b.classList.add('chained');
+
+      // Buttons in a row under the slot number: repeat counter, chain link (while CHAIN is on),
+      // then the metronome (count-in).
+      const ctr = el('div', 'ctrls');
+      if (state.chainOn && inChain) {
+        const passes = chainPassesOf(code);
+        // While the chain runs, the playing chip shows which pass it's on, e.g. "2/8".
+        const counting = code === pc && chain.code === code;
+        const cnt = el('div', 'counter');
+        const lbl = el('span', 'cn-label', counting ? Math.min(chain.done + 1, passes) + '/' + passes : '×' + passes);
+        lbl.title = (counting ? 'Pass ' + Math.min(chain.done + 1, passes) + ' of ' + passes + '. ' : '') + 'Repeats in the chain: ' + passes +
+          (state.chainPer[code] != null ? ' (its own count; the Now panel’s Reset puts it back to the shared count)' : '');
         // −/+ set this chip's own repeats right here, without selecting (and so queuing) it.
         const mk = (txt, d) => {
-          const b2 = el('button', 'cp-step', txt);
+          const b2 = el('button', 'cn-step', txt);
           b2.type = 'button';
           b2.disabled = d < 0 ? passes <= 1 : passes >= 16;
           b2.setAttribute('aria-label', (d < 0 ? 'Fewer' : 'More') + ' repeats of ' + c.code + ' ' + c.song + ' in the chain (now ' + passes + ')');
           b2.addEventListener('click', () => setChipPasses(code, passes + d));
           return b2;
         };
-        if (own) lbl.title += ' Its own repeat count (the Now panel’s Reset puts it back to the shared count).';
-        cp.append(mk('−', -1), lbl, mk('+', 1));
-      } else cp.append(lbl);
-
-      const cell = el('div', 'cell');
-      cell.append(b, rm, cp);
+        cnt.append(mk('−', -1), lbl, mk('+', 1));
+        ctr.append(cnt);
+      }
+      if (state.chainOn) {
+        const lk = el('button', 'iconbtn link' + (linked ? ' on' : ''));
+        lk.type = 'button';
+        lk.innerHTML = ICON_LINK;
+        lk.title = linked ? 'In the chain: click to take it out' : 'Add to the chain (chips next to each other)';
+        lk.setAttribute('aria-pressed', String(linked));
+        lk.setAttribute('aria-label', (linked ? 'Take ' : 'Add ') + c.code + ' ' + c.song + (linked ? ' out of' : ' to') + ' the chain');
+        lk.addEventListener('click', () => toggleChainChip(code));
+        ctr.append(lk);
+      }
       if (c.quantized) {                         // count-in needs a locked tempo
-        const ci = el('button', 'countin', 'C');
+        const ci = el('button', 'iconbtn countin');
         ci.type = 'button';
+        ci.innerHTML = ICON_METRONOME;
         const cbpm = (c.quantized.bpm * state.rate).toFixed(1);
         ci.title = 'Count in: four clicks at ' + cbpm + ' BPM, then ' + c.code + ' starts';
         ci.setAttribute('aria-label', 'Count in and start ' + c.code + ' ' + c.song + ' at ' + cbpm + ' BPM');
         ci.addEventListener('click', () => countInChip(code));
-        cell.append(ci);
+        ctr.append(ci);
       }
+
+      const cell = el('div', 'cell');
+      cell.append(b, rm, ctr);
       // Drag a chip to any slot: an empty one moves it there, another chip swaps the two.
       cell.draggable = true;
       cell.dataset.code = code;
@@ -1460,9 +1503,9 @@
         const list = chainList();
         const nx = list.length > 1 ? nextInChain(code) : null;
         ch.append(el('div', 'note',
-          (state.chainSet.filter((id) => state.looper.includes(id)).length ? list.length + ' marked chips are in the chain.' : 'Nothing is marked, so every looper chip is in the chain.') +
+          (linkedChips().length ? list.length + ' linked chips are in the chain.' : 'Nothing is linked, so the chips side by side with no gap are the chain.') +
           (state.chainOn && nx ? ' After ' + c.code + ' plays ×' + chainPassesOf(code) + ', ' + lab(nx) + ' (' + chipsByCode[nx].song + ') comes next.' : '') +
-          ' CHAIN ON (key N) moves through them on the seams. Tapping a chip still queues it.'));
+          ' A chain is chips next to each other on the board. With CHAIN on (key N), the link button on each chip adds it; the chain moves through them on the seams. Tapping a chip still queues it.'));
         sb.append(ch);
       }
       const stems = vstack(10);
@@ -1504,7 +1547,7 @@
     $('loopBtn').setAttribute('aria-pressed', String(state.loopOn));
     $('loopBtn').textContent = state.loopOn ? 'LOOP ON' : 'LOOP OFF';
     $('chainBtn').setAttribute('aria-pressed', String(state.chainOn));
-    $('chainBtn').textContent = state.chainOn ? 'CHAIN ON' : 'CHAIN OFF';
+    $('chainBtn').textContent = 'CHAIN';   // purple when on, black and grey when off
     $('clickBtn').setAttribute('aria-pressed', String(state.clickOn));
     $('clickBtn').textContent = state.clickOn ? 'CLICK ON' : 'CLICK OFF';
     // Header pill: what the click is doing for the chip you hear (or the selected one).

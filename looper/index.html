@@ -77,22 +77,24 @@
   .chip .badge { display: inline-block; font-size: clamp(9px, 3.8cqi, 13px); font-weight: 700; padding: 3px 8px; border-radius: 999px; background: #fff; color: #121212; text-shadow: none; margin-bottom: 6px; }
   .chip .bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,.3); overflow: hidden; margin-top: 10px; }
   .chip .bar i { display: block; height: 100%; width: 0; background: #fff; }
+  /* Chip buttons in a row under the slot number: repeat counter, chain link, metronome (count-in) */
+  .ctrls { position: absolute; right: clamp(6px, 5cqi, 16px); top: calc(clamp(6px, 5cqi, 16px) + clamp(11px, 6cqi, 20px)); z-index: 1; display: flex; align-items: center; gap: clamp(2px, 1.5cqi, 4px); }
+  .iconbtn { width: clamp(16px, 11cqi, 24px); height: clamp(16px, 11cqi, 24px); border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,.6); color: #fff; padding: 0; display: flex; align-items: center; justify-content: center; }
+  .iconbtn svg { width: 62%; height: 62%; }
+  .iconbtn:hover { background: var(--accent); border-color: var(--accent); }
+  .iconbtn.link.on { background: var(--accent); border-color: var(--accent); }
+  .counter { display: flex; align-items: stretch; height: clamp(16px, 11cqi, 24px); border-radius: 999px; border: 1px solid rgba(255,255,255,.7); background: rgba(0,0,0,.6); color: #fff; overflow: hidden; white-space: nowrap; }
+  .counter .cn-label { padding: 0 clamp(3px, 2.5cqi, 8px); display: flex; align-items: center; font-size: clamp(8px, 4.5cqi, 11px); font-weight: 700; letter-spacing: .04em; }
+  .counter .cn-step { border: 0; background: transparent; color: inherit; width: 20px; font-size: 13px; line-height: 1; padding: 0; display: none; }
+  .cell:hover .counter .cn-step, .counter:focus-within .cn-step { display: block; }   /* −/+ on hover */
+  .counter .cn-step:hover:not(:disabled) { background: rgba(255,255,255,.2); }
+  .counter .cn-step:disabled { opacity: .35; cursor: default; }
+  .chip.chained .code { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 5px; }   /* chained riffs */
   .remove { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; font-size: 14px; line-height: 1; opacity: 0; z-index: 1; }
   .cell:hover .remove, .remove:focus-visible { opacity: 1; }
   .cell:hover .chip .key { opacity: 0; }
   /* Chain marker on a looper chip: shown while CHAIN is on or when marked, otherwise on hover */
-  .chainpill { position: absolute; right: calc(clamp(8px, 5cqi, 16px) + 44px); top: calc(clamp(8px, 5cqi, 16px) - 2px);   /* left of the C, grows leftwards */ z-index: 1; white-space: nowrap; display: flex; align-items: stretch; border-radius: 999px; border: 1px solid rgba(255,255,255,.7); background: rgba(0,0,0,.6); color: #fff; overflow: hidden; opacity: 0; }
-  .chainpill.on, .chainpill.marked, .cell:hover .chainpill, .chainpill:focus-within { opacity: 1; }
-  .chainpill.marked { background: var(--accent); border-color: var(--accent); }
-  .chainpill button { border: 0; background: transparent; color: inherit; font-size: 10px; font-weight: 700; letter-spacing: .04em; }
-  .chainpill .cp-label { padding: 3px 8px; }
-  .chainpill .cp-step { width: 22px; font-size: 13px; line-height: 1; padding: 0; display: none; }
-  .cell:hover .chainpill .cp-step, .chainpill:focus-within .cp-step { display: block; }   /* −/+ on hover */
-  .chainpill .cp-step:hover:not(:disabled) { background: rgba(255,255,255,.2); }
-  .chainpill .cp-step:disabled { opacity: .35; cursor: default; }
   /* "C" count-in button, top right just left of the key number (the chip's padding + the number's width) */
-  .countin { position: absolute; right: calc(clamp(8px, 5cqi, 16px) + 16px); top: calc(clamp(8px, 5cqi, 16px) - 3px); z-index: 1; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,.6); color: #fff; font-family: var(--gadget); font-size: 12px; line-height: 1; padding: 0; }
-  .countin:hover { background: var(--accent); border-color: var(--accent); }
   .add-tile { margin: 8px; aspect-ratio: 16 / 9; border-radius: 12px; border: 2px dashed var(--line2); background: transparent; color: var(--dim); font-size: 14px; font-weight: 700; }
   .add-tile:hover { border-color: var(--accent); color: var(--accent); }
 
@@ -159,6 +161,7 @@
   .tbtn.play { width: 50px; height: 50px; background: var(--accent); border: 0; color: #fff; font-size: 18px; }
   .loopbtn { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font-family: var(--gadget); font-size: 16px; letter-spacing: .03em; }
   .loopbtn[aria-pressed="false"] { background: transparent; border-color: var(--line2); color: var(--muted); }
+  #chainBtn[aria-pressed="false"] { background: #000; border-color: #555; color: #8a8a8a; }   /* CHAIN off: black and grey */
   .progress { flex: 1; height: 4px; background: #2e2e2e; border-radius: 2px; position: relative; }
   .progress i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); border-radius: 2px; }
   .time { font-size: 13px; font-variant-numeric: tabular-nums; color: #cfcfcf; min-width: 90px; text-align: right; }
@@ -266,7 +269,7 @@
     <button type="button" class="tbtn" id="stopBtn" aria-label="Stop">■</button>
     <button type="button" class="tbtn play" id="playBtn" aria-label="Play">▶</button>
     <button type="button" class="loopbtn" id="loopBtn" aria-pressed="true">LOOP ON</button>
-    <button type="button" class="loopbtn" id="chainBtn" aria-pressed="false" title="Chain: move through the chips by itself (N)">CHAIN OFF</button>
+    <button type="button" class="loopbtn" id="chainBtn" aria-pressed="false" title="Chain: move through the chips by itself (N)">CHAIN</button>
     <button type="button" class="loopbtn" id="clickBtn" aria-pressed="false" title="Click track (K)">CLICK OFF</button>
     <div class="progress" aria-hidden="true"><i id="progressFill"></i></div>
     <div class="time" id="timeText">0:00 / 0:00</div>
@@ -275,6 +278,6 @@
 
 <script src="../rj-timer.js?v=1"></script><!-- RIFFJAMS practice timer (same time as the other pages) -->
 <script src="vendor/SignalsmithStretch.js"></script>
-<script src="looper.js?v=29"></script><!-- bump v on every change so the browser can't use a stale copy -->
+<script src="looper.js?v=30"></script><!-- bump v on every change so the browser can't use a stale copy -->
 </body>
 </html>
