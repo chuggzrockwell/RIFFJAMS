@@ -76,6 +76,7 @@
     const out = JSON.parse(JSON.stringify(DEFAULT_STATE));
     if (s && typeof s === 'object') {
       if (Array.isArray(s.looper)) out.looper = s.looper.slice(0, 16);
+      if (s.slots && typeof s.slots === 'object') out.slots = s.slots;
       if (s.stemOn) Object.assign(out.stemOn, s.stemOn);
       if (s.stemVol) Object.assign(out.stemVol, s.stemVol);
       if (s.nudges && typeof s.nudges === 'object') out.nudges = s.nudges;
@@ -770,11 +771,36 @@
   }
   function vstack(gap) { const d = el('div'); d.style.display = 'flex'; d.style.flexDirection = 'column'; d.style.gap = (gap || 8) + 'px'; return d; }
 
-  /* ---------- drag to reorder ---------- */
+  /* ---------- board slots ----------
+     Each looper chip sits in one of the 16 board slots (state.slots: id -> 0..15), gaps allowed.
+     state.looper stays the chips in board order (left to right, top to bottom), which is the
+     chain order; keys 1–9 play slots 1–9. */
+  let wantSlot = null;   // empty slot that opened the chip picker: the next added chip goes there
+  function layoutSlots() {
+    const slots = {}, used = new Set();
+    state.looper.forEach((id) => {
+      const s = (state.slots || {})[id];
+      if (Number.isInteger(s) && s >= 0 && s < 16 && !used.has(s)) { slots[id] = s; used.add(s); }
+    });
+    state.looper.forEach((id) => {
+      if (id in slots) return;
+      let s = wantSlot != null && !used.has(wantSlot) ? wantSlot : -1;
+      if (s === wantSlot) wantSlot = null;
+      for (let i = 0; s < 0 && i < 16; i++) if (!used.has(i)) s = i;
+      slots[id] = s;
+      used.add(s);
+    });
+    state.slots = slots;
+    state.looper.sort((a, b) => slots[a] - slots[b]);
+  }
+  function chipInSlot(i) { return state.looper.find((id) => state.slots[id] === i) || null; }
+
+  /* ---------- drag to move ---------- */
   let gridDrag = null;   // chip id being dragged; the grid isn't rebuilt mid-drag
-  function dropTarget(node, targetCode) {
+  // Drop on an empty slot: the chip moves there. Drop on another chip: the two swap places.
+  function dropTarget(node, slot) {
     node.addEventListener('dragover', (ev) => {
-      if (!gridDrag || gridDrag === targetCode) return;
+      if (!gridDrag || state.slots[gridDrag] === slot) return;
       ev.preventDefault();
       ev.dataTransfer.dropEffect = 'move';
       node.classList.add('dropover');
@@ -783,15 +809,13 @@
     node.addEventListener('drop', (ev) => {
       ev.preventDefault();
       node.classList.remove('dropover');
-      const from = state.looper.indexOf(gridDrag);
-      if (from < 0) return;
       const id = gridDrag;
-      const L = state.looper.slice();
-      L.splice(from, 1);
-      const to = targetCode == null ? L.length : state.looper.indexOf(targetCode);
-      L.splice(to, 0, id);
-      state.looper = L;
+      if (!id || !state.looper.includes(id)) return;
+      const other = chipInSlot(slot);
+      if (other && other !== id) state.slots[other] = state.slots[id];
+      state.slots[id] = slot;
       gridDrag = null;
+      layoutSlots();
       saveState();
       render();
     });
@@ -801,9 +825,11 @@
     if (gridDrag) return;   // keep the dragged element alive until the drop
     const grid = $('grid');
     grid.textContent = '';
+    layoutSlots();
+    const cells = [];
     const pc = playingCode();
     const up = upcomingCode();
-    state.looper.forEach((code, i) => {
+    state.looper.forEach((code) => {
       const c = chipsByCode[code];
       if (!c) return;
       const b = el('button', 'chip ' + (c.tier >= 2 ? 'wash' : 'full'));   // T2 and T3 get the wash art, T1 the full cover
@@ -820,7 +846,8 @@
       const p = chipPitch(code);
       if (p.key || p.hz) left.append(el('div', 'pitchtag', [p.key ? signed(p.key, ' st') : '', p.hz ? signed(p.hz, ' Hz') : ''].filter(Boolean).join(' · ')));
       top.append(left);
-      if (i < 9) top.append(el('span', 'key', String(i + 1)));
+      const slot = state.slots[code];
+      if (slot < 9) top.append(el('span', 'key', String(slot + 1)));   // key = slot number
       b.append(top);
 
       const bottom = el('div');
@@ -882,7 +909,7 @@
         ci.addEventListener('click', () => countInChip(code));
         cell.append(ci);
       }
-      // Drag a chip onto another to move it there; onto an empty slot to move it to the end.
+      // Drag a chip to any slot: an empty one moves it there, another chip swaps the two.
       cell.draggable = true;
       cell.dataset.code = code;
       cell.addEventListener('dragstart', (ev) => {
@@ -895,19 +922,21 @@
         gridDrag = null;
         renderGrid();
       });
-      dropTarget(cell, code);
-      grid.append(cell);
+      dropTarget(cell, state.slots[code]);
+      cells[state.slots[code]] = cell;
     });
     // Every empty spot of the 4×4 board is a dotted "add" slot (and a drop target).
-    for (let i = state.looper.length; i < 16; i++) {
+    for (let i = 0; i < 16; i++) {
+      if (cells[i]) { grid.append(cells[i]); continue; }
       const add = el('button', 'add-tile', '+ Add chip');
       add.type = 'button';
       add.setAttribute('aria-label', 'Add a chip to slot ' + (i + 1));
       add.addEventListener('click', () => {
         // Chip picker: opens on the looper's song when it holds just one, else on the albums.
         openPicker(looperSong());   // that song's chips, or the albums
+        wantSlot = i;               // the first chip picked lands in this slot
       });
-      dropTarget(add, null);
+      dropTarget(add, i);
       grid.append(add);
     }
     $('looperSub').textContent = state.looper.length + ' chips · guitar ' + (state.stemOn.guitar ? 'on' : 'removed');
@@ -1440,7 +1469,7 @@
       stems.append(el('div', 'label', 'STEMS'));
       stemControls(stems, false);
       sb.append(stems);
-      sb.append(el('div', 'note', 'Click a chip to queue it for the next loop boundary. Shift-click switches right away. Keys: 1–9 chips · Space play/stop · Esc stop · Shift+←/→ jump 5 s · Shift+C clear looper · G guitar · L loop · K click · N chain.'));
+      sb.append(el('div', 'note', 'Click a chip to queue it for the next loop boundary. Shift-click switches right away. Keys: 1–9 slots 1–9 · Space play/stop · Esc stop · Shift+←/→ jump 5 s · Shift+C clear looper · G guitar · L loop · K click · N chain.'));
     } else if (state.panel === 'needs') {
       renderNeeds(sb);
     } else if (state.panel === 'stems') {
@@ -1846,6 +1875,7 @@
   }
   let pickerEl = null;
   function closePicker() {
+    wantSlot = null;
     if (!pickerEl) return;
     pickerEl.remove();
     pickerEl = null;
@@ -2077,7 +2107,7 @@
     if (ev.shiftKey && (k === 'C' || k === 'c')) { ev.preventDefault(); clearLooper(); return; }
     if (k === ' ') { ev.preventDefault(); togglePlay(); }
     else if (k === 'Escape') { stopAll(); $('panelMenu').hidden = true; }
-    else if (/^[1-9]$/.test(k)) { const code = state.looper[parseInt(k, 10) - 1]; if (code) trigger(code, ev.shiftKey); }
+    else if (/^[1-9]$/.test(k)) { const code = chipInSlot(parseInt(k, 10) - 1); if (code) trigger(code, ev.shiftKey); }
     else if (k === 'g' || k === 'G') toggleStem('guitar');
     else if (k === 'l' || k === 'L') { state.loopOn = !state.loopOn; saveState(); renderTransport(); }
     else if (k === 'k' || k === 'K') setClick(!state.clickOn);
