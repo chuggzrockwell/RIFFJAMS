@@ -164,7 +164,6 @@
   .tbtn.play { width: 50px; height: 50px; background: var(--accent); border: 0; color: #fff; font-size: 18px; }
   .loopbtn { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font-family: var(--gadget); font-size: 16px; letter-spacing: .03em; }
   .loopbtn[aria-pressed="false"] { background: transparent; border-color: var(--line2); color: var(--muted); }
-  #chainBtn[aria-pressed="false"] { background: #000; border-color: #555; color: #8a8a8a; }   /* CHAIN off: black and grey */
   .progress { flex: 1; height: 4px; background: #2e2e2e; border-radius: 2px; position: relative; }
   .progress i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); border-radius: 2px; }
   .time { font-size: 13px; font-variant-numeric: tabular-nums; color: #cfcfcf; min-width: 90px; text-align: right; }
@@ -273,7 +272,6 @@
     <button type="button" class="tbtn" id="stopBtn" aria-label="Stop">■</button>
     <button type="button" class="tbtn play" id="playBtn" aria-label="Play">▶</button>
     <button type="button" class="loopbtn" id="loopBtn" aria-pressed="true">LOOP ON</button>
-    <button type="button" class="loopbtn" id="chainBtn" aria-pressed="false" title="Chain: move through the chips by itself (N)">CHAIN</button>
     <button type="button" class="loopbtn" id="clickBtn" aria-pressed="false" title="Click track (K)">CLICK OFF</button>
     <div class="progress" aria-hidden="true"><i id="progressFill"></i></div>
     <div class="time" id="timeText">0:00 / 0:00</div>
@@ -282,6 +280,6 @@
 
 <script src="../rj-timer.js?v=1"></script><!-- RIFFJAMS practice timer (same time as the other pages) -->
 <script src="vendor/SignalsmithStretch.js"></script>
-<script src="looper.js?v=34"></script><!-- bump v on every change so the browser can't use a stale copy -->
+<script src="looper.js?v=35"></script><!-- bump v on every change so the browser can't use a stale copy -->
 </body>
 </html>

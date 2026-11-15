@@ -61,7 +61,6 @@
     keyGlobal: 0,         // semitones, every chip
     hzGlobal: 0,          // fine tune for every chip, Hz relative to A = 440
     chipPitch: {},        // per chip: { key: semitones, hz: Hz }
-    chainOn: false,       // chain: move through chips automatically
     chainSet: [],         // chips linked into the chain (none = no chain)
     chainPasses: 1,       // passes per chip before moving on
     chainPer: {},         // per-chip passes override
@@ -93,7 +92,6 @@
       if (Number.isInteger(s.hzGlobal)) out.hzGlobal = clamp(s.hzGlobal, -40, 40);
       if (s.chipPitch && typeof s.chipPitch === 'object') out.chipPitch = s.chipPitch;
       if (Array.isArray(s.songsSeen)) out.songsSeen = s.songsSeen;
-      if (typeof s.chainOn === 'boolean') out.chainOn = s.chainOn;
       if (Array.isArray(s.chainSet)) out.chainSet = s.chainSet.filter((x) => typeof x === 'string');
       if (Number.isInteger(s.chainPasses)) out.chainPasses = clamp(s.chainPasses, 1, 16);
       if (s.chainPer && typeof s.chainPer === 'object') out.chainPer = s.chainPer;
@@ -503,13 +501,12 @@
   setInterval(tick, TICK_MS);
 
   /* ---------- chain ----------
-     With CHAIN on, the looper moves through the chain chips by itself: each plays its number of
-     passes, then the next chain chip (looper order, wrapping) is queued and takes over on the
-     seam like a manual queue. Chain chips are only the ones linked (chain-link button on each
-     chip while CHAIN is on); with none linked there is no chain. A chain is always contiguous: chips
-     side by side on the board with no empty slot between. If it gets split (a chip dragged
-     away), the piece holding the playing chip runs. A manual tap still queues as usual; the
-     chain carries on from whatever is playing. */
+     A chain is two or more chips side by side on the board (no empty slot between) with their
+     chain-link buttons on; that alone switches chaining on (there is no separate CHAIN switch).
+     While a chain chip plays, the looper moves through the chain by itself: each plays its number
+     of passes, then the next chain chip (board order, wrapping) is queued and takes over on the
+     seam like a manual queue. Unlinked chips just loop. If the chain gets split (a chip dragged
+     away), the piece holding the playing chip runs. A manual tap still queues as usual. */
   const chain = { code: null, done: 0, seamAt: null, hold: -1 };   // done = passes finished of chain.code
   // Split chips (board order) into runs of neighbouring slots.
   function runsOf(ids) {
@@ -523,7 +520,8 @@
   }
   function linkedChips() { return state.looper.filter((id) => state.chainSet.includes(id)); }
   function chainList() {
-    const runs = runsOf(linkedChips());   // only chips with their chain link on; none linked = no chain
+    // Only linked chips, and only runs of two or more: a lone linked chip isn't a chain yet.
+    const runs = runsOf(linkedChips()).filter((r) => r.length >= 2);
     const pc = playingCode();
     return runs.find((r) => r.includes(pc)) || runs[0] || [];
   }
@@ -549,23 +547,17 @@
     // The chain's own queue follows the current settings: if repeats went up (or the chain
     // changed) after it lined up the next chip, take that back or swap it. A chip you queued
     // yourself is left alone.
-    const linked = chainList().includes(code);   // an unlinked chip just loops, even with CHAIN on
+    const linked = chainList().includes(code);   // a chip outside the chain just loops
     if (queued && queued === chain.autoQueued) {
-      const want = state.chainOn && linked && chain.hold !== chain.done && chain.done >= chainPassesOf(code) - 1 ? nextInChain(code) : null;
+      const want = linked && chain.hold !== chain.done && chain.done >= chainPassesOf(code) - 1 ? nextInChain(code) : null;
       if (want !== queued) { queued = want; chain.autoQueued = want; render(); }
       return;
     }
-    if (!state.chainOn || !linked || queued || chain.hold === chain.done) return;
+    if (!linked || queued || chain.hold === chain.done) return;
     if (chain.done >= chainPassesOf(code) - 1) {     // this is its last pass: line up the next chip
       const nx = nextInChain(code);
       if (nx) { queued = nx; chain.autoQueued = nx; render(); }
     }
-  }
-  function setChain(on) {
-    state.chainOn = !!on;
-    if (!state.chainOn && queued && queued === chain.autoQueued) queued = null;   // drop the chain's own queue, keep a manual one
-    saveState();
-    render();
   }
   // Link / unlink a chip. Only a chip next to the chain can join it, and only an end can leave
   // it, so the chain stays in one piece.
@@ -906,11 +898,11 @@
       const inChain = chainList().includes(code);
       if (linked && inChain) b.classList.add('chained');
 
-      // Buttons in a row under the slot number: repeat counter, chain link (while CHAIN is on),
-      // then the metronome (count-in).
+      // Buttons under the slot number: repeat counter (chain chips) left of the chain link,
+      // then the metronome (count-in) below.
       const ctr = el('div', 'ctrls');
       const chainRow = el('div', 'ctrl-row');   // counter to the left of the chain link
-      if (state.chainOn && inChain) {
+      if (inChain) {
         const passes = chainPassesOf(code);
         // While the chain runs, the playing chip shows which pass it's on, e.g. "2/8".
         const counting = code === pc && chain.code === code;
@@ -930,11 +922,12 @@
         cnt.append(mk('−', -1), lbl, mk('+', 1));
         chainRow.append(cnt);
       }
-      if (state.chainOn) {
+      {
         const lk = el('button', 'iconbtn link' + (linked ? ' on' : ''));
         lk.type = 'button';
         lk.innerHTML = ICON_LINK;
-        lk.title = linked ? 'In the chain: click to take it out' : 'Add to the chain (chips next to each other)';
+        lk.title = linked ? (inChain ? 'In the chain: click to take it out' : 'Linked: link a chip next to it to start a chain')
+          : 'Link into a chain (two or more chips side by side)';
         lk.setAttribute('aria-pressed', String(linked));
         lk.setAttribute('aria-label', (linked ? 'Take ' : 'Add ') + c.code + ' ' + c.song + (linked ? ' out of' : ' to') + ' the chain');
         lk.addEventListener('click', () => toggleChainChip(code));
@@ -1505,16 +1498,16 @@
         const list = chainList();
         const nx = list.length > 1 ? nextInChain(code) : null;
         ch.append(el('div', 'note',
-          (linkedChips().length ? list.length + ' linked chips are in the chain.' : 'Nothing is linked yet, so there is no chain.') +
-          (state.chainOn && nx ? ' After ' + c.code + ' plays ×' + chainPassesOf(code) + ', ' + lab(nx) + ' (' + chipsByCode[nx].song + ') comes next.' : '') +
-          ' A chain is chips next to each other on the board. With CHAIN on (key N), the link button on each chip adds it; the chain moves through them on the seams. Tapping a chip still queues it.'));
+          (list.length ? list.length + ' chips are in the chain.' : 'No chain yet.') +
+          (nx && list.includes(code) ? ' After ' + c.code + ' plays ×' + chainPassesOf(code) + ', ' + lab(nx) + ' (' + chipsByCode[nx].song + ') comes next.' : '') +
+          ' Turn on the link button of two or more chips side by side to chain them; the looper then moves through them on the seams. Tapping a chip still queues it.'));
         sb.append(ch);
       }
       const stems = vstack(10);
       stems.append(el('div', 'label', 'STEMS'));
       stemControls(stems, false);
       sb.append(stems);
-      sb.append(el('div', 'note', 'Click a chip to queue it for the next loop boundary. Shift-click switches right away. Keys: 1–9 slots 1–9 · Space play/stop · Esc stop · Shift+←/→ jump 5 s · Shift+C clear looper · G guitar · L loop · K click · N chain.'));
+      sb.append(el('div', 'note', 'Click a chip to queue it for the next loop boundary. Shift-click switches right away. Keys: 1–9 slots 1–9 · Space play/stop · Esc stop · Shift+←/→ jump 5 s · Shift+C clear looper · G guitar · L loop · K click.'));
     } else if (state.panel === 'needs') {
       renderNeeds(sb);
     } else if (state.panel === 'stems') {
@@ -1548,8 +1541,6 @@
   function renderTransport() {
     $('loopBtn').setAttribute('aria-pressed', String(state.loopOn));
     $('loopBtn').textContent = state.loopOn ? 'LOOP ON' : 'LOOP OFF';
-    $('chainBtn').setAttribute('aria-pressed', String(state.chainOn));
-    $('chainBtn').textContent = 'CHAIN';   // purple when on, black and grey when off
     $('clickBtn').setAttribute('aria-pressed', String(state.clickOn));
     $('clickBtn').textContent = state.clickOn ? 'CLICK ON' : 'CLICK OFF';
     // Header pill: what the click is doing for the chip you hear (or the selected one).
@@ -2139,7 +2130,6 @@
   $('stopBtn').addEventListener('click', stopAll);
   $('loopBtn').addEventListener('click', () => { state.loopOn = !state.loopOn; saveState(); renderTransport(); });
   $('clickBtn').addEventListener('click', () => setClick(!state.clickOn));
-  $('chainBtn').addEventListener('click', () => setChain(!state.chainOn));
   $('sbClose').addEventListener('click', () => setPanel('off'));   // same as the "Off" panel button
   document.addEventListener('click', (ev) => {
     const m = $('panelMenu');
@@ -2157,7 +2147,6 @@
     else if (k === 'g' || k === 'G') toggleStem('guitar');
     else if (k === 'l' || k === 'L') { state.loopOn = !state.loopOn; saveState(); renderTransport(); }
     else if (k === 'k' || k === 'K') setClick(!state.clickOn);
-    else if (k === 'n' || k === 'N') setChain(!state.chainOn);
   });
   // Space is play/stop everywhere: stop a focused button from also "clicking" on key-up.
   document.addEventListener('keyup', (ev) => {
