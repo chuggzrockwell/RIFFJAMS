@@ -174,14 +174,82 @@
     "Prostitute": "QELsjWL5WeU",
     "Ain't It Fun": "emRAZ9S86Us"
   };
+  /* Direct Songsterr tabs (E Standard version where one exists). Songs not listed fall back to a search. */
+  var GNR_TABS = {
+    "Welcome to the Jungle": "https://www.songsterr.com/a/wsa/guns-n-roses-welcome-to-the-jungle-e-standard-tab-s2722673",
+    "It's So Easy": "https://www.songsterr.com/a/wsa/guns-n-roses-its-so-easy-tab-s37033",
+    "Nightrain": "https://www.songsterr.com/a/wsa/guns-n-roses-nightrain-e-standard-tab-s5148893",
+    "Out Ta Get Me": "https://www.songsterr.com/a/wsa/guns-n-roses-out-ta-get-me-tab-s8510",
+    "Mr. Brownstone": "https://www.songsterr.com/a/wsa/guns-n-roses-mr-brownstone-tab-s336",
+    "Paradise City": "https://www.songsterr.com/a/wsa/guns-n-roses-paradise-city-e-standard-tab-s4358730",
+    "My Michelle": "https://www.songsterr.com/a/wsa/guns-n-roses-my-michelle-tab-s8273",
+    "Think About You": "https://www.songsterr.com/a/wsa/guns-n-roses-think-about-you-e-tuning-tab-s509564",
+    "Sweet Child O' Mine": "https://www.songsterr.com/a/wsa/guns-n-roses-sweet-child-o-mine-e-standard-tuning-tab-s5922016",
+    "You're Crazy": "https://www.songsterr.com/a/wsa/guns-n-roses-youre-crazy-tab-s7989",
+    "Anything Goes": "https://www.songsterr.com/a/wsa/guns-n-roses-anything-goes-tab-s8432",
+    "Rocket Queen": "https://www.songsterr.com/a/wsa/guns-n-roses-rocket-queen-tab-s527",
+    "Reckless Life": "https://www.songsterr.com/a/wsa/guns-n-roses-reckless-life-tab-s8490",
+    "Nice Boys": "https://www.songsterr.com/a/wsa/guns-n-roses-nice-boys-tab-s8254",
+    "Move to the City": "https://www.songsterr.com/a/wsa/guns-n-roses-move-to-the-city-tab-s7995",
+    "Mama Kin": "https://www.songsterr.com/a/wsa/guns-n-roses-mama-kin-tab-s8300",
+    "Patience": "https://www.songsterr.com/a/wsa/guns-n-roses-patience-tab-s172",
+    "Used to Love Her": "https://www.songsterr.com/a/wsa/guns-n-roses-used-to-love-her-tab-s8409",
+    "You're Crazy (Acoustic)": "https://www.songsterr.com/a/wsa/guns-n-roses-youre-crazy-acoustic-tab-s194774",
+    "One in a Million": "https://www.songsterr.com/a/wsa/guns-n-roses-one-in-a-million-tab-s23733",
+    "Right Next Door to Hell": "https://www.songsterr.com/a/wsa/guns-n-roses-right-next-door-to-hell-tab-s8349",
+    "Dust N' Bones": "https://www.songsterr.com/a/wsa/guns-n-roses-dust-n-bones-tab-s8021",
+    "Live and Let Die": "https://www.songsterr.com/a/wsa/guns-n-roses-live-and-let-die-tab-s22292",
+    "Don't Cry": "https://www.songsterr.com/a/wsa/guns-n-roses-dont-cry-e-standard-tab-s2578773",
+    "Perfect Crime": "https://www.songsterr.com/a/wsa/guns-n-roses-perfect-crime-tab-s36999",
+    "You Ain't the First": "https://www.songsterr.com/a/wsa/guns-n-roses-you-aint-the-first-tab-s37031",
+    "Bad Obsession": "https://www.songsterr.com/a/wsa/guns-n-roses-bad-obsession-tab-s8266",
+    "Back Off Bitch": "https://www.songsterr.com/a/wsa/guns-n-roses-back-off-bitch-tab-s8447",
+    "Double Talkin' Jive": "https://www.songsterr.com/a/wsa/guns-n-roses-double-talkin-jive-tab-s8190",
+    "November Rain": "https://www.songsterr.com/a/wsa/guns-n-roses-november-rain-e-standard-and-7-string-standard-tab-s2922948",
+    "The Garden": "https://www.songsterr.com/a/wsa/guns-n-roses-the-garden-tab-s25163",
+    "Garden of Eden": "https://www.songsterr.com/a/wsa/guns-n-roses-garden-of-eden-tab-s8568",
+    "Don't Damn Me": "https://www.songsterr.com/a/wsa/guns-n-roses-dont-damn-me-solo-tab-s8096",
+    "Bad Apples": "https://www.songsterr.com/a/wsa/guns-n-roses-bad-apples-tab-s23222",
+    "Dead Horse": "https://www.songsterr.com/a/wsa/guns-n-roses-dead-horse-tab-s8315",
+    "Coma": "https://www.songsterr.com/a/wsa/guns-n-roses-coma-tab-s8381",
+    "Civil War": "https://www.songsterr.com/a/wsa/guns-n-roses-civil-war-e-standard-tab-s4057847",
+    "14 Years": "https://www.songsterr.com/a/wsa/guns-n-roses-14-years-tab-s8435",
+    "Yesterdays": "https://www.songsterr.com/a/wsa/guns-n-roses-yesterdays-solo-tab-s8174",
+    "Knockin' on Heaven's Door": "https://www.songsterr.com/a/wsa/guns-n-roses-knockin-on-heavens-door-standard-tuned-tab-tab-s395315",
+    "Get in the Ring": "https://www.songsterr.com/a/wsa/guns-n-roses-get-in-the-ring-tab-s8186",
+    "Shotgun Blues": "https://www.songsterr.com/a/wsa/guns-n-roses-shotgun-blues-tab-s8239",
+    "Breakdown": "https://www.songsterr.com/a/wsa/guns-n-roses-breakdown-tab-s36995",
+    "Pretty Tied Up": "https://www.songsterr.com/a/wsa/guns-n-roses-pretty-tied-up-tab-s37017",
+    "Locomotive": "https://www.songsterr.com/a/wsa/guns-n-roses-locomotive-complicity-tab-s36996",
+    "So Fine": "https://www.songsterr.com/a/wsa/guns-n-roses-so-fine-solo-tab-s23322",
+    "Estranged": "https://www.songsterr.com/a/wsa/guns-n-roses-estranged-e-standard-tab-s5405730",
+    "You Could Be Mine": "https://www.songsterr.com/a/wsa/guns-n-roses-you-could-be-mine-standard-tuning-tab-s535294",
+    "Chinese Democracy": "https://www.songsterr.com/a/wsa/guns-n-roses-chinese-democracy-tab-s23165",
+    "Shackler's Revenge": "https://www.songsterr.com/a/wsa/guns-n-roses-shacklers-revenge-tab-s37014",
+    "Better": "https://www.songsterr.com/a/wsa/guns-n-roses-better-tab-s23225",
+    "Street of Dreams": "https://www.songsterr.com/a/wsa/guns-n-roses-street-of-dreams-tab-s37035",
+    "If the World": "https://www.songsterr.com/a/wsa/guns-n-roses-if-the-world-tab-s70664",
+    "There Was a Time": "https://www.songsterr.com/a/wsa/guns-n-roses-there-was-a-time-tab-s37037",
+    "Catcher in the Rye": "https://www.songsterr.com/a/wsa/guns-n-roses-catcher-in-the-rye-v2-tab-s1469290",
+    "Scraped": "https://www.songsterr.com/a/wsa/guns-n-roses-scraped-tab-s603158",
+    "Riad N' the Bedouins": "https://www.songsterr.com/a/wsa/guns-n-roses-riad-n-the-bedouins-tab-s442999",
+    "Sorry": "https://www.songsterr.com/a/wsa/guns-n-roses-sorry-tab-s407804",
+    "I.R.S.": "https://www.songsterr.com/a/wsa/guns-n-roses-irs-tab-s37028",
+    "Madagascar": "https://www.songsterr.com/a/wsa/guns-n-roses-madagascar-tab-s37003",
+    "This I Love": "https://www.songsterr.com/a/wsa/guns-n-roses-this-i-love-tab-s37025",
+    "Prostitute": "https://www.songsterr.com/a/wsa/guns-n-roses-prostitute-tab-s70637",
+    "Ain't It Fun": "https://www.songsterr.com/a/wsa/guns-n-roses-aint-it-fun-solo-tab-s23221",
+    "Wild Horses": "https://www.songsterr.com/a/wsa/guns-n-roses-wild-horses-tab-s6951134"
+  };
   var GNR = { albums: [], prefixes: {}, audio: {}, local: {}, yt: GNR_YT, songsterr: {} };
   GNR_RAW.forEach(function (a) {
     GNR.albums.push({ name: a.name, cover: a.cover, font: a.font, songs: a.songs });
     a._files.forEach(function (s) {
       GNR.prefixes[s[0]] = s[1];
       GNR.local[s[0]] = "local:" + s[2];
-      GNR.songsterr[s[0]] = "https://www.songsterr.com/?pattern=" +
-        encodeURIComponent("guns n roses " + s[0].replace(/\s*\(.*\)\s*$/, ""));
+      /* Direct tab (E Standard version where one exists); otherwise a search for the E Standard version. */
+      GNR.songsterr[s[0]] = GNR_TABS[s[0]] || "https://www.songsterr.com/?pattern=" +
+        encodeURIComponent("guns n roses " + s[0].replace(/\s*\(.*\)\s*$/, "") + " e standard");
     });
   });
 
@@ -286,6 +354,76 @@
       ["Hey Hey What Can I Do", "HHWCID-", "The Complete Led Zeppelin (Remastered)/10-11 Hey Hey What Can I Do (From _The Complete Studio Recordings_).m4a"]
     ]]
   ];
+  /* Direct Songsterr tabs (main studio version). Songs not listed fall back to a search. */
+  var LZ_TABS = {
+    "Good Times Bad Times": "https://www.songsterr.com/a/wsa/led-zeppelin-good-times-bad-times-tab-s346",
+    "Babe I'm Gonna Leave You": "https://www.songsterr.com/a/wsa/led-zeppelin-babe-im-gonna-leave-you-tab-s6732",
+    "You Shook Me": "https://www.songsterr.com/a/wsa/led-zeppelin-you-shook-me-tab-s7326",
+    "Dazed and Confused": "https://www.songsterr.com/a/wsa/led-zeppelin-dazed-and-confused-tab-s11497",
+    "Black Mountain Side": "https://www.songsterr.com/a/wsa/led-zeppelin-black-mountain-side-tab-s11874",
+    "Communication Breakdown": "https://www.songsterr.com/a/wsa/led-zeppelin-communication-breakdown-tab-s208",
+    "How Many More Times": "https://www.songsterr.com/a/wsa/led-zeppelin-how-many-more-times-tab-s11789",
+    "Whole Lotta Love": "https://www.songsterr.com/a/wsa/led-zeppelin-whole-lotta-love-tab-s449",
+    "What Is and What Should Never Be": "https://www.songsterr.com/a/wsa/led-zeppelin-what-is-and-what-should-never-be-tab-s11998",
+    "The Lemon Song": "https://www.songsterr.com/a/wsa/led-zeppelin-the-lemon-song-tab-s1395",
+    "Thank You": "https://www.songsterr.com/a/wsa/led-zeppelin-thank-you-tab-s22715",
+    "Heartbreaker": "https://www.songsterr.com/a/wsa/led-zeppelin-heartbreaker-tab-s352",
+    "Living Loving Maid (She's Just a Woman)": "https://www.songsterr.com/a/wsa/led-zeppelin-living-loving-maid-tab-s72789",
+    "Ramble On": "https://www.songsterr.com/a/wsa/led-zeppelin-ramble-on-tab-s22711",
+    "Moby Dick": "https://www.songsterr.com/a/wsa/led-zeppelin-moby-dick-tab-s11830",
+    "Bring It On Home": "https://www.songsterr.com/a/wsa/led-zeppelin-bring-it-on-home-tab-s18646",
+    "Immigrant Song": "https://www.songsterr.com/a/wsa/led-zeppelin-immigrant-song-tab-s568",
+    "Friends": "https://www.songsterr.com/a/wsa/led-zeppelin-friends-tab-s11802",
+    "Celebration Day": "https://www.songsterr.com/a/wsa/led-zeppelin-celebration-day-tab-s22690",
+    "Since I've Been Loving You": "https://www.songsterr.com/a/wsa/led-zeppelin-since-ive-been-loving-you-solo-tab-s1396",
+    "Out on the Tiles": "https://www.songsterr.com/a/wsa/led-zeppelin-out-on-the-tiles-tab-s11849",
+    "Tangerine": "https://www.songsterr.com/a/wsa/led-zeppelin-tangerine-solo-tab-s22712",
+    "That's the Way": "https://www.songsterr.com/a/wsa/led-zeppelin-thats-the-way-tab-s22602",
+    "Hats Off to (Roy) Harper": "https://www.songsterr.com/a/wsa/led-zeppelin-hats-off-to-roy-harper-tab-s22695",
+    "Black Dog": "https://www.songsterr.com/a/wsa/led-zeppelin-black-dog-tab-s363",
+    "Rock and Roll": "https://www.songsterr.com/a/wsa/led-zeppelin-rock-and-roll-tab-s11537",
+    "The Battle of Evermore": "https://www.songsterr.com/a/wsa/led-zeppelin-the-battle-of-evermore-tab-s11811",
+    "Stairway to Heaven": "https://www.songsterr.com/a/wsa/led-zeppelin-stairway-to-heaven-solo-tab-s27",
+    "Misty Mountain Hop": "https://www.songsterr.com/a/wsa/led-zeppelin-misty-mountain-hop-tab-s22700",
+    "Four Sticks": "https://www.songsterr.com/a/wsa/led-zeppelin-four-sticks-tab-s22694",
+    "Going to California": "https://www.songsterr.com/a/wsa/led-zeppelin-going-to-california-tab-s154",
+    "When the Levee Breaks": "https://www.songsterr.com/a/wsa/led-zeppelin-when-the-levee-breaks-tab-s11512",
+    "The Song Remains the Same": "https://www.songsterr.com/a/wsa/led-zeppelin-the-song-remains-the-same-tab-s23802",
+    "The Rain Song": "https://www.songsterr.com/a/wsa/led-zeppelin-the-rain-song-tab-s11951",
+    "Over the Hills and Far Away": "https://www.songsterr.com/a/wsa/led-zeppelin-over-the-hills-and-far-away-tab-s11714",
+    "The Crunge": "https://www.songsterr.com/a/wsa/led-zeppelin-the-crunge-tab-s22716",
+    "Dancing Days": "https://www.songsterr.com/a/wsa/led-zeppelin-dancing-days-tab-s11459",
+    "D'yer Mak'er": "https://www.songsterr.com/a/wsa/led-zeppelin-dyer-maker-tab-s23204",
+    "No Quarter": "https://www.songsterr.com/a/wsa/led-zeppelin-no-quarter-tab-s22701",
+    "The Ocean": "https://www.songsterr.com/a/wsa/led-zeppelin-the-ocean-tab-s11909",
+    "Houses of the Holy": "https://www.songsterr.com/a/wsa/led-zeppelin-houses-of-the-holy-tab-s22697",
+    "Trampled Under Foot": "https://www.songsterr.com/a/wsa/led-zeppelin-trampled-under-foot-tab-s11859",
+    "Kashmir": "https://www.songsterr.com/a/wsa/led-zeppelin-kashmir-e-standard-tab-s6093465",
+    "In the Light": "https://www.songsterr.com/a/wsa/led-zeppelin-in-the-light-tab-s27722",
+    "Down by the Seaside": "https://www.songsterr.com/a/wsa/led-zeppelin-down-by-the-seaside-solo-tab-s11962",
+    "Ten Years Gone": "https://www.songsterr.com/a/wsa/led-zeppelin-ten-years-gone-tab-s22714",
+    "Night Flight": "https://www.songsterr.com/a/wsa/led-zeppelin-night-flight-tab-s22702",
+    "The Wanton Song": "https://www.songsterr.com/a/wsa/led-zeppelin-the-wanton-song-tab-s22717",
+    "Boogie with Stu": "https://www.songsterr.com/a/wsa/led-zeppelin-boogie-with-stu-tab-s41409",
+    "Black Country Woman": "https://www.songsterr.com/a/wsa/led-zeppelin-black-country-woman-tab-s11475",
+    "Sick Again": "https://www.songsterr.com/a/wsa/led-zeppelin-sick-again-tab-s11465",
+    "Achilles Last Stand": "https://www.songsterr.com/a/wsa/led-zeppelin-achilles-last-stand-solo-tab-s11731",
+    "Nobody's Fault but Mine": "https://www.songsterr.com/a/wsa/led-zeppelin-nobodys-fault-but-mine-tab-s11780",
+    "In the Evening": "https://www.songsterr.com/a/wsa/led-zeppelin-in-the-evening-tab-s36155",
+    "South Bound Saurez": "https://www.songsterr.com/a/wsa/led-zeppelin-south-bound-saurez-tab-s11921",
+    "Fool in the Rain": "https://www.songsterr.com/a/wsa/led-zeppelin-fool-in-the-rain-tab-s22692",
+    "Hot Dog": "https://www.songsterr.com/a/wsa/led-zeppelin-hot-dog-tab-s11590",
+    "Carouselambra": "https://www.songsterr.com/a/wsa/led-zeppelin-carouselambra-tab-s41419",
+    "All My Love": "https://www.songsterr.com/a/wsa/led-zeppelin-all-my-love-tab-s41089",
+    "I'm Gonna Crawl": "https://www.songsterr.com/a/wsa/led-zeppelin-im-gonna-crawl-tab-s22698",
+    "We're Gonna Groove": "https://www.songsterr.com/a/wsa/led-zeppelin-were-gonna-groove-tab-s41410",
+    "Poor Tom": "https://www.songsterr.com/a/wsa/led-zeppelin-poor-tom-tab-s11522",
+    "Walter's Walk": "https://www.songsterr.com/a/wsa/led-zeppelin-walters-walk-tab-s12042",
+    "Ozone Baby": "https://www.songsterr.com/a/wsa/led-zeppelin-ozone-baby-tab-s11870",
+    "Darlene": "https://www.songsterr.com/a/wsa/led-zeppelin-darlene-tab-s11646",
+    "Bonzo's Montreux": "https://www.songsterr.com/a/wsa/led-zeppelin-bonzos-montreux-tab-s92499",
+    "Wearing and Tearing": "https://www.songsterr.com/a/wsa/led-zeppelin-wearing-and-tearing-tab-s11526"
+  };
   var LZ = { albums: [], prefixes: {}, audio: {}, songsterr: {} };
   LZ_RAW.forEach(function (a) {
     LZ.albums.push({ name: a[0], cover: a[1], font: a[2], songs: a[3].map(function (s) {
@@ -296,7 +434,7 @@
     a[3].forEach(function (s) {
       LZ.prefixes[s[0]] = s[1];
       LZ.audio[s[0]] = "local:" + s[2];
-      LZ.songsterr[s[0]] = "https://www.songsterr.com/?pattern=" +
+      LZ.songsterr[s[0]] = LZ_TABS[s[0]] || "https://www.songsterr.com/?pattern=" +
         encodeURIComponent("led zeppelin " + s[0].replace(/\s*\(.*\)\s*$/, ""));
     });
   });
