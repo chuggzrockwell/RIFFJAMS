@@ -1,6 +1,2772 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-16T00:00:00.000Z",
+  "updatedAt": "2026-11-16T15:54:45.000Z",
   "assets": {},
+  "albums": [
+    {
+      "name": "Appetite for Destruction",
+      "cover": "covers/gnr/appetite.jpg?v=1",
+      "font": "font-paranoid",
+      "songs": [
+        {
+          "song": "Welcome to the Jungle",
+          "sections": [
+            [
+              "I1",
+              1,
+              "WTTJ-I1",
+              []
+            ],
+            [
+              "I2",
+              2,
+              "WTTJ-I2",
+              []
+            ],
+            [
+              "V1",
+              3,
+              "WTTJ-V1",
+              []
+            ],
+            [
+              "C1",
+              3,
+              "WTTJ-C1",
+              []
+            ],
+            [
+              "B1",
+              2,
+              "WTTJ-B1",
+              []
+            ],
+            [
+              "C2",
+              3,
+              "WTTJ-C2",
+              []
+            ],
+            [
+              "B2",
+              2,
+              "WTTJ-B2",
+              []
+            ],
+            [
+              "S1",
+              1,
+              "WTTJ-S1",
+              []
+            ],
+            [
+              "O1",
+              2,
+              "WTTJ-O1",
+              []
+            ],
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "It's So Easy",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Nightrain",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Out Ta Get Me",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Mr. Brownstone",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Paradise City",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "My Michelle",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Think About You",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Sweet Child O' Mine",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "You're Crazy",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Anything Goes",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Rocket Queen",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        }
+      ]
+    },
+    {
+      "name": "G N' R Lies",
+      "cover": "covers/gnr/lies.jpg?v=1",
+      "font": "font-sbs",
+      "songs": [
+        {
+          "song": "Reckless Life",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Nice Boys",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Move to the City",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Mama Kin",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Patience",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Used to Love Her",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "You're Crazy (Acoustic)",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "One in a Million",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        }
+      ]
+    },
+    {
+      "name": "Use Your Illusion I",
+      "cover": "covers/gnr/uyi1.jpg?v=1",
+      "font": "font-vol4",
+      "songs": [
+        {
+          "song": "Right Next Door to Hell",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Dust N' Bones",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Live and Let Die",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Don't Cry",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Perfect Crime",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "You Ain't the First",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Bad Obsession",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Back Off Bitch",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Double Talkin' Jive",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "November Rain",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "The Garden",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Garden of Eden",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Don't Damn Me",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Bad Apples",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Dead Horse",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Coma",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        }
+      ]
+    },
+    {
+      "name": "Use Your Illusion II",
+      "cover": "covers/gnr/uyi2.jpg?v=1",
+      "font": "font-vol4",
+      "songs": [
+        {
+          "song": "Civil War",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "14 Years",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Yesterdays",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Knockin' on Heaven's Door",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Get in the Ring",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Shotgun Blues",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Breakdown",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Pretty Tied Up",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Locomotive",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "So Fine",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "Estranged",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        },
+        {
+          "song": "You Could Be Mine",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "tuning": "Eb"
+        }
+      ]
+    },
+    {
+      "name": "Chinese Democracy",
+      "cover": "covers/gnr/chinese-democracy.jpg?v=1",
+      "font": "font-sabotage",
+      "songs": [
+        {
+          "song": "Chinese Democracy",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "Shackler's Revenge",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "Better",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "Street of Dreams",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "If the World",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "There Was a Time",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "Catcher in the Rye",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "Scraped",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "Riad N' the Bedouins",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "Sorry",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "I.R.S.",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "Madagascar",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "This I Love",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "Prostitute",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Live & Rarities",
+      "cover": "covers/gnr/live.jpg?v=1",
+      "font": "font-te",
+      "songs": [
+        {
+          "song": "Ain't It Fun",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "Dead Flowers",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        {
+          "song": "Wild Horses",
+          "sections": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      ]
+    }
+  ],
+  "soloMap": {
+    "albums": [
+      {
+        "name": "Appetite for Destruction",
+        "cover": "covers/gnr/appetite.jpg?v=1",
+        "font": "font-paranoid",
+        "songs": [
+          {
+            "song": "Welcome to the Jungle",
+            "licks": []
+          },
+          {
+            "song": "It's So Easy",
+            "licks": []
+          },
+          {
+            "song": "Nightrain",
+            "licks": []
+          },
+          {
+            "song": "Out Ta Get Me",
+            "licks": []
+          },
+          {
+            "song": "Mr. Brownstone",
+            "licks": []
+          },
+          {
+            "song": "Paradise City",
+            "licks": []
+          },
+          {
+            "song": "My Michelle",
+            "licks": []
+          },
+          {
+            "song": "Think About You",
+            "licks": []
+          },
+          {
+            "song": "Sweet Child O' Mine",
+            "licks": []
+          },
+          {
+            "song": "You're Crazy",
+            "licks": []
+          },
+          {
+            "song": "Anything Goes",
+            "licks": []
+          },
+          {
+            "song": "Rocket Queen",
+            "licks": []
+          }
+        ]
+      },
+      {
+        "name": "G N' R Lies",
+        "cover": "covers/gnr/lies.jpg?v=1",
+        "font": "font-sbs",
+        "songs": [
+          {
+            "song": "Reckless Life",
+            "licks": []
+          },
+          {
+            "song": "Nice Boys",
+            "licks": []
+          },
+          {
+            "song": "Move to the City",
+            "licks": []
+          },
+          {
+            "song": "Mama Kin",
+            "licks": []
+          },
+          {
+            "song": "Patience",
+            "licks": []
+          },
+          {
+            "song": "Used to Love Her",
+            "licks": []
+          },
+          {
+            "song": "You're Crazy (Acoustic)",
+            "licks": []
+          },
+          {
+            "song": "One in a Million",
+            "licks": []
+          }
+        ]
+      },
+      {
+        "name": "Use Your Illusion I",
+        "cover": "covers/gnr/uyi1.jpg?v=1",
+        "font": "font-vol4",
+        "songs": [
+          {
+            "song": "Right Next Door to Hell",
+            "licks": []
+          },
+          {
+            "song": "Dust N' Bones",
+            "licks": []
+          },
+          {
+            "song": "Live and Let Die",
+            "licks": []
+          },
+          {
+            "song": "Don't Cry",
+            "licks": []
+          },
+          {
+            "song": "Perfect Crime",
+            "licks": []
+          },
+          {
+            "song": "You Ain't the First",
+            "licks": []
+          },
+          {
+            "song": "Bad Obsession",
+            "licks": []
+          },
+          {
+            "song": "Back Off Bitch",
+            "licks": []
+          },
+          {
+            "song": "Double Talkin' Jive",
+            "licks": []
+          },
+          {
+            "song": "November Rain",
+            "licks": []
+          },
+          {
+            "song": "The Garden",
+            "licks": []
+          },
+          {
+            "song": "Garden of Eden",
+            "licks": []
+          },
+          {
+            "song": "Don't Damn Me",
+            "licks": []
+          },
+          {
+            "song": "Bad Apples",
+            "licks": []
+          },
+          {
+            "song": "Dead Horse",
+            "licks": []
+          },
+          {
+            "song": "Coma",
+            "licks": []
+          }
+        ]
+      },
+      {
+        "name": "Use Your Illusion II",
+        "cover": "covers/gnr/uyi2.jpg?v=1",
+        "font": "font-vol4",
+        "songs": [
+          {
+            "song": "Civil War",
+            "licks": []
+          },
+          {
+            "song": "14 Years",
+            "licks": []
+          },
+          {
+            "song": "Yesterdays",
+            "licks": []
+          },
+          {
+            "song": "Knockin' on Heaven's Door",
+            "licks": []
+          },
+          {
+            "song": "Get in the Ring",
+            "licks": []
+          },
+          {
+            "song": "Shotgun Blues",
+            "licks": []
+          },
+          {
+            "song": "Breakdown",
+            "licks": []
+          },
+          {
+            "song": "Pretty Tied Up",
+            "licks": []
+          },
+          {
+            "song": "Locomotive",
+            "licks": []
+          },
+          {
+            "song": "So Fine",
+            "licks": []
+          },
+          {
+            "song": "Estranged",
+            "licks": []
+          },
+          {
+            "song": "You Could Be Mine",
+            "licks": []
+          }
+        ]
+      },
+      {
+        "name": "Chinese Democracy",
+        "cover": "covers/gnr/chinese-democracy.jpg?v=1",
+        "font": "font-sabotage",
+        "songs": [
+          {
+            "song": "Chinese Democracy",
+            "licks": []
+          },
+          {
+            "song": "Shackler's Revenge",
+            "licks": []
+          },
+          {
+            "song": "Better",
+            "licks": []
+          },
+          {
+            "song": "Street of Dreams",
+            "licks": []
+          },
+          {
+            "song": "If the World",
+            "licks": []
+          },
+          {
+            "song": "There Was a Time",
+            "licks": []
+          },
+          {
+            "song": "Catcher in the Rye",
+            "licks": []
+          },
+          {
+            "song": "Scraped",
+            "licks": []
+          },
+          {
+            "song": "Riad N' the Bedouins",
+            "licks": []
+          },
+          {
+            "song": "Sorry",
+            "licks": []
+          },
+          {
+            "song": "I.R.S.",
+            "licks": []
+          },
+          {
+            "song": "Madagascar",
+            "licks": []
+          },
+          {
+            "song": "This I Love",
+            "licks": []
+          },
+          {
+            "song": "Prostitute",
+            "licks": []
+          }
+        ]
+      },
+      {
+        "name": "Live & Rarities",
+        "cover": "covers/gnr/live.jpg?v=1",
+        "font": "font-te",
+        "songs": [
+          {
+            "song": "Ain't It Fun",
+            "licks": []
+          },
+          {
+            "song": "Dead Flowers",
+            "licks": []
+          },
+          {
+            "song": "Wild Horses",
+            "licks": []
+          }
+        ]
+      }
+    ]
+  },
+  "arrangementMap": {
+    "albums": [
+      {
+        "name": "Appetite for Destruction",
+        "cover": "covers/gnr/appetite.jpg?v=1",
+        "font": "font-paranoid",
+        "songs": [
+          {
+            "song": "Welcome to the Jungle",
+            "chips": [
+              [
+                "I1",
+                1,
+                "WTTJ-I1",
+                [],
+                0.5
+              ],
+              [
+                "I2",
+                2,
+                "WTTJ-I2",
+                [],
+                24.26
+              ],
+              [
+                "V1",
+                3,
+                "WTTJ-V1",
+                [],
+                45.65
+              ],
+              [
+                "C1",
+                3,
+                "WTTJ-C1",
+                [],
+                61.25
+              ],
+              [
+                "V1",
+                3,
+                "WTTJ-V1",
+                [],
+                73
+              ],
+              [
+                "C1",
+                3,
+                "WTTJ-C1",
+                [],
+                88.53
+              ],
+              [
+                "B1",
+                2,
+                "WTTJ-B1",
+                [],
+                100.19
+              ],
+              [
+                "V1",
+                3,
+                "WTTJ-V1",
+                [],
+                116.03
+              ],
+              [
+                "C2",
+                3,
+                "WTTJ-C2",
+                [],
+                131.49
+              ],
+              [
+                "B2",
+                2,
+                "WTTJ-B2",
+                [],
+                139.32
+              ],
+              [
+                "S1",
+                1,
+                "WTTJ-S1",
+                [],
+                164.77
+              ],
+              [
+                "C2",
+                3,
+                "WTTJ-C2",
+                [],
+                233.84
+              ],
+              [
+                "O1",
+                2,
+                "WTTJ-O1",
+                [],
+                260.8,
+                273.6
+              ]
+            ]
+          },
+          {
+            "song": "It's So Easy",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Nightrain",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Out Ta Get Me",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Mr. Brownstone",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Paradise City",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "My Michelle",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Think About You",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Sweet Child O' Mine",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "You're Crazy",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Anything Goes",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Rocket Queen",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "name": "G N' R Lies",
+        "cover": "covers/gnr/lies.jpg?v=1",
+        "font": "font-sbs",
+        "songs": [
+          {
+            "song": "Reckless Life",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Nice Boys",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Move to the City",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Mama Kin",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Patience",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Used to Love Her",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "You're Crazy (Acoustic)",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "One in a Million",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Use Your Illusion I",
+        "cover": "covers/gnr/uyi1.jpg?v=1",
+        "font": "font-vol4",
+        "songs": [
+          {
+            "song": "Right Next Door to Hell",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Dust N' Bones",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Live and Let Die",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Don't Cry",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Perfect Crime",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "You Ain't the First",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Bad Obsession",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Back Off Bitch",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Double Talkin' Jive",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "November Rain",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "The Garden",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Garden of Eden",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Don't Damn Me",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Bad Apples",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Dead Horse",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Coma",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Use Your Illusion II",
+        "cover": "covers/gnr/uyi2.jpg?v=1",
+        "font": "font-vol4",
+        "songs": [
+          {
+            "song": "Civil War",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "14 Years",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Yesterdays",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Knockin' on Heaven's Door",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Get in the Ring",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Shotgun Blues",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Breakdown",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Pretty Tied Up",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Locomotive",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "So Fine",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Estranged",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "You Could Be Mine",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Chinese Democracy",
+        "cover": "covers/gnr/chinese-democracy.jpg?v=1",
+        "font": "font-sabotage",
+        "songs": [
+          {
+            "song": "Chinese Democracy",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Shackler's Revenge",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Better",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Street of Dreams",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "If the World",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "There Was a Time",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Catcher in the Rye",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Scraped",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Riad N' the Bedouins",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Sorry",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "I.R.S.",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Madagascar",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "This I Love",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Prostitute",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Live & Rarities",
+        "cover": "covers/gnr/live.jpg?v=1",
+        "font": "font-te",
+        "songs": [
+          {
+            "song": "Ain't It Fun",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Dead Flowers",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "song": "Wild Horses",
+            "chips": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "arrangementTimings": [
+    {
+      "album": "Appetite for Destruction",
+      "song": "Welcome to the Jungle",
+      "endSec": 273.6,
+      "complete": true,
+      "riffSaturationIndex": 1.956,
+      "chips": [
+        {
+          "code": "I1",
+          "tier": 1,
+          "start": 0.5,
+          "stop": 24.26,
+          "duration": 23.76,
+          "lick": "WTTJ-I1"
+        },
+        {
+          "code": "I2",
+          "tier": 2,
+          "start": 24.26,
+          "stop": 45.65,
+          "duration": 21.39,
+          "lick": "WTTJ-I2"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 45.65,
+          "stop": 61.25,
+          "duration": 15.6,
+          "lick": "WTTJ-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 61.25,
+          "stop": 73,
+          "duration": 11.75,
+          "lick": "WTTJ-C1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 73,
+          "stop": 88.53,
+          "duration": 15.53,
+          "lick": "WTTJ-V1"
+        },
+        {
+          "code": "C1",
+          "tier": 3,
+          "start": 88.53,
+          "stop": 100.19,
+          "duration": 11.66,
+          "lick": "WTTJ-C1"
+        },
+        {
+          "code": "B1",
+          "tier": 2,
+          "start": 100.19,
+          "stop": 116.03,
+          "duration": 15.84,
+          "lick": "WTTJ-B1"
+        },
+        {
+          "code": "V1",
+          "tier": 3,
+          "start": 116.03,
+          "stop": 131.49,
+          "duration": 15.46,
+          "lick": "WTTJ-V1"
+        },
+        {
+          "code": "C2",
+          "tier": 3,
+          "start": 131.49,
+          "stop": 139.32,
+          "duration": 7.83,
+          "lick": "WTTJ-C2"
+        },
+        {
+          "code": "B2",
+          "tier": 2,
+          "start": 139.32,
+          "stop": 164.77,
+          "duration": 25.45,
+          "lick": "WTTJ-B2"
+        },
+        {
+          "code": "S1",
+          "tier": 1,
+          "start": 164.77,
+          "stop": 233.84,
+          "duration": 69.07,
+          "lick": "WTTJ-S1"
+        },
+        {
+          "code": "C2",
+          "tier": 3,
+          "start": 233.84,
+          "stop": 260.8,
+          "duration": 26.96,
+          "lick": "WTTJ-C2"
+        },
+        {
+          "code": "O1",
+          "tier": 2,
+          "start": 260.8,
+          "stop": 273.6,
+          "duration": 12.8,
+          "lick": "WTTJ-O1"
+        }
+      ]
+    }
+  ],
   "minClientVersion": 2
 }
