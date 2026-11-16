@@ -133,6 +133,46 @@
     text-shadow: 0 1px 2px rgba(0,0,0,.9), 0 0 12px rgba(0,0,0,.75);
     pointer-events: none;
   }
+  /* Artist picker (landing page) */
+  #artists h1 { font-family: "Vol4 Title", "Impact", sans-serif; font-size: 2rem; font-weight: 400; letter-spacing: .04em; margin: 0 0 14px 4px; }
+  .artist-grid {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px; width: 100%; max-width: 1100px;
+  }
+  .artist-card {
+    position: relative; display: block; width: 100%; aspect-ratio: 1 / 1;
+    padding: 0; border: 0; border-radius: 14px; overflow: hidden; cursor: pointer;
+    background: #000; color: #fff; box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  }
+  .artist-art {
+    position: absolute; inset: 0; background: #000 center / cover no-repeat;
+    transition: transform .25s ease;
+  }
+  .artist-card::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to top, rgba(0,0,0,.8) 0%, rgba(0,0,0,0) 38%);
+  }
+  .artist-name {
+    position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 2;
+    font-family: "Vol4 Title", "Impact", sans-serif; font-weight: 400;
+    font-size: clamp(1.1rem, 2.6vw, 2rem); letter-spacing: .03em; text-transform: uppercase;
+    text-align: left; line-height: 1.05; text-shadow: 0 2px 6px rgba(0,0,0,.9);
+  }
+  .artist-soon {
+    position: absolute; top: 12px; right: 12px; z-index: 2;
+    font: 700 .7rem/1 "Montserrat", "Segoe UI", sans-serif; letter-spacing: .12em; text-transform: uppercase;
+    padding: 6px 9px; border-radius: 999px; background: rgba(0,0,0,.6); color: #f3e2b5;
+    border: 1px solid rgba(243,226,181,.4);
+  }
+  .artist-card:not(.soon):hover .artist-art { transform: scale(1.04); }
+  .artist-card:not(.soon):hover { filter: brightness(1.1); }
+  .artist-card.soon { cursor: default; }
+  .artist-card.soon .artist-art { filter: saturate(.85); }
+  a.back { display: inline-block; text-decoration: none; }
+  @media (max-width: 560px) {
+    .artist-grid { grid-template-columns: 1fr; gap: 10px; }
+    .artist-name { font-size: 1.5rem; }
+  }
   .tile.c { background: #ffe44a; color: #111; }
   .tile.d { background: #ff3d4e; }
   .tile:hover { filter: brightness(1.12); }
@@ -5096,13 +5136,28 @@
 </head>
 <body class="home-mode">
 <div class="wrap">
+  <section id="artists" class="hidden">
+    <h1>RIFFJAMS</h1>
+    <div class="artist-grid">
+      <a class="artist-card" id="artistSabbath" href="./#sabbath" data-band-link>
+        <span class="artist-art" style="background-image:url('covers/sabbath-hp-tile.png')"></span>
+        <span class="artist-name">Black Sabbath</span>
+      </a>
+      <a class="artist-card" id="artistGnr" href="./?band=gnr" data-band-link>
+        <span class="artist-art" style="background-image:url('covers/gnr-artist.svg?v=1')"></span>
+        <span class="artist-name">Guns N' Roses</span>
+      </a>
+      <div class="artist-card soon" id="artistZep" aria-disabled="true">
+        <span class="artist-art" style="background-image:url('covers/zeppelin-artist.svg?v=1')"></span>
+        <span class="artist-name">Led Zeppelin</span>
+        <span class="artist-soon">Coming soon</span>
+      </div>
+    </div>
+  </section>
   <section id="home">
     <div class="home-head">
-      <h1>RIFFJAMS</h1>
-      <nav class="band-switch" id="bandSwitch" aria-label="Band">
-        <a href="./" data-band-link data-band="sabbath">Black Sabbath</a>
-        <a href="./?band=gnr" data-band-link data-band="gnr">Guns N' Roses</a>
-      </nav>
+      <a class="back" id="backArtists" href="./" data-band-link>Artists</a>
+      <h1 id="homeBandName">Black Sabbath</h1>
     </div>
     <div class="grid">
       <button type="button" class="tile hp" id="btnHP"><small>Song Map</small>Sabbath<span class="tile-label">Song Map</span></button>
@@ -10579,6 +10634,7 @@ function showSections(keepScroll) {
     + (highlightMode ? " sec-peek-on" : "")
     + (typeof arrSaturationOn !== "undefined" && arrSaturationOn ? " arr-saturation" : "");
   document.getElementById("home").className = "hidden";
+  document.getElementById("artists").className = "hidden";
   document.getElementById("series").className = "hidden";
   document.getElementById("sections").className = "";
   var n = 0;
@@ -18109,6 +18165,7 @@ function showSeries(letter) {
   document.getElementById("badge").textContent = badgeLabel;
   document.getElementById("badge").className = "badge " + letter.toLowerCase();
   document.getElementById("home").className = "hidden";
+  document.getElementById("artists").className = "hidden";
   document.getElementById("sections").className = "hidden";
   document.getElementById("series").className = "";
   bindModeSelect(document.getElementById("llBoardMode"));
@@ -18193,6 +18250,7 @@ function showHome() {
   closeChipEditor();
   clearLibraryPreview();
   document.body.className = "home-mode";
+  document.getElementById("artists").className = "hidden";
   document.getElementById("home").className = "";
   document.getElementById("series").className = "hidden";
   document.getElementById("sections").className = "hidden";
@@ -18209,6 +18267,25 @@ if (_btnReord) _btnReord.onclick = function(){ reorderRevealedTabs(); };
 var _btnClear = document.getElementById("btnClear");
 if (_btnClear) _btnClear.onclick = function(){ clearRevealedLicks(); };
 document.getElementById("backSections").onclick = showHome;
+
+/* Artist picker is the landing page: shown at ./ with no ?band= and no #sabbath.
+   Black Sabbath -> ./#sabbath, Guns N' Roses -> ./?band=gnr, Led Zeppelin is a placeholder. */
+function rjOnArtistPicker() {
+  var a = document.getElementById("artists");
+  return !!a && !a.classList.contains("hidden");
+}
+(function initArtistPicker() {
+  var hasBand = false;
+  try { hasBand = !!new URLSearchParams(location.search).get("band"); } catch (e) {}
+  var nameEl = document.getElementById("homeBandName");
+  if (nameEl && window.RJ_BAND && RJ_BAND.name) nameEl.textContent = RJ_BAND.name;
+  if (hasBand || location.hash === "#sabbath") return;
+  document.getElementById("artists").className = "";
+  document.getElementById("home").className = "hidden";
+})();
+window.addEventListener("hashchange", function () {
+  if (location.hash === "#sabbath" && rjOnArtistPicker()) showHome();
+});
 
 document.getElementById("llFilters").onclick = function(e){
   var toggle = e.target.closest("[data-filter-dd-toggle]");
@@ -19700,6 +19777,8 @@ document.addEventListener("keydown", function(e){
   }
   var k = e.key.toLowerCase();
   if (document.body.classList.contains("home-mode")) {
+    if (rjOnArtistPicker()) return; /* artist picker: no hub shortcuts */
+    if (k === "escape" || k === "backspace") { location.href = "./"; return; }
     if (isNumpadKey(e, "1")) { showSections(); return; }
     if (isNumpadKey(e, "3")) { showSeries("B"); return; }
     if (k === "b") showSeries("B");
