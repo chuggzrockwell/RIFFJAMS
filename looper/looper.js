@@ -181,6 +181,8 @@
      holds manifest.json (every chip's timing) and audio/<song>/<chip>/<stem>.flac once, and the
      browser remembers it (Chrome / Edge on a computer). Lock in saves manifest.json there.
      ?audio=<url> loads the same layout from a server instead (serve_looper.py, or hosting later). */
+  /* Each band has its own chip folder (Guns N' Roses: Loop Prototype\\looper-gnr); the browser remembers each separately. */
+  const CHIP_FOLDER = (window.RJ_BAND && window.RJ_BAND.id !== 'sabbath') ? 'looper-' + window.RJ_BAND.id : 'looper';
   let source = null;   // { name, read(path) -> ArrayBuffer, manifest() -> object, lockIn(req) -> {status, body} }
   function idb(mode, fn) {
     return new Promise((res, rej) => {
@@ -208,9 +210,9 @@
   async function folderSource(picked) {
     let home = picked;
     if (!(await hasFile(home, 'manifest.json'))) {
-      const inner = await subdir(home, 'looper');
+      const inner = await subdir(home, CHIP_FOLDER);
       if (inner && await hasFile(inner, 'manifest.json')) home = inner;
-      else throw new Error('There’s no manifest.json in “' + picked.name + '”. Choose the Loop Prototype\\looper folder.');
+      else throw new Error('There’s no manifest.json in “' + picked.name + '”. Choose the Loop Prototype\\' + CHIP_FOLDER + ' folder.');
     }
     const audio = (await subdir(home, 'audio')) || home;
     const write = async (name, text) => {
@@ -859,6 +861,8 @@
       const c = chipsByCode[code];
       if (!c) return;
       const b = el('button', 'chip ' + (c.tier >= 2 ? 'wash' : 'full'));   // T2 and T3 get the wash art, T1 the full cover
+      const bandArt = bandChipArt(c.album, c.tier);   // another band: that album's cover instead of the Paranoid art
+      if (bandArt) b.style.backgroundImage = bandArt;
       b.type = 'button';
       b.dataset.code = code;
       if (c.tier === 1) b.classList.add('t1');
@@ -1634,9 +1638,9 @@
   ].join('\n');
   const SONGMAP_CSS = 'html.looper-embed, html.looper-embed body { background: #121212; }\nhtml.looper-embed #rjTimer { display: none !important; }';
   const EMBEDS = {
-    playboard: { title: 'Tab', src: '../index.html?playboard=1', css: PLAYBOARD_CSS },
+    playboard: { title: 'Tab', src: bandUrl('../index.html?playboard=1'), css: PLAYBOARD_CSS },
     songmap: {
-      title: 'Song Map', src: '../index.html', css: SONGMAP_CSS,
+      title: 'Song Map', src: bandUrl('../index.html'), css: SONGMAP_CSS,
       onload(d, w) {
         const b = d.getElementById('btnHP'); if (b) b.click();   // open the Song Map from the home screen
         // "Add to looper": while it's on, a chip click adds that chip to the looper instead of
@@ -1873,6 +1877,15 @@
   }
   /* Albums, songs and chips as the Song Map has them (same site, so its saved data is readable);
      without it, just the songs in the chip folder. Only chips in the chip folder can be added. */
+  /* Band switch (rj-band.js): RIFFJAMS links keep ?band=, and another band's chips use their album cover. */
+  function bandUrl(u) { return window.rjBandUrl ? window.rjBandUrl(u) : u; }
+  function bandChipArt(album, tier) {
+    if (!window.RJ_BAND || window.RJ_BAND.id === 'sabbath') return '';
+    const a = albumData().find((x) => x && norm(x.name) === norm(album));
+    if (!a || !a.cover) return '';
+    const wash = tier >= 2 ? 'linear-gradient(rgba(255,255,255,.28), rgba(255,255,255,.28)), ' : '';
+    return 'linear-gradient(180deg, rgba(0,0,0,.05) 30%, rgba(0,0,0,.78) 100%), ' + wash + 'url("../' + a.cover + '")';
+  }
   function albumData() {
     try {
       const a = JSON.parse(localStorage.getItem('lick-sections-albums-v3'));
@@ -2178,7 +2191,7 @@
       ? 'The Loop Station plays audio from a folder on your computer, which needs Chrome or Edge on a computer.'
       : kind === 'reconnect'
         ? 'Allow the Loop Station to open your chip folder “' + h.name + '” again.'
-        : 'Choose the folder with your chips: Loop Prototype\\looper (it holds manifest.json and the audio folder). The audio stays on your computer.';
+        : 'Choose the folder with your chips: Loop Prototype\\' + CHIP_FOLDER + ' (it holds manifest.json and the audio folder). The audio stays on your computer.';
     $('gateErr').textContent = err ? (err.message || String(err)) : '';
     const main = $('gateBtn'), other = $('gateOther');
     main.hidden = kind === 'none';

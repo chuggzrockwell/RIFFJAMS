@@ -4,8 +4,8 @@
   var REPO_OWNER = "chuggzrockwell";
   var REPO_NAME = "RIFFJAMS";
   var REPO_BRANCH = "main";
-  var DATA_PATH = "riffjams-data.json";
-  var IMAGE_DIR = "user-tabs";
+  var DATA_PATH = (window.RJ_BAND && window.RJ_BAND.dataPath) || "riffjams-data.json";   /* band switch: rj-band.js */
+  var IMAGE_DIR = (window.RJ_BAND && window.RJ_BAND.id !== "sabbath") ? "user-tabs/" + window.RJ_BAND.id : "user-tabs";
   var TOKEN_KEY = "riffjams-github-token";
   var TOKEN = "";
   var pendingImage = null;

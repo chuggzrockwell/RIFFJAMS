@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RIFFJAMS</title>
+<script src="rj-band.js?v=2"></script><!-- band switch (?band=gnr); must load before everything else -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
@@ -135,6 +136,18 @@
   .tile.c { background: #ffe44a; color: #111; }
   .tile.d { background: #ff3d4e; }
   .tile:hover { filter: brightness(1.12); }
+  /* Band switch (rj-band.js) */
+  .home-head { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 0 0 14px 4px; }
+  .home-head h1 { margin: 0 !important; }
+  .band-switch { display: inline-flex; border: 2px solid #7030a0; border-radius: 999px; overflow: hidden; }
+  .band-switch a { padding: 6px 14px; font: 600 14px/1.2 Montserrat, "Segoe UI", sans-serif; color: inherit; text-decoration: none; }
+  .band-switch a:hover { background: rgba(112,48,160,.25); }
+  html:not([data-band]) .band-switch a[data-band="sabbath"],
+  html[data-band="gnr"] .band-switch a[data-band="gnr"] { background: #7030a0; color: #fff; }
+  html[data-band="gnr"] .tile.hp { background: #000 url("covers/gnr/tile.svg?v=1") center / cover no-repeat; }
+  html[data-band="gnr"] .tile.b { background: #000 url("covers/gnr/appetite.svg?v=1") center / cover no-repeat; }
+  html[data-band="gnr"] .tile.lp { background: #000 url("covers/gnr/uyi1.svg?v=1") center / cover no-repeat; }
+  html[data-band="gnr"] .tile.b2 { display: none; }
   .hidden { display: none !important; }
   .bar { display: flex; align-items: center; gap: 12px; margin: 0 0 12px 4px; }
   body.sheet-mode #series > .bar {
@@ -5084,7 +5097,13 @@
 <body class="home-mode">
 <div class="wrap">
   <section id="home">
-    <h1>RIFFJAMS</h1>
+    <div class="home-head">
+      <h1>RIFFJAMS</h1>
+      <nav class="band-switch" id="bandSwitch" aria-label="Band">
+        <a href="./" data-band-link data-band="sabbath">Black Sabbath</a>
+        <a href="./?band=gnr" data-band-link data-band="gnr">Guns N' Roses</a>
+      </nav>
+    </div>
     <div class="grid">
       <button type="button" class="tile hp" id="btnHP"><small>Song Map</small>Sabbath<span class="tile-label">Song Map</span></button>
       <button type="button" class="tile b" id="btnB"><small>Paranoid</small>B<span class="tile-label">Lick Library</span></button>
@@ -5510,6 +5529,8 @@ var ALBUMS_DEFAULT = [
   ]},
 
 ];
+/* Band switch (rj-band.js): another band brings its own albums; its saved data lives under its own keys. */
+if (window.RJ_BAND && RJ_BAND.albums) ALBUMS_DEFAULT = JSON.parse(JSON.stringify(RJ_BAND.albums));
 var ALBUMS_KEY = "lick-sections-albums-v3";
 var ALBUMS = null; // filled after slot helpers exist (SONG_SLOTS must be defined first)
 var sectionsMode = "view";
@@ -5740,7 +5761,7 @@ function loadSoloMap() {
       }
     }
   } catch (e) {}
-  if (typeof buildDefaultSoloMapFromParanoid === "function" && typeof CATALOG !== "undefined" && CATALOG && CATALOG.length) {
+  if (window.rjIsDefaultBand !== false && typeof buildDefaultSoloMapFromParanoid === "function" && typeof CATALOG !== "undefined" && CATALOG && CATALOG.length) {
     return seedNibSoloLicks(buildDefaultSoloMapFromParanoid());
   }
   return seedNibSoloLicks(normalizeSoloMap(null, ALBUMS_DEFAULT));
@@ -8910,6 +8931,7 @@ var SECTION_SONG_PREFIX = {
   "Orchid": "ORC-", "Lord of This World": "LOTW-", "Solitude": "SOL-", "Into the Void": "ITV-",
   "Dirty Women": "DW-", "Never Say Die": "NSD-", "Johnny Blade": "JB-", "Junior's Eyes": "JE-"
 };
+if (window.RJ_BAND && RJ_BAND.prefixes) Object.keys(RJ_BAND.prefixes).forEach(function(k){ SECTION_SONG_PREFIX[k] = RJ_BAND.prefixes[k]; });
 function sectionLickId(songName, code, pairLick) {
   var lick = String(pairLick || "").trim();
   if (lick) return lick;
@@ -11984,6 +12006,8 @@ var SM_SONGSTERR = {
   "Breakout": "https://www.songsterr.com/a/wsa/black-sabbath-breakout-tab-s406157",
   "Swinging the Chain": "https://www.songsterr.com/a/wsa/black-sabbath-swinging-the-chain-tab-s814659"
 };
+/* Band switch: another band plays its own audio (rj-band.js local player) and has its own tab links. */
+if (window.RJ_BAND && RJ_BAND.audio) { SM_YT_IDS = RJ_BAND.audio; SM_YT_PLAYALONG = {}; SM_SONGSTERR = RJ_BAND.songsterr || {}; }
 function smSongsterrUrl(songName) {
   return (SM_SONGSTERR && SM_SONGSTERR[songName]) || "";
 }
@@ -12000,6 +12024,7 @@ function openSongsterrPopup(url) {
 var SM_YT_PLAYALONG_RATE = {
   "Paranoid": 166 / 142
 };
+if (window.RJ_BAND && RJ_BAND.audio) SM_YT_PLAYALONG_RATE = {};
 var smYtReady = false;
 var smYtPlayer = null;
 var smYtApiLoading = false;
@@ -16189,7 +16214,7 @@ var COVER_BY_TIER = {
   5: "covers/paranoid-tier2.png?v=45"
 };
 /* Albums included in Paranoid LL (letter B) multi-album grid */
-var LL_LIBRARY_ALBUMS = ["Black Sabbath", "Paranoid", "Master of Reality", "Vol. 4", "Sabbath Bloody Sabbath"];
+var LL_LIBRARY_ALBUMS = (window.RJ_BAND && RJ_BAND.llAlbums) ? RJ_BAND.llAlbums.slice() : ["Black Sabbath", "Paranoid", "Master of Reality", "Vol. 4", "Sabbath Bloody Sabbath"];
 function llCoverForAlbumTier(album, tier) {
   tier = parseInt(tier, 10);
   if (!(tier >= 1 && tier <= 2)) tier = 3;
@@ -17463,6 +17488,7 @@ var BOARD_ALBUM_CHRONO = [
   "Technical Ecstasy",
   "Never Say Die!"
 ];
+if (window.RJ_BAND && RJ_BAND.albums) BOARD_ALBUM_CHRONO = RJ_BAND.albums.map(function(a){ return a.name; });
 function boardAlbumName(digit) {
   var i = parseInt(digit, 10) - 1;
   return (i >= 0 && i < BOARD_ALBUM_CHRONO.length) ? BOARD_ALBUM_CHRONO[i] : "";
@@ -18173,7 +18199,7 @@ function showHome() {
 }
 document.getElementById("btnB").onclick = function(){ showSeries("B"); };
 document.getElementById("btnB2").onclick = function(){ showSeries("B2"); };
-document.getElementById("btnLP").onclick = function(){ location.href = "looper/"; };
+document.getElementById("btnLP").onclick = function(){ location.href = window.rjBandUrl ? rjBandUrl("looper/") : "looper/"; };
 document.getElementById("btnHP").onclick = showSections;
 document.getElementById("back").onclick = showHome;
 var _btnRand = document.getElementById("btnRandomize");
@@ -19807,7 +19833,7 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=444"></script>
+<script src="riffjams-admin.js?v=445"></script>
 <script src="rj-timer.js?v=1"></script><!-- practice timer, shared with the Loop Station -->
 </body>
 </html>
