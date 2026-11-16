@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RIFFJAMS</title>
-<script src="rj-band.js?v=2"></script><!-- band switch (?band=gnr); must load before everything else -->
+<script src="rj-band.js?v=3"></script><!-- band switch (?band=gnr, ?band=zeppelin); must load before everything else -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
@@ -143,11 +143,16 @@
   .band-switch a { padding: 6px 14px; font: 600 14px/1.2 Montserrat, "Segoe UI", sans-serif; color: inherit; text-decoration: none; }
   .band-switch a:hover { background: rgba(112,48,160,.25); }
   html:not([data-band]) .band-switch a[data-band="sabbath"],
-  html[data-band="gnr"] .band-switch a[data-band="gnr"] { background: #7030a0; color: #fff; }
+  html[data-band="gnr"] .band-switch a[data-band="gnr"],
+  html[data-band="zeppelin"] .band-switch a[data-band="zeppelin"] { background: #7030a0; color: #fff; }
   html[data-band="gnr"] .tile.hp { background: #000 url("covers/gnr/tile.svg?v=1") center / cover no-repeat; }
   html[data-band="gnr"] .tile.b { background: #000 url("covers/gnr/appetite.svg?v=1") center / cover no-repeat; }
   html[data-band="gnr"] .tile.lp { background: #000 url("covers/gnr/uyi1.svg?v=1") center / cover no-repeat; }
   html[data-band="gnr"] .tile.b2 { display: none; }
+  html[data-band="zeppelin"] .tile.hp { background: #000 url("covers/zeppelin/tile.svg?v=1") center / cover no-repeat; }
+  html[data-band="zeppelin"] .tile.b { background: #000 url("covers/zeppelin/lz4.svg?v=1") center / cover no-repeat; }
+  html[data-band="zeppelin"] .tile.lp { background: #000 url("covers/zeppelin/hoth.svg?v=1") center / cover no-repeat; }
+  html[data-band="zeppelin"] .tile.b2 { display: none; }
   .hidden { display: none !important; }
   .bar { display: flex; align-items: center; gap: 12px; margin: 0 0 12px 4px; }
   body.sheet-mode #series > .bar {
@@ -5102,6 +5107,7 @@
       <nav class="band-switch" id="bandSwitch" aria-label="Band">
         <a href="./" data-band-link data-band="sabbath">Black Sabbath</a>
         <a href="./?band=gnr" data-band-link data-band="gnr">Guns N' Roses</a>
+        <a href="./?band=zeppelin" data-band-link data-band="zeppelin">Led Zeppelin</a>
       </nav>
     </div>
     <div class="grid">

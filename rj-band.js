@@ -1,14 +1,16 @@
 /* RIFFJAMS band switch. Load FIRST on every RIFFJAMS page (before any other script).
 
-   ?band=gnr   -> Guns N' Roses. No param -> Black Sabbath (unchanged).
+   ?band=gnr      -> Guns N' Roses.
+   ?band=zeppelin -> Led Zeppelin.   No param -> Black Sabbath (unchanged).
 
    For a non-default band this file:
    - gives the band its own saved data: every localStorage/sessionStorage key is stored as
      "<band>:<key>" (except the few in SHARED), storage events are translated back, and
      BroadcastChannel / IndexedDB names get a band suffix, so the two bands never mix;
    - keeps ?band= on RIFFJAMS links and pop-ups (window.open, rjBandUrl);
-   - for Guns N' Roses, replaces the YouTube player with a local-audio player that plays the
-     songs from the folder you choose once (Desktop\Guns N' Roses). Same API as YT.Player, so the
+   - for a band with its own audio files (Guns N' Roses, Led Zeppelin), replaces the YouTube player
+     with a local-audio player that plays the songs from the folder you choose once
+     (band.audioFolderHint, e.g. Desktop\Guns N' Roses). Same API as YT.Player, so the
      Song Map / Board player, looping, speed and arrangement timing work unchanged. */
 (function () {
   "use strict";
@@ -114,8 +116,131 @@
     });
   });
 
+  /* ---------- Led Zeppelin catalogue (album track order; files are in Desktop\Led Zeppelin) ----------
+     Remastered files wherever the drive has them: "Remasters (Disc 1/2)" and "The Complete Led Zeppelin
+     (Remastered)"; every other song plays from its album folder. Song: [name, prefix, file, tuning?]
+     (tuning only where the song isn't in standard tuning). */
+  var R1 = "Led Zeppelin Remasters (Disc 1)/", R2 = "Led Zeppelin Remasters (Disc 2)/";
+  var LZ_RAW = [
+    ["Led Zeppelin I", "covers/zeppelin/lz1.svg?v=1", "font-paranoid", [
+      ["Good Times Bad Times", "GTBT-", R1 + "1-03 Good Times Bad Times.m4a"],
+      ["Babe I'm Gonna Leave You", "BIGLY-", R1 + "1-02 Babe I'm Gonna Leave You.m4a"],
+      ["You Shook Me", "YSM-", "Led Zeppelin I/03 You Shook Me.m4a"],
+      ["Dazed and Confused", "DAC-", R1 + "1-04 Dazed and Confused.m4a"],
+      ["Your Time Is Gonna Come", "YTIGC-", "Led Zeppelin I/05 Your Time Is Gonna Come.m4a"],
+      ["Black Mountain Side", "BMS-", "Led Zeppelin I/06 Black Mountain Side.m4a", "DADGAD"],
+      ["Communication Breakdown", "CB-", R1 + "1-01 Communication Breakdown.m4a"],
+      ["I Can't Quit You Baby", "ICQYB-", "Led Zeppelin I/08 I Can't Quit You Baby.m4a"],
+      ["How Many More Times", "HMMT-", "Led Zeppelin I/09 How Many More Times.m4a"]
+    ]],
+    ["Led Zeppelin II", "covers/zeppelin/lz2.svg?v=1", "font-sbs", [
+      ["Whole Lotta Love", "WLL-", R1 + "1-05 Whole Lotta Love.m4a"],
+      ["What Is and What Should Never Be", "WIWSNB-", "Led Zeppelin II/02 What Is And What Should Never Be.m4a"],
+      ["The Lemon Song", "TLS-", "Led Zeppelin II/03 The Lemon Song.m4a"],
+      ["Thank You", "TY-", "Led Zeppelin II/04 Thank You.m4a"],
+      ["Heartbreaker", "HB-", R1 + "1-06 Heartbreaker.m4a"],
+      ["Living Loving Maid (She's Just a Woman)", "LLM-", "Led Zeppelin II/06 Living Loving Maid (She's Just A Woman).m4a"],
+      ["Ramble On", "RO-", R1 + "1-07 Ramble On.m4a"],
+      ["Moby Dick", "MD-", "Led Zeppelin II/08 Moby Dick.m4a"],
+      ["Bring It On Home", "BIOH-", "Led Zeppelin II/09 Bring It On Home.m4a"]
+    ]],
+    ["Led Zeppelin III", "covers/zeppelin/lz3.svg?v=1", "font-vol4", [
+      ["Immigrant Song", "IS-", R1 + "1-08 Immigrant Song.m4a"],
+      ["Friends", "FR-", "Led Zeppelin III/02 Friends.m4a", "CACGCE"],
+      ["Celebration Day", "CDAY-", R1 + "1-09 Celebration Day.m4a"],
+      ["Since I've Been Loving You", "SIBLY-", R1 + "1-10 Since I've Been Loving You.m4a"],
+      ["Out on the Tiles", "OOTT-", "Led Zeppelin III/05 Out On The Tiles.m4a"],
+      ["Gallows Pole", "GP-", "Led Zeppelin III/06 Gallows Pole.m4a"],
+      ["Tangerine", "TAN-", "Led Zeppelin III/07 Tangerine.m4a"],
+      ["That's the Way", "TTW-", "Led Zeppelin III/08 That's The Way.m4a", "DGDGBD"],
+      ["Bron-Y-Aur Stomp", "BYAS-", "Led Zeppelin III/09 Bron-Y-Aur Stomp.m4a", "CFCFAC"],
+      ["Hats Off to (Roy) Harper", "HOTRH-", "Led Zeppelin III/10 Hats Off To (Roy) Harper.m4a"]
+    ]],
+    ["Led Zeppelin IV", "covers/zeppelin/lz4.svg?v=1", "font-mor", [
+      ["Black Dog", "BD-", R1 + "1-11 Black Dog.m4a"],
+      ["Rock and Roll", "RAR-", R1 + "1-12 Rock And Roll.m4a"],
+      ["The Battle of Evermore", "TBOE-", R1 + "1-13 The Battle of Evermore.m4a"],
+      ["Stairway to Heaven", "STH-", R1 + "1-15 Stairway To Heaven.m4a"],
+      ["Misty Mountain Hop", "MMH-", R1 + "1-14 Misty Mountain Hop.m4a"],
+      ["Four Sticks", "FS-", "Led Zeppelin IV/02 Four Sticks.m4a"],
+      ["Going to California", "GTC-", "Led Zeppelin IV/03 Going To California.m4a", "DGDGBD"],
+      ["When the Levee Breaks", "WTLB-", "Led Zeppelin IV/08 When The Levee Breaks.m4a"]
+    ]],
+    ["Houses of the Holy", "covers/zeppelin/hoth.svg?v=1", "font-sabotage", [
+      ["The Song Remains the Same", "TSRTS-", R2 + "2-01 Song Remains The Same.m4a"],
+      ["The Rain Song", "TRS-", R2 + "2-02 The Rain Song.m4a", "DGCDGD"],
+      ["Over the Hills and Far Away", "OTHAFA-", "Houses of the Holy/03 Over The Hills And Far Away.m4a"],
+      ["The Crunge", "TCR-", "Houses of the Holy/04 The Crunge.m4a"],
+      ["Dancing Days", "DD-", "Houses of the Holy/05 Dancing Days.m4a"],
+      ["D'yer Mak'er", "DYM-", R2 + "2-03 D'Yer Mak'er.m4a"],
+      ["No Quarter", "NQ-", R2 + "2-04 No Quarter.m4a"],
+      ["The Ocean", "TO-", "Houses of the Holy/08 The Ocean.m4a"]
+    ]],
+    ["Physical Graffiti", "covers/zeppelin/pg.svg?v=1", "font-te", [
+      ["Houses of the Holy", "HOTH-", R2 + "2-05 Houses Of The Holy.m4a"],
+      ["Trampled Under Foot", "TUF-", R2 + "2-07 Trampled Underfoot.m4a"],
+      ["Kashmir", "KSH-", R2 + "2-06 Kashmir.m4a", "DADGAD"],
+      ["In the Light", "ITL-", "Physical Graffiti [Disc 2]/2-01 In The Light.m4a"],
+      ["Bron-Yr-Aur", "BYA-", "Physical Graffiti [Disc 2]/2-02 Bron-Yr-Aur.m4a"],
+      ["Down by the Seaside", "DBTS-", "Physical Graffiti [Disc 2]/2-03 Down By The Seaside.m4a"],
+      ["Ten Years Gone", "TYG-", "Physical Graffiti [Disc 2]/2-04 Ten Years Gone.m4a"],
+      ["Night Flight", "NF-", "Physical Graffiti [Disc 2]/2-05 Night Flight.m4a"],
+      ["The Wanton Song", "TWS-", "Physical Graffiti [Disc 2]/2-06 The Wanton Song.m4a"],
+      ["Boogie with Stu", "BWSTU-", "Physical Graffiti [Disc 2]/2-07 Boogie With Stu.m4a"],
+      ["Black Country Woman", "BCW-", "Physical Graffiti [Disc 2]/2-08 Black Country Woman.m4a"],
+      ["Sick Again", "SA-", "Physical Graffiti [Disc 2]/2-09 Sick Again.m4a"]
+    ]],
+    ["Presence", "covers/zeppelin/presence.svg?v=1", "font-paranoid", [
+      ["Achilles Last Stand", "ALS-", R2 + "2-09 Achilles Last Stand.m4a"],
+      ["Nobody's Fault but Mine", "NFBM-", R2 + "2-08 Nobody's Fault But Mine.m4a"]
+    ]],
+    ["In Through the Out Door", "covers/zeppelin/itod.svg?v=1", "font-sbs", [
+      ["In the Evening", "ITE-", R2 + "2-11 In The Evening.m4a"],
+      ["South Bound Saurez", "SBSZ-", "In Through the Out Door/02 South Bound Saurez.m4a"],
+      ["Fool in the Rain", "FITR-", "In Through the Out Door/03 Fool In The Rain.m4a"],
+      ["Hot Dog", "HD-", "In Through the Out Door/04 Hot Dog.m4a"],
+      ["Carouselambra", "CAR-", "In Through the Out Door/05 Carouselambra.m4a"],
+      ["All My Love", "AML-", R2 + "2-10 All My Love.m4a"],
+      ["I'm Gonna Crawl", "IGC-", "In Through the Out Door/07 I'm Gonna Crawl.m4a"]
+    ]],
+    ["Coda", "covers/zeppelin/coda.svg?v=1", "font-vol4", [
+      ["We're Gonna Groove", "WGG-", "Coda/01 We're Gonna Groove.m4a"],
+      ["Poor Tom", "PT-", "Coda/02 Poor Tom.m4a"],
+      ["I Can't Quit You Baby (Coda)", "ICQYBC-", "Coda/03 I Can't Quit You Baby.m4a"],
+      ["Walter's Walk", "WW-", "Coda/04 Walter's Walk.m4a"],
+      ["Ozone Baby", "OB-", "Coda/05 Ozone Baby.m4a"],
+      ["Darlene", "DAR-", "Coda/06 Darlene.m4a"],
+      ["Bonzo's Montreux", "BM-", "Coda/07 Bonzo's Montreux.m4a"],
+      ["Wearing and Tearing", "WAT-", "Coda/08 Wearing And Tearing.m4a"]
+    ]],
+    ["Rarities", "covers/zeppelin/rarities.svg?v=1", "font-te", [
+      ["Hey Hey What Can I Do", "HHWCID-", "The Complete Led Zeppelin (Remastered)/10-11 Hey Hey What Can I Do (From _The Complete Studio Recordings_).m4a"]
+    ]]
+  ];
+  var LZ = { albums: [], prefixes: {}, audio: {}, songsterr: {} };
+  LZ_RAW.forEach(function (a) {
+    LZ.albums.push({ name: a[0], cover: a[1], font: a[2], songs: a[3].map(function (s) {
+      var o = { song: s[0], sections: [] };
+      if (s[3]) o.tuning = s[3];
+      return o;
+    }) });
+    a[3].forEach(function (s) {
+      LZ.prefixes[s[0]] = s[1];
+      LZ.audio[s[0]] = "local:" + s[2];
+      LZ.songsterr[s[0]] = "https://www.songsterr.com/?pattern=" +
+        encodeURIComponent("led zeppelin " + s[0].replace(/\s*\(.*\)\s*$/, ""));
+    });
+  });
+
   var BANDS = {
     sabbath: { id: "sabbath", name: "Black Sabbath", short: "Sabbath", dataPath: "riffjams-data.json" },
+    zeppelin: {
+      id: "zeppelin", name: "Led Zeppelin", short: "Zeppelin", dataPath: "zeppelin-data.json",
+      tile: "covers/zeppelin/tile.svg?v=1",
+      albums: LZ.albums, prefixes: LZ.prefixes, audio: LZ.audio, songsterr: LZ.songsterr,
+      llAlbums: LZ.albums.map(function (a) { return a.name; }),
+      audioFolderHint: "Desktop\\Led Zeppelin"
+    },
     gnr: {
       id: "gnr", name: "Guns N' Roses", short: "GN'R", dataPath: "gnr-data.json",
       tile: "covers/gnr/tile.svg?v=1",
@@ -200,7 +325,7 @@
   /* Lets other code and CSS tell which band is on. */
   document.documentElement.setAttribute("data-band", band.id);
 
-  if (band.id !== "gnr") return;
+  if (!band.audio) return;
 
   /* ---------- Local-audio player (YT.Player-compatible) ---------- */
   var PS = { UNSTARTED: -1, ENDED: 0, PLAYING: 1, PAUSED: 2, BUFFERING: 3, CUED: 5 };
@@ -272,7 +397,7 @@
       return;
     }
     try {
-      var h = await window.showDirectoryPicker({ id: "rj-gnr-audio", mode: "read" });
+      var h = await window.showDirectoryPicker({ id: "rj-" + band.id + "-audio", mode: "read" });
       rootHandle = h;
       try { await idb("readwrite", function (st) { return st.put(h, "root"); }); } catch (e) {}
       urlCache = {};
@@ -288,8 +413,8 @@
   function askForFolder() {
     (rootHandle ? Promise.resolve(rootHandle) : idb("readonly", function (st) { return st.get("root"); }).catch(function () { return null; }))
       .then(function (h) {
-        if (h) { rootHandle = h; showBanner("Allow RIFFJAMS to play your Guns N' Roses files (" + (h.name || "folder") + ").", "Allow", allowFolder); }
-        else showBanner("Choose your Guns N' Roses music folder (" + band.audioFolderHint + ") to play songs here. The audio stays on your computer.", "Choose folder", pickFolder);
+        if (h) { rootHandle = h; showBanner("Allow RIFFJAMS to play your " + band.name + " files (" + (h.name || "folder") + ").", "Allow", allowFolder); }
+        else showBanner("Choose your " + band.name + " music folder (" + band.audioFolderHint + ") to play songs here. The audio stays on your computer.", "Choose folder", pickFolder);
       });
   }
   async function resolveUrl(id) {
@@ -303,7 +428,7 @@
     var file;
     try { file = await fileFor(path); }
     catch (e) {
-      showBanner("Couldn't find “" + path + "” in " + (root.name || "the chosen folder") + ". Choose the Guns N' Roses folder.", "Choose folder", pickFolder);
+      showBanner("Couldn't find “" + path + "” in " + (root.name || "the chosen folder") + ". Choose the " + band.name + " folder.", "Choose folder", pickFolder);
       throw e;
     }
     urlCache[id] = URL.createObjectURL(file);
