@@ -28,7 +28,7 @@ folder (Desktop). Chrome / Edge remember it. The Loop Station uses its own chip 
 
 ## Led Zeppelin
 
-`?band=zeppelin` (or the home screen's band switch) opens the Led Zeppelin section, built the same way
+`?band=zeppelin` (or the Led Zeppelin card on the home page) opens the Led Zeppelin section, built the same way
 as Guns N' Roses: its own saved data (`zeppelin-data.json`, tabs in `user-tabs/zeppelin/`), songs
 played from your own files (choose the `Led Zeppelin` folder on the Desktop the first time you press
 play), and the Loop Station chip folder `Loop Prototype\looper-zeppelin`. Songs use the remastered
