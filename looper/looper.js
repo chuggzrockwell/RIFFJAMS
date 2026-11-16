@@ -1889,7 +1889,7 @@
   function albumData() {
     try {
       const a = JSON.parse(localStorage.getItem('lick-sections-albums-v3'));
-      if (Array.isArray(a) && a.length) return a;
+      if (Array.isArray(a) && a.length) return window.rjApplyBandCovers ? window.rjApplyBandCovers(a) : a;
     } catch (e) { /* no Song Map data */ }
     const by = {};
     songs.forEach((s) => {

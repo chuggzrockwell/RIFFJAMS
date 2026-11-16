@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1c2f8c"/><stop offset="1" stop-color="#5b1f8f"/></linearGradient></defs>
-<rect width="600" height="600" fill="url(#g)"/>
-<rect x="24" y="24" width="552" height="552" fill="none" stroke="#e8e2ff" stroke-width="6"/>
-<text x="300" y="92" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="34" fill="#e8e2ff" letter-spacing="6">GUNS N' ROSES</text>
-<text x="300" y="204" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="88" fill="#fff" letter-spacing="2">USE YOUR</text><text x="300" y="300" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="88" fill="#fff" letter-spacing="2">ILLUSION</text><text x="300" y="396" text-anchor="middle" font-family="Impact, 'Arial Black', sans-serif" font-size="88" fill="#fff" letter-spacing="2">II</text>
-<text x="300" y="540" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#e8e2ff" letter-spacing="4">1991</text>
-</svg>

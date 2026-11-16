@@ -27,7 +27,7 @@
     }), _files: songs };
   }
   var GNR_RAW = [
-    A("Appetite for Destruction", "covers/gnr/appetite.svg?v=1", "font-paranoid", "Eb", [
+    A("Appetite for Destruction", "covers/gnr/appetite.jpg?v=1", "font-paranoid", "Eb", [
       ["Welcome to the Jungle", "WTTJ-", "Appetite For Destruction/01 Welcome To The Jungle.m4a"],
       ["It's So Easy", "ISE-", "Appetite For Destruction/02 It's So Easy.m4a"],
       ["Nightrain", "NTR-", "Appetite For Destruction/03 Nightrain.m4a"],
@@ -41,7 +41,7 @@
       ["Anything Goes", "AG-", "Appetite For Destruction/11 Anything Goes.m4a"],
       ["Rocket Queen", "RQ-", "Appetite For Destruction/12 Rocket Queen.m4a"]
     ]),
-    A("G N' R Lies", "covers/gnr/lies.svg?v=1", "font-sbs", "Eb", [
+    A("G N' R Lies", "covers/gnr/lies.jpg?v=1", "font-sbs", "Eb", [
       ["Reckless Life", "RL-", "G N' R Lies/01 Reckless Life.m4a"],
       ["Nice Boys", "NBY-", "G N' R Lies/02 Nice Boys.m4a"],
       ["Move to the City", "MTTC-", "G N' R Lies/03 Move To The City.m4a"],
@@ -51,7 +51,7 @@
       ["You're Crazy (Acoustic)", "YCA-", "G N' R Lies/07 You're Crazy.m4a"],
       ["One in a Million", "OIAM-", "G N' R Lies/08 One In A Million.m4a"]
     ]),
-    A("Use Your Illusion I", "covers/gnr/uyi1.svg?v=1", "font-vol4", "Eb", [
+    A("Use Your Illusion I", "covers/gnr/uyi1.jpg?v=1", "font-vol4", "Eb", [
       ["Right Next Door to Hell", "RNDH-", "Use Your Illusion I/01 Right Next Door To Hell.m4a"],
       ["Dust N' Bones", "DNB-", "Use Your Illusion I/02 Dust N' Bones.m4a"],
       ["Live and Let Die", "LALD-", "Use Your Illusion I/03 Live And Let Die.m4a"],
@@ -69,7 +69,7 @@
       ["Dead Horse", "DH-", "Use Your Illusion I/15 Dead Horse.m4a"],
       ["Coma", "CMA-", "Use Your Illusion I/16 Coma.m4a"]
     ]),
-    A("Use Your Illusion II", "covers/gnr/uyi2.svg?v=1", "font-vol4", "Eb", [
+    A("Use Your Illusion II", "covers/gnr/uyi2.jpg?v=1", "font-vol4", "Eb", [
       ["Civil War", "CW-", "Use Your Illusion II/12 Civil War.m4a"],
       ["14 Years", "FTY-", "Use Your Illusion II/2-02 14 Years.m4a"],
       ["Yesterdays", "YD-", "Use Your Illusion II/2-03 Yesterdays.m4a"],
@@ -83,7 +83,7 @@
       ["Estranged", "EST-", "Use Your Illusion II/2-11 Estranged.m4a"],
       ["You Could Be Mine", "YCBM-", "Use Your Illusion II/2-12 You Could Be Mine.m4a"]
     ]),
-    A("Chinese Democracy", "covers/gnr/chinese-democracy.svg?v=1", "font-sabotage", "", [
+    A("Chinese Democracy", "covers/gnr/chinese-democracy.jpg?v=1", "font-sabotage", "", [
       ["Chinese Democracy", "CD-", "Chinese Democracy/01 Chinese Democracy.m4a"],
       ["Shackler's Revenge", "SR-", "Chinese Democracy/02 Shackler's Revenge.m4a"],
       ["Better", "BTR-", "Chinese Democracy/03 Better.m4a"],
@@ -99,7 +99,7 @@
       ["This I Love", "TIL-", "Chinese Democracy/13 This I Love.m4a"],
       ["Prostitute", "PRO-", "Chinese Democracy/14 Prostitute.m4a"]
     ]),
-    A("Live & Rarities", "covers/gnr/live.svg?v=1", "font-te", "", [
+    A("Live & Rarities", "covers/gnr/live.jpg?v=1", "font-te", "", [
       ["Ain't It Fun", "AIF-", "Greatest Hits/12 Ain't It Fun.mp3"],
       ["Dead Flowers", "DF-", "Live/Dead Flowers.mp3"],
       ["Wild Horses", "WH-", "Live/Wild Horses.mp3"]
@@ -243,7 +243,6 @@
     },
     gnr: {
       id: "gnr", name: "Guns N' Roses", short: "GN'R", dataPath: "gnr-data.json",
-      tile: "covers/gnr/tile.svg?v=1",
       albums: GNR.albums, prefixes: GNR.prefixes, audio: GNR.audio, songsterr: GNR.songsterr,
       llAlbums: GNR.albums.map(function (a) { return a.name; }),
       audioFolderHint: "Desktop\\Guns N' Roses"
@@ -253,6 +252,19 @@
   window.RJ_BANDS = BANDS;
   window.RJ_BAND = band;
   window.rjIsDefaultBand = band.id === "sabbath";
+
+  /** Saved / shared album lists keep the cover they were stored with; this puts the band's
+   *  current cover and font back on each album (so new art shows up). Sabbath: no change. */
+  window.rjApplyBandCovers = function (list) {
+    if (!band.albums || !Array.isArray(list)) return list;
+    var by = {};
+    band.albums.forEach(function (a) { by[a.name] = a; });
+    list.forEach(function (a) {
+      var d = a && by[a.name];
+      if (d) { a.cover = d.cover; a.font = d.font; }
+    });
+    return list;
+  };
 
   /** Add ?band= to a RIFFJAMS URL (relative or same-origin). Leaves other sites alone. */
   window.rjBandUrl = function (url, bandId) {
