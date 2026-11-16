@@ -81,7 +81,8 @@
       ["Locomotive", "LOCO-", "Use Your Illusion II/2-09 Locomotive.m4a"],
       ["So Fine", "SOF-", "Use Your Illusion II/2-10 So Fine.m4a"],
       ["Estranged", "EST-", "Use Your Illusion II/2-11 Estranged.m4a"],
-      ["You Could Be Mine", "YCBM-", "Use Your Illusion II/2-12 You Could Be Mine.m4a"]
+      /* The UYI II copy of this one is a broken 3-second file; the Greatest Hits copy is the full track. */
+      ["You Could Be Mine", "YCBM-", "Greatest Hits/07 You Could be Mine.mp3"]
     ]),
     A("Chinese Democracy", "covers/gnr/chinese-democracy.jpg?v=1", "font-sabotage", "", [
       ["Chinese Democracy", "CD-", "Chinese Democracy/01 Chinese Democracy.m4a"],
@@ -105,12 +106,80 @@
       ["Wild Horses", "WH-", "Live/Wild Horses.mp3"]
     ])
   ];
-  var GNR = { albums: [], prefixes: {}, audio: {}, songsterr: {} };
+  /* YouTube fallback: official album uploads (Guns N' Roses - Topic / GunsNRosesVEVO, from YouTube
+     Music's album track lists). Each one's length matches the music file to within 2 s, so chip
+     timings carry over. Dead Flowers / Wild Horses have no matching official upload. */
+  var GNR_YT = {
+    "Welcome to the Jungle": "o1tj2zJ2Wvg",
+    "It's So Easy": "FMbl1ntpIXQ",
+    "Nightrain": "VMDljoM5JFI",
+    "Out Ta Get Me": "gORKiQ0h1ZA",
+    "Mr. Brownstone": "27rKrR424cA",
+    "Paradise City": "Rbm6GXllBiw",
+    "My Michelle": "scmvAg_S97k",
+    "Think About You": "UPlP54CS0eo",
+    "Sweet Child O' Mine": "1w7OgIMMRc4",
+    "You're Crazy": "e3EQ0xP50u0",
+    "Anything Goes": "c8H8a5Bab6o",
+    "Rocket Queen": "YxW9iekNSek",
+    "Reckless Life": "G4CfGsBz9aY",
+    "Nice Boys": "3MYQA85Vx7s",
+    "Move to the City": "BGdtq9mB7Xk",
+    "Mama Kin": "Wa-SmFQCstE",
+    "Patience": "ErvgV4P6Fzc",
+    "Used to Love Her": "FDIvIb06abI",
+    "You're Crazy (Acoustic)": "OIduTH7NYA8",
+    "One in a Million": "kgIRClKD4RI",
+    "Right Next Door to Hell": "4cQg8k3Znvw",
+    "Dust N' Bones": "2yFm2EkjLN4",
+    "Live and Let Die": "6D9vAItORgE",
+    "Don't Cry": "zRIbf6JqkNc",
+    "Perfect Crime": "e-mMVVqE9UI",
+    "You Ain't the First": "XYb4MFHjU3E",
+    "Bad Obsession": "-3tFB6k64js",
+    "Back Off Bitch": "U0VCUzZMReU",
+    "Double Talkin' Jive": "tbzQX1fEHXA",
+    "November Rain": "8SbUC-UaAxE",
+    "The Garden": "s20h7uJ8CCI",
+    "Garden of Eden": "LuhLVl5qf2A",
+    "Don't Damn Me": "_EOrZ5JMgfk",
+    "Bad Apples": "D9cqJfwESV0",
+    "Dead Horse": "u8X76NRiQLQ",
+    "Coma": "vyV6Lw6t-O4",
+    "Civil War": "-ucDiz3GYrg",
+    "14 Years": "fBYsbYyYmNs",
+    "Yesterdays": "NDOPlpH6NZM",
+    "Knockin' on Heaven's Door": "k04tX2fvh0o",
+    "Get in the Ring": "LnQ_zhVWhH8",
+    "Shotgun Blues": "s2k9qaOdsGU",
+    "Breakdown": "bpkd4aF2_FE",
+    "Pretty Tied Up": "PAQIchLSYmk",
+    "Locomotive": "T43HujTS8Uo",
+    "So Fine": "i-pvfV0pBWE",
+    "Estranged": "dpmAY059TTY",
+    "You Could Be Mine": "6Sp1bLrBAuQ",
+    "Chinese Democracy": "FfIZr38DLSg",
+    "Shackler's Revenge": "IyF1GhEaSPo",
+    "Better": "tVKtLfFD8Po",
+    "Street of Dreams": "Fm-KLUZM-Tg",
+    "If the World": "uPVmq3VZFaA",
+    "There Was a Time": "bAZO90z52Rg",
+    "Catcher in the Rye": "4PNNzSNtihI",
+    "Scraped": "L3IA-EDQgsU",
+    "Riad N' the Bedouins": "ln6g0s58j9o",
+    "Sorry": "BPKHZtggOOw",
+    "I.R.S.": "7kPHj6QrLbU",
+    "Madagascar": "VWiX-MKTUTY",
+    "This I Love": "aOkiG53ituQ",
+    "Prostitute": "QELsjWL5WeU",
+    "Ain't It Fun": "emRAZ9S86Us"
+  };
+  var GNR = { albums: [], prefixes: {}, audio: {}, local: {}, yt: GNR_YT, songsterr: {} };
   GNR_RAW.forEach(function (a) {
     GNR.albums.push({ name: a.name, cover: a.cover, font: a.font, songs: a.songs });
     a._files.forEach(function (s) {
       GNR.prefixes[s[0]] = s[1];
-      GNR.audio[s[0]] = "local:" + s[2];
+      GNR.local[s[0]] = "local:" + s[2];
       GNR.songsterr[s[0]] = "https://www.songsterr.com/?pattern=" +
         encodeURIComponent("guns n roses " + s[0].replace(/\s*\(.*\)\s*$/, ""));
     });
@@ -244,6 +313,7 @@
     gnr: {
       id: "gnr", name: "Guns N' Roses", short: "GN'R", dataPath: "gnr-data.json",
       albums: GNR.albums, prefixes: GNR.prefixes, audio: GNR.audio, songsterr: GNR.songsterr,
+      localAudio: GNR.local, ytAudio: GNR.yt,   /* files first, official YouTube uploads as fallback */
       llAlbums: GNR.albums.map(function (a) { return a.name; }),
       audioFolderHint: "Desktop\\Guns N' Roses"
     }
@@ -341,7 +411,7 @@
 
   /* ---------- Local-audio player (YT.Player-compatible) ---------- */
   var PS = { UNSTARTED: -1, ENDED: 0, PLAYING: 1, PAUSED: 2, BUFFERING: 3, CUED: 5 };
-  var DB = "rj-band-audio-folder";
+  var DB = "rj-band-audio-folder-" + band.id;   /* one saved music folder per band */
   function idb(mode, fn) {
     return new Promise(function (res, rej) {
       if (!_idbOpen) { rej(new Error("no IndexedDB")); return; }
@@ -366,10 +436,10 @@
     if (!bannerEl) {
       bannerEl = document.createElement("div");
       bannerEl.id = "rjAudioFolderBanner";
-      bannerEl.style.cssText = "position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99999;" +
+      bannerEl.style.cssText = "position:fixed;left:16px;bottom:16px;z-index:99999;" +
         "background:#111;color:#fff;border:2px solid #7030a0;border-radius:10px;padding:10px 14px;" +
         "font:600 14px/1.35 Montserrat,'Segoe UI',sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.45);" +
-        "display:flex;gap:12px;align-items:center;max-width:min(640px,calc(100vw - 32px))";
+        "display:flex;gap:12px;align-items:center;max-width:min(520px,45vw)";
       document.body.appendChild(bannerEl);
     }
     bannerEl.innerHTML = "";
@@ -535,5 +605,78 @@
       if (typeof ev.onReady === "function") ev.onReady({ target: self });
     }, 0);
   }
-  window.YT = { Player: LocalPlayer, PlayerState: PS, loaded: 1, __rjLocal: true };
+  if (!band.ytAudio) {   /* files only (no YouTube table for this band) */
+    window.YT = { Player: LocalPlayer, PlayerState: PS, loaded: 1, __rjLocal: true };
+    return;
+  }
+  /* ---------- Your files first, YouTube as the fallback ----------
+     Starts on the YouTube table (official album uploads) and checks, right away, whether this
+     browser already has the music folder with permission. If so, and no player exists yet, it
+     switches to your files. A page keeps one source until reload, so a player is never swapped
+     mid-song. With no folder, a one-time bar offers to use the files (then reloads). */
+  var mode = "";
+  function fillAudio(map) {
+    Object.keys(band.audio).forEach(function (k) { delete band.audio[k]; });
+    Object.keys(map).forEach(function (k) { band.audio[k] = map[k]; });
+  }
+  function rebuildPlaylist() {
+    try { if (window.smPlaylist && window.smPlaylist.length && typeof window.smBuildPlaylist === "function") window.smBuildPlaylist(); } catch (e) {}
+  }
+  function useLocal() {
+    mode = "local";
+    fillAudio(band.localAudio);
+    window.YT = { Player: LocalPlayer, PlayerState: PS, loaded: 1, __rjLocal: true };
+    rebuildPlaylist();
+  }
+  function useYouTube() { mode = "youtube"; fillAudio(band.ytAudio); rebuildPlaylist(); }
+  window.rjAudioMode = function () { return mode; };
+
+  var OFFER_KEY = NS + "rj-audio-offer-dismissed";
+  function offerFiles(hasSaved) {
+    if (!window.showDirectoryPicker) return;   // other browsers / phones: YouTube only, no nagging
+    if (!hasSaved) { try { if (_get.call(localStorage, OFFER_KEY)) return; } catch (e) {} }
+    var shown = false;
+    function show() {
+      if (shown || mode !== "youtube") return;
+      shown = true;
+      if (hasSaved) showBanner("Playing from YouTube. Use your " + band.name + " music files instead?", "Use my files", allowFolder);
+      else showBanner("Playing from YouTube. Got the " + band.name + " music files on this computer? Choose the folder to play them instead (exact album timing).", "Choose folder", pickFolder);
+    }
+    /* Show it when you start using the player, not on the home screen. */
+    document.addEventListener("click", function (ev) {
+      var t = ev.target;
+      if (t && t.closest && t.closest("#smPlayer, .sm-player, #boardPlayer, .board-player, #sections")) show();
+    }, true);
+  }
+  function dismissOffer() { try { _set.call(localStorage, OFFER_KEY, "1"); } catch (e) {} }
+
+  /* Once you choose or allow the folder from YouTube mode, reload so the page starts on your files. */
+  var _pick = pickFolder, _allow = allowFolder;
+  pickFolder = async function () {
+    if (mode !== "youtube") return _pick();
+    if (!window.showDirectoryPicker) return _pick();
+    try {
+      var h = await window.showDirectoryPicker({ id: "rj-" + band.id + "-audio", mode: "read" });
+      try { await idb("readwrite", function (st) { return st.put(h, "root"); }); } catch (e) {}
+      location.reload();
+    } catch (e) { /* cancelled */ }
+  };
+  allowFolder = async function () {
+    if (mode !== "youtube") return _allow();
+    try { if (await ensureRoot(true)) { location.reload(); return; } } catch (e) {}
+    pickFolder();
+  };
+  window.rjChooseAudioFolder = function () { return pickFolder(); };
+  var _hide = hideBanner;
+  hideBanner = function () { if (mode === "youtube") dismissOffer(); _hide(); };
+
+  if (qs && qs.get("audio")) useLocal();
+  else {
+    useYouTube();
+    ensureRoot(false).then(function (root) {
+      var busy = (window.YT && !window.YT.__rjLocal) || window.smYtPlayer || window.boardYtPlayer;
+      if (root && !busy) { useLocal(); return; }
+      offerFiles(!!rootHandle);
+    }).catch(function () { offerFiles(false); });
+  }
 })();
