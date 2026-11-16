@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
-<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a2014"/><stop offset="1" stop-color="#8c6a3c"/></linearGradient></defs>
-<rect width="600" height="600" fill="url(#g)"/>
-<rect x="24" y="24" width="552" height="552" fill="none" stroke="#f4e2bc" stroke-width="6"/>
-<text x="300" y="92" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="34" fill="#f4e2bc" letter-spacing="8">LED ZEPPELIN</text>
-<text x="300" y="270" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="60" fill="#fff" letter-spacing="2">IN THROUGH</text><text x="300" y="370" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="60" fill="#fff" letter-spacing="2">THE OUT DOOR</text>
-<text x="300" y="540" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#f4e2bc" letter-spacing="4">1979</text>
-</svg>

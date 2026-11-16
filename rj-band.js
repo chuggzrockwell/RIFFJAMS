@@ -259,7 +259,7 @@
      (tuning only where the song isn't in standard tuning). */
   var R1 = "Led Zeppelin Remasters (Disc 1)/", R2 = "Led Zeppelin Remasters (Disc 2)/";
   var LZ_RAW = [
-    ["Led Zeppelin I", "covers/zeppelin/lz1.svg?v=1", "font-paranoid", [
+    ["Led Zeppelin I", "covers/zeppelin/lz1.jpg?v=1", "font-paranoid", [
       ["Good Times Bad Times", "GTBT-", R1 + "1-03 Good Times Bad Times.m4a"],
       ["Babe I'm Gonna Leave You", "BIGLY-", R1 + "1-02 Babe I'm Gonna Leave You.m4a"],
       ["You Shook Me", "YSM-", "Led Zeppelin I/03 You Shook Me.m4a"],
@@ -270,7 +270,7 @@
       ["I Can't Quit You Baby", "ICQYB-", "Led Zeppelin I/08 I Can't Quit You Baby.m4a"],
       ["How Many More Times", "HMMT-", "Led Zeppelin I/09 How Many More Times.m4a"]
     ]],
-    ["Led Zeppelin II", "covers/zeppelin/lz2.svg?v=1", "font-sbs", [
+    ["Led Zeppelin II", "covers/zeppelin/lz2.jpg?v=1", "font-sbs", [
       ["Whole Lotta Love", "WLL-", R1 + "1-05 Whole Lotta Love.m4a"],
       ["What Is and What Should Never Be", "WIWSNB-", "Led Zeppelin II/02 What Is And What Should Never Be.m4a"],
       ["The Lemon Song", "TLS-", "Led Zeppelin II/03 The Lemon Song.m4a"],
@@ -281,7 +281,7 @@
       ["Moby Dick", "MD-", "Led Zeppelin II/08 Moby Dick.m4a"],
       ["Bring It On Home", "BIOH-", "Led Zeppelin II/09 Bring It On Home.m4a"]
     ]],
-    ["Led Zeppelin III", "covers/zeppelin/lz3.svg?v=1", "font-vol4", [
+    ["Led Zeppelin III", "covers/zeppelin/lz3.jpg?v=1", "font-vol4", [
       ["Immigrant Song", "IS-", R1 + "1-08 Immigrant Song.m4a"],
       ["Friends", "FR-", "Led Zeppelin III/02 Friends.m4a", "CACGCE"],
       ["Celebration Day", "CDAY-", R1 + "1-09 Celebration Day.m4a"],
@@ -293,7 +293,7 @@
       ["Bron-Y-Aur Stomp", "BYAS-", "Led Zeppelin III/09 Bron-Y-Aur Stomp.m4a", "CFCFAC"],
       ["Hats Off to (Roy) Harper", "HOTRH-", "Led Zeppelin III/10 Hats Off To (Roy) Harper.m4a"]
     ]],
-    ["Led Zeppelin IV", "covers/zeppelin/lz4.svg?v=1", "font-mor", [
+    ["Led Zeppelin IV", "covers/zeppelin/lz4.jpg?v=1", "font-mor", [
       ["Black Dog", "BD-", R1 + "1-11 Black Dog.m4a"],
       ["Rock and Roll", "RAR-", R1 + "1-12 Rock And Roll.m4a"],
       ["The Battle of Evermore", "TBOE-", R1 + "1-13 The Battle of Evermore.m4a"],
@@ -303,7 +303,7 @@
       ["Going to California", "GTC-", "Led Zeppelin IV/03 Going To California.m4a", "DGDGBD"],
       ["When the Levee Breaks", "WTLB-", "Led Zeppelin IV/08 When The Levee Breaks.m4a"]
     ]],
-    ["Houses of the Holy", "covers/zeppelin/hoth.svg?v=1", "font-sabotage", [
+    ["Houses of the Holy", "covers/zeppelin/hoth.jpg?v=1", "font-sabotage", [
       ["The Song Remains the Same", "TSRTS-", R2 + "2-01 Song Remains The Same.m4a"],
       ["The Rain Song", "TRS-", R2 + "2-02 The Rain Song.m4a", "DGCDGD"],
       ["Over the Hills and Far Away", "OTHAFA-", "Houses of the Holy/03 Over The Hills And Far Away.m4a"],
@@ -313,7 +313,7 @@
       ["No Quarter", "NQ-", R2 + "2-04 No Quarter.m4a"],
       ["The Ocean", "TO-", "Houses of the Holy/08 The Ocean.m4a"]
     ]],
-    ["Physical Graffiti", "covers/zeppelin/pg.svg?v=1", "font-te", [
+    ["Physical Graffiti", "covers/zeppelin/pg.jpg?v=1", "font-te", [
       ["Houses of the Holy", "HOTH-", R2 + "2-05 Houses Of The Holy.m4a"],
       ["Trampled Under Foot", "TUF-", R2 + "2-07 Trampled Underfoot.m4a"],
       ["Kashmir", "KSH-", R2 + "2-06 Kashmir.m4a", "DADGAD"],
@@ -327,11 +327,11 @@
       ["Black Country Woman", "BCW-", "Physical Graffiti [Disc 2]/2-08 Black Country Woman.m4a"],
       ["Sick Again", "SA-", "Physical Graffiti [Disc 2]/2-09 Sick Again.m4a"]
     ]],
-    ["Presence", "covers/zeppelin/presence.svg?v=1", "font-paranoid", [
+    ["Presence", "covers/zeppelin/presence.jpg?v=1", "font-paranoid", [
       ["Achilles Last Stand", "ALS-", R2 + "2-09 Achilles Last Stand.m4a"],
       ["Nobody's Fault but Mine", "NFBM-", R2 + "2-08 Nobody's Fault But Mine.m4a"]
     ]],
-    ["In Through the Out Door", "covers/zeppelin/itod.svg?v=1", "font-sbs", [
+    ["In Through the Out Door", "covers/zeppelin/itod.jpg?v=1", "font-sbs", [
       ["In the Evening", "ITE-", R2 + "2-11 In The Evening.m4a"],
       ["South Bound Saurez", "SBSZ-", "In Through the Out Door/02 South Bound Saurez.m4a"],
       ["Fool in the Rain", "FITR-", "In Through the Out Door/03 Fool In The Rain.m4a"],
@@ -340,7 +340,7 @@
       ["All My Love", "AML-", R2 + "2-10 All My Love.m4a"],
       ["I'm Gonna Crawl", "IGC-", "In Through the Out Door/07 I'm Gonna Crawl.m4a"]
     ]],
-    ["Coda", "covers/zeppelin/coda.svg?v=1", "font-vol4", [
+    ["Coda", "covers/zeppelin/coda.jpg?v=1", "font-vol4", [
       ["We're Gonna Groove", "WGG-", "Coda/01 We're Gonna Groove.m4a"],
       ["Poor Tom", "PT-", "Coda/02 Poor Tom.m4a"],
       ["I Can't Quit You Baby (Coda)", "ICQYBC-", "Coda/03 I Can't Quit You Baby.m4a"],
@@ -350,7 +350,7 @@
       ["Bonzo's Montreux", "BM-", "Coda/07 Bonzo's Montreux.m4a"],
       ["Wearing and Tearing", "WAT-", "Coda/08 Wearing And Tearing.m4a"]
     ]],
-    ["Rarities", "covers/zeppelin/rarities.svg?v=1", "font-te", [
+    ["Rarities", "covers/zeppelin/rarities.jpg?v=1", "font-te", [
       ["Hey Hey What Can I Do", "HHWCID-", "The Complete Led Zeppelin (Remastered)/10-11 Hey Hey What Can I Do (From _The Complete Studio Recordings_).m4a"]
     ]]
   ];
@@ -443,7 +443,7 @@
     sabbath: { id: "sabbath", name: "Black Sabbath", short: "Sabbath", dataPath: "riffjams-data.json" },
     zeppelin: {
       id: "zeppelin", name: "Led Zeppelin", short: "Zeppelin", dataPath: "zeppelin-data.json",
-      tile: "covers/zeppelin/tile.svg?v=1",
+      tile: "covers/zeppelin/lz1.jpg?v=1",
       albums: LZ.albums, prefixes: LZ.prefixes, audio: LZ.audio, songsterr: LZ.songsterr,
       llAlbums: LZ.albums.map(function (a) { return a.name; }),
       audioFolderHint: "Desktop\\Led Zeppelin"
