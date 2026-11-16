@@ -24,5 +24,4 @@ own saved data (`gnr-data.json`, tabs in `user-tabs/gnr/`). Band setup lives in 
 
 Songs play from your own files: the first time you press play, choose the `Guns N' Roses` music
 folder (Desktop). Chrome / Edge remember it. The Loop Station uses its own chip folder,
-`Loop Prototype\looper-gnr`. Covers in `covers/gnr/` are placeholders; replace them with real
-art under the same names.
+`Loop Prototype\looper-gnr`. Covers in `covers/gnr/` come from the Cover Art Archive (MusicBrainz).
