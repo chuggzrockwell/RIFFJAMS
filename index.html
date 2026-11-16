@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RIFFJAMS</title>
-<script src="rj-band.js?v=3"></script><!-- band switch (?band=gnr); must load before everything else -->
+<script src="rj-band.js?v=5"></script><!-- band switch (?band=gnr, ?band=zeppelin); must load before everything else -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
@@ -188,6 +188,10 @@
   html[data-band="gnr"] .tile.b { background: #000 url("covers/gnr/uyi1.jpg?v=1") center / cover no-repeat; }
   html[data-band="gnr"] .tile.lp { background: #000 url("covers/gnr/uyi2.jpg?v=1") center / cover no-repeat; }
   html[data-band="gnr"] .tile.b2 { display: none; }
+  html[data-band="zeppelin"] .tile.hp { background: #000 url("covers/zeppelin/tile.svg?v=1") center / cover no-repeat; }
+  html[data-band="zeppelin"] .tile.b { background: #000 url("covers/zeppelin/lz4.svg?v=1") center / cover no-repeat; }
+  html[data-band="zeppelin"] .tile.lp { background: #000 url("covers/zeppelin/hoth.svg?v=1") center / cover no-repeat; }
+  html[data-band="zeppelin"] .tile.b2 { display: none; }
   .hidden { display: none !important; }
   .bar { display: flex; align-items: center; gap: 12px; margin: 0 0 12px 4px; }
   body.sheet-mode #series > .bar {
@@ -5147,11 +5151,10 @@
         <span class="artist-art" style="background-image:url('covers/gnr/uyi1.jpg?v=1')"></span>
         <span class="artist-name">Guns N' Roses</span>
       </a>
-      <div class="artist-card soon" id="artistZep" aria-disabled="true">
+      <a class="artist-card" id="artistZep" href="./?band=zeppelin" data-band-link>
         <span class="artist-art" style="background-image:url('covers/zeppelin-iv.jpg?v=1')"></span>
         <span class="artist-name">Led Zeppelin</span>
-        <span class="artist-soon">Coming soon</span>
-      </div>
+      </a>
     </div>
   </section>
   <section id="home">
@@ -18270,7 +18273,7 @@ if (_btnClear) _btnClear.onclick = function(){ clearRevealedLicks(); };
 document.getElementById("backSections").onclick = showHome;
 
 /* Artist picker is the landing page: shown at ./ with no ?band= and no #sabbath.
-   Black Sabbath -> ./#sabbath, Guns N' Roses -> ./?band=gnr, Led Zeppelin is a placeholder. */
+   Black Sabbath -> ./#sabbath, Guns N' Roses -> ./?band=gnr, Led Zeppelin -> ./?band=zeppelin. */
 function rjOnArtistPicker() {
   var a = document.getElementById("artists");
   return !!a && !a.classList.contains("hidden");
