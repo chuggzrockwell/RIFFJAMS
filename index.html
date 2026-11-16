@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RIFFJAMS</title>
-<script src="rj-band.js?v=2"></script><!-- band switch (?band=gnr); must load before everything else -->
+<script src="rj-band.js?v=3"></script><!-- band switch (?band=gnr); must load before everything else -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
@@ -184,9 +184,9 @@
   .band-switch a:hover { background: rgba(112,48,160,.25); }
   html:not([data-band]) .band-switch a[data-band="sabbath"],
   html[data-band="gnr"] .band-switch a[data-band="gnr"] { background: #7030a0; color: #fff; }
-  html[data-band="gnr"] .tile.hp { background: #000 url("covers/gnr/tile.svg?v=1") center / cover no-repeat; }
-  html[data-band="gnr"] .tile.b { background: #000 url("covers/gnr/appetite.svg?v=1") center / cover no-repeat; }
-  html[data-band="gnr"] .tile.lp { background: #000 url("covers/gnr/uyi1.svg?v=1") center / cover no-repeat; }
+  html[data-band="gnr"] .tile.hp { background: #000 url("covers/gnr/appetite.jpg?v=1") center / cover no-repeat; }
+  html[data-band="gnr"] .tile.b { background: #000 url("covers/gnr/uyi1.jpg?v=1") center / cover no-repeat; }
+  html[data-band="gnr"] .tile.lp { background: #000 url("covers/gnr/uyi2.jpg?v=1") center / cover no-repeat; }
   html[data-band="gnr"] .tile.b2 { display: none; }
   .hidden { display: none !important; }
   .bar { display: flex; align-items: center; gap: 12px; margin: 0 0 12px 4px; }
@@ -9134,6 +9134,7 @@ function repairAlbumsFromDefaults(albums) {
   return repaired;
 }
 var ALBUMS = loadAlbums();
+if (window.rjApplyBandCovers) rjApplyBandCovers(ALBUMS);   /* band switch: current album art */
 try { collapseAlbumTiers(ALBUMS); saveAlbums(); } catch (eTierAlbums) {}
 ensureAllSongSlots(ALBUMS);
 if (repairAlbumsFromDefaults(ALBUMS) > 0 || totalAlbumChips(ALBUMS) === 0) {
@@ -19912,7 +19913,7 @@ if (isPlayboardPage()) {
   bindPlaySync();
 }
 </script>
-<script src="riffjams-admin.js?v=445"></script>
+<script src="riffjams-admin.js?v=446"></script>
 <script src="rj-timer.js?v=1"></script><!-- practice timer, shared with the Loop Station -->
 </body>
 </html>

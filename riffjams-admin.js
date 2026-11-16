@@ -273,6 +273,7 @@
       button.textContent = "Attaching…";
       setMessage("Saving screenshot and chip to GitHub…");
       window.ALBUMS = next.albums;
+      if (window.rjApplyBandCovers) window.rjApplyBandCovers(window.ALBUMS);
       window.SOLO_MAP = next.soloMap;
       window.saveAlbums();
       window.saveSoloMap();
@@ -996,6 +997,7 @@
         if (typeof window.mergeSongMetaInto === "function") window.mergeSongMetaInto(fresh.albums, localAlbums);
         overlayMerged(fresh.albums, localAlbums, pend.albums, pend.albums);
         window.ALBUMS = fresh.albums;
+        if (window.rjApplyBandCovers) window.rjApplyBandCovers(window.ALBUMS);
         window.ensureAllSongSlots(window.ALBUMS);
         window.saveAlbums();
       }
