@@ -453,7 +453,7 @@
       albums: GNR.albums, prefixes: GNR.prefixes, audio: GNR.audio, songsterr: GNR.songsterr,
       localAudio: GNR.local, ytAudio: GNR.yt,   /* files first, official YouTube uploads as fallback */
       llAlbums: GNR.albums.map(function (a) { return a.name; }),
-      audioFolderHint: "Desktop\\Guns N' Roses"
+      audioFolderHint: "D:\\RIFFJAMS Audio\\Guns N' Roses"
     }
   };
   var band = BANDS[want] || BANDS.sabbath;
@@ -644,6 +644,11 @@
     var base = qs && qs.get("audio");
     if (base) return (urlCache[id] = base.replace(/\/?$/, "/") + path.split("/").map(encodeURIComponent).join("/"));
     var root = await ensureRoot(false);
+    /* Saved folder but Chrome wants permission again (new session): ask now, while the play
+       click still counts as a user action. Otherwise the "Allow" bar asks. */
+    if (!root && rootHandle && navigator.userActivation && navigator.userActivation.isActive) {
+      try { root = await ensureRoot(true); } catch (e) { root = null; }
+    }
     if (!root) return null;
     var file;
     try { file = await fileFor(path); }
@@ -749,9 +754,10 @@
   }
   /* ---------- Your files first, YouTube as the fallback ----------
      Starts on the YouTube table (official album uploads) and checks, right away, whether this
-     browser already has the music folder with permission. If so, and no player exists yet, it
-     switches to your files. A page keeps one source until reload, so a player is never swapped
-     mid-song. With no folder, a one-time bar offers to use the files (then reloads). */
+     browser has a saved music folder. If so (and no player exists yet) it switches to your files;
+     if Chrome needs permission again, it asks when you press play. A page keeps one source until
+     reload, so a player is never swapped mid-song. With no saved folder, a bar offers to choose
+     one when you use the player (each page load; × only hides it until the next load). */
   var mode = "";
   function fillAudio(map) {
     Object.keys(band.audio).forEach(function (k) { delete band.audio[k]; });
@@ -769,16 +775,13 @@
   function useYouTube() { mode = "youtube"; fillAudio(band.ytAudio); rebuildPlaylist(); }
   window.rjAudioMode = function () { return mode; };
 
-  var OFFER_KEY = NS + "rj-audio-offer-dismissed";
-  function offerFiles(hasSaved) {
+  function offerFiles() {
     if (!window.showDirectoryPicker) return;   // other browsers / phones: YouTube only, no nagging
-    if (!hasSaved) { try { if (_get.call(localStorage, OFFER_KEY)) return; } catch (e) {} }
     var shown = false;
     function show() {
       if (shown || mode !== "youtube") return;
       shown = true;
-      if (hasSaved) showBanner("Playing from YouTube. Use your " + band.name + " music files instead?", "Use my files", allowFolder);
-      else showBanner("Playing from YouTube. Got the " + band.name + " music files on this computer? Choose the folder to play them instead (exact album timing).", "Choose folder", pickFolder);
+      showBanner("Playing from YouTube. To play your own " + band.name + " music files, choose their folder (" + band.audioFolderHint + ").", "Choose folder", pickFolder);
     }
     /* Show it when you start using the player, not on the home screen. */
     document.addEventListener("click", function (ev) {
@@ -786,18 +789,50 @@
       if (t && t.closest && t.closest("#smPlayer, .sm-player, #boardPlayer, .board-player, #sections")) show();
     }, true);
   }
-  function dismissOffer() { try { _set.call(localStorage, OFFER_KEY, "1"); } catch (e) {} }
 
-  /* Once you choose or allow the folder from YouTube mode, reload so the page starts on your files. */
+  /* The folder must hold the album folders. Accepts that folder, or the one above it. */
+  async function bandFolderFrom(h) {
+    var first = band.localAudio[Object.keys(band.localAudio)[0]].replace(/^local:/, "");
+    async function has(dir) {
+      try {
+        var parts = first.split("/"), d = dir;
+        for (var i = 0; i < parts.length - 1; i++) d = await d.getDirectoryHandle(parts[i]);
+        await d.getFileHandle(parts[parts.length - 1]);
+        return true;
+      } catch (e) { return false; }
+    }
+    if (await has(h)) return h;
+    try { var sub = await h.getDirectoryHandle(band.name); if (await has(sub)) return sub; } catch (e) {}
+    return null;
+  }
+
+  /* Choosing or allowing the folder from YouTube mode saves it, checks it, then reloads so the
+     page starts on your files. */
   var _pick = pickFolder, _allow = allowFolder;
   pickFolder = async function () {
     if (mode !== "youtube") return _pick();
     if (!window.showDirectoryPicker) return _pick();
+    var picked;
+    try { picked = await window.showDirectoryPicker({ id: "rj-" + band.id + "-audio", mode: "read" }); }
+    catch (e) { return; }   // cancelled
+    var h = await bandFolderFrom(picked);
+    if (!h) {
+      showBanner("“" + picked.name + "” doesn't hold the " + band.name + " album folders (e.g. “" +
+        band.localAudio[Object.keys(band.localAudio)[0]].replace(/^local:/, "").split("/")[0] +
+        "”). Choose the folder that contains them: " + band.audioFolderHint + ".", "Choose folder", pickFolder);
+      return;
+    }
+    var saved = null;
     try {
-      var h = await window.showDirectoryPicker({ id: "rj-" + band.id + "-audio", mode: "read" });
-      try { await idb("readwrite", function (st) { return st.put(h, "root"); }); } catch (e) {}
-      location.reload();
-    } catch (e) { /* cancelled */ }
+      await idb("readwrite", function (st) { return st.put(h, "root"); });
+      saved = await idb("readonly", function (st) { return st.get("root"); });
+    } catch (e) { saved = null; }
+    if (!saved) {
+      showBanner("This browser couldn't save the folder (a private window, or site data blocked?). Use a normal Chrome or Edge window.", "Try again", pickFolder);
+      return;
+    }
+    showBanner("Linked “" + h.name + "”. Reloading to play your files…");
+    setTimeout(function () { location.reload(); }, 600);
   };
   allowFolder = async function () {
     if (mode !== "youtube") return _allow();
@@ -805,16 +840,14 @@
     pickFolder();
   };
   window.rjChooseAudioFolder = function () { return pickFolder(); };
-  var _hide = hideBanner;
-  hideBanner = function () { if (mode === "youtube") dismissOffer(); _hide(); };
 
   if (qs && qs.get("audio")) useLocal();
   else {
     useYouTube();
-    ensureRoot(false).then(function (root) {
+    idb("readonly", function (st) { return st.get("root"); }).catch(function () { return null; }).then(function (h) {
       var busy = (window.YT && !window.YT.__rjLocal) || window.smYtPlayer || window.boardYtPlayer;
-      if (root && !busy) { useLocal(); return; }
-      offerFiles(!!rootHandle);
-    }).catch(function () { offerFiles(false); });
+      if (h && !busy) { rootHandle = h; useLocal(); return; }   // permission, if needed, is asked on play
+      offerFiles();
+    });
   }
 })();
