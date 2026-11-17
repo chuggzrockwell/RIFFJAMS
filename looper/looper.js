@@ -183,6 +183,7 @@
      ?audio=<url> loads the same layout from a server instead (serve_looper.py, or hosting later). */
   /* Each band has its own chip folder (Guns N' Roses: Loop Prototype\\looper-gnr); the browser remembers each separately. */
   const CHIP_FOLDER = (window.RJ_BAND && window.RJ_BAND.id !== 'sabbath') ? 'looper-' + window.RJ_BAND.id : 'looper';
+  const CHIP_PATH = 'D:\\RIFFJAMS Audio\\Loop Prototype\\' + CHIP_FOLDER;   // where the chip folders live on this computer
   let source = null;   // { name, read(path) -> ArrayBuffer, manifest() -> object, lockIn(req) -> {status, body} }
   function idb(mode, fn) {
     return new Promise((res, rej) => {
@@ -212,7 +213,7 @@
     if (!(await hasFile(home, 'manifest.json'))) {
       const inner = await subdir(home, CHIP_FOLDER);
       if (inner && await hasFile(inner, 'manifest.json')) home = inner;
-      else throw new Error('There’s no manifest.json in “' + picked.name + '”. Choose the Loop Prototype\\' + CHIP_FOLDER + ' folder.');
+      else throw new Error('There’s no manifest.json in “' + picked.name + '”. Choose ' + CHIP_PATH + ' instead.');
     }
     const audio = (await subdir(home, 'audio')) || home;
     const write = async (name, text) => {
@@ -2191,7 +2192,7 @@
       ? 'The Loop Station plays audio from a folder on your computer, which needs Chrome or Edge on a computer.'
       : kind === 'reconnect'
         ? 'Allow the Loop Station to open your chip folder “' + h.name + '” again.'
-        : 'Choose the folder with your chips: Loop Prototype\\' + CHIP_FOLDER + ' (it holds manifest.json and the audio folder). The audio stays on your computer.';
+        : 'Choose the folder with your chips: ' + CHIP_PATH + ' (it holds manifest.json and the audio folder). The audio stays on your computer.';
     $('gateErr').textContent = err ? (err.message || String(err)) : '';
     const main = $('gateBtn'), other = $('gateOther');
     main.hidden = kind === 'none';
