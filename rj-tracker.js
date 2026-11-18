@@ -41,6 +41,9 @@
     '#tracker .trk-tabs, #tracker .trk-bands { display: inline-flex; border: 2px solid #7030a0; border-radius: 999px; overflow: hidden; }',
     '#tracker .trk-tabs button, #tracker .trk-bands button { border: 0; background: none; color: inherit; padding: 6px 14px; font: 600 14px/1.2 Montserrat, "Segoe UI", sans-serif; cursor: pointer; }',
     '#tracker .trk-tabs button.on, #tracker .trk-bands button.on { background: #7030a0; color: #fff; }',
+    '#tracker .trk-bands button { font-family: "Vol4 Title", Impact, sans-serif; font-weight: 400; font-size: 16px; letter-spacing: .03em; }',
+    '#tracker td.c-day.ed { cursor: pointer; }',
+    '#tracker td.c-day.ed:hover { box-shadow: inset 0 0 0 2px rgba(243,226,181,.55); }',
     '#tracker .trk-nav { display: flex; align-items: center; gap: 10px; margin: 0 0 10px 4px; flex-wrap: wrap; }',
     '#tracker .trk-nav button { border: 1px solid #555; background: #1b1c20; color: #f3f3f1; border-radius: 8px; padding: 4px 12px; font-size: 16px; cursor: pointer; }',
     '#tracker .trk-nav button:disabled { opacity: .35; cursor: default; }',
@@ -54,6 +57,10 @@
     '#tracker .trk-day .n { font-size: 12px; color: #aaa; }',
     '#tracker .trk-day .t { font-family: "Vol4 Title", Impact, sans-serif; font-size: 22px; text-align: right; }',
     '#tracker .trk-day.zero .t { color: #555; font-size: 16px; }',
+    '#tracker .trk-day.ed { cursor: pointer; }',
+    '#tracker .trk-day.ed:hover { box-shadow: inset 0 0 0 2px rgba(243,226,181,.55); }',
+    '#tracker .trk-day input { width: 100%; box-sizing: border-box; font: 600 16px/1.2 Montserrat, "Segoe UI", sans-serif; text-align: right; color: #111; background: #fff; border: 0; border-radius: 6px; padding: 3px 6px; }',
+    '#tracker .trk-hint { color: #888; font-size: 12px; margin: 8px 4px 0; }',
     '#tracker .trk-grid-wrap { overflow: auto; max-height: calc(100vh - 170px); border-radius: 10px; background: #15161a; }',
     '#tracker table { border-collapse: separate; border-spacing: 0; font-size: 13px; }',
     '#tracker th, #tracker td { padding: 0; height: 30px; }',
@@ -81,7 +88,7 @@
 
   var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   var MON3 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  var view = "time", month = null, endOffset = 0, band = "sabbath";
+  var view = "time", month = null, endOffset = 0, band = "sabbath", editing = false;
 
   function fmtHM(ms) { var m = Math.round(ms / 60000); return Math.floor(m / 60) + ":" + pad(m % 60); }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -107,6 +114,41 @@
     };
   }
 
+  /* "1:30" = 1 h 30 min, "45" = 45 min, "1:30:15" = with seconds; empty = 0. */
+  function parseTime(v) {
+    v = String(v).trim();
+    if (!v) return 0;
+    var p = v.split(/[:.\s]+/);
+    if (p.length > 3 || p.some(function (x) { return !/^\d+$/.test(x); })) return null;
+    p = p.map(Number);
+    if (p.length === 1) return p[0] * 60000;
+    if (p.length === 2) return (p[0] * 60 + p[1]) * 60000;
+    return ((p[0] * 60 + p[1]) * 60 + p[2]) * 1000;
+  }
+  function editDay(cell, today) {
+    var k = cell.getAttribute("data-k"), ms = +cell.getAttribute("data-ms") || 0, t = cell.querySelector(".t"), done = false;
+    var inp = document.createElement("input");
+    inp.type = "text"; inp.value = fmtHM(ms); inp.setAttribute("aria-label", "Time for " + k + " (H:MM)");
+    t.replaceWith(inp); editing = true; inp.focus(); inp.select();
+    function finish(commit) {
+      if (done) return; done = true; editing = false;
+      var v = commit ? parseTime(inp.value) : null;
+      if (v !== null && v !== ms) {
+        if (k === today && window.rjTimerSet) window.rjTimerSet(v);   /* the stopwatch keeps today's total */
+        else {
+          try {
+            var h = read(DAYS_KEY);
+            if (v) h[k] = v; else delete h[k];
+            localStorage.setItem(DAYS_KEY, JSON.stringify(h));
+          } catch (e) {}
+        }
+      }
+      render();
+    }
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") finish(true); else if (e.key === "Escape") finish(false); });
+    inp.addEventListener("blur", function () { finish(true); });
+  }
+
   function renderTime(body) {
     var today = dayKey(), t = fromKey(today);
     if (!month) month = new Date(t.getFullYear(), t.getMonth(), 1);
@@ -118,8 +160,10 @@
       var k = y + "-" + pad(mo + 1) + "-" + pad(d), ms = days[k] || 0;
       total += ms; if (ms >= 60000) active++;
       var a = Math.min(1, ms / (2 * 3600000)), bg = ms >= 60000 ? ' style="background: rgba(112,48,160,' + (0.25 + 0.75 * a).toFixed(2) + ')"' : "";
-      cells.push('<div class="trk-day' + (ms < 60000 ? " zero" : "") + (k === today ? " today" : "") + '"' + bg +
-        ' title="' + esc(fmtHM(ms) + " on " + MONTHS[mo] + " " + d) + '"><span class="n">' + d + '</span><span class="t">' + (ms >= 60000 ? fmtHM(ms) : "–") + '</span></div>');
+      var canEdit = k <= today;
+      cells.push('<div class="trk-day' + (ms < 60000 ? " zero" : "") + (k === today ? " today" : "") + (canEdit ? " ed" : "") + '"' + bg +
+        (canEdit ? ' data-k="' + k + '" data-ms="' + ms + '"' : "") +
+        ' title="' + esc(fmtHM(ms) + " on " + MONTHS[mo] + " " + d + (canEdit ? " · click to edit" : "")) + '"><span class="n">' + d + '</span><span class="t">' + (ms >= 60000 ? fmtHM(ms) : "–") + '</span></div>');
     }
     var isNow = y === t.getFullYear() && mo === t.getMonth();
     body.innerHTML =
@@ -127,7 +171,12 @@
       '<span class="trk-label">' + MONTHS[mo] + " " + y + '</span>' +
       '<button type="button" id="trkNext" aria-label="Next month"' + (isNow ? " disabled" : "") + '>&#8250;</button>' +
       '<span class="trk-sum">' + fmtHM(total) + ' total · ' + active + ' day' + (active === 1 ? "" : "s") + ' practised</span></div>' +
-      '<div class="trk-cal">' + cells.join("") + '</div>';
+      '<div class="trk-cal">' + cells.join("") + '</div>' +
+      '<p class="trk-hint">Click a day to change its time (H:MM). Today\'s time also sets the stopwatch.</p>';
+    body.querySelector(".trk-cal").onclick = function (e) {
+      var cell = e.target.closest(".trk-day.ed");
+      if (cell && !cell.querySelector("input")) editDay(cell, today);
+    };
     body.querySelector("#trkPrev").onclick = function () { month = new Date(y, mo - 1, 1); render(); };
     body.querySelector("#trkNext").onclick = function () { if (!isNow) { month = new Date(y, mo + 1, 1); render(); } };
   }
@@ -166,19 +215,33 @@
         var p = plays[B.id + "|" + a.name + "|" + s.song] || [], set = {};
         p.forEach(function (k) { set[k] = 1; });
         if (p.length) any = true;
-        rows += '<tr class="song"><td class="c-song" title="' + esc(s.song) + '">' + esc(s.song) + '</td><td class="c-last">' + ago(p[p.length - 1], today) + '</td>';
+        rows += '<tr class="song" data-key="' + esc(B.id + "|" + a.name + "|" + s.song) + '"><td class="c-song" title="' + esc(s.song) + '">' + esc(s.song) + '</td><td class="c-last">' + ago(p[p.length - 1], today) + '</td>';
         colKeys.forEach(function (k) {
-          rows += '<td class="c-day' + (k === today ? " today" : "") + '">' + (set[k] ? '<img src="' + esc(cover) + '" alt="Played" title="' + esc(s.song + " · " + k) + '">' : "") + '</td>';
+          rows += '<td class="c-day' + (k === today ? " today" : "") + (k <= today ? ' ed" data-k="' + k : "") + '">' + (set[k] ? '<img src="' + esc(cover) + '" alt="Played" title="' + esc(s.song + " · " + k) + '">' : "") + '</td>';
         });
         rows += '</tr>';
       });
     });
     body.innerHTML = head + (any ? "" : '<p class="trk-empty">No plays recorded for ' + esc(B.name) + ' yet. Songs show up here once you play them in the Song Map player.</p>') +
-      '<div class="trk-grid-wrap"><table><thead>' + mRow + '</tr>' + dRow + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+      '<p class="trk-hint" style="margin: 0 4px 8px">Click a day to add or remove a play.</p><div class="trk-grid-wrap"><table><thead>' + mRow + '</tr>' + dRow + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
     body.querySelector(".trk-bands").onclick = function (e) { var b = e.target.closest("button"); if (b) { band = b.getAttribute("data-b"); render(); } };
     body.querySelector("#trkOlder").onclick = function () { endOffset++; render(); };
     body.querySelector("#trkNewer").onclick = function () { if (endOffset > 0) { endOffset--; render(); } };
-    var wrap = body.querySelector(".trk-grid-wrap"); wrap.scrollLeft = wrap.scrollWidth;
+    /* Click a day to add or remove a play of that song. */
+    body.querySelector("tbody").onclick = function (e) {
+      var td = e.target.closest("td.c-day.ed"), tr = td && td.parentElement;
+      if (!td || !tr.getAttribute("data-key")) return;
+      var key = tr.getAttribute("data-key"), k = td.getAttribute("data-k"), left = wrapEl.scrollLeft, top = wrapEl.scrollTop;
+      try {
+        var all = read(PLAYS_KEY), list = all[key] || [], i = list.indexOf(k);
+        if (i >= 0) list.splice(i, 1); else { list.push(k); list.sort(); }
+        if (list.length) all[key] = list; else delete all[key];
+        localStorage.setItem(PLAYS_KEY, JSON.stringify(all));
+      } catch (err) {}
+      render();
+      var w = sec.querySelector(".trk-grid-wrap"); if (w) { w.scrollLeft = left; w.scrollTop = top; }
+    };
+    var wrapEl = body.querySelector(".trk-grid-wrap"); wrapEl.scrollLeft = wrapEl.scrollWidth;
   }
 
   function render() {
@@ -195,9 +258,9 @@
     render();
   };
   window.addEventListener("storage", function (e) {
-    if (sec.className !== "hidden" && (e.key === DAYS_KEY || e.key === PLAYS_KEY)) render();
+    if (sec.className !== "hidden" && !editing && (e.key === DAYS_KEY || e.key === PLAYS_KEY)) render();
   });
-  setInterval(function () { if (sec.className !== "hidden" && view === "time" && !document.hidden) render(); }, 60000);
+  setInterval(function () { if (sec.className !== "hidden" && view === "time" && !editing && !document.hidden) render(); }, 60000);
   /* ./#tracker opens it (from the artist page card); leaving the hash goes back to the artists. */
   function route() {
     var hasBand = false;

@@ -88,6 +88,8 @@
   });
   rs.addEventListener("click", function () { if (inp) endEdit(false); reset(); draw(); });
   window.addEventListener("storage", function (e) { if (e.key === KEY) { try { st = JSON.parse(e.newValue) || { ms: 0, since: null, resetAt: Date.now() }; } catch (x) {} draw(); } });
+  /* The Tracker's calendar sets today's time through this. */
+  window.rjTimerSet = function (ms) { if (inp) endEdit(false); st.ms = Math.max(0, ms); if (st.since) st.since = Date.now(); save(); draw(); };
   window.addEventListener("pagehide", function () { if (st.since) record(true); });
   setInterval(draw, 1000); draw(); record(true);
 })();
