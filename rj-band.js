@@ -488,7 +488,7 @@
 
   /* ---------- Per-band storage ---------- */
   var NS = band.id + ":";
-  var SHARED = { "riffjams-github-token": 1, "riffjams_timer_v1": 1 };
+  var SHARED = { "riffjams-github-token": 1, "riffjams_timer_v1": 1, "riffjams_timer_days_v1": 1, "riffjams_plays_v1": 1 };
   function nsKey(k) { k = String(k); return SHARED[k] ? k : NS + k; }
   var SP = Storage.prototype;
   var _get = SP.getItem, _set = SP.setItem, _rem = SP.removeItem;

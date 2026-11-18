@@ -2239,8 +2239,6 @@
         });
       });
       saveState();
-      const albums = [...new Set(songs.map((s) => s.album))];
-      $('songTag').textContent = albums.join(' · ') + ' · ' + songs.map((s) => s.song).join(', ');
       focusCode = state.looper[0] || null;
       render();
       requestAnimationFrame(frame);

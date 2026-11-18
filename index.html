@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RIFFJAMS</title>
-<script src="rj-band.js?v=8"></script><!-- band switch (?band=gnr, ?band=zeppelin); must load before everything else -->
+<script src="rj-band.js?v=9"></script><!-- band switch (?band=gnr, ?band=zeppelin); must load before everything else -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
@@ -168,6 +168,9 @@
   .artist-card:not(.soon):hover { filter: brightness(1.1); }
   .artist-card.soon { cursor: default; }
   .artist-card.soon .artist-art { filter: saturate(.85); }
+  .artist-card.trk-card .artist-art { background: radial-gradient(circle at 30% 25%, #9b4fd1 0%, #7030a0 45%, #2a0f40 100%); }
+  .artist-card.trk-card .trk-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: clamp(3rem, 12vw, 8rem); color: rgba(255,255,255,.9); }
   a.back { display: inline-block; text-decoration: none; }
   @media (max-width: 560px) {
     .artist-grid { grid-template-columns: 1fr; gap: 10px; }
@@ -5155,8 +5158,13 @@
         <span class="artist-art" style="background-image:url('covers/zeppelin-iv.jpg?v=1')"></span>
         <span class="artist-name">Led Zeppelin</span>
       </a>
+      <a class="artist-card trk-card" id="artistTracker" href="./#tracker">
+        <span class="artist-art"></span><span class="trk-icon" aria-hidden="true">&#128197;</span>
+        <span class="artist-name">Tracker</span>
+      </a>
     </div>
   </section>
+  <section id="tracker" class="hidden"></section>
   <section id="home">
     <div class="home-head">
       <a class="back" id="backArtists" href="./" data-band-link>Artists</a>
@@ -12672,6 +12680,8 @@ function smEnsureApi(cb) {
             }
             smPlaying = true;
             smNoteSessionSong();
+            /* Tracker: this song was played today */
+            try { var trkCur = smCurrent(); if (trkCur && window.rjTrackerNotePlay) rjTrackerNotePlay(trkCur.album, trkCur.song); } catch (eTrk) {}
             if (smPlayerMode === "player") smSetPlayIcon(true);
             smStartTick(); smApplyPlaybackRate(); smSchedulePublishPlayerSync();
             try { syncSingleSongFocusFromPlayer(); } catch (eSinglePlay) {}
@@ -19917,6 +19927,7 @@ if (isPlayboardPage()) {
 }
 </script>
 <script src="riffjams-admin.js?v=446"></script>
-<script src="rj-timer.js?v=1"></script><!-- practice timer, shared with the Loop Station -->
+<script src="rj-timer.js?v=2"></script><!-- practice timer, shared with the Loop Station -->
+<script src="rj-tracker.js?v=1"></script><!-- Tracker: practice time per day + songs played (./#tracker) -->
 </body>
 </html>

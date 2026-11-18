@@ -37,7 +37,20 @@
   var t = document.getElementById("rjtTime"), pl = document.getElementById("rjtPlay"), pa = document.getElementById("rjtPause"),
       ed = document.getElementById("rjtEdit"), rs = document.getElementById("rjtReset"), inp = null;
   function cur() { return st.ms + (st.since ? Date.now() - st.since : 0); }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} record(true); }
+  /* Daily totals for the Tracker: { "YYYY-MM-DD": ms }, the day being the 5 am to 5 am practice day. */
+  var DAYS = "riffjams_timer_days_v1", lastRec = 0;
+  function dayOf(ts) { var d = new Date(ts - RESET_HOUR * 3600000); return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function record(force) {
+    var now = Date.now();
+    if (!force && now - lastRec < 15000) return;
+    lastRec = now;
+    try {
+      var h = JSON.parse(localStorage.getItem(DAYS)) || {}, k = dayOf(st.resetAt || now), v = Math.round(cur());
+      if (h[k] === v) return;
+      h[k] = v; localStorage.setItem(DAYS, JSON.stringify(h));
+    } catch (e) {}
+  }
   function fmt(ms) {
     var sec = Math.floor(ms / 1000), m = Math.floor(sec / 60);
     return Math.floor(m / 60) + ":" + ("0" + (m % 60)).slice(-2) + ":" + ("0" + (sec % 60)).slice(-2);
@@ -46,7 +59,8 @@
   function reset() { st = { ms: 0, since: null, resetAt: Date.now() }; save(); }
   function draw() {
     if (!st.resetAt) { st.resetAt = Date.now(); save(); }
-    else if (st.resetAt < lastBoundary()) reset();
+    else if (st.resetAt < lastBoundary()) { record(true); reset(); }
+    else if (st.since) record(false);
     t.textContent = fmt(cur());
     pl.classList.toggle("off", !!st.since); pa.classList.toggle("off", !st.since);
   }
@@ -74,5 +88,6 @@
   });
   rs.addEventListener("click", function () { if (inp) endEdit(false); reset(); draw(); });
   window.addEventListener("storage", function (e) { if (e.key === KEY) { try { st = JSON.parse(e.newValue) || { ms: 0, since: null, resetAt: Date.now() }; } catch (x) {} draw(); } });
-  setInterval(draw, 1000); draw();
+  window.addEventListener("pagehide", function () { if (st.since) record(true); });
+  setInterval(draw, 1000); draw(); record(true);
 })();
