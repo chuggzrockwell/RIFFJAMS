@@ -16,6 +16,18 @@ The first attachment on a browser requires a fine-grained GitHub token restricte
 to this repository with **Contents: Read and write** permission. The token is kept
 in that browser only and can be disconnected from the chip editor.
 
+## Stems in single song mode
+
+In the Song Map's Single Song view, a mixer sits next to the player: **Stems** on plays the song from
+your own stem files instead of YouTube, with a volume, mute (M) and solo (S, shift-click to add) per
+part (vocals, drums, bass, other, guitar) and tuning in 1 Hz steps (A = 440 ± n; click the value to
+reset). Songs without a stem file, or Stems off, play YouTube as before. Code: `rj-stems.js`.
+
+The files are one 10-channel WAV per song (`Loop Prototype\looper\songs\<slug>.wav` + `index.json`),
+made from the Demucs stems by `Loop Prototype\build\make_song_files.py`. They're read from the Loop
+Station chip folder you already chose (same browser), so they never go in this repo.
+`?stems=<url>` loads the songs folder from a server instead.
+
 ## Guns N' Roses
 
 The home screen's band switch (or `?band=gnr`) opens the Guns N' Roses section: same Song Map

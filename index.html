@@ -12657,7 +12657,7 @@ function smEnsureApi(cb) {
   if (smYtReady && smYtPlayer) { cb && cb(); return; }
   window.onYouTubeIframeAPIReady = function(){
     smYtReady = true;
-    smYtPlayer = new YT.Player("ytPlayerHost", {
+    smYtPlayer = new (window.RjStemsPlayer || YT.Player)("ytPlayerHost", {
       height: "1",
       width: "1",
       playerVars: { autoplay: 0, controls: 0, rel: 0, modestbranding: 1, playsinline: 1 },
@@ -19927,6 +19927,7 @@ if (isPlayboardPage()) {
 }
 </script>
 <script src="riffjams-admin.js?v=446"></script>
+<script src="rj-stems.js?v=2"></script><!-- Stems in single song mode: mix the parts, tune by Hz (your own stem files) -->
 <script src="rj-timer.js?v=3"></script><!-- practice timer, shared with the Loop Station -->
 <script src="rj-tracker.js?v=2"></script><!-- Tracker: practice time per day + songs played (./#tracker) -->
 </body>
