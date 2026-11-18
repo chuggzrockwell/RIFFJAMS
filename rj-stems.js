@@ -170,9 +170,8 @@
     }
     function applyMix(now) {
       if (!g) return;
-      var anySolo = STEMS.some(function (s) { return st.solo[s]; });
       STEMS.forEach(function (s) {
-        var v = anySolo ? (st.solo[s] ? st.vol[s] : 0) : (st.mute[s] ? 0 : st.vol[s]);
+        var v = st.mute[s] ? 0 : st.vol[s];   // mute = the part's switch is off
         g.gains[s].forEach(function (n) {
           if (now) n.gain.value = v / 100;
           else n.gain.setTargetAtTime(v / 100, ctx.currentTime, 0.015);
@@ -300,183 +299,184 @@
   }
   window.RjStemsPlayer = RjStemsPlayer;
 
-  /* ---------- mixer panel (single song mode) ---------- */
+
+  /* ---------- Stems sidebar (single song mode) ----------
+     Looks like the Loop Station's Stems panel: a MIX list (name, volume, on/off switch per part) and a
+     Tuning stepper. The Stems button in the Song Map toolbar turns stems on and shows the sidebar on
+     the left of the stage; pressing it again (or ×) goes back to YouTube and hides it. */
   var ui = { update: function () {} };
+  var SB_W = 340;
   var CSS = [
-    ".rj-stems{position:fixed;z-index:199;box-sizing:border-box;background:#000;border:1px solid #222;border-radius:14px;padding:10px 14px;color:#fff;",
-    "font-family:'Montserrat','Segoe UI',system-ui,sans-serif;text-transform:uppercase;display:flex;flex-direction:column;gap:8px}",
-    ".rj-stems[hidden]{display:none}",
-    ".rj-stems-head{display:flex;align-items:center;gap:10px;min-height:20px}",
-    ".rj-stems button{appearance:none;font-family:inherit;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;border-radius:999px;line-height:1}",
-    ".rj-stems-on{border:1px solid #444;background:#111;color:#fff;font-size:.62rem;padding:5px 9px}",
-    ".rj-stems-on[aria-pressed=true]{background:#7030a0;border-color:#7030a0}",
-    ".rj-stems-status{font-size:.6rem;color:#aaa;letter-spacing:.03em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
-    ".rj-stems-status b{color:#fff}",
-    ".rj-stems-folder{border:1px solid #1db954;background:#1db954;color:#000;font-size:.6rem;padding:5px 9px}",
-    ".rj-stems-row{display:flex;gap:12px;align-items:stretch}",
-    ".rj-stem{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:5px;border-left:1px solid #222;padding-left:10px}",
-    ".rj-stem:first-child{border-left:0;padding-left:0}",
-    ".rj-stem-top{display:flex;justify-content:space-between;align-items:baseline;font-size:.62rem;font-weight:700;letter-spacing:.04em}",
-    ".rj-stem-pct{color:#aaa;font-weight:600}",
-    ".rj-stem input[type=range]{width:100%;margin:0;accent-color:#7030a0;height:16px}",
-    ".rj-stem.off input[type=range]{opacity:.35}",
-    ".rj-stem-btns{display:flex;gap:5px}",
-    ".rj-stem-btns button{flex:1;border:1px solid #444;background:#111;color:#fff;font-size:.6rem;padding:4px 0}",
-    ".rj-stem-btns .m[aria-pressed=true]{background:#c0392b;border-color:#c0392b}",
-    ".rj-stem-btns .s[aria-pressed=true]{background:#e0b000;border-color:#e0b000;color:#000}",
-    ".rj-tune{flex:1.15 1 0}",
-    ".rj-tune-val{font-size:.95rem;font-weight:800;text-align:center;cursor:pointer;letter-spacing:.02em;text-transform:none}",
-    ".rj-tune-val small{font-size:.6rem;color:#aaa;font-weight:600;margin-left:3px}",
-    ".rj-stems.inactive .rj-stem:not(.rj-tune) .rj-stem-top,.rj-stems.inactive .rj-tune-val{color:#777}"
+    ".rj-sb{position:fixed;z-index:150;box-sizing:border-box;width:" + SB_W + "px;background:#121212;color:#f2f2f2;border:1px solid #2a2a2a;border-radius:10px;",
+    "font-family:Inter,'Segoe UI',system-ui,sans-serif;overflow:hidden;display:flex;flex-direction:column}",
+    ".rj-sb[hidden]{display:none}",
+    ".rj-sb *{box-sizing:border-box}",
+    ".rj-sb button{font:inherit;color:inherit;cursor:pointer}",
+    ".rj-sb-body{flex:1;min-height:0;padding:18px 44px 18px 20px;display:flex;flex-direction:column;gap:16px;overflow-y:auto}",
+    ".rj-sb-close{position:absolute;top:8px;right:8px;z-index:5;width:28px;height:28px;border-radius:50%;border:1px solid #3a3a3a;background:#1b1b1b;color:#ddd;font-size:17px;line-height:1;padding:0}",
+    ".rj-sb-close:hover{background:#7030a0;border-color:#7030a0;color:#fff}",
+    ".rj-sb .label{font-size:11px;letter-spacing:.08em;color:#8a8a8a;font-weight:700}",
+    ".rj-sb .big{font-family:'Vol4 Title',Impact,sans-serif;font-size:28px;margin-top:4px;line-height:1.1;overflow-wrap:anywhere}",
+    ".rj-sb .note{font-size:12px;color:#8a8a8a;line-height:1.5}",
+    ".rj-sb .note b{color:#f2f2f2;font-weight:600}",
+    ".rj-sb .vstack{display:flex;flex-direction:column;gap:12px}",
+    ".rj-sb .stem{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}",
+    ".rj-sb .stem > span{width:52px;flex:0 0 auto}",
+    ".rj-sb .stem input[type=range]{flex:1;min-width:0;accent-color:#7030a0}",
+    ".rj-sb .stem.off input[type=range]{opacity:.35}",
+    ".rj-sb .switch{width:40px;height:22px;border-radius:999px;border:0;background:#3a3a3a;position:relative;flex:0 0 auto;padding:0}",
+    ".rj-sb .switch::after{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .12s}",
+    ".rj-sb .switch[aria-checked=true]{background:#7030a0}",
+    ".rj-sb .switch[aria-checked=true]::after{left:21px}",
+    ".rj-sb .stepper{display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid #2a2a2a;border-radius:8px}",
+    ".rj-sb .stepper .name{color:#8a8a8a;font-size:13px;width:52px;flex:0 0 auto}",
+    ".rj-sb .stepbtn{width:34px;height:30px;border-radius:6px;border:1px solid #3a3a3a;background:transparent;font-size:18px;line-height:1;padding:0}",
+    ".rj-sb .stepbtn:hover{border-color:#7030a0;background:rgba(112,48,160,.25)}",
+    ".rj-sb .stepval{flex:1;text-align:center;font-family:'Vol4 Title',Impact,sans-serif;font-size:18px;font-variant-numeric:tabular-nums;white-space:nowrap}",
+    ".rj-sb .smallbtn{border:1px solid #3a3a3a;background:transparent;border-radius:6px;font-size:12px;padding:4px 7px}",
+    ".rj-sb .smallbtn:hover{border-color:#7030a0}",
+    ".rj-sb .lockbtn{border-color:#7030a0;background:#7030a0;color:#fff;font-weight:700;align-self:flex-start;padding:6px 10px}",
+    "body:not(.sections-single-song) #secStemsBtn{display:none}",
+    "#secStemsBtn.on{background:#7030a0;border-color:#7030a0;color:#fff}",
+    "body.rj-sb-open.sections-single-song.sections-mode #sectionsSheet{margin-left:" + (SB_W + 12) + "px;width:calc(100% - " + (SB_W + 12) + "px)}"
   ].join("");
 
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
   function buildUi() {
-    var style = document.createElement("style");
+    var style = el("style");
     style.textContent = CSS;
     document.head.appendChild(style);
-    var box = document.createElement("div");
-    box.className = "rj-stems";
-    box.id = "rjStems";
-    box.hidden = true;
-    box.setAttribute("aria-label", "Stems mixer");
-    var head = document.createElement("div");
-    head.className = "rj-stems-head";
-    var onBtn = document.createElement("button");
-    onBtn.type = "button"; onBtn.className = "rj-stems-on"; onBtn.textContent = "Stems";
-    onBtn.title = "Play songs from your stem files (mix the parts, tune by Hz). Off: YouTube.";
-    var status = document.createElement("div");
-    status.className = "rj-stems-status";
-    var folderBtn = document.createElement("button");
-    folderBtn.type = "button"; folderBtn.className = "rj-stems-folder"; folderBtn.hidden = true;
-    head.append(onBtn, status, folderBtn);
-    var row = document.createElement("div");
-    row.className = "rj-stems-row";
-    var strips = {};
-    STEMS.forEach(function (s) {
-      var col = document.createElement("div");
-      col.className = "rj-stem";
-      var top = document.createElement("div");
-      top.className = "rj-stem-top";
-      var name = document.createElement("span"); name.textContent = LABEL[s];
-      var pct = document.createElement("span"); pct.className = "rj-stem-pct";
-      top.append(name, pct);
-      var range = document.createElement("input");
-      range.type = "range"; range.min = "0"; range.max = "150"; range.step = "1";
-      range.title = LABEL[s] + " volume (double-click: 100%)";
-      range.setAttribute("aria-label", LABEL[s] + " volume");
-      var btns = document.createElement("div"); btns.className = "rj-stem-btns";
-      var m = document.createElement("button"); m.type = "button"; m.className = "m"; m.textContent = "M"; m.title = "Mute " + LABEL[s];
-      var so = document.createElement("button"); so.type = "button"; so.className = "s"; so.textContent = "S"; so.title = "Solo " + LABEL[s];
-      btns.append(m, so);
-      col.append(top, range, btns);
-      row.appendChild(col);
-      strips[s] = { col: col, pct: pct, range: range, m: m, s: so };
-      range.addEventListener("input", function () { st.vol[s] = +range.value; changedMix(); });
-      range.addEventListener("dblclick", function () { st.vol[s] = 100; changedMix(); });
-      range.addEventListener("keydown", function (e) { if (e.key === " ") e.preventDefault(); });
-      m.addEventListener("click", function () { st.mute[s] = !st.mute[s]; changedMix(); m.blur(); });
-      so.addEventListener("click", function (e) {
-        var only = !e.shiftKey && !st.solo[s];   // click: solo just this one; shift-click: add to the solos
-        if (only) STEMS.forEach(function (x) { st.solo[x] = false; });
-        st.solo[s] = only ? true : !st.solo[s];
-        changedMix(); so.blur();
-      });
-    });
-    var tune = document.createElement("div");
-    tune.className = "rj-stem rj-tune";
-    var tTop = document.createElement("div"); tTop.className = "rj-stem-top";
-    var tName = document.createElement("span"); tName.textContent = "Tuning";
-    tTop.append(tName);
-    var tVal = document.createElement("div"); tVal.className = "rj-tune-val"; tVal.title = "Click: back to A = 440 Hz";
-    var tBtns = document.createElement("div"); tBtns.className = "rj-stem-btns";
-    var down = document.createElement("button"); down.type = "button"; down.textContent = "− 1 Hz"; down.title = "Tune down 1 Hz";
-    var up = document.createElement("button"); up.type = "button"; up.textContent = "+ 1 Hz"; up.title = "Tune up 1 Hz";
-    tBtns.append(down, up);
-    tune.append(tTop, tVal, tBtns);
-    row.appendChild(tune);
-    function setHz(hz) { st.hz = Math.max(-40, Math.min(40, Math.round(hz))); save(); players.forEach(function (p) { p._eng.applyPitch(); }); render(); }
-    down.addEventListener("click", function () { setHz(st.hz - 1); down.blur(); });
-    up.addEventListener("click", function () { setHz(st.hz + 1); up.blur(); });
-    tVal.addEventListener("click", function () { setHz(0); });
-    box.append(head, row);
-    document.body.appendChild(box);
 
-    function changedMix() { save(); players.forEach(function (p) { p._eng.applyMix(); }); render(); }
-    onBtn.addEventListener("click", function () {
-      st.on = !st.on; save(); onBtn.blur();
+    var sb = el("aside", "rj-sb");
+    sb.id = "rjStems";
+    sb.hidden = true;
+    sb.setAttribute("aria-label", "Stems");
+    var close = el("button", "rj-sb-close", "×");
+    close.type = "button"; close.title = "Stems off (back to YouTube)"; close.setAttribute("aria-label", close.title);
+    var body = el("div", "rj-sb-body");
+    sb.append(close, body);
+    document.body.appendChild(sb);
+
+    /* Toolbar button, after Solo in the Song Map nav */
+    var navBtn = el("button", "sec-mode-btn", "Stems");
+    navBtn.type = "button"; navBtn.id = "secStemsBtn";
+    navBtn.title = "Stems: play the song from your stem files, mix the parts and tune by Hz. Off: YouTube.";
+    function mountNav() {
+      if (navBtn.isConnected) return;
+      var solo = document.getElementById("secSoloBtn"), bar = document.getElementById("secModes");
+      if (solo && solo.parentNode) solo.parentNode.insertBefore(navBtn, solo.nextSibling);
+      else if (bar) bar.appendChild(navBtn);
+    }
+
+    function setOn(on) {
+      st.on = !!on; save();
       if (st.on && !index) getIndex(true).then(reswitchAll); else reswitchAll();
-      render();
-    });
-    folderBtn.addEventListener("click", async function () {
-      folderBtn.blur();
+    }
+    navBtn.addEventListener("click", function () { navBtn.blur(); setOn(!st.on); });
+    close.addEventListener("click", function () { setOn(false); });
+    function reswitchAll() { players.forEach(function (p) { p._reswitch(); }); render(); }
+    function changedMix() { save(); players.forEach(function (p) { p._eng.applyMix(); }); }
+    function setHz(hz) { st.hz = Math.max(-40, Math.min(40, Math.round(hz))); save(); players.forEach(function (p) { p._eng.applyPitch(); }); render(); }
+    async function folderAction() {
       try {
         if (need && need.kind === "allow") { index = null; await getIndex(true); }
         else await chooseFolder();
       } catch (e) { if (!(e && e.name === "AbortError")) need = { kind: "error", msg: e.message || String(e) }; }
       reswitchAll();
-    });
-    function reswitchAll() { players.forEach(function (p) { p._reswitch(); }); render(); }
+    }
 
     function render() {
-      onBtn.setAttribute("aria-pressed", st.on ? "true" : "false");
-      var anySolo = STEMS.some(function (s) { return st.solo[s]; });
-      STEMS.forEach(function (s) {
-        var x = strips[s];
-        x.range.value = String(st.vol[s]);
-        x.pct.textContent = st.vol[s] + "%";
-        x.m.setAttribute("aria-pressed", st.mute[s] ? "true" : "false");
-        x.s.setAttribute("aria-pressed", st.solo[s] ? "true" : "false");
-        x.col.classList.toggle("off", anySolo ? !st.solo[s] : !!st.mute[s]);
-      });
-      tVal.innerHTML = "A = " + (A4 + st.hz) + "<small>Hz</small>";
+      mountNav();
+      navBtn.classList.toggle("on", !!st.on);
+      navBtn.setAttribute("aria-pressed", st.on ? "true" : "false");
+      document.body.classList.toggle("rj-sb-open", !!st.on);
+      place();
+      if (!st.on) return;
+      body.textContent = "";
       var p = players[0], info = p ? p._info() : { active: "yt", title: "" };
-      var msg = "", btn = "";
-      if (!st.on) msg = "Off · playing YouTube";
-      else if (info.active === "stem") msg = "Playing stems · <b>" + esc(info.title) + "</b>";
-      else if (need && need.kind === "choose") { msg = "Choose your chip folder (Loop Prototype\\" + CHIP_FOLDER + ") to play stems"; btn = "Choose folder"; }
-      else if (need && need.kind === "allow") { msg = "Allow RIFFJAMS to open “" + esc(need.name) + "” again"; btn = "Allow"; }
-      else if (need && need.kind === "nosongs") { msg = "No songs folder in “" + esc(need.name) + "” yet (run make_song_files.py)"; btn = "Choose folder"; }
-      else if (need && need.kind === "none") msg = "Stems need Chrome or Edge on a computer";
-      else if (need && need.kind === "error") { msg = "Couldn't open the stems: " + esc(need.msg); btn = "Choose folder"; }
-      else if (info.err) msg = "Couldn't play the stem file: " + esc(info.err) + " · YouTube";
-      else if (info.title) msg = "No stem file for <b>" + esc(info.title) + "</b> · playing YouTube";
-      else msg = "Stems on · play a song";
-      status.innerHTML = msg;
-      folderBtn.hidden = !btn || !!qsBase;
-      folderBtn.textContent = btn;
-      box.classList.toggle("inactive", !(st.on && info.active === "stem"));
-    }
-    function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
-    /* Shown in single song mode, next to the Song Map player (left of it, or above it when narrow). */
-    function place() {
-      var show = document.body.classList.contains("sections-mode") && document.body.classList.contains("sections-single-song");
-      box.hidden = !show;
-      if (!show) return;
-      var pl = document.getElementById("smPlayer");
-      var r = pl && pl.getBoundingClientRect();
-      var W = window.innerWidth, H = window.innerHeight;
-      if (!r || !r.width) r = { left: W - 16, right: W - 16, top: H - 16, bottom: H - 16, width: 0, height: 0 };
-      var room = r.left - 16 - 12;
-      box.style.top = "auto";
-      if (room >= 620) {
-        box.style.left = Math.max(16, r.left - 12 - Math.min(room, 900)) + "px";
-        box.style.width = Math.min(room, 900) + "px";
-        box.style.bottom = Math.max(0, H - r.bottom) + "px";
-        box.style.minHeight = r.height ? r.height + "px" : "";
-      } else {
-        var w = Math.min(W - 32, 640);
-        box.style.left = Math.max(16, r.right - w) + "px";
-        box.style.width = w + "px";
-        box.style.bottom = Math.max(0, H - r.top + 10) + "px";
-        box.style.minHeight = "";
+      var head = el("div");
+      head.append(el("div", "label", "STEMS"));
+      head.append(el("div", "big", info.title || "No song"));
+      body.append(head);
+
+      var msg = "", btn = "";
+      if (info.active === "stem") msg = "Playing from your stem files.";
+      else if (need && need.kind === "choose") { msg = "Choose your chip folder (Loop Prototype\\" + CHIP_FOLDER + ") to play stems."; btn = "Choose folder"; }
+      else if (need && need.kind === "allow") { msg = "Allow RIFFJAMS to open “" + esc(need.name) + "” again."; btn = "Allow"; }
+      else if (need && need.kind === "nosongs") { msg = "No songs folder in “" + esc(need.name) + "” yet (run make_song_files.py)."; btn = "Choose folder"; }
+      else if (need && need.kind === "none") msg = "Stems need Chrome or Edge on a computer.";
+      else if (need && need.kind === "error") { msg = "Couldn’t open the stems: " + esc(need.msg); btn = "Choose folder"; }
+      else if (info.err) msg = "Couldn’t play the stem file (" + esc(info.err) + "), so this is YouTube.";
+      else if (info.title) msg = "No stem file for <b>" + esc(info.title) + "</b>, so this is YouTube.";
+      else msg = "Play a song.";
+      var note = el("div", "note"); note.innerHTML = msg;
+      body.append(note);
+      if (btn && !qsBase) {
+        var fb = el("button", "smallbtn lockbtn", btn); fb.type = "button";
+        fb.addEventListener("click", folderAction);
+        body.append(fb);
       }
+
+      body.append(el("div", "label", "MIX"));
+      var box = el("div", "vstack");
+      STEMS.forEach(function (s) {
+        var row = el("div", "stem" + (st.mute[s] ? " off" : ""));
+        var r = el("input");
+        r.type = "range"; r.min = "0"; r.max = "150"; r.step = "5"; r.value = String(st.vol[s]);
+        r.setAttribute("aria-label", LABEL[s] + " volume");
+        r.title = LABEL[s] + " " + st.vol[s] + "% (double-click: 100%)";
+        r.addEventListener("input", function () { st.vol[s] = +r.value; r.title = LABEL[s] + " " + st.vol[s] + "% (double-click: 100%)"; changedMix(); });
+        r.addEventListener("dblclick", function () { st.vol[s] = 100; r.value = "100"; changedMix(); });
+        r.addEventListener("keydown", function (e) { if (e.key === " ") e.preventDefault(); });
+        var sw = el("button", "switch");
+        sw.type = "button"; sw.setAttribute("role", "switch");
+        sw.setAttribute("aria-checked", String(!st.mute[s]));
+        sw.setAttribute("aria-label", LABEL[s]);
+        sw.addEventListener("click", function () {
+          st.mute[s] = !st.mute[s];
+          sw.setAttribute("aria-checked", String(!st.mute[s]));
+          row.classList.toggle("off", !!st.mute[s]);
+          changedMix(); sw.blur();
+        });
+        row.append(el("span", null, LABEL[s]), r, sw);
+        box.append(row);
+      });
+      body.append(box);
+
+      body.append(el("div", "label", "TUNING"));
+      var step = el("div", "stepper");
+      var minus = el("button", "stepbtn", "−"); minus.type = "button"; minus.setAttribute("aria-label", "Lower tuning by 1 Hz");
+      var val = el("span", "stepval", "A = " + (A4 + st.hz) + " Hz");
+      var plus = el("button", "stepbtn", "+"); plus.type = "button"; plus.setAttribute("aria-label", "Raise tuning by 1 Hz");
+      var reset = el("button", "smallbtn", "Reset"); reset.type = "button"; reset.setAttribute("aria-label", "Reset tuning to A = 440 Hz");
+      minus.addEventListener("click", function () { setHz(st.hz - 1); });
+      plus.addEventListener("click", function () { setHz(st.hz + 1); });
+      reset.addEventListener("click", function () { setHz(0); });
+      step.append(el("span", "name", "Tuning"), minus, val, plus, reset);
+      body.append(step);
+      body.append(el("div", "note", "Tunes the whole song in 1 Hz steps. Changes happen live."));
+    }
+
+    /* Left of the single song stage, same height. */
+    function place() {
+      var show = !!st.on && document.body.classList.contains("sections-mode") && document.body.classList.contains("sections-single-song");
+      var sheet = document.getElementById("sectionsSheet");
+      var r = sheet && sheet.getBoundingClientRect();
+      if (!show || !r || !r.height) { sb.hidden = true; return; }
+      sb.hidden = false;
+      sb.style.left = Math.max(0, r.left - SB_W - 12) + "px";
+      sb.style.top = Math.max(0, r.top) + "px";
+      sb.style.height = Math.max(200, Math.min(r.height, window.innerHeight - Math.max(0, r.top) - 8)) + "px";
     }
     new MutationObserver(place).observe(document.body, { attributes: true, attributeFilter: ["class"] });
     window.addEventListener("resize", place);
-    setInterval(place, 1000);   // the player moves with page zoom; cheap to re-check
+    window.addEventListener("scroll", place, true);
+    setInterval(function () { mountNav(); place(); }, 1000);
     ui.update = render;
-    render(); place();
+    render();
     if (st.on) getIndex(false).then(render);
   }
   if (document.body) buildUi(); else document.addEventListener("DOMContentLoaded", buildUi);
