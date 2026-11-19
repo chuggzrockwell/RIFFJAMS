@@ -19,6 +19,7 @@
   var STEMS = ["vocals", "drums", "bass", "other", "guitar"];
   var LABEL = { vocals: "Vocals", drums: "Drums", bass: "Bass", other: "Other", guitar: "Guitar" };
   var A4 = 440;
+  var HZ_MAX = 40;   // tuning range: A = 400–480 Hz
   var SAVE_KEY = "rj-stems-v1";
   var BASE = (document.currentScript && document.currentScript.src || "").replace(/[^\/?#]*([?#].*)?$/, "");
   var band = window.RJ_BAND;
@@ -333,6 +334,12 @@
     ".rj-sb .stepbtn{width:34px;height:30px;border-radius:6px;border:1px solid #3a3a3a;background:transparent;font-size:18px;line-height:1;padding:0}",
     ".rj-sb .stepbtn:hover{border-color:#7030a0;background:rgba(112,48,160,.25)}",
     ".rj-sb .stepval{flex:1;text-align:center;font-family:'Vol4 Title',Impact,sans-serif;font-size:18px;font-variant-numeric:tabular-nums;white-space:nowrap}",
+    ".rj-sb .stepbtn,.rj-sb .stepper .smallbtn{flex:0 0 auto}",
+    ".rj-sb .stepper .stepval{min-width:0}",
+    ".rj-sb .hzin{width:56px;font:inherit;color:#f2f2f2;background:transparent;border:0;border-bottom:1px dashed #3a3a3a;text-align:center;padding:0 2px;-moz-appearance:textfield}",
+    ".rj-sb .hzin::-webkit-outer-spin-button,.rj-sb .hzin::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}",
+    ".rj-sb .hzin:hover{border-bottom-color:#7030a0}",
+    ".rj-sb .hzin:focus{outline:none;border-bottom:1px solid #7030a0;background:rgba(112,48,160,.25);border-radius:4px 4px 0 0}",
     ".rj-sb .smallbtn{border:1px solid #3a3a3a;background:transparent;border-radius:6px;font-size:12px;padding:4px 7px}",
     ".rj-sb .smallbtn:hover{border-color:#7030a0}",
     ".rj-sb .lockbtn{border-color:#7030a0;background:#7030a0;color:#fff;font-weight:700;align-self:flex-start;padding:6px 10px}",
@@ -378,7 +385,7 @@
     close.addEventListener("click", function () { setOn(false); });
     function reswitchAll() { players.forEach(function (p) { p._reswitch(); }); render(); }
     function changedMix() { save(); players.forEach(function (p) { p._eng.applyMix(); }); }
-    function setHz(hz) { st.hz = Math.max(-40, Math.min(40, Math.round(hz))); save(); players.forEach(function (p) { p._eng.applyPitch(); }); render(); }
+    function setHz(hz) { st.hz = Math.max(-HZ_MAX, Math.min(HZ_MAX, Math.round(hz * 10) / 10)); save(); players.forEach(function (p) { p._eng.applyPitch(); }); render(); }
     async function folderAction() {
       try {
         if (need && need.kind === "allow") { index = null; await getIndex(true); }
@@ -449,15 +456,34 @@
       body.append(el("div", "label", "TUNING"));
       var step = el("div", "stepper");
       var minus = el("button", "stepbtn", "−"); minus.type = "button"; minus.setAttribute("aria-label", "Lower tuning by 1 Hz");
-      var val = el("span", "stepval", "A = " + (A4 + st.hz) + " Hz");
+      /* A = [ 440 ] Hz: type a frequency (400–480, decimals OK) and press Enter or click away */
+      var val = el("label", "stepval");
+      var hzIn = el("input", "hzin");
+      hzIn.type = "number"; hzIn.min = String(A4 - HZ_MAX); hzIn.max = String(A4 + HZ_MAX); hzIn.step = "0.1";
+      hzIn.value = String(+(A4 + st.hz).toFixed(1));
+      hzIn.setAttribute("aria-label", "Tuning: A in Hz");
+      hzIn.title = "Type the frequency of A (" + (A4 - HZ_MAX) + "–" + (A4 + HZ_MAX) + " Hz), then Enter";
+      function commitHz() {
+        var v = parseFloat(hzIn.value);
+        if (isFinite(v)) setHz(v - A4); else hzIn.value = String(+(A4 + st.hz).toFixed(1));
+      }
+      hzIn.addEventListener("change", commitHz);
+      hzIn.addEventListener("keydown", function (e) {
+        e.stopPropagation();   // typing here must not trigger the Song Map's keyboard shortcuts
+        if (e.key === "Enter") { commitHz(); hzIn.blur(); }
+        else if (e.key === "Escape") { hzIn.value = String(+(A4 + st.hz).toFixed(1)); hzIn.blur(); }
+      });
+      hzIn.addEventListener("keyup", function (e) { e.stopPropagation(); });
+      hzIn.addEventListener("keypress", function (e) { e.stopPropagation(); });
+      val.append("A = ", hzIn, " Hz");
       var plus = el("button", "stepbtn", "+"); plus.type = "button"; plus.setAttribute("aria-label", "Raise tuning by 1 Hz");
       var reset = el("button", "smallbtn", "Reset"); reset.type = "button"; reset.setAttribute("aria-label", "Reset tuning to A = 440 Hz");
       minus.addEventListener("click", function () { setHz(st.hz - 1); });
       plus.addEventListener("click", function () { setHz(st.hz + 1); });
       reset.addEventListener("click", function () { setHz(0); });
-      step.append(el("span", "name", "Tuning"), minus, val, plus, reset);
+      step.append(minus, val, plus, reset);
       body.append(step);
-      body.append(el("div", "note", "Tunes the whole song in 1 Hz steps. Changes happen live."));
+      body.append(el("div", "note", "Tunes the whole song: − / + move 1 Hz, or type the frequency of A (e.g. 432) and press Enter. Changes happen live."));
     }
 
     /* Left of the single song stage, same height. */
