@@ -12,7 +12,7 @@
  * rate with the pitch put back by the stretch node (better than the browser's own pitch keeping).
  *
  * window.RjStemsPlayer has the YouTube player API, so the Song Map uses it in place of YT.Player:
- * songs without a stem file (or with Stems off) go to the real YouTube player inside it.
+ * songs without a stem file go to the real YouTube player inside it.
  */
 (function () {
   "use strict";
@@ -37,6 +37,10 @@
   try { Object.assign(st, JSON.parse(localStorage.getItem(SAVE_KEY) || "{}")); } catch (e) {}
   STEMS.forEach(function (s) { if (typeof st.vol[s] !== "number") st.vol[s] = 100; });
   if (typeof st.key !== "number") st.key = 0;
+  /* The Mix panel only shows/hides (st.open); songs with a stem file always play from it, so closing
+     the panel keeps the same mix, key and tuning. (st.on used to mean "stems on" and doubled as open.) */
+  if (typeof st.open !== "boolean") st.open = st.on !== false;
+  st.on = true;
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(st)); } catch (e) {} }
 
   /* ---------- where the song files are ---------- */
@@ -254,7 +258,7 @@
       title = titleFor(vid);
       var entry = null;
       lastErr = "";
-      if (st.on && title) { var idx = await getIndex(false); entry = idx && idx[title] || null; }
+      if (title) { var idx = await getIndex(false); entry = idx && idx[title] || null; }
       if (my !== token) return;
       if (entry) {
         if (active === "yt") R("pauseVideo");
@@ -346,8 +350,8 @@
     ".rj-sb .smallbtn{border:1px solid #3a3a3a;background:transparent;border-radius:6px;font-size:12px;padding:4px 7px}",
     ".rj-sb .smallbtn:hover{border-color:#7030a0}",
     ".rj-sb .lockbtn{border-color:#7030a0;background:#7030a0;color:#fff;font-weight:700;align-self:flex-start;padding:6px 10px}",
-    "body:not(.sections-single-song) #secStemsBtn{display:none}",
-    "#secStemsBtn.on{background:#7030a0;border-color:#7030a0;color:#fff}",
+    "body:not(.sections-single-song) #secMixBtn{display:none}",
+    "#secMixBtn.on{background:#7030a0;border-color:#7030a0;color:#fff}",
     "body.rj-sb-open.sections-single-song.sections-mode #sectionsSheet{margin-left:" + (SB_W + 12) + "px;width:calc(100% - " + (SB_W + 12) + "px)}"
   ].join("");
 
@@ -362,17 +366,17 @@
     var sb = el("aside", "rj-sb");
     sb.id = "rjStems";
     sb.hidden = true;
-    sb.setAttribute("aria-label", "Stems");
+    sb.setAttribute("aria-label", "Mix");
     var close = el("button", "rj-sb-close", "×");
-    close.type = "button"; close.title = "Stems off (back to YouTube)"; close.setAttribute("aria-label", close.title);
+    close.type = "button"; close.title = "Hide the Mix panel (the mix, key and tuning stay)"; close.setAttribute("aria-label", close.title);
     var body = el("div", "rj-sb-body");
     sb.append(close, body);
     document.body.appendChild(sb);
 
     /* Toolbar button, after Solo in the Song Map nav */
-    var navBtn = el("button", "sec-mode-btn", "Stems");
-    navBtn.type = "button"; navBtn.id = "secStemsBtn";
-    navBtn.title = "Stems: play the song from your stem files, mix the parts and tune by Hz. Off: YouTube.";
+    var navBtn = el("button", "sec-mode-btn", "Mix");
+    navBtn.type = "button"; navBtn.id = "secMixBtn";
+    navBtn.title = "Mix: show or hide the panel to mix the parts, change key and tune by Hz (songs with stem files)";
     function mountNav() {
       if (navBtn.isConnected) return;
       var solo = document.getElementById("secSoloBtn"), bar = document.getElementById("secModes");
@@ -381,10 +385,10 @@
     }
 
     function setOn(on) {
-      st.on = !!on; save();
-      if (st.on && !index) getIndex(true).then(reswitchAll); else reswitchAll();
+      st.open = !!on; save();
+      if (st.open && !index) getIndex(true).then(reswitchAll); else render();   // opening may ask for the folder
     }
-    navBtn.addEventListener("click", function () { navBtn.blur(); setOn(!st.on); });
+    navBtn.addEventListener("click", function () { navBtn.blur(); setOn(!st.open); });
     close.addEventListener("click", function () { setOn(false); });
     function reswitchAll() { players.forEach(function (p) { p._reswitch(); }); render(); }
     function changedMix() { save(); players.forEach(function (p) { p._eng.applyMix(); }); }
@@ -400,16 +404,16 @@
 
     function render() {
       mountNav();
-      navBtn.classList.toggle("on", !!st.on);
-      navBtn.setAttribute("aria-pressed", st.on ? "true" : "false");
-      document.body.classList.toggle("rj-sb-open", !!st.on);
+      navBtn.classList.toggle("on", !!st.open);
+      navBtn.setAttribute("aria-pressed", st.open ? "true" : "false");
+      document.body.classList.toggle("rj-sb-open", !!st.open);
       place();
-      if (!st.on) return;
+      if (!st.open) return;
       body.textContent = "";
       var p = players[0], info = p ? p._info() : { active: "yt", title: "" };
 
       var head = el("div");
-      head.append(el("div", "label", "STEMS"));
+      head.append(el("div", "label", "MIX"));
       head.append(el("div", "big", info.title || "No song"));
       body.append(head);
 
@@ -431,7 +435,7 @@
         body.append(fb);
       }
 
-      body.append(el("div", "label", "MIX"));
+      body.append(el("div", "label", "PARTS"));
       var box = el("div", "vstack");
       STEMS.forEach(function (s) {
         var row = el("div", "stem" + (st.mute[s] ? " off" : ""));
@@ -503,7 +507,7 @@
 
     /* Left of the single song stage, same height. */
     function place() {
-      var show = !!st.on && document.body.classList.contains("sections-mode") && document.body.classList.contains("sections-single-song");
+      var show = !!st.open && document.body.classList.contains("sections-mode") && document.body.classList.contains("sections-single-song");
       var sheet = document.getElementById("sectionsSheet");
       var r = sheet && sheet.getBoundingClientRect();
       if (!show || !r || !r.height) { sb.hidden = true; return; }
@@ -518,7 +522,7 @@
     setInterval(function () { mountNav(); place(); }, 1000);
     ui.update = render;
     render();
-    if (st.on) getIndex(false).then(render);
+    getIndex(false).then(render);
   }
   if (document.body) buildUi(); else document.addEventListener("DOMContentLoaded", buildUi);
 })();
