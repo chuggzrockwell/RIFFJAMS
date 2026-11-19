@@ -20,6 +20,7 @@
   var LABEL = { vocals: "Vocals", drums: "Drums", bass: "Bass", other: "Other", guitar: "Guitar" };
   var A4 = 440;
   var HZ_MAX = 40;   // tuning range: A = 400–480 Hz
+  var KEY_MAX = 12;  // key change range: ± one octave
   var SAVE_KEY = "rj-stems-v1";
   var BASE = (document.currentScript && document.currentScript.src || "").replace(/[^\/?#]*([?#].*)?$/, "");
   var band = window.RJ_BAND;
@@ -32,9 +33,10 @@
   }
 
   /* ---------- saved settings ---------- */
-  var st = { on: true, hz: 0, vol: {}, mute: {}, solo: {} };
+  var st = { on: true, hz: 0, key: 0, vol: {}, mute: {}, solo: {} };
   try { Object.assign(st, JSON.parse(localStorage.getItem(SAVE_KEY) || "{}")); } catch (e) {}
   STEMS.forEach(function (s) { if (typeof st.vol[s] !== "number") st.vol[s] = 100; });
+  if (typeof st.key !== "number") st.key = 0;
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(st)); } catch (e) {} }
 
   /* ---------- where the song files are ---------- */
@@ -129,7 +131,7 @@
     audio.style.display = "none";
     try { audio.preservesPitch = false; audio.webkitPreservesPitch = false; audio.mozPreservesPitch = false; } catch (e) {}
     (document.body || document.documentElement).appendChild(audio);
-    var ctx = null, g = null, gP = null, file = "", wantPlay = false, rate = 1, state = PS().UNSTARTED, silent = false;
+    var lastSemis = 0, ctx = null, g = null, gP = null, file = "", wantPlay = false, rate = 1, state = PS().UNSTARTED, silent = false;
     function fire(s) { state = s; if (!silent) onState(s); }
     audio.addEventListener("playing", function () { fire(PS().PLAYING); });
     audio.addEventListener("pause", function () { if (!audio.ended && state !== PS().CUED) fire(PS().PAUSED); });
@@ -181,7 +183,8 @@
     }
     function applyPitch() {
       if (!g) return;
-      var semis = 12 * Math.log2((A4 + st.hz) / A4) - 12 * Math.log2(rate);   // element rate changes pitch; put it back
+      var semis = (st.key || 0) + 12 * Math.log2((A4 + st.hz) / A4) - 12 * Math.log2(rate);   // element rate changes pitch; put it back
+      lastSemis = semis;
       g.node.schedule({ active: true, semitones: semis });
     }
     this.applyMix = function () { applyMix(false); };
@@ -222,7 +225,7 @@
     this.debug = function () {
       var rms = 0;
       if (g) { var b = new Float32Array(g.meter.fftSize); g.meter.getFloatTimeDomainData(b); for (var i = 0; i < b.length; i++) rms += b[i] * b[i]; rms = Math.sqrt(rms / b.length); }
-      return { ctx: ctx && ctx.state, lat: g && g.lat, file: file, rate: rate, rms: rms, t: audio.currentTime };
+      return { ctx: ctx && ctx.state, lat: g && g.lat, file: file, rate: rate, rms: rms, t: audio.currentTime, semitones: lastSemis };
     };
     this.destroy = function () { try { audio.pause(); audio.removeAttribute("src"); audio.remove(); } catch (e) {} if (ctx) ctx.close(); };
   }
@@ -385,6 +388,7 @@
     close.addEventListener("click", function () { setOn(false); });
     function reswitchAll() { players.forEach(function (p) { p._reswitch(); }); render(); }
     function changedMix() { save(); players.forEach(function (p) { p._eng.applyMix(); }); }
+    function setKey(k) { st.key = Math.max(-KEY_MAX, Math.min(KEY_MAX, Math.round(k))); save(); players.forEach(function (p) { p._eng.applyPitch(); }); render(); }
     function setHz(hz) { st.hz = Math.max(-HZ_MAX, Math.min(HZ_MAX, Math.round(hz * 10) / 10)); save(); players.forEach(function (p) { p._eng.applyPitch(); }); render(); }
     async function folderAction() {
       try {
@@ -453,7 +457,18 @@
       });
       body.append(box);
 
-      body.append(el("div", "label", "TUNING"));
+      body.append(el("div", "label", "KEY & TUNING"));
+      /* Key: − [Key +2 st] + Reset, in semitones */
+      var kstep = el("div", "stepper");
+      var kminus = el("button", "stepbtn", "−"); kminus.type = "button"; kminus.setAttribute("aria-label", "Lower the key by a semitone");
+      var kval = el("span", "stepval", "Key " + (st.key > 0 ? "+" : st.key < 0 ? "−" : "") + Math.abs(st.key) + " st");
+      var kplus = el("button", "stepbtn", "+"); kplus.type = "button"; kplus.setAttribute("aria-label", "Raise the key by a semitone");
+      var kreset = el("button", "smallbtn", "Reset"); kreset.type = "button"; kreset.setAttribute("aria-label", "Reset the key");
+      kminus.addEventListener("click", function () { setKey(st.key - 1); });
+      kplus.addEventListener("click", function () { setKey(st.key + 1); });
+      kreset.addEventListener("click", function () { setKey(0); });
+      kstep.append(kminus, kval, kplus, kreset);
+      body.append(kstep);
       var step = el("div", "stepper");
       var minus = el("button", "stepbtn", "−"); minus.type = "button"; minus.setAttribute("aria-label", "Lower tuning by 1 Hz");
       /* A = [ 440 ] Hz: type a frequency (400–480, decimals OK) and press Enter or click away */
@@ -483,7 +498,7 @@
       reset.addEventListener("click", function () { setHz(0); });
       step.append(minus, val, plus, reset);
       body.append(step);
-      body.append(el("div", "note", "Tunes the whole song: − / + move 1 Hz, or type the frequency of A (e.g. 432) and press Enter. Changes happen live."));
+      body.append(el("div", "note", "Key moves the whole song in semitones (± 12). Tuning moves A in 1 Hz steps, or type its frequency (e.g. 432) and press Enter. They add up. Changes happen live."));
     }
 
     /* Left of the single song stage, same height. */
@@ -493,7 +508,7 @@
       var r = sheet && sheet.getBoundingClientRect();
       if (!show || !r || !r.height) { sb.hidden = true; return; }
       sb.hidden = false;
-      sb.style.left = Math.max(0, r.left - SB_W - 12) + "px";
+      sb.style.left = (r.left - SB_W - 12) + "px";   // follows the stage when the page scrolls sideways
       sb.style.top = Math.max(0, r.top) + "px";
       sb.style.height = Math.max(200, Math.min(r.height, window.innerHeight - Math.max(0, r.top) - 8)) + "px";
     }

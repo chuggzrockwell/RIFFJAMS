@@ -21,7 +21,7 @@ in that browser only and can be disconnected from the chip editor.
 In the Song Map's Single Song view, the **Stems** button in the toolbar plays the song from your own
 stem files instead of YouTube and opens a sidebar on the left (same look as the Loop Station's Stems
 panel): a volume slider and on/off switch per part (vocals, drums, bass, other, guitar) and tuning in
-1 Hz steps or a typed frequency (A = 400–480 Hz). Press Stems again (or ×) to go back to YouTube and hide it. Songs without a
+1 Hz steps or a typed frequency (A = 400–480 Hz), plus a key change in semitones (± 12). Press Stems again (or ×) to go back to YouTube and hide it. Songs without a
 stem file play YouTube as before. Code: `rj-stems.js`.
 
 The files are one 10-channel WAV per song (`Loop Prototype\looper\songs\<slug>.wav` + `index.json`),
