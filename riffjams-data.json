@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-14T18:50:18.959Z",
+  "updatedAt": "2026-11-20T01:45:20.661Z",
   "assets": {
     "12": "user-tabs/12.png",
     "V1": "user-tabs/V1.png?v=9",
@@ -87,7 +87,8 @@
     "RARD-I1": "user-tabs/RARD-I1.png",
     "RNRD-V1": "user-tabs/RNRD-V1.png",
     "RNRD-C1": "user-tabs/RNRD-C1.png",
-    "RNRD-I1": "user-tabs/RNRD-I1.png"
+    "RNRD-I1": "user-tabs/RNRD-I1.png",
+    "IM-2-6B": "user-tabs/IM-2-6B.png"
   },
   "albums": [
     {
@@ -3475,6 +3476,15 @@
                 "2-5B",
                 2,
                 "IM-2-5B"
+              ],
+              [
+                "2-6B",
+                1,
+                "IM-2-6B",
+                [
+                  1,
+                  3
+                ]
               ]
             ]
           },
