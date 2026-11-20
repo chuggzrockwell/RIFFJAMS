@@ -512,6 +512,10 @@
         rememberToken("");
         window.setSaveStatus("GitHub connection expired. Connect again to upload.");
         showBatchConnect("Your GitHub connection expired or was rejected. Paste a new token to upload your staged crops.");
+      } else if (/did not grant permission/i.test(error.message || "")) {
+        /* Connected, but the token can't write (Contents not Read and write): let a new token replace it. */
+        window.setSaveStatus("This GitHub token can't write to RIFFJAMS.");
+        showBatchConnect("This token can read RIFFJAMS but can't save to it. Paste a token with Contents: Read and write (or fix that permission on GitHub and press Batch upload again).");
       } else {
         window.setSaveStatus(error.message || "Batch upload failed.");
         alert(error.message || "Batch upload failed.");
