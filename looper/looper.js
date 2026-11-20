@@ -1895,8 +1895,9 @@
     if (a && a.cover) return a.cover;
     return { sabotage: 'covers/sabotage.jpg', technicalecstasy: 'covers/te.jpg', neversaydie: 'covers/nsd.jpg' }[norm(album)] || '';
   }
-  /* Which part of a square cover a wide chip shows. Master of Reality: the top, so "BLACK SABBATH" shows. */
-  function coverPosition(album) { return norm(album) === 'masterofreality' ? 'center top' : ''; }
+  /* Which part of a square cover a wide chip shows. Master of Reality and Vol. 4: the top, so the
+     band name shows. */
+  function coverPosition(album) { return ['masterofreality', 'vol4'].includes(norm(album)) ? 'center top' : ''; }
   function bandChipArt(album, tier) {
     if (!window.RJ_BAND || window.RJ_BAND.id === 'sabbath') {
       const cover = sabbathCover(album, tier);
