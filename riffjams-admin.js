@@ -415,12 +415,72 @@
   var restoreP = null;
   function ensureRestored() { return restoreP || (restoreP = restoreStaged()); }
 
+  /* Batch upload without a GitHub connection (never connected, or the token expired): a small Connect
+     box opens right above the button, and the upload starts as soon as the token is authorized. */
+  function showBatchConnect(reason) {
+    var box = qs("rjBatchConnect");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "rjBatchConnect";
+      box.style.cssText = "position:fixed;right:16px;bottom:72px;z-index:100001;width:340px;max-width:calc(100vw - 32px);box-sizing:border-box;" +
+        "padding:14px 16px;border-radius:12px;background:#1c1c1c;color:#f2f2f2;border:1px solid #3a3a3a;box-shadow:0 8px 24px rgba(0,0,0,.5);" +
+        "font:13px/1.45 Inter,'Segoe UI',system-ui,sans-serif;";
+      box.innerHTML =
+        '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">' +
+          '<b style="font-size:14px">Connect GitHub to upload</b>' +
+          '<button type="button" id="rjBatchConnectClose" aria-label="Close" style="border:0;background:none;color:#aaa;font-size:18px;line-height:1;cursor:pointer;padding:0 2px">&times;</button>' +
+        '</div>' +
+        '<div id="rjBatchConnectWhy" style="color:#bbb;margin-bottom:8px"></div>' +
+        '<div style="display:flex;gap:6px">' +
+          '<input id="rjBatchConnectToken" type="password" autocomplete="off" placeholder="Paste fine-grained GitHub token" ' +
+            'style="flex:1;min-width:0;padding:7px 9px;border-radius:7px;border:1px solid #3a3a3a;background:#121212;color:#f2f2f2;font:inherit">' +
+          '<button type="button" id="rjBatchConnectGo" style="padding:7px 12px;border:0;border-radius:7px;background:#6b2fa0;color:#fff;font:inherit;font-weight:700;cursor:pointer">Authorize</button>' +
+        '</div>' +
+        '<div id="rjBatchConnectMsg" style="min-height:1em;margin-top:6px;color:#ff8a8a"></div>' +
+        '<small style="color:#999"><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#c9a3ec">Create token</a>: ' +
+          'only the RIFFJAMS repository, Contents: Read and write. A longer expiration means fewer reconnects. The token stays only in this browser.</small>';
+      document.body.appendChild(box);
+      var input = qs("rjBatchConnectToken");
+      var close = function () { box.hidden = true; };
+      var go = async function () {
+        var token = (input.value || "").trim();
+        if (!token) { input.focus(); return; }
+        var msg = qs("rjBatchConnectMsg");
+        msg.style.color = "#bbb"; msg.textContent = "Connecting to GitHub…";
+        try {
+          await verifyConnection(token);
+          input.value = "";
+          close();
+          batchUploadStaged();
+        } catch (error) {
+          TOKEN = "";
+          msg.style.color = "#ff8a8a"; msg.textContent = error.message || "Could not connect GitHub.";
+        }
+      };
+      qs("rjBatchConnectClose").onclick = close;
+      qs("rjBatchConnectGo").onclick = go;
+      /* Typing the token must not trigger the page's keyboard shortcuts. */
+      ["keydown", "keyup", "keypress"].forEach(function (type) {
+        input.addEventListener(type, function (event) {
+          event.stopPropagation();
+          if (type !== "keydown") return;
+          if (event.key === "Enter") { event.preventDefault(); go(); }
+          else if (event.key === "Escape") close();
+        });
+      });
+    }
+    qs("rjBatchConnectWhy").textContent = reason || "This browser isn't connected to GitHub. Paste a token to upload your staged crops.";
+    qs("rjBatchConnectMsg").textContent = "";
+    box.hidden = false;
+    qs("rjBatchConnectToken").focus();
+  }
+
   async function batchUploadStaged() {
     var btn = qs("rjBatchUpload");
     var licks = Object.keys(staged);
     if (!licks.length) return;
+    if (!TOKEN) { showBatchConnect(); return; }
     try {
-      if (!TOKEN) throw new Error("Connect GitHub first (open any chip, then Connect).");
       if (btn) { btn.disabled = true; btn.textContent = "Uploading " + licks.length + "…"; }
       var images = [];
       var addAssets = {};
@@ -448,9 +508,14 @@
       window.setSaveStatus("Uploaded " + licks.length + ". Publishing…");
       if (document.body.classList.contains("sections-mode")) window.showSections(true);
     } catch (error) {
-      if (/expired|Connect GitHub|Bad credentials/i.test(error.message || "")) rememberToken("");
-      window.setSaveStatus(error.message || "Batch upload failed.");
-      alert(error.message || "Batch upload failed.");
+      if (/expired|Connect GitHub|Bad credentials/i.test(error.message || "")) {
+        rememberToken("");
+        window.setSaveStatus("GitHub connection expired. Connect again to upload.");
+        showBatchConnect("Your GitHub connection expired or was rejected. Paste a new token to upload your staged crops.");
+      } else {
+        window.setSaveStatus(error.message || "Batch upload failed.");
+        alert(error.message || "Batch upload failed.");
+      }
     } finally {
       if (btn) btn.disabled = false;
       updateBatchButton();
