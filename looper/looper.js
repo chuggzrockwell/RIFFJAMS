@@ -862,7 +862,7 @@
       const c = chipsByCode[code];
       if (!c) return;
       const b = el('button', 'chip ' + (c.tier >= 2 ? 'wash' : 'full'));   // T2 and T3 get the wash art, T1 the full cover
-      const bandArt = bandChipArt(c.album, c.tier);   // another band: that album's cover instead of the Paranoid art
+      const bandArt = bandChipArt(c.album, c.tier);   // the chip's own album cover (Paranoid keeps the full / wash art)
       if (bandArt) b.style.backgroundImage = bandArt;
       b.type = 'button';
       b.dataset.code = code;
@@ -1880,8 +1880,26 @@
      without it, just the songs in the chip folder. Only chips in the chip folder can be added. */
   /* Band switch (rj-band.js): RIFFJAMS links keep ?band=, and another band's chips use their album cover. */
   function bandUrl(u) { return window.rjBandUrl ? window.rjBandUrl(u) : u; }
+  /* Black Sabbath: each chip shows its own album's cover, the one RIFFJAMS uses for that album and
+     tier (same rules as llCoverForAlbumTier in index.html). Paranoid keeps the full / wash art. */
+  function sabbathCover(album, tier) {
+    const t = tier >= 1 && tier <= 2 ? tier : 3;
+    switch (norm(album)) {
+      case 'paranoid': return '';
+      case 'blacksabbath': return 'covers/sabbath-hp.png?v=288';
+      case 'sabbathbloodysabbath': return t >= 3 ? 'covers/sbs-tier3.png?v=5' : 'covers/sbs-ll.png?v=5';
+      case 'masterofreality': return t >= 3 ? 'covers/mor-tier3.png?v=1' : 'covers/mor-ll.png?v=1';
+      case 'vol4': return t >= 3 ? 'covers/vol4-tier3.png?v=2' : 'covers/vol4.png';
+    }
+    const a = albumData().find((x) => x && norm(x.name) === norm(album));
+    if (a && a.cover) return a.cover;
+    return { sabotage: 'covers/sabotage.jpg', technicalecstasy: 'covers/te.jpg', neversaydie: 'covers/nsd.jpg' }[norm(album)] || '';
+  }
   function bandChipArt(album, tier) {
-    if (!window.RJ_BAND || window.RJ_BAND.id === 'sabbath') return '';
+    if (!window.RJ_BAND || window.RJ_BAND.id === 'sabbath') {
+      const cover = sabbathCover(album, tier);
+      return cover ? 'linear-gradient(180deg, rgba(0,0,0,.05) 30%, rgba(0,0,0,.78) 100%), url("../' + cover + '")' : '';
+    }
     const a = albumData().find((x) => x && norm(x.name) === norm(album));
     if (!a || !a.cover) return '';
     const wash = tier >= 2 ? 'linear-gradient(rgba(255,255,255,.28), rgba(255,255,255,.28)), ' : '';
