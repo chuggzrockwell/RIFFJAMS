@@ -863,7 +863,7 @@
       if (!c) return;
       const b = el('button', 'chip ' + (c.tier >= 2 ? 'wash' : 'full'));   // T2 and T3 get the wash art, T1 the full cover
       const bandArt = bandChipArt(c.album, c.tier);   // the chip's own album cover (Paranoid keeps the full / wash art)
-      if (bandArt) b.style.backgroundImage = bandArt;
+      if (bandArt) { b.style.backgroundImage = bandArt; b.style.backgroundPosition = coverPosition(c.album); }
       b.type = 'button';
       b.dataset.code = code;
       if (c.tier === 1) b.classList.add('t1');
@@ -1725,7 +1725,7 @@
       // other albums use the cover RIFFJAMS gives that album and tier.
       const ch = el('div', 'chip ' + (n.cover ? '' : n.tier >= 2 ? 'wash' : 'full'));
       if (n.tier === 1) ch.classList.add('t1');
-      if (n.cover) ch.style.backgroundImage = 'linear-gradient(180deg, rgba(0,0,0,.05) 30%, rgba(0,0,0,.78) 100%), url("../' + n.cover + '")';
+      if (n.cover) { ch.style.backgroundImage = 'linear-gradient(180deg, rgba(0,0,0,.05) 30%, rgba(0,0,0,.78) 100%), url("../' + n.cover + '")'; ch.style.backgroundPosition = coverPosition(n.album); }
       ch.setAttribute('role', 'img');
       ch.setAttribute('aria-label', n.code + ' ' + n.song + (n.album ? ' (' + n.album + ')' : '') + ', tier ' + n.tier);
       const top = el('div', 'row');
@@ -1895,6 +1895,8 @@
     if (a && a.cover) return a.cover;
     return { sabotage: 'covers/sabotage.jpg', technicalecstasy: 'covers/te.jpg', neversaydie: 'covers/nsd.jpg' }[norm(album)] || '';
   }
+  /* Which part of a square cover a wide chip shows. Master of Reality: the top, so "BLACK SABBATH" shows. */
+  function coverPosition(album) { return norm(album) === 'masterofreality' ? 'center top' : ''; }
   function bandChipArt(album, tier) {
     if (!window.RJ_BAND || window.RJ_BAND.id === 'sabbath') {
       const cover = sabbathCover(album, tier);
