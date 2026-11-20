@@ -11278,7 +11278,7 @@ function initPlayboardPage() {
     + '<button type="button" class="sec-play-clear" id="secPlayRandomize" title="Shuffle Board order (Z)">Randomize</button>'
     + '<button type="button" class="sec-play-clear" id="secPlayClear" title="Clear all licks (Shift+C or 0 then Enter)">Clear</button>'
     + '<button type="button" class="sec-play-clear board-rf-toggle" id="boardRefreshToggle" aria-pressed="false" title="Lick refresh mode: new batch every few seconds (R)">Refresh</button>'
-    + '<div class="sec-play-meta" id="secPlayMeta">Solo — album+song|0[.pos|.0 all] + NP Enter</div>'
+    + '<div class="sec-play-meta" id="secPlayMeta">Solo — album·song·position + Enter (0 = all)</div>'
     + '</div>'
     + boardRefreshBarHtml()
     + '<div class="board-player" id="boardPlayer" aria-label="Board player">'
@@ -11295,7 +11295,7 @@ function initPlayboardPage() {
     + '<span class="board-player-time end" id="boardTimeDur">0:00</span>'
     + '</div>'
     + '</div>'
-    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to remove · drag to reorder · album+song|0[.pos|.0 all]+Enter to add.</div></div>'
+    + '<div class="sec-play-board" id="secPlayBoard"><div class="sec-play-empty">Click a card to remove · drag to reorder · album·song·position + Enter to add (0 = all; 200 = whole album).</div></div>'
     + '</aside></div></div>';
   pullPlayQueue();
   trimPlayQueueToFit();
@@ -11390,23 +11390,13 @@ function initPlayboardPage() {
       updateBoardEntryMeta();
       return;
     }
-    /* NP Enter: commit album+song|0[.pos] and display matching Solo licks */
+    /* Enter: commit album·song·position (BOARD_CODE_HELP) and show the matching Solo licks */
     var isNpEnter = e.code === "NumpadEnter" || (e.key === "Enter" && e.location === 3);
     var isEnter = e.key === "Enter" || e.code === "Enter" || isNpEnter;
     if (isEnter) {
       e.preventDefault();
       e.stopImmediatePropagation();
       commitBoardEntry();
-      return;
-    }
-    /* Decimal: album+song.pos (24.3 …) or album+0.pos (20.3 = all songs); .0 = all positions (22.0, 20.0) */
-    var isDot = e.code === "NumpadDecimal" || e.key === "." || e.key === "," || e.code === "Period";
-    if (isDot) {
-      if (!/^[1-8](0|[1-9]|10)$/.test(boardEntryBuf)) return;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      boardEntryBuf += ".";
-      updateBoardEntryMeta();
       return;
     }
     var digit = null;
@@ -11420,24 +11410,15 @@ function initPlayboardPage() {
     if (!digit) return;
     e.preventDefault();
     e.stopImmediatePropagation();
-    /* Buffer: album(1-8) + song(1-10|0=all) + optional .pos(1-5, or .0 = all positions). Bare 0 = clear. */
-    if (!boardEntryBuf) {
-      if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
-    } else if (boardEntryBuf === "0") {
-      if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
-    } else if (/^[1-8]$/.test(boardEntryBuf)) {
-      if (digit >= "1" && digit <= "9") boardEntryBuf += digit;
-      else if (digit === "0") boardEntryBuf += "0"; /* album+0 = all songs on album */
-    } else if (/^[1-8]1$/.test(boardEntryBuf)) {
-      if (digit === "0") boardEntryBuf += "0"; /* song 10 */
-      else if (digit >= "1" && digit <= "8") boardEntryBuf = digit;
-    } else if (/^[1-8]0$/.test(boardEntryBuf) || /^[1-8][2-9]$/.test(boardEntryBuf) || /^[1-8]10$/.test(boardEntryBuf)) {
-      if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
-    } else if (/^[1-8](0|[1-9]|10)\.$/.test(boardEntryBuf)) {
-      if (digit >= "0" && digit <= "5") boardEntryBuf += digit;   /* .0 = every position */
-    } else if (/^[1-8](0|[1-9]|10)\.[0-5]$/.test(boardEntryBuf)) {
-      if (digit === "0" || (digit >= "1" && digit <= "8")) boardEntryBuf = digit;
-    }
+    /* Buffer: album · song · position, 0 = all in any slot (BOARD_CODE_HELP). Song 10 = 4 digits
+       (album, 1, 0, position). A finished code followed by another digit starts a new one. */
+    var b = boardEntryBuf;
+    if (b.length >= 4 || (b.length === 3 && !/^[0-8]10$/.test(b))) b = "";
+    if (b.length === 0) { if (digit <= "8") b = digit; }
+    else if (b.length === 1) b += digit;
+    else if (digit <= "5") b += digit;
+    else b = digit <= "8" ? digit : "";
+    boardEntryBuf = b;
     updateBoardEntryMeta();
   }
   /* One listener only — document+window both in capture double-fired every digit. */
@@ -14616,8 +14597,8 @@ function renderPlayBoard() {
       meta.innerHTML = boardRefreshMetaHtml();
     } else {
       meta.innerHTML = playQueue.length
-        ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · A–E clear class · album+song|0[.pos|.0 all] + Enter · 0 clear")
-        : "Board — album+song|0[.pos|.0 all] + NP Enter · A–E clear class · Z randomize · 0 / Shift+C clear · Esc close";
+        ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · A–E clear class · album·song·position + Enter (0 = all) · 0 clear")
+        : "Board — " + BOARD_CODE_HELP + " · A–E clear class · Z randomize · 0 / Shift+C clear · Esc close";
     }
   }
   if (!visible.length) {
@@ -17701,17 +17682,31 @@ function syncSoloFrettingFromSongChip(songName, pair) {
   if (touched && typeof saveSoloMap === "function") saveSoloMap();
   return touched;
 }
+/* Tab board call-up: type album · song · position, then Enter. 0 = all in that slot.
+   200 = the whole Paranoid album · 211 = War Pigs, position 1 · 203 = Paranoid album, position 3 ·
+   001 = position 1 on every album · 4103 = Vol. 4 song 10, position 3 · 0 alone = clear the board. */
+var BOARD_CODE_HELP = "album·song·position + Enter (0 = all: 200 album, 211 song pos 1, 001 pos 1 everywhere)";
+/** "211" -> {album:"2", song:"1", pos:"1"}; 4 digits for song 10; 2 digits = every position. */
+function boardParseCode(buf) {
+  var m = String(buf || "").match(/^([0-8])(10)([0-5])$/) || String(buf || "").match(/^([0-8])([0-9])([0-5])?$/);
+  if (!m) return null;
+  if (m[1] === "0" && m[2] !== "0") return null;   /* all albums: song must be 0 (all songs) */
+  return { album: m[1], song: m[2], pos: m[3] || "0" };
+}
 function boardEntryLabel(buf) {
   if (!buf) return "";
-  if (buf === "0") return "Clear board";
-  var m = String(buf).match(/^([1-8])(0|[1-9]|10)?(?:\.([0-5])?)?$/);
-  if (!m) return "…";
-  var album = boardAlbumName(m[1]) || ("Album " + m[1]);
-  if (!m[2]) return album + " · song…";
-  var song = (m[2] === "0") ? "all songs" : (boardSongNameAt(album, m[2]) || ("Song " + m[2]));
-  if (m[3] === "") return album + " · " + song + " · pos…";
-  if (m[3] && m[3] !== "0") return album + " · " + song + " · pos " + m[3];
-  return album + " · " + song + " (all positions)";
+  buf = String(buf);
+  if (buf === "0") return "Clear board (or keep typing: 0 = all albums)";
+  var a = buf.charAt(0);
+  var album = a === "0" ? "All albums" : (boardAlbumName(a) || ("Album " + a));
+  if (buf.length === 1) return album + " · song…";
+  var ten = /^[0-8]10/.test(buf) && buf.length === 4;
+  var s = ten ? "10" : buf.charAt(1);
+  var p = ten ? buf.charAt(3) : buf.charAt(2);
+  if (a === "0" && s !== "0") return "All albums: song must be 0 (all songs)";
+  var song = s === "0" ? "all songs" : (boardSongNameAt(album, s) || ("Song " + s));
+  if (!p) return album + " · " + song + " · position… (Enter = all positions)";
+  return album + " · " + song + " · " + (p === "0" ? "all positions" : "position " + p);
 }
 function updateBoardEntryMeta() {
   var meta = document.getElementById("secPlayMeta");
@@ -17725,19 +17720,21 @@ function updateBoardEntryMeta() {
     return;
   }
   meta.innerHTML = playQueue.length
-    ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · A–E clear class · album+song|0[.pos|.0 all] + Enter · 0 clear")
-    : "Board — album+song|0[.pos|.0 all] + NP Enter · A–E clear class · Z randomize · 0 / Shift+C clear · Esc close";
+    ? ("<strong>"+playQueue.length+"</strong> on Board · Z randomize · A–E clear class · album·song·position + Enter (0 = all) · 0 clear")
+    : "Board — " + BOARD_CODE_HELP + " · A–E clear class · Z randomize · 0 / Shift+C clear · Esc close";
 }
 /**
  * Board: queue Solo Map licks for album+song (or songDigit 0 = all songs on album),
- * optional fretting position 1–5 (.0 or no .pos = every position).
+ * fretting position 1–5 (null = every position); albumDigit 0 = every album (songDigit must be 0).
  * .pos = Solo pair[3], else Song Map fretting for same lick id, else code leading digit.
  * Toggle: if every match is already queued, remove them; else add missing.
  */
 function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
-  var albumName = boardAlbumName(albumDigit);
-  if (!albumName) return -1;
+  var allAlbums = String(albumDigit) === "0";
+  var albumName = allAlbums ? "" : boardAlbumName(albumDigit);
+  if (!allAlbums && !albumName) return -1;
   var allSongs = String(songDigit) === "0";
+  if (allAlbums && !allSongs) return -1;
   var songName = allSongs ? "" : boardSongNameAt(albumName, songDigit);
   if (!allSongs && !songName) return -1;
   var wantPos = (posDigit != null && posDigit !== "") ? parseInt(posDigit, 10) : null;
@@ -17746,7 +17743,8 @@ function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
   var songPairs = []; /* [{song, pair}, ...] so song name stays correct per lick */
   var soloAlbums = (typeof SOLO_MAP !== "undefined" && SOLO_MAP && SOLO_MAP.albums) ? SOLO_MAP.albums : [];
   soloAlbums.forEach(function(a){
-    if (!a || a.name !== albumName) return;
+    if (!a) return;
+    if (allAlbums ? BOARD_ALBUM_CHRONO.indexOf(a.name) < 0 : a.name !== albumName) return;
     (a.songs || []).forEach(function(s){
       if (!s) return;
       if (!allSongs && s.song !== songName) return;
@@ -17787,7 +17785,7 @@ function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
   if (!items.length) {
     var meta = document.getElementById("secPlayMeta");
     if (meta) {
-      meta.innerHTML = "<strong>" + boardEntryLabel(String(albumDigit) + String(songDigit) + (wantPos != null ? ("." + wantPos) : "")) + "</strong> — no matching licks";
+      meta.innerHTML = "<strong>" + boardEntryLabel(String(albumDigit) + String(songDigit) + String(wantPos != null ? wantPos : 0)) + "</strong> — no matching licks";
     }
     return 0;
   }
@@ -17813,10 +17811,9 @@ function commitBoardEntry() {
   boardEntryBuf = "";
   if (!buf) return;
   if (buf === "0") { clearPlayQueue(); updateBoardEntryMeta(); return; }
-  /* album + song(1-10) or 0(=all songs) + optional .pos; .0 (or no .pos) = every position */
-  var m = buf.match(/^([1-8])(0|[1-9]|10)(?:\.([0-5]))?$/);
-  if (!m) { updateBoardEntryMeta(); return; }
-  var n = queueAlbumSongPosForBoard(m[1], m[2], (m[3] && m[3] !== "0") ? m[3] : null);
+  var c = boardParseCode(buf);
+  if (!c) { updateBoardEntryMeta(); return; }
+  var n = queueAlbumSongPosForBoard(c.album, c.song, c.pos !== "0" ? c.pos : null);
   if (n !== 0) updateBoardEntryMeta();
   /* n===0: keep the "no matching licks" line from queue */
 }
