@@ -1457,6 +1457,73 @@
       0 0 18px 4px rgba(200,180,220,.5),
       0 0 40px 10px rgba(160,140,190,.25);
   }
+  /* Board glow by fretting position (Jacob): 1 purple, 2 red, 3 green, 4 yellow, 5 blue.
+     Declared after the tier rules so position wins on a card that carries both. */
+  .sec-play-card.pos-1 .face {
+    box-shadow:
+      0 0 6px 1px rgba(163,73,164,.95),
+      0 0 18px 4px rgba(163,73,164,.7),
+      0 0 40px 10px rgba(163,73,164,.4);
+  }
+  .sec-play-card.pos-2 .face {
+    box-shadow:
+      0 0 6px 1px rgba(226,58,58,.95),
+      0 0 18px 4px rgba(226,58,58,.7),
+      0 0 40px 10px rgba(226,58,58,.4);
+  }
+  .sec-play-card.pos-3 .face {
+    box-shadow:
+      0 0 6px 1px rgba(46,194,94,.95),
+      0 0 18px 4px rgba(46,194,94,.7),
+      0 0 40px 10px rgba(46,194,94,.4);
+  }
+  .sec-play-card.pos-4 .face {
+    box-shadow:
+      0 0 6px 1px rgba(234,195,38,.95),
+      0 0 18px 4px rgba(234,195,38,.7),
+      0 0 40px 10px rgba(234,195,38,.4);
+  }
+  .sec-play-card.pos-5 .face {
+    box-shadow:
+      0 0 6px 1px rgba(56,126,225,.95),
+      0 0 18px 4px rgba(56,126,225,.7),
+      0 0 40px 10px rgba(56,126,225,.4);
+  }
+  .sec-play-card.pos-1:active .face,
+  .sec-play-card.pos-1.is-active .face {
+    box-shadow:
+      inset 0 3px 8px rgba(0,0,0,.35),
+      0 0 4px 0 rgba(163,73,164,.55),
+      0 0 10px 2px rgba(163,73,164,.35);
+  }
+  .sec-play-card.pos-2:active .face,
+  .sec-play-card.pos-2.is-active .face {
+    box-shadow:
+      inset 0 3px 8px rgba(0,0,0,.35),
+      0 0 4px 0 rgba(226,58,58,.55),
+      0 0 10px 2px rgba(226,58,58,.35);
+  }
+  .sec-play-card.pos-3:active .face,
+  .sec-play-card.pos-3.is-active .face {
+    box-shadow:
+      inset 0 3px 8px rgba(0,0,0,.35),
+      0 0 4px 0 rgba(46,194,94,.55),
+      0 0 10px 2px rgba(46,194,94,.35);
+  }
+  .sec-play-card.pos-4:active .face,
+  .sec-play-card.pos-4.is-active .face {
+    box-shadow:
+      inset 0 3px 8px rgba(0,0,0,.35),
+      0 0 4px 0 rgba(234,195,38,.55),
+      0 0 10px 2px rgba(234,195,38,.35);
+  }
+  .sec-play-card.pos-5:active .face,
+  .sec-play-card.pos-5.is-active .face {
+    box-shadow:
+      inset 0 3px 8px rgba(0,0,0,.35),
+      0 0 4px 0 rgba(56,126,225,.55),
+      0 0 10px 2px rgba(56,126,225,.35);
+  }
   .sec-play-card img {
     width: auto;
     height: auto;
@@ -10986,7 +11053,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=292";
+  var url = base + "?playboard=1&v=293";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -11015,7 +11082,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=292") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=293") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
@@ -14584,6 +14651,56 @@ function visiblePlayKeys() {
 function boardLickDisplayId(id) {
   return String(id || "").replace(/^(IM|WP|PC|HOD|RS|FOB|EF|P)-/, "");
 }
+/** First fretting base 1-5 in a raw pos list / data-position attribute; null if none. */
+function firstPosBase(raw) {
+  var list = (typeof parsePosList === "function") ? parsePosList(raw) : [];
+  for (var i = 0; i < list.length; i++) {
+    var b = slotBase(list[i]);
+    if (b >= 1 && b <= 5) return b;
+  }
+  return null;
+}
+/** Fretting position for a Board card: Solo Map pair[3], else Song Map fretting, else code digit, else 1. */
+function lickBoardPos(lick, song, code) {
+  var want = String(lick || "").trim();
+  if (want && typeof SOLO_MAP !== "undefined" && SOLO_MAP && SOLO_MAP.albums) {
+    var found = null;
+    SOLO_MAP.albums.forEach(function(a){
+      ((a && a.songs) || []).forEach(function(s){
+        if (!s) return;
+        if (song && s.song !== song) return;
+        (s.licks || []).forEach(function(pair){
+          if (found != null) return;
+          if (typeof isChipPair === "function" && !isChipPair(pair)) return;
+          var sl = String((pair[2] != null && pair[2] !== "") ? pair[2] : (pair[0] || "")).trim();
+          if (sl !== want) return;
+          var ps = boardEntryPositions(pair, s.song || song || "");
+          if (ps && ps.length) found = slotBase(ps[0]);
+        });
+      });
+    });
+    if (found >= 1 && found <= 5) return found;
+  }
+  if (want && song && typeof songMapPosBasesForLick === "function") {
+    var inh = songMapPosBasesForLick(song, want);
+    if (inh && inh.length) {
+      var b = slotBase(inh[0]);
+      if (b >= 1 && b <= 5) return b;
+    }
+  }
+  var g = (typeof soloCodePosGroup === "function") ? soloCodePosGroup(code || want) : null;
+  if (g >= 1 && g <= 5) return g;
+  return 1;
+}
+/** Board card position, resolved and cached on the queue item (older saved queues carry no .pos). */
+function boardItemPos(item) {
+  if (!item) return 1;
+  var p = parseInt(item.pos, 10);
+  if (p >= 1 && p <= 5) return p;
+  p = lickBoardPos(item.lick, item.song, item.code);
+  item.pos = p;
+  return p;
+}
 function renderPlayBoard() {
   if (boardActiveKey && findPlayIndex(boardActiveKey) < 0) boardActiveKey = null;
   var board = document.getElementById("secPlayBoard");
@@ -14608,9 +14725,10 @@ function renderPlayBoard() {
   }
   board.innerHTML = visible.map(function(item){
     var tier = slotBase(normalizeSlot(item.tier, 2));
+    var pos = boardItemPos(item);
     var fullId = item.code || item.lick || "";
     var shortId = boardLickDisplayId(fullId);
-    return '<div class="sec-play-card tier-'+tier+(item.key === boardActiveKey ? " is-active" : "")+'" data-key="'+item.key+'" data-lick="'+fullId+'">'
+    return '<div class="sec-play-card tier-'+tier+' pos-'+pos+(item.key === boardActiveKey ? " is-active" : "")+'" data-key="'+item.key+'" data-lick="'+fullId+'" data-pos="'+pos+'">'
       + '<div class="face">'
       + '<div class="ref">'+shortId+'</div>'
       + '<img src="'+item.src+'" alt="'+fullId+'">'
@@ -14669,6 +14787,7 @@ function togglePlayChip(chip) {
     song: song,
     lick: lick,
     tier: slotBase(normalizeSlot(chip.getAttribute("data-tier"), 2)),
+    pos: firstPosBase(chip.getAttribute("data-position")),
     src: lickSrc(lick)
   });
   trimPlayQueueToFit();
@@ -14835,6 +14954,7 @@ function togglePlayPhrase(el) {
       song: librarySongLabel(),
       lick: name,
       tier: 2,
+      pos: firstPosBase(el.getAttribute("data-position")),
       src: lickSrc(name)
     });
     trimPlayQueueToFit();
@@ -14866,6 +14986,7 @@ function togglePlayPhrase(el) {
     song: librarySongLabel(),
     lick: name,
     tier: 2,
+    pos: firstPosBase(el.getAttribute("data-position")),
     src: src
   });
   trimPlayQueueToFit();
@@ -17779,6 +17900,7 @@ function queueAlbumSongPosForBoard(albumDigit, songDigit, posDigit) {
       song: sn,
       lick: lick,
       tier: (typeof chipTier === "function") ? chipTier(pair) : 2,
+      pos: (wantPos != null ? wantPos : (positions.length ? slotBase(positions[0]) : null)),
       src: lickSrc(lick)
     });
   });
