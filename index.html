@@ -1460,10 +1460,10 @@
   /* Board: fretting position as a solid border (Jacob): 1 purple, 2 red, 3 green, 4 yellow, 5 blue.
      Declared after the tier rules so position wins on a card that carries both. */
   .sec-play-card[data-pos] .face {
-    border: 10px solid #a349a4;
+    border: 10px solid #7030a0;
     box-shadow: none;
   }
-  .sec-play-card.pos-1 .face { border-color: #a349a4; }
+  .sec-play-card.pos-1 .face { border-color: #7030a0; }
   .sec-play-card.pos-2 .face { border-color: #e23a3a; }
   .sec-play-card.pos-3 .face { border-color: #2ec25e; }
   .sec-play-card.pos-4 .face { border-color: #eac326; }
@@ -11001,7 +11001,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=295";
+  var url = base + "?playboard=1&v=296";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -11030,7 +11030,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=295") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=296") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
