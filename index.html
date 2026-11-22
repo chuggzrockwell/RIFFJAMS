@@ -1460,7 +1460,7 @@
   /* Board: fretting position as a solid border (Jacob): 1 purple, 2 red, 3 green, 4 yellow, 5 blue.
      Declared after the tier rules so position wins on a card that carries both. */
   .sec-play-card[data-pos] .face {
-    border: 3px solid #a349a4;
+    border: 10px solid #a349a4;
     box-shadow: none;
   }
   .sec-play-card.pos-1 .face { border-color: #a349a4; }
@@ -11001,7 +11001,7 @@ function pullPlayQueue() {
 }
 function openPlayWindow() {
   var base = location.href.split("?")[0].split("#")[0];
-  var url = base + "?playboard=1&v=294";
+  var url = base + "?playboard=1&v=295";
   /* Centered popup window (not a tab) — no LL resize/move */
   var availL = (window.screen && typeof screen.availLeft === "number") ? screen.availLeft : 0;
   var availT = (window.screen && typeof screen.availTop === "number") ? screen.availTop : 0;
@@ -11030,7 +11030,7 @@ function openPlayWindow() {
     return null;
   }
   try {
-    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=294") < 0) {
+    if (w.location && w.location.href && w.location.href.indexOf("playboard=1") >= 0 && w.location.href.indexOf("v=295") < 0) {
       w.location.href = url;
     }
   } catch (e) {}
