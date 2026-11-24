@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T17:52:43.803Z",
+  "updatedAt": "2026-11-24T18:25:41.189Z",
   "assets": {
     "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
     "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
@@ -11,7 +11,13 @@
     "WIAW-V1": "user-tabs/zeppelin/WIAW-V1.png",
     "WIAW-C1": "user-tabs/zeppelin/WIAW-C1.png",
     "WIAW-C2": "user-tabs/zeppelin/WIAW-C2.png",
-    "WIAW-O1": "user-tabs/zeppelin/WIAW-O1.png"
+    "WIAW-O1": "user-tabs/zeppelin/WIAW-O1.png",
+    "HB-I1": "user-tabs/zeppelin/HB-I1.png",
+    "HB-V1": "user-tabs/zeppelin/HB-V1.png",
+    "HB-V2": "user-tabs/zeppelin/HB-V2.png",
+    "HB-B1": "user-tabs/zeppelin/HB-B1.png",
+    "HB-B2": "user-tabs/zeppelin/HB-B2.png",
+    "HB-B3": "user-tabs/zeppelin/HB-B3.png"
   },
   "minClientVersion": 2,
   "albums": [
@@ -143,7 +149,39 @@
         },
         {
           "song": "Heartbreaker",
-          "sections": []
+          "sections": [
+            [
+              "I1",
+              1,
+              "HB-I1",
+              "1O"
+            ],
+            [
+              "V1",
+              3,
+              "HB-V1"
+            ],
+            [
+              "V2",
+              3,
+              "HB-V2"
+            ],
+            [
+              "B1",
+              1,
+              "HB-B1"
+            ],
+            [
+              "B2",
+              3,
+              "HB-B2"
+            ],
+            [
+              "B3",
+              2,
+              "HB-B3"
+            ]
+          ]
         },
         {
           "song": "Living Loving Maid (She's Just a Woman)",
@@ -736,7 +774,64 @@
           },
           {
             "song": "Heartbreaker",
-            "chips": []
+            "chips": [
+              [
+                "i1",
+                1,
+                "HB-I1",
+                "1O",
+                0
+              ],
+              [
+                "V1",
+                3,
+                "HB-V1",
+                [],
+                null
+              ],
+              [
+                "V2",
+                3,
+                "HB-V2",
+                [],
+                null
+              ],
+              [
+                "i1",
+                1,
+                "HB-I1",
+                "1O",
+                0
+              ],
+              [
+                "V2",
+                3,
+                "HB-V2",
+                [],
+                null
+              ],
+              [
+                "B1",
+                1,
+                "HB-B1",
+                [],
+                null
+              ],
+              [
+                "B2",
+                3,
+                "HB-B2",
+                [],
+                null
+              ],
+              [
+                "B3",
+                2,
+                "HB-B3",
+                [],
+                null
+              ]
+            ]
           },
           {
             "song": "Living Loving Maid (She's Just a Woman)",
@@ -1224,6 +1319,31 @@
           "stop": 273.7,
           "duration": 62.5,
           "lick": "WIAW-O1"
+        }
+      ]
+    },
+    {
+      "album": "Led Zeppelin II",
+      "song": "Heartbreaker",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "i1",
+          "tier": 1,
+          "start": 0,
+          "stop": 0,
+          "duration": null,
+          "lick": "HB-I1"
+        },
+        {
+          "code": "i1",
+          "tier": 1,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "HB-I1"
         }
       ]
     }
