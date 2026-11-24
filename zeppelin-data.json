@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T17:40:16.104Z",
+  "updatedAt": "2026-11-24T17:40:20.983Z",
   "assets": {
     "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
     "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
@@ -568,7 +568,7 @@
                 "end": 7
               },
               {
-                "name": "Section",
+                "name": "OUTRO",
                 "start": 8,
                 "end": 8
               }
