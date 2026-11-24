@@ -1073,6 +1073,37 @@
     });
   }
 
+  function hasChipContent(song) {
+    return Object.keys(CHIP_FIELDS).some(function (f) {
+      return (Array.isArray(song && song[f]) ? song[f] : []).some(function (p) { return Array.isArray(p) && p[0]; });
+    });
+  }
+  /** Rescue edits a pre-seeding sync threw away: before the data file could hold a band's albums,
+   *  each sync "succeeded" against albums: [] and cleared its pending flag, leaving the chips in
+   *  this browser only. Any song this browser has chips for that the repo does not list at all is
+   *  flagged pending again, against an empty base so the merge keeps the local chips. */
+  function reflagUnrepoedSongs(data, pend) {
+    var raw = {
+      albums: Array.isArray(data.albums) ? data.albums : [],
+      solo: (data.soloMap && data.soloMap.albums) || [],
+      arr: (data.arrangementMap && data.arrangementMap.albums) || []
+    };
+    var m = currentMaps();
+    var changed = false;
+    [["albums", m.albums], ["solo", m.solo], ["arr", m.arr]].forEach(function (row) {
+      var k = row[0];
+      mapSongs(row[1], function (a, s) {
+        var key = songKeyOf(a, s);
+        if (pend[k][key] || !hasChipContent(s) || findSong(raw[k], key)) return;
+        var baseStr = JSON.stringify(songSkeleton(s));
+        pend[k][key] = baseStr;
+        if (tabBase) tabBase[k][key] = baseStr;
+        changed = true;
+      });
+    });
+    if (changed) writePending(pend);
+  }
+
   /** Repo is the source of truth. Local copies only win for songs this browser edited and has
    *  not synced yet (riffjams-pending-sync-v1); everything else comes from riffjams-data.json. */
   async function loadSharedData() {
@@ -1144,6 +1175,7 @@
           if (s) tabBase[k][key] = (typeof pend[k][key] === "string") ? pend[k][key] : "__pending__";
         });
       });
+      reflagUnrepoedSongs(data, pend);
       if (document.body.classList.contains("sections-mode")) window.showSections(true);
       if (document.body.classList.contains("sheet-mode") && window.currentLetter) window.showSeries(window.currentLetter);
     } catch (e) {
