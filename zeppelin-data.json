@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T17:40:20.983Z",
+  "updatedAt": "2026-11-24T17:40:35.749Z",
   "assets": {
     "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
     "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
@@ -85,8 +85,7 @@
             [
               "O1",
               3,
-              "WLL-O1",
-              []
+              "WLL-O1"
             ],
             [
               "V2",
@@ -532,7 +531,9 @@
               [
                 "O1",
                 3,
-                "WLL-O1"
+                "WLL-O1",
+                1,
+                238.2
               ],
               [
                 "V2",
@@ -898,7 +899,7 @@
       "song": "Whole Lotta Love",
       "endSec": null,
       "complete": false,
-      "riffSaturationIndex": 1.973,
+      "riffSaturationIndex": 1.974,
       "chips": [
         {
           "code": "V1",
@@ -960,9 +961,17 @@
           "code": "C1",
           "tier": 2,
           "start": 227.9,
+          "stop": 238.2,
+          "duration": 10.3,
+          "lick": "WLL-C1"
+        },
+        {
+          "code": "O1",
+          "tier": 3,
+          "start": 238.2,
           "stop": null,
           "duration": null,
-          "lick": "WLL-C1"
+          "lick": "WLL-O1"
         }
       ]
     }
