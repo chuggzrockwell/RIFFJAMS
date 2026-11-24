@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T15:57:57.558Z",
+  "updatedAt": "2026-11-24T17:38:02.381Z",
   "assets": {
     "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
     "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
@@ -480,7 +480,8 @@
                 "V1",
                 1,
                 "WLL-V1",
-                4
+                4,
+                0
               ],
               [
                 "C1",
@@ -853,5 +854,23 @@
       }
     ]
   },
-  "arrangementTimings": []
+  "arrangementTimings": [
+    {
+      "album": "Led Zeppelin II",
+      "song": "Whole Lotta Love",
+      "endSec": null,
+      "complete": false,
+      "riffSaturationIndex": null,
+      "chips": [
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 0,
+          "stop": null,
+          "duration": null,
+          "lick": "WLL-V1"
+        }
+      ]
+    }
+  ]
 }
