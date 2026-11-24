@@ -671,7 +671,50 @@
       if (done) return;
       var albumName = key.split("|")[0];
       var album = (targetAlbums || []).filter(function (a) { return albumKey(a) === albumName; })[0];
+      /* A band whose data file is still empty (new band section) has no album to append to:
+         create it from the local album's own metadata, or the edit would be silently dropped. */
+      if (!album && targetAlbums) {
+        var src = findAlbumOf(localAlbums, albumName);
+        album = { name: albumName, songs: [] };
+        if (src) {
+          if (src.cover) album.cover = src.cover;
+          if (src.font) album.font = src.font;
+          if (src.tuning) album.tuning = src.tuning;
+        }
+        targetAlbums.push(album);
+      }
       if (album) (album.songs || (album.songs = [])).push(clone(local));
+    });
+  }
+  function findAlbumOf(albums, name) {
+    return (albums || []).filter(function (a) { return albumKey(a) === name; })[0] || null;
+  }
+  /** The song as the repo should first see it: its own fields, every chip list empty. */
+  function songSkeleton(song) {
+    var out = clone(song);
+    Object.keys(CHIP_FIELDS).forEach(function (f) { if (Array.isArray(out[f])) out[f] = []; });
+    return out;
+  }
+  /** Add albums/songs the repo copy does not list yet (empty), so an overlay has a place to land. */
+  function seedMissingAlbums(targetAlbums, localAlbums) {
+    if (!targetAlbums || !localAlbums) return;
+    localAlbums.forEach(function (a) {
+      var name = albumKey(a);
+      if (!name) return;
+      var t = findAlbumOf(targetAlbums, name);
+      if (!t) {
+        t = { name: a.name, songs: [] };
+        if (a.cover) t.cover = a.cover;
+        if (a.font) t.font = a.font;
+        if (a.tuning) t.tuning = a.tuning;
+        targetAlbums.push(t);
+      }
+      if (!Array.isArray(t.songs)) t.songs = [];
+      (a.songs || []).forEach(function (s) {
+        if (!s || !s.song) return;
+        var has = t.songs.some(function (x) { return x && x.song === s.song; });
+        if (!has) t.songs.push(songSkeleton(s));
+      });
     });
   }
   function timingKey(t) { return String((t && t.album) || "") + "|" + String((t && t.song) || ""); }
@@ -718,6 +761,12 @@
       manifest.soloMap.albums = manifest.soloMap.albums || [];
       manifest.arrangementMap = manifest.arrangementMap || { albums: [] };
       manifest.arrangementMap.albums = manifest.arrangementMap.albums || [];
+      /* A band whose data file does not list an album/song yet (a new band section starts with
+         albums: []) gives overlayMerged nothing to merge into, so its edits were dropped on every
+         sync. Seed the missing albums/songs empty first; the overlay then fills in what changed. */
+      seedMissingAlbums(manifest.albums, m.albums);
+      seedMissingAlbums(manifest.soloMap.albums, m.solo);
+      seedMissingAlbums(manifest.arrangementMap.albums, m.arr);
       overlayMerged(manifest.albums, m.albums, pend.albums, tabBase && tabBase.albums);
       overlayMerged(manifest.soloMap.albums, m.solo, pend.solo, tabBase && tabBase.solo);
       if (typeof window.purgeRetiredSoloLicksFromAlbums === "function") {
