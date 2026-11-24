@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T17:41:00.099Z",
+  "updatedAt": "2026-11-24T17:41:04.986Z",
   "assets": {
     "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
     "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
@@ -542,11 +542,7 @@
                 4,
                 267.9
               ],
-              [
-                "B1",
-                3,
-                "WLL-B1"
-              ]
+              null
             ],
             "sectionRulers": [
               {
