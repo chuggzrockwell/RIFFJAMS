@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T17:52:10.679Z",
+  "updatedAt": "2026-11-24T17:52:43.803Z",
   "assets": {
     "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
     "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
@@ -694,7 +694,8 @@
                 2,
                 "WIAW-O1",
                 [],
-                211.2
+                211.2,
+                273.7
               ]
             ],
             "sectionRulers": [
@@ -1132,9 +1133,9 @@
     {
       "album": "Led Zeppelin II",
       "song": "What Is and What Should Never Be",
-      "endSec": null,
-      "complete": false,
-      "riffSaturationIndex": 1.167,
+      "endSec": 273.7,
+      "complete": true,
+      "riffSaturationIndex": 1.357,
       "chips": [
         {
           "code": "V1",
@@ -1220,8 +1221,8 @@
           "code": "O1",
           "tier": 2,
           "start": 211.2,
-          "stop": null,
-          "duration": null,
+          "stop": 273.7,
+          "duration": 62.5,
           "lick": "WIAW-O1"
         }
       ]
