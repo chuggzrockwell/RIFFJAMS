@@ -1,6 +1,21 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-16T00:00:00.000Z",
-  "assets": {},
-  "minClientVersion": 2
+  "updatedAt": "2026-11-24T15:44:37.368Z",
+  "assets": {
+    "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
+    "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
+    "WWL-V1": "user-tabs/zeppelin/WWL-V1.png",
+    "WWL-S1": "user-tabs/zeppelin/WWL-S1.png",
+    "WLL-V2": "user-tabs/zeppelin/WLL-V2.png",
+    "WLL-O1": "user-tabs/zeppelin/WLL-O1.png"
+  },
+  "minClientVersion": 2,
+  "albums": [],
+  "soloMap": {
+    "albums": []
+  },
+  "arrangementMap": {
+    "albums": []
+  },
+  "arrangementTimings": []
 }
