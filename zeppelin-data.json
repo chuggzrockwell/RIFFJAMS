@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T17:41:16.773Z",
+  "updatedAt": "2026-11-24T17:41:50.037Z",
   "assets": {
     "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
     "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
@@ -575,7 +575,14 @@
           },
           {
             "song": "What Is and What Should Never Be",
-            "chips": []
+            "chips": [],
+            "sectionRulers": [
+              {
+                "name": "VERSE",
+                "start": 0,
+                "end": 1
+              }
+            ]
           },
           {
             "song": "The Lemon Song",
