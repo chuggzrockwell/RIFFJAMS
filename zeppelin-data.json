@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T15:46:59.098Z",
+  "updatedAt": "2026-11-24T15:57:32.753Z",
   "assets": {
     "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
     "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
@@ -10,12 +10,823 @@
     "WLL-O1": "user-tabs/zeppelin/WLL-O1.png"
   },
   "minClientVersion": 2,
-  "albums": [],
+  "albums": [
+    {
+      "name": "Led Zeppelin I",
+      "songs": [
+        {
+          "song": "Good Times Bad Times",
+          "sections": []
+        },
+        {
+          "song": "Babe I'm Gonna Leave You",
+          "sections": []
+        },
+        {
+          "song": "You Shook Me",
+          "sections": []
+        },
+        {
+          "song": "Dazed and Confused",
+          "sections": []
+        },
+        {
+          "song": "Your Time Is Gonna Come",
+          "sections": []
+        },
+        {
+          "song": "Black Mountain Side",
+          "sections": [],
+          "tuning": "DADGAD"
+        },
+        {
+          "song": "Communication Breakdown",
+          "sections": []
+        },
+        {
+          "song": "I Can't Quit You Baby",
+          "sections": []
+        },
+        {
+          "song": "How Many More Times",
+          "sections": []
+        }
+      ],
+      "cover": "covers/zeppelin/lz1.jpg?v=1",
+      "font": "font-paranoid"
+    },
+    {
+      "name": "Led Zeppelin II",
+      "songs": [
+        {
+          "song": "Whole Lotta Love",
+          "sections": [
+            [
+              "V1",
+              1,
+              "WLL-V1",
+              4
+            ],
+            [
+              "C1",
+              2,
+              "WLL-C1",
+              []
+            ],
+            [
+              "B1",
+              3,
+              "WLL-B1",
+              []
+            ],
+            [
+              "S1",
+              1,
+              "WLL-S1",
+              []
+            ],
+            [
+              "O1",
+              3,
+              "WLL-O1",
+              []
+            ],
+            [
+              "V2",
+              1,
+              "WLL-V2",
+              4
+            ]
+          ]
+        },
+        {
+          "song": "What Is and What Should Never Be",
+          "sections": []
+        },
+        {
+          "song": "The Lemon Song",
+          "sections": []
+        },
+        {
+          "song": "Thank You",
+          "sections": []
+        },
+        {
+          "song": "Heartbreaker",
+          "sections": []
+        },
+        {
+          "song": "Living Loving Maid (She's Just a Woman)",
+          "sections": []
+        },
+        {
+          "song": "Ramble On",
+          "sections": []
+        },
+        {
+          "song": "Moby Dick",
+          "sections": []
+        },
+        {
+          "song": "Bring It On Home",
+          "sections": []
+        }
+      ],
+      "cover": "covers/zeppelin/lz2.jpg?v=1",
+      "font": "font-sbs"
+    },
+    {
+      "name": "Led Zeppelin III",
+      "songs": [
+        {
+          "song": "Immigrant Song",
+          "sections": []
+        },
+        {
+          "song": "Friends",
+          "sections": [],
+          "tuning": "CACGCE"
+        },
+        {
+          "song": "Celebration Day",
+          "sections": []
+        },
+        {
+          "song": "Since I've Been Loving You",
+          "sections": []
+        },
+        {
+          "song": "Out on the Tiles",
+          "sections": []
+        },
+        {
+          "song": "Gallows Pole",
+          "sections": []
+        },
+        {
+          "song": "Tangerine",
+          "sections": []
+        },
+        {
+          "song": "That's the Way",
+          "sections": [],
+          "tuning": "DGDGBD"
+        },
+        {
+          "song": "Bron-Y-Aur Stomp",
+          "sections": [],
+          "tuning": "CFCFAC"
+        },
+        {
+          "song": "Hats Off to (Roy) Harper",
+          "sections": []
+        }
+      ],
+      "cover": "covers/zeppelin/lz3.jpg?v=1",
+      "font": "font-vol4"
+    },
+    {
+      "name": "Led Zeppelin IV",
+      "songs": [
+        {
+          "song": "Black Dog",
+          "sections": []
+        },
+        {
+          "song": "Rock and Roll",
+          "sections": []
+        },
+        {
+          "song": "The Battle of Evermore",
+          "sections": []
+        },
+        {
+          "song": "Stairway to Heaven",
+          "sections": []
+        },
+        {
+          "song": "Misty Mountain Hop",
+          "sections": []
+        },
+        {
+          "song": "Four Sticks",
+          "sections": []
+        },
+        {
+          "song": "Going to California",
+          "sections": [],
+          "tuning": "DGDGBD"
+        },
+        {
+          "song": "When the Levee Breaks",
+          "sections": []
+        }
+      ],
+      "cover": "covers/zeppelin/lz4.jpg?v=1",
+      "font": "font-mor"
+    },
+    {
+      "name": "Houses of the Holy",
+      "songs": [
+        {
+          "song": "The Song Remains the Same",
+          "sections": []
+        },
+        {
+          "song": "The Rain Song",
+          "sections": [],
+          "tuning": "DGCDGD"
+        },
+        {
+          "song": "Over the Hills and Far Away",
+          "sections": []
+        },
+        {
+          "song": "The Crunge",
+          "sections": []
+        },
+        {
+          "song": "Dancing Days",
+          "sections": []
+        },
+        {
+          "song": "D'yer Mak'er",
+          "sections": []
+        },
+        {
+          "song": "No Quarter",
+          "sections": []
+        },
+        {
+          "song": "The Ocean",
+          "sections": []
+        }
+      ],
+      "cover": "covers/zeppelin/hoth.jpg?v=1",
+      "font": "font-sabotage"
+    },
+    {
+      "name": "Physical Graffiti",
+      "songs": [
+        {
+          "song": "Houses of the Holy",
+          "sections": []
+        },
+        {
+          "song": "Trampled Under Foot",
+          "sections": []
+        },
+        {
+          "song": "Kashmir",
+          "sections": [],
+          "tuning": "DADGAD"
+        },
+        {
+          "song": "In the Light",
+          "sections": []
+        },
+        {
+          "song": "Bron-Yr-Aur",
+          "sections": []
+        },
+        {
+          "song": "Down by the Seaside",
+          "sections": []
+        },
+        {
+          "song": "Ten Years Gone",
+          "sections": []
+        },
+        {
+          "song": "Night Flight",
+          "sections": []
+        },
+        {
+          "song": "The Wanton Song",
+          "sections": []
+        },
+        {
+          "song": "Boogie with Stu",
+          "sections": []
+        },
+        {
+          "song": "Black Country Woman",
+          "sections": []
+        },
+        {
+          "song": "Sick Again",
+          "sections": []
+        }
+      ],
+      "cover": "covers/zeppelin/pg.jpg?v=1",
+      "font": "font-te"
+    },
+    {
+      "name": "Presence",
+      "songs": [
+        {
+          "song": "Achilles Last Stand",
+          "sections": []
+        },
+        {
+          "song": "Nobody's Fault but Mine",
+          "sections": []
+        }
+      ],
+      "cover": "covers/zeppelin/presence.jpg?v=1",
+      "font": "font-paranoid"
+    },
+    {
+      "name": "In Through the Out Door",
+      "songs": [
+        {
+          "song": "In the Evening",
+          "sections": []
+        },
+        {
+          "song": "South Bound Saurez",
+          "sections": []
+        },
+        {
+          "song": "Fool in the Rain",
+          "sections": []
+        },
+        {
+          "song": "Hot Dog",
+          "sections": []
+        },
+        {
+          "song": "Carouselambra",
+          "sections": []
+        },
+        {
+          "song": "All My Love",
+          "sections": []
+        },
+        {
+          "song": "I'm Gonna Crawl",
+          "sections": []
+        }
+      ],
+      "cover": "covers/zeppelin/itod.jpg?v=1",
+      "font": "font-sbs"
+    },
+    {
+      "name": "Coda",
+      "songs": [
+        {
+          "song": "We're Gonna Groove",
+          "sections": []
+        },
+        {
+          "song": "Poor Tom",
+          "sections": []
+        },
+        {
+          "song": "I Can't Quit You Baby (Coda)",
+          "sections": []
+        },
+        {
+          "song": "Walter's Walk",
+          "sections": []
+        },
+        {
+          "song": "Ozone Baby",
+          "sections": []
+        },
+        {
+          "song": "Darlene",
+          "sections": []
+        },
+        {
+          "song": "Bonzo's Montreux",
+          "sections": []
+        },
+        {
+          "song": "Wearing and Tearing",
+          "sections": []
+        }
+      ],
+      "cover": "covers/zeppelin/coda.jpg?v=1",
+      "font": "font-vol4"
+    },
+    {
+      "name": "Rarities",
+      "songs": [
+        {
+          "song": "Hey Hey What Can I Do",
+          "sections": []
+        }
+      ],
+      "cover": "covers/zeppelin/rarities.jpg?v=1",
+      "font": "font-te"
+    }
+  ],
   "soloMap": {
     "albums": []
   },
   "arrangementMap": {
-    "albums": []
+    "albums": [
+      {
+        "name": "Led Zeppelin I",
+        "songs": [
+          {
+            "song": "Good Times Bad Times",
+            "chips": []
+          },
+          {
+            "song": "Babe I'm Gonna Leave You",
+            "chips": []
+          },
+          {
+            "song": "You Shook Me",
+            "chips": []
+          },
+          {
+            "song": "Dazed and Confused",
+            "chips": []
+          },
+          {
+            "song": "Your Time Is Gonna Come",
+            "chips": []
+          },
+          {
+            "song": "Black Mountain Side",
+            "chips": []
+          },
+          {
+            "song": "Communication Breakdown",
+            "chips": []
+          },
+          {
+            "song": "I Can't Quit You Baby",
+            "chips": []
+          },
+          {
+            "song": "How Many More Times",
+            "chips": []
+          }
+        ],
+        "cover": "covers/zeppelin/lz1.jpg?v=1",
+        "font": "font-paranoid"
+      },
+      {
+        "name": "Led Zeppelin II",
+        "songs": [
+          {
+            "song": "Whole Lotta Love",
+            "chips": [
+              [
+                "V1",
+                1,
+                "WLL-V1",
+                4
+              ],
+              [
+                "C1",
+                2,
+                "WLL-C1"
+              ],
+              [
+                "B1",
+                3,
+                "WLL-B1"
+              ],
+              [
+                "S1",
+                1,
+                "WLL-S1"
+              ],
+              [
+                "O1",
+                3,
+                "WLL-O1"
+              ],
+              [
+                "V2",
+                1,
+                "WLL-V2",
+                4
+              ]
+            ]
+          },
+          {
+            "song": "What Is and What Should Never Be",
+            "chips": []
+          },
+          {
+            "song": "The Lemon Song",
+            "chips": []
+          },
+          {
+            "song": "Thank You",
+            "chips": []
+          },
+          {
+            "song": "Heartbreaker",
+            "chips": []
+          },
+          {
+            "song": "Living Loving Maid (She's Just a Woman)",
+            "chips": []
+          },
+          {
+            "song": "Ramble On",
+            "chips": []
+          },
+          {
+            "song": "Moby Dick",
+            "chips": []
+          },
+          {
+            "song": "Bring It On Home",
+            "chips": []
+          }
+        ],
+        "cover": "covers/zeppelin/lz2.jpg?v=1",
+        "font": "font-sbs"
+      },
+      {
+        "name": "Led Zeppelin III",
+        "songs": [
+          {
+            "song": "Immigrant Song",
+            "chips": []
+          },
+          {
+            "song": "Friends",
+            "chips": []
+          },
+          {
+            "song": "Celebration Day",
+            "chips": []
+          },
+          {
+            "song": "Since I've Been Loving You",
+            "chips": []
+          },
+          {
+            "song": "Out on the Tiles",
+            "chips": []
+          },
+          {
+            "song": "Gallows Pole",
+            "chips": []
+          },
+          {
+            "song": "Tangerine",
+            "chips": []
+          },
+          {
+            "song": "That's the Way",
+            "chips": []
+          },
+          {
+            "song": "Bron-Y-Aur Stomp",
+            "chips": []
+          },
+          {
+            "song": "Hats Off to (Roy) Harper",
+            "chips": []
+          }
+        ],
+        "cover": "covers/zeppelin/lz3.jpg?v=1",
+        "font": "font-vol4"
+      },
+      {
+        "name": "Led Zeppelin IV",
+        "songs": [
+          {
+            "song": "Black Dog",
+            "chips": []
+          },
+          {
+            "song": "Rock and Roll",
+            "chips": []
+          },
+          {
+            "song": "The Battle of Evermore",
+            "chips": []
+          },
+          {
+            "song": "Stairway to Heaven",
+            "chips": []
+          },
+          {
+            "song": "Misty Mountain Hop",
+            "chips": []
+          },
+          {
+            "song": "Four Sticks",
+            "chips": []
+          },
+          {
+            "song": "Going to California",
+            "chips": []
+          },
+          {
+            "song": "When the Levee Breaks",
+            "chips": []
+          }
+        ],
+        "cover": "covers/zeppelin/lz4.jpg?v=1",
+        "font": "font-mor"
+      },
+      {
+        "name": "Houses of the Holy",
+        "songs": [
+          {
+            "song": "The Song Remains the Same",
+            "chips": []
+          },
+          {
+            "song": "The Rain Song",
+            "chips": []
+          },
+          {
+            "song": "Over the Hills and Far Away",
+            "chips": []
+          },
+          {
+            "song": "The Crunge",
+            "chips": []
+          },
+          {
+            "song": "Dancing Days",
+            "chips": []
+          },
+          {
+            "song": "D'yer Mak'er",
+            "chips": []
+          },
+          {
+            "song": "No Quarter",
+            "chips": []
+          },
+          {
+            "song": "The Ocean",
+            "chips": []
+          }
+        ],
+        "cover": "covers/zeppelin/hoth.jpg?v=1",
+        "font": "font-sabotage"
+      },
+      {
+        "name": "Physical Graffiti",
+        "songs": [
+          {
+            "song": "Houses of the Holy",
+            "chips": []
+          },
+          {
+            "song": "Trampled Under Foot",
+            "chips": []
+          },
+          {
+            "song": "Kashmir",
+            "chips": []
+          },
+          {
+            "song": "In the Light",
+            "chips": []
+          },
+          {
+            "song": "Bron-Yr-Aur",
+            "chips": []
+          },
+          {
+            "song": "Down by the Seaside",
+            "chips": []
+          },
+          {
+            "song": "Ten Years Gone",
+            "chips": []
+          },
+          {
+            "song": "Night Flight",
+            "chips": []
+          },
+          {
+            "song": "The Wanton Song",
+            "chips": []
+          },
+          {
+            "song": "Boogie with Stu",
+            "chips": []
+          },
+          {
+            "song": "Black Country Woman",
+            "chips": []
+          },
+          {
+            "song": "Sick Again",
+            "chips": []
+          }
+        ],
+        "cover": "covers/zeppelin/pg.jpg?v=1",
+        "font": "font-te"
+      },
+      {
+        "name": "Presence",
+        "songs": [
+          {
+            "song": "Achilles Last Stand",
+            "chips": []
+          },
+          {
+            "song": "Nobody's Fault but Mine",
+            "chips": []
+          }
+        ],
+        "cover": "covers/zeppelin/presence.jpg?v=1",
+        "font": "font-paranoid"
+      },
+      {
+        "name": "In Through the Out Door",
+        "songs": [
+          {
+            "song": "In the Evening",
+            "chips": []
+          },
+          {
+            "song": "South Bound Saurez",
+            "chips": []
+          },
+          {
+            "song": "Fool in the Rain",
+            "chips": []
+          },
+          {
+            "song": "Hot Dog",
+            "chips": []
+          },
+          {
+            "song": "Carouselambra",
+            "chips": []
+          },
+          {
+            "song": "All My Love",
+            "chips": []
+          },
+          {
+            "song": "I'm Gonna Crawl",
+            "chips": []
+          }
+        ],
+        "cover": "covers/zeppelin/itod.jpg?v=1",
+        "font": "font-sbs"
+      },
+      {
+        "name": "Coda",
+        "songs": [
+          {
+            "song": "We're Gonna Groove",
+            "chips": []
+          },
+          {
+            "song": "Poor Tom",
+            "chips": []
+          },
+          {
+            "song": "I Can't Quit You Baby (Coda)",
+            "chips": []
+          },
+          {
+            "song": "Walter's Walk",
+            "chips": []
+          },
+          {
+            "song": "Ozone Baby",
+            "chips": []
+          },
+          {
+            "song": "Darlene",
+            "chips": []
+          },
+          {
+            "song": "Bonzo's Montreux",
+            "chips": []
+          },
+          {
+            "song": "Wearing and Tearing",
+            "chips": []
+          }
+        ],
+        "cover": "covers/zeppelin/coda.jpg?v=1",
+        "font": "font-vol4"
+      },
+      {
+        "name": "Rarities",
+        "songs": [
+          {
+            "song": "Hey Hey What Can I Do",
+            "chips": []
+          }
+        ],
+        "cover": "covers/zeppelin/rarities.jpg?v=1",
+        "font": "font-te"
+      }
+    ]
   },
   "arrangementTimings": []
 }
