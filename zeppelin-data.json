@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T17:39:11.094Z",
+  "updatedAt": "2026-11-24T17:39:18.158Z",
   "assets": {
     "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
     "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
@@ -516,11 +516,17 @@
                 185
               ],
               [
+                "V1",
+                1,
+                "WLL-V1",
+                4,
+                46.4
+              ],
+              [
                 "B1",
                 3,
                 "WLL-B1"
               ],
-              null,
               [
                 "O1",
                 3,
@@ -543,6 +549,11 @@
                 "name": "verse 2",
                 "start": 2,
                 "end": 3
+              },
+              {
+                "name": "bRIDGE",
+                "start": 4,
+                "end": 5
               }
             ]
           },
@@ -887,6 +898,14 @@
           "stop": 46.4,
           "duration": 12,
           "lick": "WLL-C1"
+        },
+        {
+          "code": "V1",
+          "tier": 1,
+          "start": 46.4,
+          "stop": 46.4,
+          "duration": null,
+          "lick": "WLL-V1"
         },
         {
           "code": "V1",
