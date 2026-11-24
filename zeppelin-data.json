@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T17:38:28.907Z",
+  "updatedAt": "2026-11-24T17:38:39.288Z",
   "assets": {
     "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
     "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
@@ -75,8 +75,7 @@
             [
               "B1",
               3,
-              "WLL-B1",
-              []
+              "WLL-B1"
             ],
             [
               "S1",
@@ -503,7 +502,11 @@
                 1,
                 69.5
               ],
-              null,
+              [
+                "B1",
+                3,
+                "WLL-B1"
+              ],
               null,
               [
                 "B1",
