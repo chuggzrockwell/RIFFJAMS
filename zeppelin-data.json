@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-24T17:41:50.037Z",
+  "updatedAt": "2026-11-24T17:41:54.130Z",
   "assets": {
     "WLL-V1": "user-tabs/zeppelin/WLL-V1.png",
     "WWL-C1": "user-tabs/zeppelin/WWL-C1.png",
@@ -578,7 +578,7 @@
             "chips": [],
             "sectionRulers": [
               {
-                "name": "VERSE",
+                "name": "VERSE 1",
                 "start": 0,
                 "end": 1
               }
