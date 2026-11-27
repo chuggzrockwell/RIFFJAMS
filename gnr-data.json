@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-11-16T15:54:45.000Z",
+  "updatedAt": "2026-11-27T20:23:37.185Z",
   "assets": {},
   "albums": [
     {
@@ -1579,7 +1579,7 @@
                 3,
                 "WTTJ-V1",
                 [],
-                45.65
+                45.7
               ],
               [
                 "C1",
@@ -2673,16 +2673,16 @@
           "code": "I2",
           "tier": 2,
           "start": 24.26,
-          "stop": 45.65,
-          "duration": 21.39,
+          "stop": 45.7,
+          "duration": 21.44,
           "lick": "WTTJ-I2"
         },
         {
           "code": "V1",
           "tier": 3,
-          "start": 45.65,
+          "start": 45.7,
           "stop": 61.25,
-          "duration": 15.6,
+          "duration": 15.55,
           "lick": "WTTJ-V1"
         },
         {
