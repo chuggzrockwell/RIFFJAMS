@@ -199,6 +199,16 @@
     });
   }
   const savedFolder = () => idb('readonly', (st) => st.get('root')).catch(() => null);
+  /* Chrome can stall a folder permission check indefinitely (seen 2026-11-27: queryPermission on a
+     saved handle never settled, so start() never reached the gate and the board stayed blank).
+     Every permission call goes through this so a stall ends in a message instead of nothing. */
+  const PERM_TIMEOUT_MS = 5000;
+  const STALL_MSG = 'Chrome didn’t answer the folder permission check. Quit and reopen Chrome, then reload this page, or choose the folder again.';
+  function withTimeout(p, ms) {
+    let t;
+    return Promise.race([p, new Promise((_, rej) => { t = setTimeout(() => rej(Object.assign(new Error(STALL_MSG), { name: 'TimeoutError' })), ms); })])
+      .finally(() => clearTimeout(t));
+  }
   const rememberFolder = (h) => idb('readwrite', (st) => st.put(h, 'root')).catch(() => {});
   async function fileIn(dir, path) {
     const parts = path.split('/');
@@ -1106,7 +1116,8 @@
 
   function renderTune(sb) {
     const code = playingCode() || focusCode || state.looper[0];
-    const bpm = code ? chipBpm(code) : null;
+    const chip = code ? chipsByCode[code] : null;   // missing before the chip folder opens, or if manifest.json dropped it
+    const bpm = chip ? chipBpm(code) : null;
 
     const tempo = vstack(8);
     tempo.append(el('div', 'label', 'TEMPO · ALL CHIPS'));
@@ -1121,11 +1132,11 @@
     key.append(stepper('Tuning', 'A = ' + (A4 + state.hzGlobal) + ' Hz', () => setHzGlobal(state.hzGlobal - 1), () => setHzGlobal(state.hzGlobal + 1), 'tuning of all chips by 1 Hz', () => setHzGlobal(0)));
     sb.append(key);
 
-    if (code) {
+    if (chip) {
       const p = chipPitch(code);
       const one = vstack(8);
-      const nm = lab(code) + ' (' + chipsByCode[code].song + ')';
-      one.append(el('div', 'label', 'THIS CHIP · ' + lab(code) + ' · ' + chipsByCode[code].song.toUpperCase()));
+      const nm = lab(code) + ' (' + chip.song + ')';
+      one.append(el('div', 'label', 'THIS CHIP · ' + lab(code) + ' · ' + chip.song.toUpperCase()));
       one.append(stepper('Key', signed(p.key, ' st'), () => setChipPitch(code, 'key', -1), () => setChipPitch(code, 'key', 1), 'key of ' + nm + ' by a semitone', () => resetChipPitch(code, 'key')));
       one.append(stepper('Tuning', signed(p.hz, ' Hz'), () => setChipPitch(code, 'hz', -1), () => setChipPitch(code, 'hz', 1), 'tuning of ' + nm + ' by 1 Hz', () => resetChipPitch(code, 'hz')));
       const total = semitonesFor(code);
@@ -2186,9 +2197,15 @@
     const url = new URLSearchParams(location.search).get('audio');
     if (url) { source = urlSource(url); return boot(await source.manifest()); }
     if (!window.showDirectoryPicker) return gate('none');
-    const h = await savedFolder();
-    if (h && (await h.queryPermission({ mode: 'readwrite' })) === 'granted') {
-      try { return await openFolder(h); } catch (e) { return gate('choose', null, e); }   // folder moved or renamed
+    const h = await withTimeout(savedFolder(), PERM_TIMEOUT_MS).catch(() => null);
+    if (h) {
+      let perm;
+      try { perm = await withTimeout(h.queryPermission({ mode: 'readwrite' }), PERM_TIMEOUT_MS); }
+      catch (e) { return gate('stalled', h); }   // permission check never answered
+      if (perm === 'granted') {
+        try { return await withTimeout(openFolder(h), PERM_TIMEOUT_MS * 3); }
+        catch (e) { return gate(e && e.name === 'TimeoutError' ? 'stalled' : 'choose', h, e && e.name === 'TimeoutError' ? null : e); }   // folder moved, renamed or unreachable
+      }
     }
     gate(h ? 'reconnect' : 'choose', h);
   }
@@ -2213,7 +2230,9 @@
       ? 'The Loop Station plays audio from a folder on your computer, which needs Chrome or Edge on a computer.'
       : kind === 'reconnect'
         ? 'Allow the Loop Station to open your chip folder “' + h.name + '” again.'
-        : 'Choose the folder with your chips: ' + CHIP_PATH + ' (it holds manifest.json and the audio folder). The audio stays on your computer.';
+        : kind === 'stalled'
+          ? 'Chrome didn’t answer the permission check for your chip folder “' + h.name + '”. Quit and reopen Chrome, then reload this page, or choose the folder again.'
+          : 'Choose the folder with your chips: ' + CHIP_PATH + ' (it holds manifest.json and the audio folder). The audio stays on your computer.';
     $('gateErr').textContent = err ? (err.message || String(err)) : '';
     const main = $('gateBtn'), other = $('gateOther');
     main.hidden = kind === 'none';
@@ -2223,7 +2242,7 @@
       try {
         let dir = h;
         if (pick) dir = await pickFolder();
-        else if ((await h.requestPermission({ mode: 'readwrite' })) !== 'granted') return;
+        else if ((await withTimeout(h.requestPermission({ mode: 'readwrite' }), PERM_TIMEOUT_MS)) !== 'granted') return;
         await openFolder(dir);
       } catch (e) {
         if (e && e.name === 'AbortError') return;
