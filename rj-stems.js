@@ -59,10 +59,17 @@
   }
   async function sub(dir, name) { try { return await dir.getDirectoryHandle(name); } catch (e) { return null; } }
   var songsDir = null, index = null, need = null;   // need: {kind: 'choose'|'allow'|'nosongs'|'none'|'error', name}
+  /* Chrome can stall a folder permission check indefinitely; a stall becomes a readable error. */
+  var PERM_TIMEOUT_MS = 5000;
+  function withTimeout(p, ms) {
+    var t;
+    return Promise.race([p, new Promise(function (_, rej) { t = setTimeout(function () { rej(new Error("Chrome didn’t answer the folder permission check. Quit and reopen Chrome, or choose the folder again.")); }, ms); })])
+      .finally(function () { clearTimeout(t); });
+  }
   async function openFolder(h, interactive) {
     var q = { mode: "read" };
-    var p = await h.queryPermission(q);
-    if (p !== "granted" && interactive) p = await h.requestPermission(q);
+    var p = await withTimeout(h.queryPermission(q), PERM_TIMEOUT_MS);
+    if (p !== "granted" && interactive) p = await withTimeout(h.requestPermission(q), PERM_TIMEOUT_MS);
     if (p !== "granted") { need = { kind: "allow", name: h.name }; return null; }
     var d = await sub(h, "songs");
     if (!d) { var inner = await sub(h, CHIP_FOLDER); if (inner) d = await sub(inner, "songs"); }

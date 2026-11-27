@@ -600,14 +600,26 @@
     for (var i = 0; i < parts.length - 1; i++) dir = await dir.getDirectoryHandle(parts[i]);
     return (await dir.getFileHandle(parts[parts.length - 1])).getFile();
   }
+  /* Chrome can stall a folder permission check indefinitely; treat a stall as "not granted" so
+     the Allow / Choose folder banner shows instead of playback silently never starting. */
+  var PERM_TIMEOUT_MS = 5000;
+  function withTimeout(p, ms) {
+    var t;
+    return Promise.race([p, new Promise(function (_, rej) { t = setTimeout(function () { rej(new Error("permission check timed out")); }, ms); })])
+      .finally(function () { clearTimeout(t); });
+  }
   /** Folder handle with read permission, or null (then the banner asks for it). */
   async function ensureRoot(interactive) {
     if (!rootHandle) { try { rootHandle = await idb("readonly", function (st) { return st.get("root"); }); } catch (e) { rootHandle = null; } }
     if (!rootHandle) return null;
     var q = { mode: "read" };
-    var p = await rootHandle.queryPermission(q);
+    var p = null;
+    try { p = await withTimeout(rootHandle.queryPermission(q), PERM_TIMEOUT_MS); } catch (e) { p = null; }
     if (p === "granted") return rootHandle;
-    if (interactive) { p = await rootHandle.requestPermission(q); if (p === "granted") return rootHandle; }
+    if (interactive) {
+      try { p = await withTimeout(rootHandle.requestPermission(q), PERM_TIMEOUT_MS); } catch (e) { p = null; }
+      if (p === "granted") return rootHandle;
+    }
     return null;
   }
   function flushWaiting() { var w = waiting.slice(); waiting = []; w.forEach(function (fn) { try { fn(); } catch (e) {} }); }
